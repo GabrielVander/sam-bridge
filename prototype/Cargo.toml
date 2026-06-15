@@ -1,0 +1,8 @@
+[package]
+name = "prototype"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sam_site = { path = "../sam_site" }
+tokio = { version = "1.52.3", features = ["full"] }

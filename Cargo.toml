@@ -1,0 +1,5 @@
+[workspace]
+members = ["prototype", "sam_site", "students"]
+resolver = "3"
+
+[workspace.dependencies]
