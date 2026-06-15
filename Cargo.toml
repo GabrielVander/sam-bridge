@@ -1,5 +1,5 @@
 [workspace]
-members = ["prototype", "sam_site", "students"]
+members = ["app_prototype", "lib_sam_site", "lib_students"]
 resolver = "3"
 
 [workspace.dependencies]

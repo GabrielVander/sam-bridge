@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use reqwest::Client;
 
-use students::domain::entities::{MusicianLevel, OrganistLevel, Region, Student, StudentPosition};
+use lib_students::domain::entities::{
+    MusicianLevel, OrganistLevel, Region, Student, StudentPosition,
+};
 
 #[derive(serde::Deserialize, Debug)]
 struct StudentResponseJson {

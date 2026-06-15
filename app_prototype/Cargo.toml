@@ -1,8 +1,8 @@
 [package]
-name = "prototype"
+name = "app_prototype"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-sam_site = { path = "../sam_site" }
+lib_sam_site = { path = "../lib_sam_site" }
 tokio = { version = "1.52.3", features = ["full"] }
