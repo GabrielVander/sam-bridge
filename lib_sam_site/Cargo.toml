@@ -8,3 +8,4 @@ lib_students = { path = "../lib_students" }
 reqwest = { version = "0.13.4", features = ["form", "cookies", "json"] }
 serde = { version = "1.0.228", features = ["derive"] }
 regex = "1.12.4"
+thiserror = "2.0.18"

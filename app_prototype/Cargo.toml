@@ -5,4 +5,7 @@ edition = "2024"
 
 [dependencies]
 lib_sam_site = { path = "../lib_sam_site" }
+lib_students = { path = "../lib_students" }
 tokio = { version = "1.52.3", features = ["full"] }
+crossterm = "0.29.0"
+ratatui = "0.30.2"
