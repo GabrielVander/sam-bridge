@@ -1,10 +1,10 @@
 [package]
-name = "lib_sam_site"
+name = "sam_site"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-lib_students = { path = "../lib_students" }
+student_management = { path = "../student_management" }
 reqwest = { version = "0.13.4", features = ["form", "cookies", "json"] }
 serde = { version = "1.0.228", features = ["derive"] }
 regex = "1.12.4"

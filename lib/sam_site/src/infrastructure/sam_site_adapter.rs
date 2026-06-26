@@ -2,7 +2,7 @@ use reqwest::StatusCode;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-use lib_students::domain::entities::{
+use student_management::domain::entities::{
     MusicianLevel, OrganistLevel, Region, Student, StudentPosition,
 };
 

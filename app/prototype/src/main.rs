@@ -3,8 +3,6 @@ use crossterm::{
     execute,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use lib_sam_site::infrastructure::sam_site_adapter::{AdapterError, SamSiteAdapter};
-use lib_students::domain::entities::{Student, StudentPosition};
 use ratatui::{
     Frame, Terminal,
     backend::CrosstermBackend,
@@ -12,7 +10,9 @@ use ratatui::{
     style::{Color, Modifier, Style},
     widgets::{Block, Borders, Cell, Paragraph, Row, Table, TableState},
 };
+use sam_site::infrastructure::sam_site_adapter::{AdapterError, SamSiteAdapter};
 use std::{error::Error, io, rc::Rc, time::Duration};
+use student_management::domain::entities::{Student, StudentPosition};
 use tokio::sync::mpsc;
 
 enum AppEvent {

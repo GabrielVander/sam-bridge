@@ -1,5 +1,5 @@
 [workspace]
-members = ["app_cross_platform_client","app_prototype", "lib_sam_site", "lib_students"]
+members = ["app/prototype", "lib/sam_site", "lib/student_management"]
 resolver = "3"
 
 [workspace.dependencies]

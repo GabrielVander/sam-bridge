@@ -1,11 +1,11 @@
 [package]
-name = "app_prototype"
+name = "prototype"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-lib_sam_site = { path = "../lib_sam_site" }
-lib_students = { path = "../lib_students" }
+sam_site = { path = "../../lib/sam_site" }
+student_management = { path = "../../lib/student_management" }
 tokio = { version = "1.52.3", features = ["full"] }
 crossterm = "0.29.0"
 ratatui = "0.30.2"

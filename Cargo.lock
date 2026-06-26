@@ -24,21 +24,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 
 [[package]]
-name = "app_cross_platform_client"
-version = "0.1.0"
-
-[[package]]
-name = "app_prototype"
-version = "0.1.0"
-dependencies = [
- "crossterm",
- "lib_sam_site",
- "lib_students",
- "ratatui",
- "tokio",
-]
-
-[[package]]
 name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1060,21 +1045,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
-name = "lib_sam_site"
-version = "0.1.0"
-dependencies = [
- "lib_students",
- "regex",
- "reqwest",
- "serde",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "lib_students"
-version = "0.1.0"
-
-[[package]]
 name = "libc"
 version = "0.2.186"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1468,6 +1438,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8fd00f0bb2e90d81d1044c2b32617f68fcb9fa3bb7640c23e9c748e53fb30934"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "prototype"
+version = "0.1.0"
+dependencies = [
+ "crossterm",
+ "ratatui",
+ "sam_site",
+ "student_management",
+ "tokio",
 ]
 
 [[package]]
@@ -1919,6 +1900,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
+name = "sam_site"
+version = "0.1.0"
+dependencies = [
+ "regex",
+ "reqwest",
+ "serde",
+ "student_management",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "same-file"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2156,6 +2148,10 @@ dependencies = [
  "quote",
  "syn 2.0.117",
 ]
+
+[[package]]
+name = "student_management"
+version = "0.1.0"
 
 [[package]]
 name = "subtle"
