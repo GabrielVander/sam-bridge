@@ -11,6 +11,7 @@ pub struct Student {
 pub enum StudentPosition {
     Musician { level: MusicianLevel },
     Organist { level: OrganistLevel },
+    Secretary { r#type: SecretaryType },
     Unknown(String),
 }
 
@@ -42,4 +43,10 @@ pub enum Region {
     AraraquaraSaoCarlos,
     AraraquaraItirapina,
     Other(String),
+}
+
+#[derive(Debug)]
+pub enum SecretaryType {
+    Gem,
+    Music,
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/adapters/students_presenter.dart';
-import 'package:flutter_application/adapters/view_models.dart';
 import 'package:flutter_application/adapters/views.dart';
 import 'package:flutter_application/frb_generated.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

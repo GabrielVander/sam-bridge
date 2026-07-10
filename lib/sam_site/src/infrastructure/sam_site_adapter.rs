@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 
 use student_management::domain::{
-    entities::{MusicianLevel, OrganistLevel, Region, Student, StudentPosition},
+    entities::{MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition},
     gateway::StudentGateway,
 };
 
@@ -219,6 +219,12 @@ impl StudentResponseJson {
             },
             "ORGANISTA" => StudentPosition::Organist {
                 level: self.parse_organist_level(raw_level),
+            },
+            "SECRETÁRIO DO GEM" => StudentPosition::Secretary {
+                r#type: SecretaryType::Gem,
+            },
+            "SECRETÁRIO DA MÚSICA" => StudentPosition::Secretary {
+                r#type: SecretaryType::Music,
             },
             other => StudentPosition::Unknown(other.to_owned()),
         }
