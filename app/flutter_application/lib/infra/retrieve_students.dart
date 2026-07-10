@@ -3,8 +3,14 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
+import '../adapters/view_models.dart';
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-String greet({required String name}) =>
-    RustLib.instance.api.crateApiSimpleGreet(name: name);
+Future<List<SingleStudentViewModel>> retrieveStudentsDefault({
+  required String user,
+  required String pass,
+}) => RustLib.instance.api.crateInfraRetrieveStudentsRetrieveStudentsDefault(
+  user: user,
+  pass: pass,
+);
