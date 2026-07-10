@@ -1,6 +1,5 @@
 [workspace]
 members = [
-  "app/prototype",
   "lib/sam_site",
   "lib/student_management",
   "app/flutter_application/rust",
