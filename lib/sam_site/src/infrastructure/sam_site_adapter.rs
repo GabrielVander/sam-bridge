@@ -1,9 +1,11 @@
+use async_trait::async_trait;
 use reqwest::StatusCode;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-use student_management::domain::entities::{
-    MusicianLevel, OrganistLevel, Region, Student, StudentPosition,
+use student_management::domain::{
+    entities::{MusicianLevel, OrganistLevel, Region, Student, StudentPosition},
+    gateway::StudentGateway,
 };
 
 #[derive(thiserror::Error, Debug)]
@@ -116,6 +118,17 @@ impl SamSiteAdapter {
         }
 
         Ok(())
+    }
+}
+
+#[async_trait]
+impl StudentGateway for SamSiteAdapter {
+    async fn login(&self, username: String, password: String) -> Result<(), String> {
+        self.login(username, password).await
+    }
+
+    async fn get_avaliable_records(&self) -> Result<Vec<Student>, String> {
+        self.get_students().await.map_err(|e| e.to_string())
     }
 }
 

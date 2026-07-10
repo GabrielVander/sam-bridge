@@ -1,28 +1,26 @@
-use std::future::Future;
+use crate::domain::gateway::StudentGateway;
 
 use super::entities::Student;
 
-async fn retrieve_students<GetAllStudents, GetAllStudentsFuture>(
-    get_all_students_op: GetAllStudents,
-) -> Result<Vec<Student>, RetrieveStudentError>
-where
-    GetAllStudents: Fn() -> GetAllStudentsFuture,
-    GetAllStudentsFuture: Future<Output = Result<Vec<Student>, String>>,
-{
-    get_all_students_op()
-        .await
-        .map_err(RetrieveStudentError::from)
+pub struct RetrieveStudentsImpl<'a, T: StudentGateway> {
+    gateway: &'a T,
 }
 
-enum RetrieveStudentError {
+impl<'a, T: StudentGateway> RetrieveStudentsImpl<'a, T> {
+    pub async fn retrieve_students(&self) -> Result<Vec<Student>, RetrieveStudentsError> {
+        self.gateway
+            .get_avaliable_records()
+            .await
+            .map_err(RetrieveStudentsError::from)
+    }
+}
+
+pub enum RetrieveStudentsError {
     Generic(String),
 }
 
-impl From<String> for RetrieveStudentError {
-    fn from(value: String) -> RetrieveStudentError {
-        RetrieveStudentError::Generic(format!(
-            "Students retrieval failed unexpectedly: {:?}",
-            value
-        ))
+impl From<String> for RetrieveStudentsError {
+    fn from(value: String) -> RetrieveStudentsError {
+        RetrieveStudentsError::Generic(value)
     }
 }

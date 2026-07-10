@@ -1,2 +1,3 @@
 pub mod entities;
-mod use_cases;
+pub mod gateway;
+pub mod use_cases;
