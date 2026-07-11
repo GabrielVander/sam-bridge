@@ -1,11 +1,13 @@
 use sam_site::infrastructure::sam_site_adapter::SamSiteAdapter;
+use student_management::domain::gateway::StudentGateway;
 
-use crate::adapters::view_models::SingleStudentViewModel;
+use crate::adapters::view_models::SingleLessonViewModel;
 
-pub async fn retrieve_students_default(
+pub async fn retrieve_student_lessons(
     user: String,
     pass: String,
-) -> Result<Vec<SingleStudentViewModel>, String> {
+    student: String,
+) -> Result<Vec<SingleLessonViewModel>, String> {
     let adapter: SamSiteAdapter = SamSiteAdapter::new("https://musical.congregacao.org.br/")
         .map_err(|e| format!("{:#?}", e))?;
 
@@ -15,10 +17,10 @@ pub async fn retrieve_students_default(
         .map_err(|e| format!("{:#?}", e))?;
 
     Ok(adapter
-        .get_students()
+        .get_all_lessons_for_student_with_id(&student)
         .await
         .map_err(|e| format!("{:#?}", e))?
         .iter()
-        .map(SingleStudentViewModel::from)
+        .map(SingleLessonViewModel::from)
         .collect())
 }

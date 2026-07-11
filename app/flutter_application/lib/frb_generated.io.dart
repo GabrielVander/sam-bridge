@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;
 import 'frb_generated.dart';
+import 'infra/retrieve_student_lessons.dart';
 import 'infra/retrieve_students.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
 
@@ -26,9 +27,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<SingleLessonViewModel> dco_decode_list_single_lesson_view_model(
+    dynamic raw,
+  );
+
+  @protected
   List<SingleStudentViewModel> dco_decode_list_single_student_view_model(
     dynamic raw,
   );
+
+  @protected
+  SingleLessonViewModel dco_decode_single_lesson_view_model(dynamic raw);
 
   @protected
   SingleStudentViewModel dco_decode_single_student_view_model(dynamic raw);
@@ -46,7 +55,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<SingleLessonViewModel> sse_decode_list_single_lesson_view_model(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<SingleStudentViewModel> sse_decode_list_single_student_view_model(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SingleLessonViewModel sse_decode_single_lesson_view_model(
     SseDeserializer deserializer,
   );
 
@@ -77,8 +96,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_single_lesson_view_model(
+    List<SingleLessonViewModel> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_single_student_view_model(
     List<SingleStudentViewModel> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_single_lesson_view_model(
+    SingleLessonViewModel self,
     SseSerializer serializer,
   );
 

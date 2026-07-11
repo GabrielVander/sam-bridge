@@ -6,7 +6,54 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`
+
+class SingleLessonViewModel {
+  final String id;
+  final String date;
+  final String phase;
+  final String page;
+  final String lesson;
+  final String clef;
+  final String description;
+  final String instructor;
+
+  const SingleLessonViewModel({
+    required this.id,
+    required this.date,
+    required this.phase,
+    required this.page,
+    required this.lesson,
+    required this.clef,
+    required this.description,
+    required this.instructor,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      date.hashCode ^
+      phase.hashCode ^
+      page.hashCode ^
+      lesson.hashCode ^
+      clef.hashCode ^
+      description.hashCode ^
+      instructor.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SingleLessonViewModel &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          date == other.date &&
+          phase == other.phase &&
+          page == other.page &&
+          lesson == other.lesson &&
+          clef == other.clef &&
+          description == other.description &&
+          instructor == other.instructor;
+}
 
 class SingleStudentViewModel {
   final String id;

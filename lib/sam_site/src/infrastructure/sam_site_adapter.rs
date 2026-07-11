@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use std::sync::OnceLock;
 use std::{collections::HashMap, str::Split};
+use student_management::domain::entities::{Clef, Lesson, Range};
 
 use student_management::domain::{
     entities::{MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition},
@@ -29,36 +30,82 @@ pub enum AdapterError {
 pub struct SamSiteAdapter {
     client: reqwest::Client,
     base_url: String,
-    session_id: Option<String>,
 }
 
 impl SamSiteAdapter {
     pub fn new(base_url: &str) -> Result<Self, AdapterError> {
         let client = reqwest::Client::builder()
             .redirect(reqwest::redirect::Policy::none())
-            .cookie_store(true) // Automatically handles the session cookie
+            .cookie_store(true)
             .build()?;
 
         Ok(Self {
             client,
             base_url: base_url.to_owned(),
-            session_id: None,
         })
     }
 
-    pub async fn login(&mut self, user: &str, password: &str) -> Result<String, AdapterError> {
-        let session_id: String = self.perform_auth_request(user, password).await?;
-
-        self.session_id = Some(session_id.clone());
-
-        Ok(session_id)
+    pub async fn login(&self, user: &str, password: &str) -> Result<String, AdapterError> {
+        self.perform_auth_request(user, password).await
     }
 
     pub async fn get_students(&self) -> Result<Vec<Student>, AdapterError> {
-        // Visit the main panel first to set any necessary state/cookies
         self.visit_main_page().await?;
         let response_json: StudentResponseJson = self.retrieve_student_listing().await?;
         response_json.to_entity()
+    }
+
+    pub async fn get_student_lessons(&self, id: &str) -> Result<Vec<Lesson>, AdapterError> {
+        let url: String = format!("{}/licoes/index/{}", self.base_url, id);
+
+        let raw_response: String = self.client.get(&url).send().await?.text().await?;
+
+        let document: scraper::Html = scraper::Html::parse_document(&raw_response);
+
+        let msa_row_selector: scraper::Selector =
+            scraper::Selector::parse(r#"tr[id^="msa_"]"#).expect("Failed to parse row selector");
+        let cell_selector: scraper::Selector =
+            scraper::Selector::parse("td").expect("Failed to parse td selector");
+
+        let mut lessons: Vec<Lesson> = Vec::new();
+
+        for row in document.select(&msa_row_selector) {
+            let id: String = row.value().attr("id").unwrap_or("unknown_id").to_string();
+            let mut data: scraper::element_ref::Select = row.select(&cell_selector);
+
+            let date: String = Self::extract_text(&mut data);
+            let phase: Option<Range> = Self::parse_fragment(&Self::extract_text(&mut data));
+            let page: Option<Range> = Self::parse_fragment(&Self::extract_text(&mut data));
+            let lesson_frag: Option<Range> = Self::parse_fragment(&Self::extract_text(&mut data));
+            let clef: Option<Clef> = Self::parse_clef(&Self::extract_text(&mut data));
+
+            let desc_text: String = Self::extract_text(&mut data);
+            let description: Option<String> = if desc_text.is_empty() {
+                None
+            } else {
+                Some(desc_text)
+            };
+
+            let inst_text: String = Self::extract_text(&mut data);
+            let instructor: Option<String> = if inst_text.is_empty() {
+                None
+            } else {
+                Some(inst_text)
+            };
+
+            lessons.push(Lesson {
+                id,
+                date,
+                phase,
+                page,
+                lesson: lesson_frag,
+                clef,
+                description,
+                instructor,
+            });
+        }
+
+        Ok(lessons)
     }
 
     async fn perform_auth_request(
@@ -109,27 +156,75 @@ impl SamSiteAdapter {
         let url: String = format!("{}/alunos/listagem", self.base_url);
         let referer_url: String = format!("{}/alunos", self.base_url);
 
-        let request: reqwest::RequestBuilder = self
+        let response: reqwest::Response = self
             .client
             .post(&url)
             .header("X-Requested-With", "XMLHttpRequest")
             .header("Referer", referer_url)
-            .form(&form);
+            .form(&form)
+            .send()
+            .await?;
 
-        let response: reqwest::Response = request.send().await?;
         let json: StudentResponseJson = response.json::<StudentResponseJson>().await?;
         Ok(json)
+    }
+
+    fn extract_text<'a, I>(iter: &mut I) -> String
+    where
+        I: Iterator<Item = scraper::ElementRef<'a>>,
+    {
+        iter.next()
+            .map(|td| td.text().collect::<Vec<_>>().join(" ").trim().to_string())
+            .unwrap_or_default()
+    }
+
+    fn parse_fragment(val: &str) -> Option<Range> {
+        if val.is_empty() {
+            return None;
+        }
+        let parts: Vec<&str> = val.split('-').map(|s| s.trim()).collect();
+        if parts.len() == 2 {
+            Some(Range {
+                from: parts[0].to_string(),
+                to: parts[1].to_string(),
+            })
+        } else if parts.len() == 1 {
+            Some(Range {
+                from: parts[0].to_string(),
+                to: parts[0].to_string(),
+            })
+        } else {
+            None
+        }
+    }
+
+    fn parse_clef(val: &str) -> Option<Clef> {
+        match val.to_uppercase().as_str() {
+            "SOL" => Some(Clef::G),
+            "FÁ" | "FA" => Some(Clef::F),
+            "DÓ" | "DO" => Some(Clef::C),
+            _ => None,
+        }
     }
 }
 
 #[async_trait]
 impl StudentGateway for SamSiteAdapter {
     async fn login(&self, username: String, password: String) -> Result<(), String> {
-        self.login(username, password).await
+        self.login(&username, &password)
+            .await
+            .map(|_| ())
+            .map_err(|e| e.to_string())
     }
 
     async fn get_avaliable_records(&self) -> Result<Vec<Student>, String> {
         self.get_students().await.map_err(|e| e.to_string())
+    }
+
+    async fn get_all_lessons_for_student_with_id(&self, id: &str) -> Result<Vec<Lesson>, String> {
+        self.get_student_lessons(id)
+            .await
+            .map_err(|e| e.to_string())
     }
 }
 

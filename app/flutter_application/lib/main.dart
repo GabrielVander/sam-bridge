@@ -53,6 +53,9 @@ class MainScreen extends StatelessWidget {
               message: "Retrieving data...",
             ),
             StudentsViewLoaded() => TableView(students: state.students),
+            StudentsViewLessonsLoaded() => LessonsListView(
+              lessons: state.lessons,
+            ),
             StudentsViewError() => ErrorView(
               errorMessage: state.message,
               onBackButtonPressed: () =>

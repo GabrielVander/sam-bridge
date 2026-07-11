@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
+import 'infra/retrieve_student_lessons.dart';
 import 'infra/retrieve_students.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -67,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => 629914153;
+  int get rustContentHash => 334307010;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -80,6 +81,13 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
 abstract class RustLibApi extends BaseApi {
   Future<void> crateInfraInitInitApp();
+
+  Future<List<SingleLessonViewModel>>
+  crateInfraRetrieveStudentLessonsRetrieveStudentLessons({
+    required String user,
+    required String pass,
+    required String student,
+  });
 
   Future<List<SingleStudentViewModel>>
   crateInfraRetrieveStudentsRetrieveStudentsDefault({
@@ -124,6 +132,46 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "init_app", argNames: []);
 
   @override
+  Future<List<SingleLessonViewModel>>
+  crateInfraRetrieveStudentLessonsRetrieveStudentLessons({
+    required String user,
+    required String pass,
+    required String student,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(user, serializer);
+          sse_encode_String(pass, serializer);
+          sse_encode_String(student, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_single_lesson_view_model,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta:
+            kCrateInfraRetrieveStudentLessonsRetrieveStudentLessonsConstMeta,
+        argValues: [user, pass, student],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateInfraRetrieveStudentLessonsRetrieveStudentLessonsConstMeta =>
+      const TaskConstMeta(
+        debugName: "retrieve_student_lessons",
+        argNames: ["user", "pass", "student"],
+      );
+
+  @override
   Future<List<SingleStudentViewModel>>
   crateInfraRetrieveStudentsRetrieveStudentsDefault({
     required String user,
@@ -138,7 +186,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 3,
             port: port_,
           );
         },
@@ -173,6 +221,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<SingleLessonViewModel> dco_decode_list_single_lesson_view_model(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_single_lesson_view_model)
+        .toList();
+  }
+
+  @protected
   List<SingleStudentViewModel> dco_decode_list_single_student_view_model(
     dynamic raw,
   ) {
@@ -180,6 +238,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return (raw as List<dynamic>)
         .map(dco_decode_single_student_view_model)
         .toList();
+  }
+
+  @protected
+  SingleLessonViewModel dco_decode_single_lesson_view_model(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return SingleLessonViewModel(
+      id: dco_decode_String(arr[0]),
+      date: dco_decode_String(arr[1]),
+      phase: dco_decode_String(arr[2]),
+      page: dco_decode_String(arr[3]),
+      lesson: dco_decode_String(arr[4]),
+      clef: dco_decode_String(arr[5]),
+      description: dco_decode_String(arr[6]),
+      instructor: dco_decode_String(arr[7]),
+    );
   }
 
   @protected
@@ -223,6 +299,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<SingleLessonViewModel> sse_decode_list_single_lesson_view_model(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <SingleLessonViewModel>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_single_lesson_view_model(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<SingleStudentViewModel> sse_decode_list_single_student_view_model(
     SseDeserializer deserializer,
   ) {
@@ -234,6 +324,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ans_.add(sse_decode_single_student_view_model(deserializer));
     }
     return ans_;
+  }
+
+  @protected
+  SingleLessonViewModel sse_decode_single_lesson_view_model(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_date = sse_decode_String(deserializer);
+    var var_phase = sse_decode_String(deserializer);
+    var var_page = sse_decode_String(deserializer);
+    var var_lesson = sse_decode_String(deserializer);
+    var var_clef = sse_decode_String(deserializer);
+    var var_description = sse_decode_String(deserializer);
+    var var_instructor = sse_decode_String(deserializer);
+    return SingleLessonViewModel(
+      id: var_id,
+      date: var_date,
+      phase: var_phase,
+      page: var_page,
+      lesson: var_lesson,
+      clef: var_clef,
+      description: var_description,
+      instructor: var_instructor,
+    );
   }
 
   @protected
@@ -293,6 +408,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_single_lesson_view_model(
+    List<SingleLessonViewModel> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_single_lesson_view_model(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_single_student_view_model(
     List<SingleStudentViewModel> self,
     SseSerializer serializer,
@@ -302,6 +429,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     for (final item in self) {
       sse_encode_single_student_view_model(item, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_single_lesson_view_model(
+    SingleLessonViewModel self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.date, serializer);
+    sse_encode_String(self.phase, serializer);
+    sse_encode_String(self.page, serializer);
+    sse_encode_String(self.lesson, serializer);
+    sse_encode_String(self.clef, serializer);
+    sse_encode_String(self.description, serializer);
+    sse_encode_String(self.instructor, serializer);
   }
 
   @protected
