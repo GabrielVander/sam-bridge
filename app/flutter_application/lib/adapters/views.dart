@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/adapters/students_presenter.dart';
 import 'package:flutter_application/adapters/view_models.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginForm extends StatefulWidget {
   final void Function(String, String) onSubmitted;
@@ -165,6 +167,23 @@ class TableView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
+            onChanged: (String content) =>
+                context.read<StudentsPresenter>().search(content),
+            decoration: InputDecoration(
+              hintText: 'Search students...',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ),
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,

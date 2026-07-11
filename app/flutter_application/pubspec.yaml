@@ -37,6 +37,7 @@ dependencies:
   flutter_rust_bridge: 2.13.0-beta.2
   flutter_rust_bridge_hooks: 2.13.0-beta.2
   flutter_bloc: ^9.1.1
+  fuzzy: ^0.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
