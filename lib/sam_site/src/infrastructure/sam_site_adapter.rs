@@ -1,7 +1,6 @@
 use async_trait::async_trait;
-use reqwest::StatusCode;
-use std::collections::HashMap;
 use std::sync::OnceLock;
+use std::{collections::HashMap, str::Split};
 
 use student_management::domain::{
     entities::{MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition},
@@ -18,8 +17,8 @@ pub enum AdapterError {
     MissingSessionId,
     #[error("Expected network response status {expected}, but got {actual}")]
     UnexpectedStatus {
-        expected: StatusCode,
-        actual: StatusCode,
+        expected: reqwest::StatusCode,
+        actual: reqwest::StatusCode,
     },
     #[error("Missing required field in response: {0}")]
     MissingField(&'static str),
@@ -48,9 +47,18 @@ impl SamSiteAdapter {
     }
 
     pub async fn login(&mut self, user: &str, password: &str) -> Result<String, AdapterError> {
-        let session_id = self.perform_auth_request(user, password).await?;
+        let session_id: String = self.perform_auth_request(user, password).await?;
+
         self.session_id = Some(session_id.clone());
+
         Ok(session_id)
+    }
+
+    pub async fn get_students(&self) -> Result<Vec<Student>, AdapterError> {
+        // Visit the main panel first to set any necessary state/cookies
+        self.visit_main_page().await?;
+        let response_json: StudentResponseJson = self.retrieve_student_listing().await?;
+        response_json.to_entity()
     }
 
     async fn perform_auth_request(
@@ -62,10 +70,10 @@ impl SamSiteAdapter {
         form.insert("login", user);
         form.insert("password", password);
 
-        let url = format!("{}/autenticar", self.base_url);
-        let response = self.client.post(&url).form(&form).send().await?;
+        let url: String = format!("{}/autenticar", self.base_url);
+        let response: reqwest::Response = self.client.post(&url).form(&form).send().await?;
 
-        if response.status() == StatusCode::SEE_OTHER {
+        if response.status() == reqwest::StatusCode::SEE_OTHER {
             response
                 .cookies()
                 .last()
@@ -76,11 +84,19 @@ impl SamSiteAdapter {
         }
     }
 
-    pub async fn get_students(&self) -> Result<Vec<Student>, AdapterError> {
-        // Visit the main panel first to set any necessary state/cookies
-        self.visit_main_page().await?;
-        let response_json = self.retrieve_student_listing().await?;
-        response_json.to_entity()
+    async fn visit_main_page(&self) -> Result<(), AdapterError> {
+        let url: String = format!("{}/painel", self.base_url);
+        let response: reqwest::Response = self.client.get(&url).send().await?;
+
+        let actual_status: reqwest::StatusCode = response.status();
+        if actual_status != reqwest::StatusCode::OK {
+            return Err(AdapterError::UnexpectedStatus {
+                expected: reqwest::StatusCode::OK,
+                actual: actual_status,
+            });
+        }
+
+        Ok(())
     }
 
     async fn retrieve_student_listing(&self) -> Result<StudentResponseJson, AdapterError> {
@@ -90,34 +106,19 @@ impl SamSiteAdapter {
         form.insert("search[value]", "");
         form.insert("search[regex]", "false");
 
-        let url = format!("{}/alunos/listagem", self.base_url);
-        let referer_url = format!("{}/alunos", self.base_url);
+        let url: String = format!("{}/alunos/listagem", self.base_url);
+        let referer_url: String = format!("{}/alunos", self.base_url);
 
-        let request = self
+        let request: reqwest::RequestBuilder = self
             .client
             .post(&url)
             .header("X-Requested-With", "XMLHttpRequest")
             .header("Referer", referer_url)
             .form(&form);
 
-        let response = request.send().await?;
-        let json = response.json::<StudentResponseJson>().await?;
+        let response: reqwest::Response = request.send().await?;
+        let json: StudentResponseJson = response.json::<StudentResponseJson>().await?;
         Ok(json)
-    }
-
-    async fn visit_main_page(&self) -> Result<(), AdapterError> {
-        let url = format!("{}/painel", self.base_url);
-        let response = self.client.get(&url).send().await?;
-
-        let actual_status = response.status();
-        if actual_status != StatusCode::OK {
-            return Err(AdapterError::UnexpectedStatus {
-                expected: StatusCode::OK,
-                actual: actual_status,
-            });
-        }
-
-        Ok(())
     }
 }
 
@@ -146,37 +147,38 @@ impl StudentResponseJson {
     }
 
     fn parse_student(&self, raw_data: &[Option<String>]) -> Result<Student, AdapterError> {
-        let id = raw_data
+        let id: String = raw_data
             .first()
             .and_then(|opt| opt.as_ref())
             .ok_or(AdapterError::MissingField("ID"))?
             .to_owned();
 
-        let name = raw_data
+        let name: String = raw_data
             .get(1)
             .and_then(|opt| opt.as_ref())
             .ok_or(AdapterError::MissingField("Name"))?
             .to_owned();
 
-        let raw_location = raw_data
+        let raw_location: &String = raw_data
             .get(2)
             .and_then(|opt| opt.as_ref())
             .ok_or(AdapterError::MissingField("Location"))?;
 
-        let cleaned_location = remove_double_or_more_spaces(&remove_span_tags(raw_location));
+        let cleaned_location: String =
+            remove_double_or_more_spaces(&remove_span_tags(raw_location));
         let (location, region) = self.parse_location_and_region(&cleaned_location)?;
 
-        let raw_position = raw_data
+        let raw_position: &String = raw_data
             .get(3)
             .and_then(|opt| opt.as_ref())
             .ok_or(AdapterError::MissingField("Position"))?;
 
-        let raw_level = raw_data
+        let raw_level: &String = raw_data
             .get(5)
             .and_then(|opt| opt.as_ref())
             .ok_or(AdapterError::MissingField("Level"))?;
 
-        let position = self.parse_student_position(raw_position, raw_level);
+        let position: StudentPosition = self.parse_student_position(raw_position, raw_level);
 
         Ok(Student {
             id,
@@ -188,15 +190,15 @@ impl StudentResponseJson {
     }
 
     fn parse_location_and_region(&self, value: &str) -> Result<(String, Region), AdapterError> {
-        let mut parts = value.split('|');
+        let mut parts: Split<char> = value.split('|');
 
-        let location = parts
+        let location: String = parts
             .next()
             .ok_or_else(|| AdapterError::ParseError("Missing location data".to_string()))?
             .trim()
             .to_owned();
 
-        let raw_region = parts
+        let raw_region: &str = parts
             .next()
             .ok_or_else(|| AdapterError::ParseError("Missing region data".to_string()))?
             .trim();
@@ -258,12 +260,13 @@ impl StudentResponseJson {
 
 fn remove_span_tags(input: &str) -> String {
     static SPAN_RE: OnceLock<regex::Regex> = OnceLock::new();
-    let re = SPAN_RE.get_or_init(|| regex::Regex::new(r"<span[^>]*></span>").unwrap());
+    let re: &regex::Regex =
+        SPAN_RE.get_or_init(|| regex::Regex::new(r"<span[^>]*></span>").unwrap());
     re.replace_all(input, "").to_string()
 }
 
 fn remove_double_or_more_spaces(input: &str) -> String {
     static SPACES_RE: OnceLock<regex::Regex> = OnceLock::new();
-    let re = SPACES_RE.get_or_init(|| regex::Regex::new(r"\s{2,}").unwrap());
+    let re: &regex::Regex = SPACES_RE.get_or_init(|| regex::Regex::new(r"\s{2,}").unwrap());
     re.replace_all(input, " ").to_string()
 }
