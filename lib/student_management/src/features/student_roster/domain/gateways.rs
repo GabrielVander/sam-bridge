@@ -4,5 +4,5 @@ use crate::features::student_roster::domain::entities::Student;
 
 #[async_trait]
 pub trait StudentsRetrievalGateway {
-    async fn get_avaliable_records(&self) -> Result<Vec<Student>, String>;
+    async fn get_avaliable_records(&self) -> anyhow::Result<Vec<Student>>;
 }

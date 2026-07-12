@@ -1,5 +1,6 @@
 use std::{collections::HashMap, str::Split, sync::OnceLock};
 
+use anyhow::Context;
 use student_management::features::{
     student_lessons::domain::entities::{Clef, Lesson, Range},
     student_roster::domain::entities::{
@@ -13,11 +14,12 @@ pub struct SamClient {
 }
 
 impl SamClient {
-    pub fn new(base_url: &str) -> Result<Self, AdapterError> {
+    pub fn new(base_url: &str) -> anyhow::Result<Self> {
         let client = reqwest::Client::builder()
             .redirect(reqwest::redirect::Policy::none())
             .cookie_store(true)
-            .build()?;
+            .build()
+            .context("Unable to instantiate HTTP client")?;
 
         Ok(Self {
             client,
@@ -25,27 +27,34 @@ impl SamClient {
         })
     }
 
-    pub async fn login(&self, user: &str, password: &str) -> Result<String, AdapterError> {
+    pub async fn login(&self, user: &str, password: &str) -> anyhow::Result<String> {
         self.perform_auth_request(user, password).await
     }
 
-    pub async fn get_students(&self) -> Result<Vec<Student>, AdapterError> {
+    pub async fn get_students(&self) -> anyhow::Result<Vec<Student>> {
         self.visit_main_page().await?;
-        let response_json: StudentResponseJson = self.retrieve_student_listing().await?;
-        response_json.to_entity()
+        self.retrieve_student_listing().await?.to_entity()
     }
 
-    pub async fn get_student_lessons(&self, id: &str) -> Result<Vec<Lesson>, AdapterError> {
+    pub async fn get_student_lessons(&self, id: &str) -> anyhow::Result<Vec<Lesson>> {
         let url: String = format!("{}/licoes/index/{}", self.base_url, id);
 
-        let raw_response: String = self.client.get(&url).send().await?.text().await?;
+        let raw_response: String = self
+            .client
+            .get(&url)
+            .send()
+            .await
+            .with_context(|| format!("Student's (#{}) lessons request failed", id))?
+            .text()
+            .await
+            .with_context(|| format!("Unable to decode student's (#{}) lessons response", id))?;
 
         let document: scraper::Html = scraper::Html::parse_document(&raw_response);
 
-        let msa_row_selector: scraper::Selector =
-            scraper::Selector::parse(r#"tr[id^="msa_"]"#).expect("Failed to parse row selector");
-        let cell_selector: scraper::Selector =
-            scraper::Selector::parse("td").expect("Failed to parse td selector");
+        let msa_row_selector: scraper::Selector = scraper::Selector::parse(r#"tr[id^="msa_"]"#)
+            .map_err(|e| AdapterError::HtmlParserError(format!("{:#?}", e)))?;
+        let cell_selector: scraper::Selector = scraper::Selector::parse("td")
+            .map_err(|e| AdapterError::HtmlParserError(format!("{:#?}", e)))?;
 
         let mut lessons: Vec<Lesson> = Vec::new();
 
@@ -88,11 +97,7 @@ impl SamClient {
         Ok(lessons)
     }
 
-    async fn perform_auth_request(
-        &self,
-        user: &str,
-        password: &str,
-    ) -> Result<String, AdapterError> {
+    async fn perform_auth_request(&self, user: &str, password: &str) -> anyhow::Result<String> {
         let mut form: HashMap<&str, &str> = HashMap::new();
         form.insert("login", user);
         form.insert("password", password);
@@ -105,28 +110,33 @@ impl SamClient {
                 .cookies()
                 .last()
                 .map(|c| c.value().to_owned())
-                .ok_or(AdapterError::MissingSessionId)
+                .ok_or(anyhow::anyhow!(
+                    "No session ID was returned from the server"
+                ))
         } else {
-            Err(AdapterError::AuthFailed)
+            Err(anyhow::anyhow!("Authentication failed"))
         }
     }
 
-    async fn visit_main_page(&self) -> Result<(), AdapterError> {
+    async fn visit_main_page(&self) -> anyhow::Result<()> {
         let url: String = format!("{}/painel", self.base_url);
         let response: reqwest::Response = self.client.get(&url).send().await?;
 
         let actual_status: reqwest::StatusCode = response.status();
         if actual_status != reqwest::StatusCode::OK {
-            return Err(AdapterError::UnexpectedStatus {
-                expected: reqwest::StatusCode::OK,
-                actual: actual_status,
-            });
+            let error_msg: String = format!(
+                "Expected network response status {}, but got {}",
+                reqwest::StatusCode::OK,
+                actual_status
+            );
+
+            anyhow::bail!(error_msg);
         }
 
         Ok(())
     }
 
-    async fn retrieve_student_listing(&self) -> Result<StudentResponseJson, AdapterError> {
+    async fn retrieve_student_listing(&self) -> anyhow::Result<StudentResponseJson> {
         let mut form: HashMap<&str, &str> = HashMap::new();
         form.insert("start", "0");
         form.insert("length", "999999999");
@@ -143,10 +153,13 @@ impl SamClient {
             .header("Referer", referer_url)
             .form(&form)
             .send()
-            .await?;
+            .await
+            .context("Student listing request failed")?;
 
-        let json: StudentResponseJson = response.json::<StudentResponseJson>().await?;
-        Ok(json)
+        response
+            .json::<StudentResponseJson>()
+            .await
+            .context("Failed to decode student listing response")
     }
 
     fn extract_text<'a, I>(iter: &mut I) -> String
@@ -189,22 +202,13 @@ impl SamClient {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum AdapterError {
-    #[error("Network or request error: {0}")]
-    Request(#[from] reqwest::Error),
-    #[error("Authentication failed")]
-    AuthFailed,
-    #[error("No session ID was returned from the server")]
-    MissingSessionId,
-    #[error("Expected network response status {expected}, but got {actual}")]
-    UnexpectedStatus {
-        expected: reqwest::StatusCode,
-        actual: reqwest::StatusCode,
-    },
+enum AdapterError {
     #[error("Missing required field in response: {0}")]
     MissingField(&'static str),
     #[error("Failed to parse data: {0}")]
     ParseError(String),
+    #[error("Unable to parse html response: {0}")]
+    HtmlParserError(String),
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -213,14 +217,14 @@ struct StudentResponseJson {
 }
 
 impl StudentResponseJson {
-    pub fn to_entity(&self) -> Result<Vec<Student>, AdapterError> {
+    pub fn to_entity(&self) -> anyhow::Result<Vec<Student>> {
         self.data
             .iter()
             .map(|raw_student| self.parse_student(raw_student))
             .collect()
     }
 
-    fn parse_student(&self, raw_data: &[Option<String>]) -> Result<Student, AdapterError> {
+    fn parse_student(&self, raw_data: &[Option<String>]) -> anyhow::Result<Student> {
         let id: String = raw_data
             .first()
             .and_then(|opt| opt.as_ref())
@@ -263,7 +267,7 @@ impl StudentResponseJson {
         })
     }
 
-    fn parse_location_and_region(&self, value: &str) -> Result<(String, Region), AdapterError> {
+    fn parse_location_and_region(&self, value: &str) -> anyhow::Result<(String, Region)> {
         let mut parts: Split<char> = value.split('|');
 
         let location: String = parts

@@ -9,11 +9,7 @@ impl<'a, T: AuthGateway> LoginUseCase<'a, T> {
         Self { gateway }
     }
 
-    pub async fn execute(&self, username: String, password: String) -> Result<(), ()> {
-        self.gateway
-            .login(username, password)
-            .await
-            .inspect_err(|e| println!("{:#?}", e))
-            .map_err(|_| ())
+    pub async fn execute(&self, username: String, password: String) -> anyhow::Result<()> {
+        self.gateway.login(username, password).await
     }
 }

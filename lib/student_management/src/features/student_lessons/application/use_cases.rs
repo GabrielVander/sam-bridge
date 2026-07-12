@@ -9,24 +9,7 @@ impl<'a, T: StudentLessonsGateway> RetrieveStudentLessonsUseCase<'a, T> {
         Self { gateway }
     }
 
-    pub async fn execute(
-        &self,
-        student_id: &str,
-    ) -> Result<Vec<Lesson>, RetrieveStudentLessonsError> {
-        self.gateway
-            .get_all_for_student_with_id(student_id)
-            .await
-            .map_err(RetrieveStudentLessonsError::from)
-    }
-}
-
-#[derive(Debug)]
-pub enum RetrieveStudentLessonsError {
-    Generic(String),
-}
-
-impl From<String> for RetrieveStudentLessonsError {
-    fn from(value: String) -> RetrieveStudentLessonsError {
-        RetrieveStudentLessonsError::Generic(value)
+    pub async fn execute(&self, student_id: &str) -> anyhow::Result<Vec<Lesson>> {
+        self.gateway.get_all_for_student_with_id(student_id).await
     }
 }

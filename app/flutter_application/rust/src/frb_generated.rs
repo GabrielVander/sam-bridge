@@ -77,7 +77,7 @@ fn wire__crate__adapters__sam_site_facade__SamSiteFacade_login_impl(
             let api_password = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, ()>(
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let mut api_that_guard = None;
                         let decode_indices_ =
@@ -96,14 +96,12 @@ fn wire__crate__adapters__sam_site_facade__SamSiteFacade_login_impl(
                             }
                         }
                         let api_that_guard = api_that_guard.unwrap();
-                        let output_ok = Result::<_, ()>::Ok({
-                            crate::adapters::sam_site_facade::SamSiteFacade::login(
-                                &*api_that_guard,
-                                api_username,
-                                api_password,
-                            )
-                            .await;
-                        })?;
+                        let output_ok = crate::adapters::sam_site_facade::SamSiteFacade::login(
+                            &*api_that_guard,
+                            api_username,
+                            api_password,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -134,11 +132,12 @@ fn wire__crate__adapters__sam_site_facade__SamSiteFacade_new_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok =
-                    Result::<_, ()>::Ok(crate::adapters::sam_site_facade::SamSiteFacade::new())?;
-                Ok(output_ok)
-            })())
+            transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                (move || {
+                    let output_ok = crate::adapters::sam_site_facade::SamSiteFacade::new()?;
+                    Ok(output_ok)
+                })(),
+            )
         },
     )
 }
@@ -153,7 +152,7 @@ fn wire__crate__adapters__sam_site_facade__SamSiteFacade_retrieve_student_lesson
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SamSiteFacade>>>::sse_decode(&mut deserializer);
 let api_student_id = <String>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
-                    transform_result_sse::<_, String>((move || async move {
+                    transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>((move || async move {
                         let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
         for i in decode_indices_ {
@@ -194,7 +193,7 @@ fn wire__crate__adapters__sam_site_facade__SamSiteFacade_retrieve_students_impl(
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, String>(
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let mut api_that_guard = None;
                         let decode_indices_ =
@@ -268,6 +267,14 @@ flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
 );
 
 // Section: dart2rust
+
+impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <String>::sse_decode(deserializer);
+        return flutter_rust_bridge::for_generated::anyhow::anyhow!("{}", inner);
+    }
+}
 
 impl SseDecode for SamSiteFacade {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -524,6 +531,13 @@ impl flutter_rust_bridge::IntoIntoDart<crate::adapters::view_models::SingleStude
 {
     fn into_into_dart(self) -> crate::adapters::view_models::SingleStudentViewModel {
         self
+    }
+}
+
+impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(format!("{:?}", self), serializer);
     }
 }
 

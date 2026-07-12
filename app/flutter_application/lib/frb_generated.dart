@@ -143,7 +143,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
-          decodeErrorData: null,
+          decodeErrorData: sse_decode_AnyhowException,
         ),
         constMeta: kCrateAdaptersSamSiteFacadeSamSiteFacadeLoginConstMeta,
         argValues: [that, username, password],
@@ -169,7 +169,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         codec: SseCodec(
           decodeSuccessData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSamSiteFacade,
-          decodeErrorData: null,
+          decodeErrorData: sse_decode_AnyhowException,
         ),
         constMeta: kCrateAdaptersSamSiteFacadeSamSiteFacadeNewConstMeta,
         argValues: [],
@@ -205,7 +205,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_single_lesson_view_model,
-          decodeErrorData: sse_decode_String,
+          decodeErrorData: sse_decode_AnyhowException,
         ),
         constMeta:
             kCrateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentLessonsConstMeta,
@@ -244,7 +244,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_single_student_view_model,
-          decodeErrorData: sse_decode_String,
+          decodeErrorData: sse_decode_AnyhowException,
         ),
         constMeta:
             kCrateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentsConstMeta,
@@ -295,6 +295,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   RustArcDecrementStrongCountFnType
   get rust_arc_decrement_strong_count_SamSiteFacade => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSamSiteFacade;
+
+  @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AnyhowException(raw as String);
+  }
 
   @protected
   SamSiteFacade
@@ -403,6 +409,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BigInt dco_decode_usize(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dcoDecodeU64(raw);
+  }
+
+  @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_String(deserializer);
+    return AnyhowException(inner);
   }
 
   @protected
@@ -552,6 +565,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  void sse_encode_AnyhowException(
+    AnyhowException self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.message, serializer);
   }
 
   @protected

@@ -11,21 +11,7 @@ impl<'a, T: StudentsRetrievalGateway> RetrieveStudentsUseCase<'a, T> {
         Self { gateway }
     }
 
-    pub async fn execute(&self) -> Result<Vec<Student>, RetrieveStudentsError> {
-        self.gateway
-            .get_avaliable_records()
-            .await
-            .map_err(RetrieveStudentsError::from)
-    }
-}
-
-#[derive(Debug)]
-pub enum RetrieveStudentsError {
-    Generic(String),
-}
-
-impl From<String> for RetrieveStudentsError {
-    fn from(value: String) -> RetrieveStudentsError {
-        RetrieveStudentsError::Generic(value)
+    pub async fn execute(&self) -> anyhow::Result<Vec<Student>> {
+        self.gateway.get_avaliable_records().await
     }
 }

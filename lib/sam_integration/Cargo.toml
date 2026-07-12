@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 student_management = { path = "../student_management" }
+anyhow = { workspace = true }
 thiserror = { workspace = true }
 async-trait = { workspace = true }
 reqwest = { version = "0.13.4", features = ["form", "cookies", "json"] }
