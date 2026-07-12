@@ -1,31 +1,11 @@
-use async_trait::async_trait;
-use std::sync::OnceLock;
-use std::{collections::HashMap, str::Split};
-use student_management::domain::entities::{Clef, Lesson, Range};
+use std::{collections::HashMap, str::Split, sync::OnceLock};
 
-use student_management::domain::{
-    entities::{MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition},
-    gateway::StudentGateway,
-};
-
-#[derive(thiserror::Error, Debug)]
-pub enum AdapterError {
-    #[error("Network or request error: {0}")]
-    Request(#[from] reqwest::Error),
-    #[error("Authentication failed")]
-    AuthFailed,
-    #[error("No session ID was returned from the server")]
-    MissingSessionId,
-    #[error("Expected network response status {expected}, but got {actual}")]
-    UnexpectedStatus {
-        expected: reqwest::StatusCode,
-        actual: reqwest::StatusCode,
+use crate::features::{
+    student_lessons::domain::entities::{Clef, Lesson, Range},
+    student_roster::domain::entities::{
+        MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
     },
-    #[error("Missing required field in response: {0}")]
-    MissingField(&'static str),
-    #[error("Failed to parse data: {0}")]
-    ParseError(String),
-}
+};
 
 pub struct SamSiteAdapter {
     client: reqwest::Client,
@@ -208,24 +188,23 @@ impl SamSiteAdapter {
     }
 }
 
-#[async_trait]
-impl StudentGateway for SamSiteAdapter {
-    async fn login(&self, username: String, password: String) -> Result<(), String> {
-        self.login(&username, &password)
-            .await
-            .map(|_| ())
-            .map_err(|e| e.to_string())
-    }
-
-    async fn get_avaliable_records(&self) -> Result<Vec<Student>, String> {
-        self.get_students().await.map_err(|e| e.to_string())
-    }
-
-    async fn get_all_lessons_for_student_with_id(&self, id: &str) -> Result<Vec<Lesson>, String> {
-        self.get_student_lessons(id)
-            .await
-            .map_err(|e| e.to_string())
-    }
+#[derive(thiserror::Error, Debug)]
+pub enum AdapterError {
+    #[error("Network or request error: {0}")]
+    Request(#[from] reqwest::Error),
+    #[error("Authentication failed")]
+    AuthFailed,
+    #[error("No session ID was returned from the server")]
+    MissingSessionId,
+    #[error("Expected network response status {expected}, but got {actual}")]
+    UnexpectedStatus {
+        expected: reqwest::StatusCode,
+        actual: reqwest::StatusCode,
+    },
+    #[error("Missing required field in response: {0}")]
+    MissingField(&'static str),
+    #[error("Failed to parse data: {0}")]
+    ParseError(String),
 }
 
 #[derive(serde::Deserialize, Debug)]

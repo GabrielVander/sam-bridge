@@ -3,14 +3,13 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'adapters/api.dart';
 import 'adapters/view_models.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
-import 'infra/retrieve_student_lessons.dart';
-import 'infra/retrieve_students.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 /// Main entrypoint of the Rust API
@@ -68,7 +67,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => 334307010;
+  int get rustContentHash => 1814815271;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -80,20 +79,31 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<void> crateInfraInitInitApp();
+  Future<void> crateAdaptersApiApiLogin({
+    required Api that,
+    required String username,
+    required String password,
+  });
+
+  Future<Api> crateAdaptersApiApiNew();
 
   Future<List<SingleLessonViewModel>>
-  crateInfraRetrieveStudentLessonsRetrieveStudentLessons({
-    required String user,
-    required String pass,
-    required String student,
+  crateAdaptersApiApiRetrieveStudentLessons({
+    required Api that,
+    required String studentId,
   });
 
-  Future<List<SingleStudentViewModel>>
-  crateInfraRetrieveStudentsRetrieveStudentsDefault({
-    required String user,
-    required String pass,
+  Future<List<SingleStudentViewModel>> crateAdaptersApiApiRetrieveStudents({
+    required Api that,
   });
+
+  Future<void> crateInfraInitInitApp();
+
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Api;
+
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Api;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ApiPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -105,6 +115,148 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<void> crateAdaptersApiApiLogin({
+    required Api that,
+    required String username,
+    required String password,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+            that,
+            serializer,
+          );
+          sse_encode_String(username, serializer);
+          sse_encode_String(password, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateAdaptersApiApiLoginConstMeta,
+        argValues: [that, username, password],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateAdaptersApiApiLoginConstMeta => const TaskConstMeta(
+    debugName: "Api_login",
+    argNames: ["that", "username", "password"],
+  );
+
+  @override
+  Future<Api> crateAdaptersApiApiNew() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateAdaptersApiApiNewConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateAdaptersApiApiNewConstMeta =>
+      const TaskConstMeta(debugName: "Api_new", argNames: []);
+
+  @override
+  Future<List<SingleLessonViewModel>>
+  crateAdaptersApiApiRetrieveStudentLessons({
+    required Api that,
+    required String studentId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+            that,
+            serializer,
+          );
+          sse_encode_String(studentId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_single_lesson_view_model,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateAdaptersApiApiRetrieveStudentLessonsConstMeta,
+        argValues: [that, studentId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateAdaptersApiApiRetrieveStudentLessonsConstMeta =>
+      const TaskConstMeta(
+        debugName: "Api_retrieve_student_lessons",
+        argNames: ["that", "studentId"],
+      );
+
+  @override
+  Future<List<SingleStudentViewModel>> crateAdaptersApiApiRetrieveStudents({
+    required Api that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_single_student_view_model,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateAdaptersApiApiRetrieveStudentsConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateAdaptersApiApiRetrieveStudentsConstMeta =>
+      const TaskConstMeta(
+        debugName: "Api_retrieve_students",
+        argNames: ["that"],
+      );
+
+  @override
   Future<void> crateInfraInitInitApp() {
     return handler.executeNormal(
       NormalTask(
@@ -113,7 +265,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 1,
+            funcId: 5,
             port: port_,
           );
         },
@@ -131,82 +283,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateInfraInitInitAppConstMeta =>
       const TaskConstMeta(debugName: "init_app", argNames: []);
 
-  @override
-  Future<List<SingleLessonViewModel>>
-  crateInfraRetrieveStudentLessonsRetrieveStudentLessons({
-    required String user,
-    required String pass,
-    required String student,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(user, serializer);
-          sse_encode_String(pass, serializer);
-          sse_encode_String(student, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 2,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_single_lesson_view_model,
-          decodeErrorData: sse_decode_String,
-        ),
-        constMeta:
-            kCrateInfraRetrieveStudentLessonsRetrieveStudentLessonsConstMeta,
-        argValues: [user, pass, student],
-        apiImpl: this,
-      ),
-    );
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_Api => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_Api => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi;
+
+  @protected
+  Api
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ApiImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
-  TaskConstMeta
-  get kCrateInfraRetrieveStudentLessonsRetrieveStudentLessonsConstMeta =>
-      const TaskConstMeta(
-        debugName: "retrieve_student_lessons",
-        argNames: ["user", "pass", "student"],
-      );
-
-  @override
-  Future<List<SingleStudentViewModel>>
-  crateInfraRetrieveStudentsRetrieveStudentsDefault({
-    required String user,
-    required String pass,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(user, serializer);
-          sse_encode_String(pass, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 3,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_single_student_view_model,
-          decodeErrorData: sse_decode_String,
-        ),
-        constMeta: kCrateInfraRetrieveStudentsRetrieveStudentsDefaultConstMeta,
-        argValues: [user, pass],
-        apiImpl: this,
-      ),
-    );
+  @protected
+  Api
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ApiImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
-  TaskConstMeta
-  get kCrateInfraRetrieveStudentsRetrieveStudentsDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "retrieve_students_default",
-        argNames: ["user", "pass"],
-      );
+  @protected
+  Api
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ApiImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
 
   @protected
   String dco_decode_String(dynamic raw) {
@@ -282,6 +392,48 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void dco_decode_unit(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return;
+  }
+
+  @protected
+  BigInt dco_decode_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
+  Api
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ApiImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  Api
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ApiImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  Api
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ApiImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
   }
 
   @protected
@@ -380,6 +532,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
@@ -389,6 +547,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    Api self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ApiImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    Api self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ApiImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApi(
+    Api self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ApiImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
   }
 
   @protected
@@ -471,6 +668,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
@@ -481,4 +684,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
   }
+}
+
+@sealed
+class ApiImpl extends RustOpaque implements Api {
+  // Not to be used by end users
+  ApiImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  ApiImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Api,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Api,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_ApiPtr,
+  );
+
+  Future<void> login({required String username, required String password}) =>
+      RustLib.instance.api.crateAdaptersApiApiLogin(
+        that: this,
+        username: username,
+        password: password,
+      );
+
+  Future<List<SingleLessonViewModel>> retrieveStudentLessons({
+    required String studentId,
+  }) => RustLib.instance.api.crateAdaptersApiApiRetrieveStudentLessons(
+    that: this,
+    studentId: studentId,
+  );
+
+  Future<List<SingleStudentViewModel>> retrieveStudents() =>
+      RustLib.instance.api.crateAdaptersApiApiRetrieveStudents(that: this);
 }

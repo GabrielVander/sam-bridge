@@ -1,6 +1,5 @@
+import 'package:flutter_application/adapters/api.dart';
 import 'package:flutter_application/adapters/view_models.dart';
-import 'package:flutter_application/infra/retrieve_student_lessons.dart';
-import 'package:flutter_application/infra/retrieve_students.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fuzzy/fuzzy.dart';
 
@@ -21,10 +20,11 @@ class StudentsPresenter extends Cubit<StudentsViewState> {
       this.username = username;
       this.password = password;
 
-      List<SingleStudentViewModel> students = await retrieveStudentsDefault(
-        user: username,
-        pass: password,
-      );
+      Api api = (await Api.newInstance());
+
+      await api.login(username: username, password: password);
+
+      List<SingleStudentViewModel> students = await api.retrieveStudents();
 
       emit(StudentsViewLoaded(allStudents: students, students: students));
     } catch (e) {
@@ -87,10 +87,10 @@ class StudentsPresenter extends Cubit<StudentsViewState> {
     emit(StudentsViewLoading());
 
     try {
-      List<SingleLessonViewModel> lessons = await retrieveStudentLessons(
-        user: username!,
-        pass: password!,
-        student: studentId,
+      Api api = (await Api.newInstance());
+
+      List<SingleLessonViewModel> lessons = await api.retrieveStudentLessons(
+        studentId: studentId,
       );
 
       emit(StudentsViewLessonsLoaded(lessons: lessons));
