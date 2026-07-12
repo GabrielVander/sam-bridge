@@ -1,5 +1,5 @@
 [workspace]
-members = ["lib/student_management", "app/flutter_application/rust"]
+members = ["lib/student_management", "app/flutter_application/rust", "lib/sam_integration"]
 resolver = "3"
 
 [workspace.dependencies]

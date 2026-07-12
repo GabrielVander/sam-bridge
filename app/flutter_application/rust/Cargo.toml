@@ -8,6 +8,7 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 student_management = { path = "../../../lib/student_management" }
+sam_integration = { path = "../../../lib/sam_integration" }
 flutter_rust_bridge = "=2.13.0-beta.2"
 
 [lints.rust]

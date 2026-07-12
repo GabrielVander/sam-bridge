@@ -1,18 +1,18 @@
 use std::{collections::HashMap, str::Split, sync::OnceLock};
 
-use crate::features::{
+use student_management::features::{
     student_lessons::domain::entities::{Clef, Lesson, Range},
     student_roster::domain::entities::{
         MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
     },
 };
 
-pub struct SamSiteAdapter {
+pub struct SamClient {
     client: reqwest::Client,
     base_url: String,
 }
 
-impl SamSiteAdapter {
+impl SamClient {
     pub fn new(base_url: &str) -> Result<Self, AdapterError> {
         let client = reqwest::Client::builder()
             .redirect(reqwest::redirect::Policy::none())

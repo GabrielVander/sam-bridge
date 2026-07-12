@@ -1,21 +1,19 @@
-use student_management::{
-    features::{
-        authentication::application::use_cases::LoginUseCase,
-        student_lessons::application::use_cases::RetrieveStudentLessonsUseCase,
-        student_roster::application::use_cases::RetrieveStudentsUseCase,
-    },
-    shared::infra::sam_site_adapter::SamSiteAdapter,
+use sam_integration::features::basic_sam_site_interop::infra::sam_client::SamClient;
+use student_management::features::{
+    authentication::application::use_cases::LoginUseCase,
+    student_lessons::application::use_cases::RetrieveStudentLessonsUseCase,
+    student_roster::application::use_cases::RetrieveStudentsUseCase,
 };
 
 use crate::adapters::view_models::{SingleLessonViewModel, SingleStudentViewModel};
 
 pub struct Api {
-    sam_site_adapter: SamSiteAdapter,
+    sam_site_adapter: SamClient,
 }
 
 impl Api {
     pub fn new() -> Self {
-        let adapter: SamSiteAdapter = SamSiteAdapter::new("https://musical.congregacao.org.br/")
+        let adapter: SamClient = SamClient::new("https://musical.congregacao.org.br/")
             .map_err(|e| format!("{:#?}", e))
             .unwrap();
 
