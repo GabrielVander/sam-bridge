@@ -7,13 +7,12 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'view_models.dart';
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Api>>
-abstract class Api implements RustOpaqueInterface {
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SamSiteFacade>>
+abstract class SamSiteFacade implements RustOpaqueInterface {
   Future<void> login({required String username, required String password});
 
-  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
-  static Future<Api> newInstance() =>
-      RustLib.instance.api.crateAdaptersApiApiNew();
+  factory SamSiteFacade() =>
+      RustLib.instance.api.crateAdaptersSamSiteFacadeSamSiteFacadeNew();
 
   Future<List<SingleLessonViewModel>> retrieveStudentLessons({
     required String studentId,

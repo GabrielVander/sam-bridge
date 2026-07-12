@@ -1,13 +1,14 @@
-import 'package:flutter_application/adapters/api.dart';
+import 'package:flutter_application/adapters/sam_site_facade.dart';
 import 'package:flutter_application/adapters/view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fuzzy/fuzzy.dart';
 
 class StudentsPresenter extends Cubit<StudentsViewState> {
-  String? username;
-  String? password;
+  final SamSiteFacade _facade = SamSiteFacade();
+  String? _username;
+  String? _password;
 
-  StudentsPresenter() : super(StudentsView());
+  StudentsPresenter() : super(StudentsLoginView());
 
   Future<void> submitLogin(String username, String password) async {
     emit(StudentsViewLoading());
@@ -17,14 +18,12 @@ class StudentsPresenter extends Cubit<StudentsViewState> {
         throw Exception("Username and password cannot be empty.");
       }
 
-      this.username = username;
-      this.password = password;
+      _username = username;
+      _password = password;
 
-      Api api = (await Api.newInstance());
+      await _facade.login(username: _username!, password: _password!);
 
-      await api.login(username: username, password: password);
-
-      List<SingleStudentViewModel> students = await api.retrieveStudents();
+      List<SingleStudentViewModel> students = await _facade.retrieveStudents();
 
       emit(StudentsViewLoaded(allStudents: students, students: students));
     } catch (e) {
@@ -33,7 +32,7 @@ class StudentsPresenter extends Cubit<StudentsViewState> {
   }
 
   void returnToLogin() {
-    emit(StudentsView());
+    emit(StudentsLoginView());
   }
 
   void search(String query) {
@@ -87,11 +86,8 @@ class StudentsPresenter extends Cubit<StudentsViewState> {
     emit(StudentsViewLoading());
 
     try {
-      Api api = (await Api.newInstance());
-
-      List<SingleLessonViewModel> lessons = await api.retrieveStudentLessons(
-        studentId: studentId,
-      );
+      List<SingleLessonViewModel> lessons = await _facade
+          .retrieveStudentLessons(studentId: studentId);
 
       emit(StudentsViewLessonsLoaded(lessons: lessons));
     } catch (e) {
@@ -102,7 +98,7 @@ class StudentsPresenter extends Cubit<StudentsViewState> {
 
 sealed class StudentsViewState {}
 
-final class StudentsView extends StudentsViewState {}
+final class StudentsLoginView extends StudentsViewState {}
 
 final class StudentsViewLoading extends StudentsViewState {}
 

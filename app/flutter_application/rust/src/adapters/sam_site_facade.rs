@@ -7,30 +7,29 @@ use student_management::features::{
 
 use crate::adapters::view_models::{SingleLessonViewModel, SingleStudentViewModel};
 
-pub struct Api {
-    sam_site_adapter: SamClient,
+pub struct SamSiteFacade {
+    sam_client: SamClient,
 }
 
-impl Api {
+impl SamSiteFacade {
+    #[flutter_rust_bridge::frb(sync)]
     pub fn new() -> Self {
-        let adapter: SamClient = SamClient::new("https://musical.congregacao.org.br/")
+        let client: SamClient = SamClient::new("https://musical.congregacao.org.br/")
             .map_err(|e| format!("{:#?}", e))
             .unwrap();
 
-        Self {
-            sam_site_adapter: adapter,
-        }
+        Self { sam_client: client }
     }
 
     pub async fn login(&self, username: String, password: String) {
-        LoginUseCase::new(&self.sam_site_adapter)
+        LoginUseCase::new(&self.sam_client)
             .execute(username, password)
             .await
             .unwrap()
     }
 
     pub async fn retrieve_students(&self) -> Result<Vec<SingleStudentViewModel>, String> {
-        RetrieveStudentsUseCase::new(&self.sam_site_adapter)
+        RetrieveStudentsUseCase::new(&self.sam_client)
             .execute()
             .await
             .map(|students| students.iter().map(SingleStudentViewModel::from).collect())
@@ -41,7 +40,7 @@ impl Api {
         &self,
         student_id: &str,
     ) -> Result<Vec<SingleLessonViewModel>, String> {
-        RetrieveStudentLessonsUseCase::new(&self.sam_site_adapter)
+        RetrieveStudentLessonsUseCase::new(&self.sam_client)
             .execute(student_id)
             .await
             .map(|lessons| lessons.iter().map(SingleLessonViewModel::from).collect())

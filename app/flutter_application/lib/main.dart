@@ -45,7 +45,7 @@ class MainScreen extends StatelessWidget {
       body: BlocBuilder<StudentsPresenter, StudentsViewState>(
         builder: (BuildContext context, StudentsViewState state) {
           return switch (state) {
-            StudentsView() => LoginForm(
+            StudentsLoginView() => LoginForm(
               onSubmitted: (user, password) =>
                   context.read<StudentsPresenter>().submitLogin(user, password),
             ),
