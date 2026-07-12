@@ -6,11 +6,11 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
-import 'adapters/sam_site_facade.dart';
 import 'adapters/view_models.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
+import 'infra/sam_site_facade.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {

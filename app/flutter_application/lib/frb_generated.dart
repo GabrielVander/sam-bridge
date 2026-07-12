@@ -3,13 +3,13 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'adapters/sam_site_facade.dart';
 import 'adapters/view_models.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
+import 'infra/sam_site_facade.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 /// Main entrypoint of the Rust API
@@ -67,7 +67,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => -320542676;
+  int get rustContentHash => 1858816597;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,22 +79,22 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<void> crateAdaptersSamSiteFacadeSamSiteFacadeLogin({
+  Future<void> crateInfraSamSiteFacadeSamSiteFacadeLogin({
     required SamSiteFacade that,
     required String username,
     required String password,
   });
 
-  SamSiteFacade crateAdaptersSamSiteFacadeSamSiteFacadeNew();
+  SamSiteFacade crateInfraSamSiteFacadeSamSiteFacadeNew();
 
   Future<List<SingleLessonViewModel>>
-  crateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentLessons({
+  crateInfraSamSiteFacadeSamSiteFacadeRetrieveStudentLessons({
     required SamSiteFacade that,
     required String studentId,
   });
 
   Future<List<SingleStudentViewModel>>
-  crateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudents({
+  crateInfraSamSiteFacadeSamSiteFacadeRetrieveStudents({
     required SamSiteFacade that,
   });
 
@@ -119,7 +119,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<void> crateAdaptersSamSiteFacadeSamSiteFacadeLogin({
+  Future<void> crateInfraSamSiteFacadeSamSiteFacadeLogin({
     required SamSiteFacade that,
     required String username,
     required String password,
@@ -145,21 +145,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta: kCrateAdaptersSamSiteFacadeSamSiteFacadeLoginConstMeta,
+        constMeta: kCrateInfraSamSiteFacadeSamSiteFacadeLoginConstMeta,
         argValues: [that, username, password],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateAdaptersSamSiteFacadeSamSiteFacadeLoginConstMeta =>
+  TaskConstMeta get kCrateInfraSamSiteFacadeSamSiteFacadeLoginConstMeta =>
       const TaskConstMeta(
         debugName: "SamSiteFacade_login",
         argNames: ["that", "username", "password"],
       );
 
   @override
-  SamSiteFacade crateAdaptersSamSiteFacadeSamSiteFacadeNew() {
+  SamSiteFacade crateInfraSamSiteFacadeSamSiteFacadeNew() {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -171,19 +171,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSamSiteFacade,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta: kCrateAdaptersSamSiteFacadeSamSiteFacadeNewConstMeta,
+        constMeta: kCrateInfraSamSiteFacadeSamSiteFacadeNewConstMeta,
         argValues: [],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateAdaptersSamSiteFacadeSamSiteFacadeNewConstMeta =>
+  TaskConstMeta get kCrateInfraSamSiteFacadeSamSiteFacadeNewConstMeta =>
       const TaskConstMeta(debugName: "SamSiteFacade_new", argNames: []);
 
   @override
   Future<List<SingleLessonViewModel>>
-  crateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentLessons({
+  crateInfraSamSiteFacadeSamSiteFacadeRetrieveStudentLessons({
     required SamSiteFacade that,
     required String studentId,
   }) {
@@ -208,7 +208,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_AnyhowException,
         ),
         constMeta:
-            kCrateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentLessonsConstMeta,
+            kCrateInfraSamSiteFacadeSamSiteFacadeRetrieveStudentLessonsConstMeta,
         argValues: [that, studentId],
         apiImpl: this,
       ),
@@ -216,7 +216,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentLessonsConstMeta =>
+  get kCrateInfraSamSiteFacadeSamSiteFacadeRetrieveStudentLessonsConstMeta =>
       const TaskConstMeta(
         debugName: "SamSiteFacade_retrieve_student_lessons",
         argNames: ["that", "studentId"],
@@ -224,7 +224,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<List<SingleStudentViewModel>>
-  crateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudents({
+  crateInfraSamSiteFacadeSamSiteFacadeRetrieveStudents({
     required SamSiteFacade that,
   }) {
     return handler.executeNormal(
@@ -247,7 +247,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_AnyhowException,
         ),
         constMeta:
-            kCrateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentsConstMeta,
+            kCrateInfraSamSiteFacadeSamSiteFacadeRetrieveStudentsConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
@@ -255,7 +255,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta
-  get kCrateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentsConstMeta =>
+  get kCrateInfraSamSiteFacadeSamSiteFacadeRetrieveStudentsConstMeta =>
       const TaskConstMeta(
         debugName: "SamSiteFacade_retrieve_students",
         argNames: ["that"],
@@ -733,7 +733,7 @@ class SamSiteFacadeImpl extends RustOpaque implements SamSiteFacade {
   );
 
   Future<void> login({required String username, required String password}) =>
-      RustLib.instance.api.crateAdaptersSamSiteFacadeSamSiteFacadeLogin(
+      RustLib.instance.api.crateInfraSamSiteFacadeSamSiteFacadeLogin(
         that: this,
         username: username,
         password: password,
@@ -742,7 +742,7 @@ class SamSiteFacadeImpl extends RustOpaque implements SamSiteFacade {
   Future<List<SingleLessonViewModel>> retrieveStudentLessons({
     required String studentId,
   }) => RustLib.instance.api
-      .crateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudentLessons(
+      .crateInfraSamSiteFacadeSamSiteFacadeRetrieveStudentLessons(
         that: this,
         studentId: studentId,
       );
@@ -750,5 +750,5 @@ class SamSiteFacadeImpl extends RustOpaque implements SamSiteFacade {
   Future<List<SingleStudentViewModel>> retrieveStudents() => RustLib
       .instance
       .api
-      .crateAdaptersSamSiteFacadeSamSiteFacadeRetrieveStudents(that: this);
+      .crateInfraSamSiteFacadeSamSiteFacadeRetrieveStudents(that: this);
 }

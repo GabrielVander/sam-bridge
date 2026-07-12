@@ -1,5 +1,5 @@
-import 'package:flutter_application/adapters/sam_site_facade.dart';
 import 'package:flutter_application/adapters/view_models.dart';
+import 'package:flutter_application/infra/sam_site_facade.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fuzzy/fuzzy.dart';
 

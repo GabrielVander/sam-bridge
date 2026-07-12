@@ -3,16 +3,16 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
+import '../adapters/view_models.dart';
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'view_models.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SamSiteFacade>>
 abstract class SamSiteFacade implements RustOpaqueInterface {
   Future<void> login({required String username, required String password});
 
   factory SamSiteFacade() =>
-      RustLib.instance.api.crateAdaptersSamSiteFacadeSamSiteFacadeNew();
+      RustLib.instance.api.crateInfraSamSiteFacadeSamSiteFacadeNew();
 
   Future<List<SingleLessonViewModel>> retrieveStudentLessons({
     required String studentId,
