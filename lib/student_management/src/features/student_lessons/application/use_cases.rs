@@ -1,4 +1,4 @@
-use crate::features::student_lessons::domain::{entities::Lesson, gateways::StudentLessonsGateway};
+use crate::api::{application::StudentLessonsGateway, domain::Lesson};
 
 pub struct RetrieveStudentLessonsUseCase<'a, T: StudentLessonsGateway> {
     gateway: &'a T,

@@ -1,8 +1,6 @@
-use sam_integration::features::basic_sam_site_interop::infra::sam_client::SamClient;
-use student_management::features::{
-    authentication::application::use_cases::LoginUseCase,
-    student_lessons::application::use_cases::RetrieveStudentLessonsUseCase,
-    student_roster::application::use_cases::RetrieveStudentsUseCase,
+use sam_integration::api::infrastructure::SamClient;
+use student_management::api::application::{
+    LoginUseCase, RetrieveStudentLessonsUseCase, RetrieveStudentsUseCase,
 };
 
 use crate::adapters::view_models::{SingleLessonViewModel, SingleStudentViewModel};

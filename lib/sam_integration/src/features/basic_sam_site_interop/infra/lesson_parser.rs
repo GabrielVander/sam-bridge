@@ -1,6 +1,6 @@
 use anyhow::Context;
 use scraper::{ElementRef, Html, Selector};
-use student_management::features::student_lessons::domain::entities::{Clef, Lesson, Range};
+use student_management::api::domain::{Clef, Lesson, Range};
 
 pub struct LessonParser;
 

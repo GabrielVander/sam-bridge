@@ -1,11 +1,10 @@
 use async_trait::async_trait;
-use student_management::features::{
-    authentication::domain::gateways::AuthGateway,
-    student_lessons::domain::{entities::Lesson, gateways::StudentLessonsGateway},
-    student_roster::domain::{entities::Student, gateways::StudentsRetrievalGateway},
+use student_management::api::{
+    application::{AuthGateway, StudentLessonsGateway, StudentsRetrievalGateway},
+    domain::{Lesson, Student},
 };
 
-use crate::features::basic_sam_site_interop::infra::sam_client::SamClient;
+use crate::api::infrastructure::SamClient;
 
 #[async_trait]
 impl AuthGateway for SamClient {

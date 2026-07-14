@@ -1,6 +1,4 @@
-use crate::features::student_roster::domain::{
-    entities::Student, gateways::StudentsRetrievalGateway,
-};
+use crate::api::{application::StudentsRetrievalGateway, domain::Student};
 
 pub struct RetrieveStudentsUseCase<'a, T: StudentsRetrievalGateway> {
     gateway: &'a T,

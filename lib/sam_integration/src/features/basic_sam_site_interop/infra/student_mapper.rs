@@ -1,6 +1,6 @@
 use regex::Regex;
 use std::{str::Split, sync::OnceLock};
-use student_management::features::student_roster::domain::entities::{
+use student_management::api::domain::{
     MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
 };
 

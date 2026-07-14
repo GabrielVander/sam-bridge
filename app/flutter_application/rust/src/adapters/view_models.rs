@@ -1,7 +1,4 @@
-use student_management::features::{
-    student_lessons::domain::entities::{Clef, Lesson},
-    student_roster::domain::entities::Student,
-};
+use student_management::api::domain::{Clef, Lesson, Student};
 
 pub struct SingleStudentViewModel {
     pub id: String,

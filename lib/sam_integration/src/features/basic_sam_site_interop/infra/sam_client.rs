@@ -1,10 +1,7 @@
 use anyhow::Context;
 use reqwest::{Client, StatusCode};
 use std::collections::HashMap;
-
-use student_management::features::{
-    student_lessons::domain::entities::Lesson, student_roster::domain::entities::Student,
-};
+use student_management::api::domain::{Lesson, Student};
 
 use crate::features::basic_sam_site_interop::infra::{
     lesson_parser::LessonParser, sam_endpoints::SamEndpoints, student_mapper::StudentResponseJson,
@@ -39,7 +36,8 @@ impl SamClient {
             .post(SamEndpoints::auth(&self.base_url))
             .form(&form)
             .send()
-            .await?;
+            .await
+            .context("Login request failed")?;
 
         if response.status() == StatusCode::SEE_OTHER {
             response
@@ -48,7 +46,7 @@ impl SamClient {
                 .map(|c| c.value().to_owned())
                 .ok_or_else(|| anyhow::anyhow!("No session ID was returned from the server"))
         } else {
-            Err(anyhow::anyhow!("Authentication failed"))
+            Err(anyhow::anyhow!("Invalid credentials"))
         }
     }
 

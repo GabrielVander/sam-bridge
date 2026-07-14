@@ -1,4 +1,4 @@
-use crate::features::authentication::domain::gateways::AuthGateway;
+use crate::api::application::AuthGateway;
 
 pub struct LoginUseCase<'a, T: AuthGateway> {
     gateway: &'a T,
