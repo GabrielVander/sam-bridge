@@ -62,7 +62,9 @@ impl SamClient {
             let id: String = row.value().attr("id").unwrap_or("unknown_id").to_string();
             let mut data: scraper::element_ref::Select = row.select(&cell_selector);
 
-            let date: String = Self::extract_text(&mut data);
+            let date: chrono::NaiveDate =
+                chrono::NaiveDate::parse_from_str(&Self::extract_text(&mut data), "%d/%m/%Y")
+                    .context("Failed to parse lesson date")?;
             let phase: Option<Range> = Self::parse_fragment(&Self::extract_text(&mut data));
             let page: Option<Range> = Self::parse_fragment(&Self::extract_text(&mut data));
             let lesson_frag: Option<Range> = Self::parse_fragment(&Self::extract_text(&mut data));
@@ -76,11 +78,7 @@ impl SamClient {
             };
 
             let inst_text: String = Self::extract_text(&mut data);
-            let instructor: Option<String> = if inst_text.is_empty() {
-                None
-            } else {
-                Some(inst_text)
-            };
+            let instructor: String = inst_text;
 
             lessons.push(Lesson {
                 id,

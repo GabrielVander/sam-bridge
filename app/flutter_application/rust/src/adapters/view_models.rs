@@ -1,5 +1,6 @@
 use student_management::features::{
-    student_lessons::domain::entities::Lesson, student_roster::domain::entities::Student,
+    student_lessons::domain::entities::{Clef, Lesson},
+    student_roster::domain::entities::Student,
 };
 
 pub struct SingleStudentViewModel {
@@ -31,41 +32,45 @@ pub struct SingleLessonViewModel {
     pub instructor: String,
 }
 
+fn displat_clef(clef: &Clef) -> String {
+    match clef {
+        Clef::G => "Sol".to_string(),
+        Clef::C => "Dó".to_string(),
+        Clef::F => "Fá".to_string(),
+    }
+}
+
 impl From<&Lesson> for SingleLessonViewModel {
     fn from(value: &Lesson) -> Self {
         Self {
             id: value.id.clone(),
-            date: value.date.clone(),
+            date: value.date.to_string(),
             phase: value
                 .phase
                 .as_ref()
                 .map(|i| format!("{} - {}", i.from, i.to))
-                .unwrap_or("".to_string()),
+                .unwrap_or("N/A".to_string()),
             page: value
                 .page
                 .as_ref()
                 .map(|i| format!("{} - {}", i.from, i.to))
-                .unwrap_or("".to_string()),
+                .unwrap_or("N/A".to_string()),
             lesson: value
                 .lesson
                 .as_ref()
                 .map(|i| format!("{} - {}", i.from, i.to))
-                .unwrap_or("".to_string()),
+                .unwrap_or("N/A".to_string()),
             clef: value
                 .clef
                 .as_ref()
-                .map(|i| format!("{:#?}", i))
-                .unwrap_or("".to_string()),
+                .map(displat_clef)
+                .unwrap_or("N/A".to_string()),
             description: value
                 .description
                 .as_ref()
-                .map(|i| format!("{:#?}", i))
+                .map(|i| i.to_string())
                 .unwrap_or("".to_string()),
-            instructor: value
-                .instructor
-                .as_ref()
-                .map(|i| format!("{:#?}", i))
-                .unwrap_or("".to_string()),
+            instructor: value.instructor.clone(),
         }
     }
 }
