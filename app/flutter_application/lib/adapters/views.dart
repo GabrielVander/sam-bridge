@@ -240,16 +240,6 @@ class TableView extends StatelessWidget {
             ),
           ),
         ),
-        Container(
-          width: double.infinity,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          // padding: const EdgeInsets.all(12.0),
-          child: const Text(
-            " SAM Portal ",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white70),
-          ),
-        ),
       ],
     );
   }
