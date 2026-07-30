@@ -1,1 +1,1 @@
-pub mod basic_sam_site_interop;
+pub(crate) mod basic_sam_site_interop;

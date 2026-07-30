@@ -1595,7 +1595,10 @@ name = "rust_lib_flutter_application"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
+ "chrono",
  "flutter_rust_bridge",
+ "regex",
  "sam_integration",
  "student_management",
 ]
@@ -1713,13 +1716,9 @@ name = "sam_integration"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "async-trait",
- "chrono",
- "regex",
  "reqwest",
  "scraper",
  "serde",
- "student_management",
  "thiserror",
 ]
 

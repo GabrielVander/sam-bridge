@@ -10,6 +10,9 @@ crate-type = ["cdylib", "staticlib"]
 student_management = { path = "../../../lib/student_management" }
 sam_integration = { path = "../../../lib/sam_integration" }
 anyhow = { workspace = true }
+async-trait = { workspace = true }
+chrono = { workspace = true }
+regex = "1.12.4"
 flutter_rust_bridge = "=2.13.0-beta.2"
 
 [lints.rust]

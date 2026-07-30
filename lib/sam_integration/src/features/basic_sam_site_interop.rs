@@ -1,2 +1,1 @@
-pub mod adapters;
-pub mod infra;
+pub(crate) mod infra;
