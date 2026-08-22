@@ -3,6 +3,7 @@ members = [
   "lib/student_management",
   "app/flutter_application/rust",
   "lib/sam_integration",
+  "sam",
 ]
 resolver = "3"
 
@@ -11,3 +12,6 @@ async-trait = "0.1.89"
 anyhow = "1.0.103"
 thiserror = "2.0.18"
 chrono = "0.4.45"
+
+[profile.dev]
+debug = "line-tables-only"
