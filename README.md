@@ -73,6 +73,7 @@ Common commands (from the repository root unless noted):
 cargo test --workspace
 cargo clippy --workspace --all-targets
 cargo llvm-cov nextest -p sam --summary-only
+cargo llvm-cov nextest -p student_management --summary-only
 cargo llvm-cov nextest -p student_management_sam_adapter --summary-only
 cargo llvm-cov nextest -p gui_application --summary-only \
   --ignore-filename-regex 'frb_generated\.rs'
@@ -89,8 +90,8 @@ cd gui_application/flutter && flutter_rust_bridge_codegen generate
 ```
 
 Coverage gates are 100% regions/lines/functions for `sam`,
-`student_management_sam_adapter`, and `gui_application` (generated glue
-excluded). If a coverage build reports unreachable defensive arms, they are
+`student_management`, `student_management_sam_adapter`, and
+`gui_application` (generated glue excluded). If a coverage build reports unreachable defensive arms, they are
 compiled out under `cfg(coverage)` instead of being tested artificially.
 
 ## Testing conventions

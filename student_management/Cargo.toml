@@ -7,3 +7,6 @@ edition = "2024"
 async-trait = { workspace = true }
 anyhow = { workspace = true }
 chrono = { workspace = true }
+
+[dev-dependencies]
+smol = "2.0.2"

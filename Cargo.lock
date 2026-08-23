@@ -2268,6 +2268,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
+ "smol",
 ]
 
 [[package]]
