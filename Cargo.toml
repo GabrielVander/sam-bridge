@@ -1,7 +1,6 @@
 [workspace]
 members = [
   "student_management",
-  "lib/sam_integration",
   "sam",
   "student_management_sam_adapter",
   "gui_application",
