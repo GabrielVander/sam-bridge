@@ -60,6 +60,16 @@ impl SamTransport {
         self.read_raw_response(response, "Unable to read students listing response body")
     }
 
+    pub(crate) fn fetch_student_lessons(&self, student_id: &str) -> Result<RawResponse> {
+        let response: reqwest::blocking::Response = self
+            .http_client
+            .get(self.student_lessons_endpoint(student_id))
+            .send()
+            .context("Student lessons request failed")?;
+
+        self.read_raw_response(response, "Unable to read student lessons response body")
+    }
+
     fn read_raw_response(
         &self,
         response: reqwest::blocking::Response,
@@ -81,6 +91,10 @@ impl SamTransport {
 
     fn students_listing_endpoint(&self) -> String {
         format!("{}/alunos/listagem", self.base_url)
+    }
+
+    fn student_lessons_endpoint(&self, student_id: &str) -> String {
+        format!("{}/licoes/index/{student_id}", self.base_url)
     }
 }
 

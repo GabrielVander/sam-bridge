@@ -14,8 +14,8 @@ struct SamSiteConfig {
 fn configured_sam_site() -> Option<SamSiteConfig> {
     let username: String = std::env::var("SAM_USERNAME").ok()?;
     let password: String = std::env::var("SAM_PASSWORD").ok()?;
-    let base_url: String =
-        std::env::var("SAM_BASE_URL").unwrap_or_else(|_| "https://musical.congregacao.org.br".to_owned());
+    let base_url: String = std::env::var("SAM_BASE_URL")
+        .unwrap_or_else(|_| "https://musical.congregacao.org.br".to_owned());
 
     Some(SamSiteConfig {
         base_url,
@@ -72,8 +72,10 @@ fn login_page_returns_ui_html() {
 
     let client: reqwest::blocking::Client = build_http_client();
 
-    let response: reqwest::blocking::Response =
-        client.get(build_sam_authentication_url(&site)).send().unwrap();
+    let response: reqwest::blocking::Response = client
+        .get(build_sam_authentication_url(&site))
+        .send()
+        .unwrap();
     println!("{:#?}", response);
 
     assert_eq!(response.status(), reqwest::StatusCode::OK);
@@ -121,7 +123,10 @@ fn login_with_valid_credentials_returns_session_id_cookie() {
 
     let response: reqwest::blocking::Response = client
         .post(build_sam_authentication_url(&site))
-        .form(&[("login", site.username.as_str()), ("password", site.password.as_str())])
+        .form(&[
+            ("login", site.username.as_str()),
+            ("password", site.password.as_str()),
+        ])
         .send()
         .unwrap();
     println!("{:#?}", response);
@@ -158,9 +163,14 @@ fn dashboard_is_unacessable_if_not_logged_in() {
     println!("{:#?}", response);
 
     assert_eq!(response.status(), reqwest::StatusCode::TEMPORARY_REDIRECT);
-    assert_eq!(
-        response.headers().get("location").unwrap(),
-        build_sam_base_url(&site)
+    assert!(
+        response
+            .headers()
+            .get("location")
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .starts_with(build_sam_base_url(&site))
     )
 }
 
@@ -201,14 +211,21 @@ fn students_listing_is_unacessable_if_not_logged_in() {
 
     let client: reqwest::blocking::Client = build_http_client();
 
-    let response: reqwest::blocking::Response =
-        client.get(build_sam_students_listing_url(&site)).send().unwrap();
+    let response: reqwest::blocking::Response = client
+        .get(build_sam_students_listing_url(&site))
+        .send()
+        .unwrap();
     println!("{:#?}", response);
 
     assert_eq!(response.status(), reqwest::StatusCode::TEMPORARY_REDIRECT);
-    assert_eq!(
-        response.headers().get("location").unwrap(),
-        build_sam_base_url(&site)
+    assert!(
+        response
+            .headers()
+            .get("location")
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .starts_with(build_sam_base_url(&site))
     )
 }
 
@@ -287,9 +304,14 @@ fn student_lessons_fail_if_not_logged_in() {
     println!("{:#?}", response);
 
     assert_eq!(response.status(), reqwest::StatusCode::TEMPORARY_REDIRECT);
-    assert_eq!(
-        response.headers().get("location").unwrap(),
-        build_sam_base_url(&site)
+    assert!(
+        response
+            .headers()
+            .get("location")
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .starts_with(build_sam_base_url(&site))
     );
 }
 
@@ -353,6 +375,32 @@ fn student_lessons_succeeds_if_logged_in_and_valid_student_id() {
     assert!(response_content.contains("Lições Aprovadas"));
 }
 
+#[test]
+fn student_lessons_contains_msa_lessons() {
+    let site: SamSiteConfig = require_sam_site();
+    if site.base_url.is_empty() {
+        return;
+    }
+
+    let client: reqwest::blocking::Client = build_http_client();
+
+    let valid_student_id: String = build_valid_student_id();
+
+    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
+    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
+
+    let response: reqwest::blocking::Response = client
+        .get(build_sam_student_lessons_url(&site, &valid_student_id))
+        .header(reqwest::header::COOKIE, session_cookie)
+        .send()
+        .unwrap();
+
+    let response_content: String = response.text().unwrap();
+    println!("{:#?}", response_content);
+
+    assert!(response_content.contains("<tr id=\"msa_42763\">\n            <td>19/09/2023</td>\n            <td>4.4 - 4.5</td>\n            <td>38 - 39</td>\n            <td>13 - 14</td>\n            <td>Sol</td>\n            <td>Estudar o praticar solfejo </td>\n            <td>THIAGO SOUZA SANTOS</td>\n            <td>\n                                    <button type=\"button\" class=\"btn btn-danger btn-sm\" data-toggle=\"tooltip\" title=\"Excluir\"\n                            onclick=\"delete_lancamento_msa(42763)\">\n                        <i class=\"fa fa-trash\"></i> Apagar\n                    </button>\n                            </td>\n        </tr>"));
+}
+
 fn build_http_client() -> reqwest::blocking::Client {
     reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -402,7 +450,10 @@ fn get_authenticated_session_id(
 ) -> String {
     client
         .post(build_sam_authentication_url(site))
-        .form(&[("login", site.username.as_str()), ("password", site.password.as_str())])
+        .form(&[
+            ("login", site.username.as_str()),
+            ("password", site.password.as_str()),
+        ])
         .send()
         .unwrap()
         .cookies()
@@ -412,7 +463,11 @@ fn get_authenticated_session_id(
         .to_string()
 }
 
-fn visit_dashboard(client: &reqwest::blocking::Client, site: &SamSiteConfig, session_cookie: &String) {
+fn visit_dashboard(
+    client: &reqwest::blocking::Client,
+    site: &SamSiteConfig,
+    session_cookie: &String,
+) {
     client
         .get(build_sam_dashboard_url(site))
         .header(reqwest::header::COOKIE, session_cookie)

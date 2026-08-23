@@ -1994,6 +1994,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "reqwest",
+ "scraper",
  "serde",
  "serde_json",
  "smol",

@@ -3,7 +3,7 @@ mod support;
 use support::{ScriptedResponse, spawn_scripted_http_server};
 
 use anyhow::{Error, Result};
-use sam::client::{Authenticated, SamClient, SamCredentials, SamStudent, Unauthenticated};
+use sam::client::{Authenticated, MsaLesson, SamClient, SamCredentials, SamStudent, Unauthenticated};
 
 #[test]
 fn given_inaccessible_dashboard_students_should_fail_with_session_error() {
@@ -416,6 +416,115 @@ fn given_truncated_listing_body_students_should_fail() {
             .starts_with("Unable to read students listing response body"),
         "Expected a listing response decoding failure"
     );
+}
+
+#[test]
+fn given_valid_student_lessons_page_lessons_should_be_mapped_without_dashboard_warmup() {
+    smol::block_on(async {
+        let mock_server: wiremock::MockServer = wiremock::MockServer::start().await;
+        let credentials: SamCredentials = build_valid_credentials();
+
+        given_credentials_authentication_endpoint_responds_with(
+            &mock_server,
+            &credentials,
+            build_valid_credentials_response(),
+        )
+        .await;
+
+        wiremock::Mock::given(wiremock::matchers::method("GET"))
+            .and(wiremock::matchers::path("/licoes/index/500132"))
+            .respond_with(
+                build_student_lessons_response(&msa_lessons_page(
+                    r#"<tr id="msa_559783" role="row" class="even">
+                        <td>09/09/2025</td>
+                        <td>4.5 - 4.5</td>
+                        <td>38 - 38</td>
+                        <td>7 - 8</td>
+                        <td>Sol</td>
+                        <td>Passou lições 7 e 8, estudar próximas lições.</td>
+                        <td>MARCOS ROGÉRIO COSME</td>
+                    </tr>"#,
+                )),
+            )
+            .mount(&mock_server)
+            .await;
+
+        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
+            .expect("Client should be created")
+            .login(&credentials)
+            .expect("Login should succeed");
+
+        let result: Result<Vec<MsaLesson>> = client.student_lessons("500132");
+
+        assert_eq!(
+            result.expect("Lessons retrieval should succeed"),
+            vec![MsaLesson {
+                id: "559783".to_string(),
+                date: "09/09/2025".to_string(),
+                phases: "4.5 - 4.5".to_string(),
+                pages: "38 - 38".to_string(),
+                lessons: Some("7 - 8".to_string()),
+                clefs: Some("Sol".to_string()),
+                description: Some("Passou lições 7 e 8, estudar próximas lições.".to_string()),
+                authorizer: "MARCOS ROGÉRIO COSME".to_string(),
+            }]
+        );
+
+        let received_requests: Vec<wiremock::Request> = mock_server
+            .received_requests()
+            .await
+            .expect("All requests should have been recorded");
+
+        assert!(
+            received_requests
+                .iter()
+                .all(|request| request.url.path() != "/painel"),
+            "Student lessons should not require a dashboard warm-up"
+        );
+    });
+}
+
+#[test]
+fn given_lessons_connection_dropped_student_lessons_should_fail() {
+    let server_addr: std::net::SocketAddr = spawn_scripted_http_server(vec![
+        ScriptedResponse::Http { status: 303, body: "" },
+        ScriptedResponse::CloseConnection,
+    ]);
+
+    let client: SamClient<Authenticated> = SamClient::new(format!("http://{server_addr}"))
+        .expect("Client should be created")
+        .login(&build_valid_credentials())
+        .expect("Login should succeed");
+
+    let result: Result<Vec<MsaLesson>> = client.student_lessons("500132");
+
+    assert!(
+        result.is_err(),
+        "Expected lessons retrieval to fail but got {:#?}",
+        result
+    );
+    assert!(
+        result
+            .unwrap_err()
+            .to_string()
+            .starts_with("Student lessons request failed"),
+        "Expected a student lessons request failure"
+    );
+}
+
+fn msa_lessons_page(rows_html: &str) -> String {
+    format!(
+        r#"<html><body><div id="msa"><table id="datatable1" class="table table-striped dataTable no-footer" role="grid">
+    <thead><tr><th>Data da Lição</th><th>Fases</th><th>Paginas</th><th>Lições</th><th>Claves</th><th>Observações</th><th>Autorizante</th><th>Ações</th></tr></thead>
+    <tbody>{rows_html}</tbody>
+</table></div></body></html>"#
+    )
+}
+
+fn build_student_lessons_response(body: &str) -> wiremock::ResponseTemplate {
+    wiremock::ResponseTemplate::new(200)
+        .set_body_string(body)
+        .insert_header("Content-Type", "text/html")
 }
 
 fn free_local_port() -> u16 {
