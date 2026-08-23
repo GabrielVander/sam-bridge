@@ -98,7 +98,9 @@ fn build_http_client() -> Result<reqwest::blocking::Client> {
         .redirect(reqwest::redirect::Policy::none());
 
     #[cfg(coverage)]
-    return Ok(builder.build().expect("Fixed HTTP client configuration must be valid"));
+    return Ok(builder
+        .build()
+        .expect("Fixed HTTP client configuration must be valid"));
 
     #[cfg(not(coverage))]
     builder.build().context("Unable to instantiate HTTP client")

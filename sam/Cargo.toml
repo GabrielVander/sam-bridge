@@ -3,6 +3,16 @@ name = "sam"
 version = "0.1.0"
 edition = "2024"
 
+autotests = false
+
+[[test]]
+name = "client"
+path = "tests/client.rs"
+
+[[test]]
+name = "sam_http_capabilities"
+path = "tests/sam_http_capabilities_and_behaviour.rs"
+
 [dependencies]
 anyhow = { workspace = true }
 reqwest = { version = "0.13.4", features = [

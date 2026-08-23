@@ -82,11 +82,7 @@ mod students_listing_tests {
             r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#,
         );
 
-        assert!(
-            result.is_err(),
-            "Expected an Err but got {:#?}",
-            result
-        );
+        assert!(result.is_err(), "Expected an Err but got {:#?}", result);
         assert!(
             result
                 .unwrap_err()
