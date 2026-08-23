@@ -937,6 +937,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
 
 [[package]]
+name = "gui_application"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "flutter_rust_bridge",
+ "smol",
+ "student_management",
+ "student_management_sam_adapter",
+ "wiremock",
+]
+
+[[package]]
 name = "h2"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1855,19 +1869,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rust_lib_flutter_application"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "chrono",
- "flutter_rust_bridge",
- "regex",
- "sam_integration",
- "student_management",
-]
-
-[[package]]
 name = "rustc-demangle"
 version = "0.1.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2287,6 +2288,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
+ "regex",
  "sam",
  "smol",
  "student_management",

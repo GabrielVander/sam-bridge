@@ -1,5 +1,7 @@
-pub mod method;
-pub mod msa;
+pub mod auth;
+pub mod lessons;
+pub mod roster;
 
-pub use method::SamMethodGateway;
-pub use msa::SamMsaGateway;
+pub use auth::{SamAuthGateway, login};
+pub use lessons::SamLessonsGateway;
+pub use roster::SamRosterGateway;

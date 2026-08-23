@@ -1,10 +1,10 @@
 [workspace]
 members = [
   "student_management",
-  "app/flutter_application/rust",
   "lib/sam_integration",
   "sam",
   "student_management_sam_adapter",
+  "gui_application",
 ]
 resolver = "3"
 

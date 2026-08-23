@@ -1,40 +1,35 @@
-use anyhow::bail;
 
-#[derive(Debug, PartialEq, Clone)]
+/// All fields are optional: SAM data is assumed to be potentially absent.
+#[derive(Debug, PartialEq, Clone, Default)]
 pub struct MsaLesson {
-    pub id: String,
-    pub date: String,
-    pub phases: String,
-    pub pages: String,
+    pub id: Option<String>,
+    pub date: Option<String>,
+    pub phases: Option<String>,
+    pub pages: Option<String>,
     pub lessons: Option<String>,
     pub clefs: Option<String>,
     pub description: Option<String>,
-    pub authorizer: String,
+    pub authorizer: Option<String>,
 }
 
-pub(crate) fn parse_msa_lessons(
-    response_status: reqwest::StatusCode,
-    body: &str,
-) -> anyhow::Result<Vec<MsaLesson>> {
-    if response_status != reqwest::StatusCode::OK {
-        bail!("Unexpected status for MSA lessons response: {response_status:?}");
-    }
-
+pub(crate) fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
     if body.trim().is_empty() {
-        return Ok(Vec::new());
+        return Vec::new();
     }
 
     let document: scraper::Html = scraper::Html::parse_document(body);
     let selectors: &Selectors = selectors();
 
-    let msa_table: scraper::ElementRef = document
-        .select(&selectors.msa_table)
-        .next()
-        .ok_or_else(|| anyhow::anyhow!("No MSA lessons table found"))?;
+    // A missing table means SAM has no lessons to show (e.g. its
+    // "information not found" page) — that is an empty list, not an error.
+    let Some(msa_table): Option<scraper::ElementRef> = document.select(&selectors.msa_table).next()
+    else {
+        return Vec::new();
+    };
 
     msa_table
         .select(&selectors.body_row)
-        .map(|row| parse_msa_lesson_row(row, &selectors.cell))
+        .map(|row| parse_row(row, &selectors.cell))
         .collect()
 }
 
@@ -56,44 +51,25 @@ fn selectors() -> &'static Selectors {
     })
 }
 
-fn parse_msa_lesson_row(
-    row: scraper::ElementRef,
-    cell_selector: &scraper::Selector,
-) -> anyhow::Result<MsaLesson> {
-    let id: String = row
+fn parse_row(row: scraper::ElementRef, cell_selector: &scraper::Selector) -> MsaLesson {
+    let id = row
         .value()
         .attr("id")
         .and_then(|value| value.strip_prefix("msa_"))
         .filter(|value| !value.is_empty())
-        .map(str::to_owned)
-        .ok_or_else(|| anyhow::anyhow!("MSA lesson row is missing a valid 'id'"))?;
+        .map(str::to_owned);
 
     let mut cells: scraper::element_ref::Select = row.select(cell_selector);
 
-    let date: String = required_cell(&mut cells, "date")?;
-    let phases: String = required_cell(&mut cells, "phases")?;
-    let pages: String = required_cell(&mut cells, "pages")?;
-    let lessons: Option<String> = optional_cell(&mut cells);
-    let clefs: Option<String> = optional_cell(&mut cells);
-    let description: Option<String> = optional_cell(&mut cells);
-    let authorizer: String = required_cell(&mut cells, "authorizer")?;
-
-    Ok(MsaLesson {
+    MsaLesson {
         id,
-        date,
-        phases,
-        pages,
-        lessons,
-        clefs,
-        description,
-        authorizer,
-    })
-}
-
-fn required_cell(cells: &mut scraper::element_ref::Select, field: &str) -> anyhow::Result<String> {
-    match cells.next().map(extract_cell_text) {
-        Some(text) if !text.is_empty() => Ok(text),
-        _ => bail!("MSA lesson row is missing '{field}'"),
+        date: optional_cell(&mut cells),
+        phases: optional_cell(&mut cells),
+        pages: optional_cell(&mut cells),
+        lessons: optional_cell(&mut cells),
+        clefs: optional_cell(&mut cells),
+        description: optional_cell(&mut cells),
+        authorizer: optional_cell(&mut cells),
     }
 }
 
@@ -115,8 +91,7 @@ fn extract_cell_text(element: scraper::ElementRef) -> String {
 
 #[cfg(test)]
 mod msa_lessons_tests {
-    use super::{MsaLesson, parse_msa_lessons};
-    use reqwest::StatusCode;
+    use super::{MsaLesson, parse_msa_lessons_body};
 
     fn msa_lessons_page(rows_html: &str) -> String {
         format!(
@@ -153,168 +128,80 @@ mod msa_lessons_tests {
         </tr>"#,
         );
 
-        let result = parse_msa_lessons(StatusCode::OK, response_body);
+        let result = parse_msa_lessons_body(response_body);
 
         assert_eq!(
-            result.expect("Parsing should succeed"),
+            result,
             vec![
                 MsaLesson {
-                    id: "538784".to_string(),
-                    date: "19/08/2025".to_string(),
-                    phases: "3.4 - 4.1".to_string(),
-                    pages: "30 - 34".to_string(),
+                    id: Some("538784".to_string()),
+                    date: Some("19/08/2025".to_string()),
+                    phases: Some("3.4 - 4.1".to_string()),
+                    pages: Some("30 - 34".to_string()),
                     lessons: None,
                     clefs: None,
                     description: Some(
                         "Revisão: Ligaduras. Estudar exercícios 1 e 2, página 32.".to_string()
                     ),
-                    authorizer: "ELIAS BRANDE".to_string(),
+                    authorizer: Some("ELIAS BRANDE".to_string()),
                 },
                 MsaLesson {
-                    id: "559783".to_string(),
-                    date: "09/09/2025".to_string(),
-                    phases: "4.5 - 4.5".to_string(),
-                    pages: "38 - 38".to_string(),
+                    id: Some("559783".to_string()),
+                    date: Some("09/09/2025".to_string()),
+                    phases: Some("4.5 - 4.5".to_string()),
+                    pages: Some("38 - 38".to_string()),
                     lessons: Some("7 - 8".to_string()),
                     clefs: Some("Sol".to_string()),
                     description: Some("Passou lições 7 e 8, estudar próximas lições.".to_string()),
-                    authorizer: "MARCOS ROGÉRIO COSME".to_string(),
+                    authorizer: Some("MARCOS ROGÉRIO COSME".to_string()),
                 },
             ]
         );
     }
 
     #[test]
+    fn given_row_with_every_field_absent_should_still_be_returned() {
+        let response_body: &str = &msa_lessons_page(
+            r#"<tr>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        </tr><tr id="msa_1"></tr>"#,
+        );
+
+        let result = parse_msa_lessons_body(response_body);
+
+        assert_eq!(
+            result,
+            vec![MsaLesson::default(), MsaLesson { id: Some("1".to_owned()), ..Default::default() }],
+            "Rows without authorizer or any other field must not be dropped"
+        );
+    }
+
+    #[test]
     fn given_row_with_empty_table_should_return_no_lessons() {
-        let result = parse_msa_lessons(StatusCode::OK, &msa_lessons_page(""));
+        let result = parse_msa_lessons_body(&msa_lessons_page(""));
 
-        assert_eq!(result.expect("Parsing should succeed"), vec![]);
+        assert_eq!(result, vec![]);
     }
 
     #[test]
-    fn given_missing_required_cell_should_fail_loudly() {
-        let missing_authorizer_row: &str = r#"<tr id="msa_538784">
-            <td>19/08/2025</td>
-            <td>3.4 - 4.1</td>
-            <td>30 - 34</td>
-            <td></td>
-            <td></td>
-            <td>Revisão: Ligaduras.</td>
-        </tr>"#;
-
-        let result =
-            parse_msa_lessons(StatusCode::OK, &msa_lessons_page(missing_authorizer_row));
-
-        assert!(
-            result.is_err(),
-            "Expected a row without an authorizer to fail but got {:#?}",
-            result
-        );
-        assert!(
-            result.unwrap_err().to_string().contains("missing"),
-            "Expected a loud error naming the missing field"
-        );
-    }
-
-    #[test]
-    fn given_rows_missing_each_leading_required_field_should_fail_naming_it() {
-        let missing_date_row: &str = r#"<tr id="msa_1"></tr>"#;
-        let missing_phases_row: &str = r#"<tr id="msa_2"><td>19/08/2025</td></tr>"#;
-        let missing_pages_row: &str =
-            r#"<tr id="msa_3"><td>19/08/2025</td><td>3.4 - 4.1</td></tr>"#;
-
-        let error_test_cases: Vec<(&str, &str)> = vec![
-            (missing_date_row, "missing 'date'"),
-            (missing_phases_row, "missing 'phases'"),
-            (missing_pages_row, "missing 'pages'"),
-        ];
-
-        for (row_html, expected_error) in error_test_cases {
-            let result = parse_msa_lessons(StatusCode::OK, &msa_lessons_page(row_html));
-
-            assert!(
-                result.is_err(),
-                "Expected '{row_html}' to fail but got {:#?}",
-                result
-            );
-            assert!(
-                result.unwrap_err().to_string().contains(expected_error),
-                "Expected error naming {expected_error}"
-            );
-        }
-    }
-
-    #[test]
-    fn given_row_without_valid_id_should_fail_loudly() {
-        let row_without_id: &str = r#"<tr class="odd">
-            <td>19/08/2025</td>
-            <td>3.4 - 4.1</td>
-            <td>30 - 34</td>
-            <td></td>
-            <td></td>
-            <td>Revisão.</td>
-            <td>ELIAS BRANDE</td>
-        </tr>"#;
-
-        let result = parse_msa_lessons(StatusCode::OK, &msa_lessons_page(row_without_id));
-
-        assert!(
-            result.is_err(),
-            "Expected a row without an id to fail but got {:#?}",
-            result
-        );
-    }
-
-    #[test]
-    fn given_html_without_msa_table_should_fail_with_table_error() {
-        let result = parse_msa_lessons(
-            StatusCode::OK,
-            "<html><body><h1>Lições Aprovadas</h1></body></html>",
+    fn given_html_without_msa_table_should_return_empty_list_not_error() {
+        let result = parse_msa_lessons_body("<html><body><h1>Informação não encontrada</h1></body></html>",
         );
 
-        assert!(
-            result.is_err(),
-            "Expected parsing without an MSA table to fail but got {:#?}",
-            result
-        );
-        assert!(
-            result
-                .unwrap_err()
-                .to_string()
-                .starts_with("No MSA lessons table found"),
-            "Expected a missing-table error"
-        );
+        assert_eq!(result, vec![]);
     }
 
     #[test]
     fn given_empty_body_should_return_no_lessons() {
         for empty_body in ["", "   "] {
-            let result = parse_msa_lessons(StatusCode::OK, empty_body);
+            let result = parse_msa_lessons_body(empty_body);
 
             assert_eq!(
-                result.expect("Parsing should succeed"),
+                result,
                 vec![],
                 "Expected no lessons for '{empty_body}'"
             );
         }
     }
 
-    #[test]
-    fn given_unexpected_response_status_should_fail_with_status_error() {
-        let result = parse_msa_lessons(
-            StatusCode::TEMPORARY_REDIRECT,
-            &msa_lessons_page(
-                "<tr id=\"msa_1\"><td>d</td><td>p</td><td>pg</td><td></td><td></td><td>obs</td><td>a</td></tr>",
-            ),
-        );
-
-        assert!(result.is_err(), "Expected an Err but got {:#?}", result);
-        assert!(
-            result
-                .unwrap_err()
-                .to_string()
-                .starts_with("Unexpected status for MSA lessons response: 307"),
-            "Expected an unexpected-status error"
-        );
-    }
 }

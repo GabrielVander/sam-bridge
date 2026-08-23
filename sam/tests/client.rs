@@ -4,7 +4,8 @@ use support::{ScriptedResponse, spawn_scripted_http_server};
 
 use anyhow::{Error, Result};
 use sam::client::{
-    Authenticated, MsaLesson, MtdLesson, SamClient, SamCredentials, SamStudent, Unauthenticated,
+    Authenticated, MsaLesson, MtdLesson, SamClient, SamCredentials, SamStudent,
+    StudentLessonsPage, Unauthenticated,
 };
 
 #[test]
@@ -445,7 +446,7 @@ fn given_truncated_listing_body_students_should_fail() {
 }
 
 #[test]
-fn given_valid_msa_lessons_page_lessons_should_be_mapped_without_dashboard_warmup() {
+fn given_student_lessons_page_should_parse_both_tables_from_a_single_fetch() {
     smol::block_on(async {
         let mock_server: wiremock::MockServer = wiremock::MockServer::start().await;
         let credentials: SamCredentials = build_valid_credentials();
@@ -459,8 +460,9 @@ fn given_valid_msa_lessons_page_lessons_should_be_mapped_without_dashboard_warmu
 
         wiremock::Mock::given(wiremock::matchers::method("GET"))
             .and(wiremock::matchers::path("/licoes/index/500132"))
-            .respond_with(build_msa_lessons_response(&msa_lessons_page(
-                r#"<tr id="msa_559783" role="row" class="even">
+            .respond_with(html_response(&student_lessons_page(
+                &msa_table_fragment(
+                    r#"<tr id="msa_559783" role="row" class="even">
                         <td>09/09/2025</td>
                         <td>4.5 - 4.5</td>
                         <td>38 - 38</td>
@@ -469,6 +471,18 @@ fn given_valid_msa_lessons_page_lessons_should_be_mapped_without_dashboard_warmu
                         <td>Passou lições 7 e 8, estudar próximas lições.</td>
                         <td>MARCOS ROGÉRIO COSME</td>
                     </tr>"#,
+                ),
+                &mtd_table_fragment(
+                    r#"<tr id="mtd_214020" role="row" class="even">
+                        <td>00</td>
+                        <td>00</td>
+                        <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
+                        <td>04/12/2023</td>
+                        <td>MURILO FAGNER CARDOSO</td>
+                        <td>04/12/2023 21:17:17</td>
+                        <td>Postura do violino </td>
+                    </tr>"#,
+                ),
             )))
             .mount(&mock_server)
             .await;
@@ -478,19 +492,33 @@ fn given_valid_msa_lessons_page_lessons_should_be_mapped_without_dashboard_warmu
             .login(&credentials)
             .expect("Login should succeed");
 
-        let result: Result<Vec<MsaLesson>> = client.msa_lessons("500132");
+        let page: StudentLessonsPage =
+            client.student_lessons("500132").expect("Lessons retrieval should succeed");
 
         assert_eq!(
-            result.expect("Lessons retrieval should succeed"),
+            page.msa,
             vec![MsaLesson {
-                id: "559783".to_string(),
-                date: "09/09/2025".to_string(),
-                phases: "4.5 - 4.5".to_string(),
-                pages: "38 - 38".to_string(),
+                id: Some("559783".to_string()),
+                date: Some("09/09/2025".to_string()),
+                phases: Some("4.5 - 4.5".to_string()),
+                pages: Some("38 - 38".to_string()),
                 lessons: Some("7 - 8".to_string()),
                 clefs: Some("Sol".to_string()),
                 description: Some("Passou lições 7 e 8, estudar próximas lições.".to_string()),
-                authorizer: "MARCOS ROGÉRIO COSME".to_string(),
+                authorizer: Some("MARCOS ROGÉRIO COSME".to_string()),
+            }]
+        );
+        assert_eq!(
+            page.method,
+            vec![MtdLesson {
+                id: Some("214020".to_string()),
+                pages: Some("00".to_string()),
+                lesson: Some("00".to_string()),
+                method: Some("MÉTODO CCB - SCHIMOLL - VIOLINO".to_string()),
+                date: Some("04/12/2023".to_string()),
+                authorizer: Some("MURILO FAGNER CARDOSO".to_string()),
+                registration_date: Some("04/12/2023 21:17:17".to_string()),
+                observations: Some("Postura do violino".to_string()),
             }]
         );
 
@@ -499,17 +527,100 @@ fn given_valid_msa_lessons_page_lessons_should_be_mapped_without_dashboard_warmu
             .await
             .expect("All requests should have been recorded");
 
+        assert_eq!(
+            received_requests
+                .iter()
+                .filter(|request| request.url.path() == "/licoes/index/500132")
+                .count(),
+            1,
+            "Both lesson kinds must come from exactly one fetch"
+        );
         assert!(
             received_requests
                 .iter()
                 .all(|request| request.url.path() != "/painel"),
-            "MSA lessons should not require a dashboard warm-up"
+            "Student lessons should not require a dashboard warm-up"
         );
     });
 }
 
 #[test]
-fn given_msa_lessons_connection_dropped_should_fail() {
+fn given_page_without_method_table_should_return_empty_method_list() {
+    smol::block_on(async {
+        let mock_server: wiremock::MockServer = wiremock::MockServer::start().await;
+        let credentials: SamCredentials = build_valid_credentials();
+
+        given_credentials_authentication_endpoint_responds_with(
+            &mock_server,
+            &credentials,
+            build_valid_credentials_response(),
+        )
+        .await;
+
+        wiremock::Mock::given(wiremock::matchers::method("GET"))
+            .and(wiremock::matchers::path("/licoes/index/500132"))
+            .respond_with(html_response(&student_lessons_page(
+                &msa_table_fragment(
+                    "<tr id=\"msa_1\"><td>01/01/2024</td><td>1.0</td><td>1</td><td></td><td></td><td>obs</td><td></td></tr>",
+                ),
+                "<!-- no datatable3 on this page -->",
+            )))
+            .mount(&mock_server)
+            .await;
+
+        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
+            .expect("Client should be created")
+            .login(&credentials)
+            .expect("Login should succeed");
+
+        let page: StudentLessonsPage =
+            client.student_lessons("500132").expect("Should not fail on missing table");
+
+        assert_eq!(page.msa.len(), 1);
+        assert!(page.method.is_empty());
+        assert_eq!(page.msa[0].authorizer, None, "Absent authorizer stays absent");
+    });
+}
+
+#[test]
+fn given_unexpected_status_for_lessons_should_fail_with_status_error() {
+    smol::block_on(async {
+        let mock_server: wiremock::MockServer = wiremock::MockServer::start().await;
+        let credentials: SamCredentials = build_valid_credentials();
+
+        given_credentials_authentication_endpoint_responds_with(
+            &mock_server,
+            &credentials,
+            build_valid_credentials_response(),
+        )
+        .await;
+
+        wiremock::Mock::given(wiremock::matchers::method("GET"))
+            .and(wiremock::matchers::path("/licoes/index/500132"))
+            .respond_with(wiremock::ResponseTemplate::new(500))
+            .mount(&mock_server)
+            .await;
+
+        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
+            .expect("Client should be created")
+            .login(&credentials)
+            .expect("Login should succeed");
+
+        let result: Result<StudentLessonsPage> = client.student_lessons("500132");
+
+        assert!(result.is_err(), "Expected an Err but got {:#?}", result);
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .starts_with("Unexpected status for student lessons response: 500"),
+            "Expected an unexpected-status error"
+        );
+    });
+}
+
+#[test]
+fn given_lessons_connection_dropped_should_fail() {
     let server_addr: std::net::SocketAddr = spawn_scripted_http_server(vec![
         ScriptedResponse::Http {
             status: 303,
@@ -523,7 +634,7 @@ fn given_msa_lessons_connection_dropped_should_fail() {
         .login(&build_valid_credentials())
         .expect("Login should succeed");
 
-    let result: Result<Vec<MsaLesson>> = client.msa_lessons("500132");
+    let result: Result<StudentLessonsPage> = client.student_lessons("500132");
 
     assert!(
         result.is_err(),
@@ -534,21 +645,34 @@ fn given_msa_lessons_connection_dropped_should_fail() {
         result
             .unwrap_err()
             .to_string()
-            .starts_with("MSA lessons request failed"),
-        "Expected a MSA lessons request failure"
+            .starts_with("Student lessons request failed"),
+        "Expected a student lessons request failure"
     );
 }
 
-fn msa_lessons_page(rows_html: &str) -> String {
+fn student_lessons_page(msa_table_html: &str, mtd_table_html: &str) -> String {
+    format!("<html><body>{msa_table_html}{mtd_table_html}</body></html>")
+}
+
+fn msa_table_fragment(rows_html: &str) -> String {
     format!(
-        r#"<html><body><div id="msa"><table id="datatable1" class="table table-striped dataTable no-footer" role="grid">
+        r#"<div id="msa"><table id="datatable1" class="table table-striped dataTable no-footer" role="grid">
     <thead><tr><th>Data da Lição</th><th>Fases</th><th>Paginas</th><th>Lições</th><th>Claves</th><th>Observações</th><th>Autorizante</th><th>Ações</th></tr></thead>
     <tbody>{rows_html}</tbody>
-</table></div></body></html>"#
+</table></div>"#
     )
 }
 
-fn build_msa_lessons_response(body: &str) -> wiremock::ResponseTemplate {
+fn mtd_table_fragment(rows_html: &str) -> String {
+    format!(
+        r#"<table id="datatable3" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid">
+    <thead><tr><th>Páginas</th><th>Lição</th><th>Método</th><th>Data da Lição</th><th>Autorizante</th><th>Data de Cadastro</th><th>Observações</th><th>Ações</th></tr></thead>
+    <tbody>{rows_html}</tbody>
+</table>"#
+    )
+}
+
+fn html_response(body: &str) -> wiremock::ResponseTemplate {
     wiremock::ResponseTemplate::new(200)
         .set_body_string(body)
         .insert_header("Content-Type", "text/html")
@@ -636,114 +760,4 @@ async fn given_credentials_authentication_endpoint_responds_with(
         .respond_with(response)
         .mount(server)
         .await;
-}
-
-fn mtd_lessons_page(rows_html: &str) -> String {
-    format!(
-        r#"<html><body><table id="datatable3" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid">
-    <thead><tr><th>Páginas</th><th>Lição</th><th>Método</th><th>Data da Lição</th><th>Autorizante</th><th>Data de Cadastro</th><th>Observações</th><th>Ações</th></tr></thead>
-    <tbody>{rows_html}</tbody>
-</table></body></html>"#
-    )
-}
-
-fn build_method_lessons_response(body: &str) -> wiremock::ResponseTemplate {
-    wiremock::ResponseTemplate::new(200)
-        .set_body_string(body)
-        .insert_header("Content-Type", "text/html")
-}
-
-#[test]
-fn given_valid_method_lessons_page_lessons_should_be_mapped_without_dashboard_warmup() {
-    smol::block_on(async {
-        let mock_server: wiremock::MockServer = wiremock::MockServer::start().await;
-        let credentials: SamCredentials = build_valid_credentials();
-
-        given_credentials_authentication_endpoint_responds_with(
-            &mock_server,
-            &credentials,
-            build_valid_credentials_response(),
-        )
-        .await;
-
-        wiremock::Mock::given(wiremock::matchers::method("GET"))
-            .and(wiremock::matchers::path("/metodo/licoes/500132"))
-            .respond_with(build_method_lessons_response(&mtd_lessons_page(
-                r#"<tr id="mtd_214020" role="row" class="even">
-                        <td>00</td>
-                        <td>00</td>
-                        <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
-                        <td>04/12/2023</td>
-                        <td>MURILO FAGNER CARDOSO</td>
-                        <td>04/12/2023 21:17:17</td>
-                        <td>Postura do violino </td>
-                    </tr>"#,
-            )))
-            .mount(&mock_server)
-            .await;
-
-        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
-            .expect("Client should be created")
-            .login(&credentials)
-            .expect("Login should succeed");
-
-        let result: Result<Vec<MtdLesson>> = client.method_lessons("500132");
-
-        assert_eq!(
-            result.expect("Lessons retrieval should succeed"),
-            vec![MtdLesson {
-                id: "214020".to_string(),
-                pages: "00".to_string(),
-                lesson: Some("00".to_string()),
-                method: "MÉTODO CCB - SCHIMOLL - VIOLINO".to_string(),
-                date: "04/12/2023".to_string(),
-                authorizer: "MURILO FAGNER CARDOSO".to_string(),
-                registration_date: "04/12/2023 21:17:17".to_string(),
-                observations: Some("Postura do violino".to_string()),
-            }]
-        );
-
-        let received_requests: Vec<wiremock::Request> = mock_server
-            .received_requests()
-            .await
-            .expect("All requests should have been recorded");
-
-        assert!(
-            received_requests
-                .iter()
-                .all(|request| request.url.path() != "/painel"),
-            "Method lessons should not require a dashboard warm-up"
-        );
-    });
-}
-
-#[test]
-fn given_method_lessons_connection_dropped_should_fail() {
-    let server_addr: std::net::SocketAddr = spawn_scripted_http_server(vec![
-        ScriptedResponse::Http {
-            status: 303,
-            body: "",
-        },
-        ScriptedResponse::CloseConnection,
-    ]);
-
-    let client: SamClient<Authenticated> = SamClient::new(format!("http://{server_addr}"))
-        .expect("Client should be created")
-        .login(&build_valid_credentials())
-        .expect("Login should succeed");
-
-    let result: Result<Vec<MtdLesson>> = client.method_lessons("500132");
-
-    assert!(
-        result.is_err(),
-        "Expected lessons retrieval to fail but got {:#?}",
-        result
-    );
-    assert!(
-        result
-            .unwrap_err()
-            .to_string()
-            .starts_with("Method lessons request failed"),
-        "Expected a method lessons request failure"
-    );
 }

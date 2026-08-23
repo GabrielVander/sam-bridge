@@ -1,6 +1,6 @@
 use anyhow::{Context, bail};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct SamStudent {
     pub id: String,
     pub name: String,

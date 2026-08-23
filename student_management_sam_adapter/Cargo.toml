@@ -9,6 +9,7 @@ student_management = { path = "../student_management" }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 chrono = { workspace = true }
+regex = "1.12.4"
 smol = "2.0.2"
 
 [dev-dependencies]

@@ -1,4 +1,0 @@
-rust_input: crate
-rust_root: rust/
-dart_output: lib
-enable_lifetime: true

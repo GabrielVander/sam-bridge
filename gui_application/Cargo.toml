@@ -1,0 +1,22 @@
+[package]
+name = "gui_application"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+student_management = { path = "../student_management" }
+student_management_sam_adapter = { path = "../student_management_sam_adapter" }
+flutter_rust_bridge = "=2.13.0-beta.2"
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+chrono = { workspace = true }
+smol = "2.0.2"
+
+[dev-dependencies]
+wiremock = "0.6.5"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }
