@@ -18,12 +18,11 @@ about HTTP or HTML.
 @startuml
 title SAM Bridge Component Diagram
 
-component "gui_application::flutter\nPresentation (go_router + CubitSignal)" as ui
-component "gui_application\nFRB api + vertical slices + composition root" as app
-component "student_management\nCore (domain entities + use cases)" as core
-component "student_management_sam_adapter\nGateway implementations over the SAM client" as adapter
-component "sam\nSAM portal client (blocking reqwest + scraper)" as sam
-component "lib/sam_integration\nLEGACY - pending removal" as legacy
+component "Presentation GUI" as ui <<gui_application::flutter>>
+component "FRB api + composition root" as app <<gui_application>>
+component "Core student domain" as core <<student_management>>
+component "Gateway implementations over the SAM client" as adapter <<student_management_sam_adapter>>
+component "SAM portal client" as sam <<sam>>
 
 ui --> app
 app --> core
