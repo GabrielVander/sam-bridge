@@ -4,6 +4,7 @@ members = [
   "app/flutter_application/rust",
   "lib/sam_integration",
   "sam",
+  "student_management_sam_adapter",
 ]
 resolver = "3"
 

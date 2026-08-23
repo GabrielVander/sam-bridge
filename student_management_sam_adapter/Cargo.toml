@@ -1,0 +1,18 @@
+[package]
+name = "student_management_sam_adapter"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sam = { path = "../sam" }
+student_management = { path = "../lib/student_management" }
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+chrono = { workspace = true }
+smol = "2.0.2"
+
+[dev-dependencies]
+wiremock = "0.6.5"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }

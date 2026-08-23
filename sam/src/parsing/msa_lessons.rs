@@ -1,6 +1,6 @@
 use anyhow::bail;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct MsaLesson {
     pub id: String,
     pub date: String,

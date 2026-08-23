@@ -12,10 +12,10 @@ pub struct SamClient<State> {
     _state: PhantomData<State>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Unauthenticated;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Authenticated;
 
 impl SamClient<Unauthenticated> {

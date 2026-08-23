@@ -3,11 +3,17 @@ pub(crate) mod features;
 pub mod api {
 
     pub mod application {
+        #[allow(deprecated)]
         pub use crate::features::{
             authentication::application::gateways::AuthGateway,
             authentication::application::use_cases::LoginUseCase,
-            student_lessons::application::gateways::StudentLessonsGateway,
-            student_lessons::application::use_cases::RetrieveStudentLessonsUseCase,
+            student_lessons::application::gateways::{
+                MethodGateway, MethodLessonsGateway, MsaGateway, StudentLessonsGateway,
+            },
+            student_lessons::application::use_cases::{
+                RetrieveMethodLessonsUseCase, RetrieveMsaLessonsUseCase,
+                RetrieveStudentLessonsUseCase,
+            },
             student_roster::application::gateways::StudentsRetrievalGateway,
             student_roster::application::use_cases::RetrieveStudentsUseCase,
         };

@@ -2281,6 +2281,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "student_management_sam_adapter"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "sam",
+ "smol",
+ "student_management",
+ "wiremock",
+]
+
+[[package]]
 name = "subtle"
 version = "2.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

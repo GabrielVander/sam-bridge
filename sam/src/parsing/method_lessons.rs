@@ -1,6 +1,6 @@
 use anyhow::bail;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct MtdLesson {
     pub id: String,
     pub pages: String,
