@@ -3,8 +3,6 @@ use student_management_sam_adapter::{
     gateways::{SamLessonsGateway, SamRosterGateway},
 };
 
-/// Composition root wiring: the set of gateways the API surface uses, all
-/// backed by one authenticated SAM session.
 #[derive(Clone)]
 pub struct AppGateways {
     pub roster: SamRosterGateway<SamClient<Authenticated>>,

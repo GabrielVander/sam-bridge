@@ -1,11 +1,8 @@
 import 'package:flutter_application/api.dart' as api;
 import 'package:flutter_application/view_models.dart';
 
-/// Base URL of the SAM portal.
 const String kSamBaseUrl = 'https://musical.congregacao.org.br';
 
-/// Boundary the UI layer talks to. Implemented by Rust bindings in
-/// production and by fakes in tests — keeps presenters pure Dart-testable.
 abstract interface class SamPortal {
   Future<void> login({
     required String baseUrl,
@@ -20,7 +17,6 @@ abstract interface class SamPortal {
   });
 }
 
-/// Production implementation delegating to the generated FRB bindings.
 final class RustSamPortal implements SamPortal {
   const RustSamPortal();
 

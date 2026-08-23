@@ -1,5 +1,4 @@
 
-/// All fields are optional: SAM data is assumed to be potentially absent.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct MsaLesson {
     pub id: Option<String>,
@@ -20,8 +19,6 @@ pub(crate) fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
     let document: scraper::Html = scraper::Html::parse_document(body);
     let selectors: &Selectors = selectors();
 
-    // A missing table means SAM has no lessons to show (e.g. its
-    // "information not found" page) — that is an empty list, not an error.
     let Some(msa_table): Option<scraper::ElementRef> = document.select(&selectors.msa_table).next()
     else {
         return Vec::new();

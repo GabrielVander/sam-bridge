@@ -1,5 +1,4 @@
 
-/// All fields are optional: SAM data is assumed to be potentially absent.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct MtdLesson {
     pub id: Option<String>,
@@ -20,8 +19,6 @@ pub(crate) fn parse_method_lessons_body(body: &str) -> Vec<MtdLesson> {
     let document: scraper::Html = scraper::Html::parse_document(body);
     let selectors: &Selectors = selectors();
 
-    // A missing table means SAM has no method lessons to show (e.g. its
-    // "information not found" page) — that is an empty list, not an error.
     let Some(mtd_table): Option<scraper::ElementRef> = document.select(&selectors.mtd_table).next()
     else {
         return Vec::new();

@@ -10,7 +10,6 @@ import 'view_models.dart';
 // These functions are ignored because they are not marked as `pub`: `session_slot`, `with_session`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `Session`
 
-/// Authenticates against SAM and keeps the session for subsequent calls.
 Future<void> login({
   required String baseUrl,
   required String username,
@@ -21,17 +20,13 @@ Future<void> login({
   password: password,
 );
 
-/// Clears the current session, if any.
 Future<void> logout() => RustLib.instance.api.crateApiLogout();
 
-/// Whether a session is currently active.
 Future<bool> isLoggedIn() => RustLib.instance.api.crateApiIsLoggedIn();
 
-/// Lists all students available in SAM.
 Future<List<StudentListItem>> retrieveStudents() =>
     RustLib.instance.api.crateApiRetrieveStudents();
 
-/// Loads both MSA and Method lessons for a student, most recent first.
 Future<StudentLessonsView> retrieveStudentLessons({
   required String studentId,
 }) => RustLib.instance.api.crateApiRetrieveStudentLessons(studentId: studentId);

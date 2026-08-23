@@ -2,7 +2,6 @@ use crate::view_models::{LessonItem, LessonKind, StudentLessonsView};
 use student_management::api::application::StudentLessonsGateway;
 use student_management::api::domain::StudentLessons;
 
-/// Loads both lesson kinds for a student and orders each list most-recent-first.
 pub async fn load(
     lessons_gateway: &(dyn StudentLessonsGateway + Send + Sync),
     student_id: &str,
@@ -10,8 +9,6 @@ pub async fn load(
     let bundle: StudentLessons =
         lessons_gateway.get_all_for_student_with_id(student_id).await?;
 
-    // Sort on typed dates first; ISO strings in view models keep the order.
-    // Dateless lessons naturally sink to the end via Option ordering.
     let mut approved = bundle.approved;
     sort_most_recent_first(&mut approved);
     let mut method = bundle.method;

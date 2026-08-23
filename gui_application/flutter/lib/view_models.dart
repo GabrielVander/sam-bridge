@@ -9,8 +9,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 class LessonItem {
   final LessonKind kind;
   final String id;
-
-  /// ISO-8601 (`YYYY-MM-DD`) — FRB-friendly primitive for the Dart side.
   final String date;
   final String phase;
   final String page;

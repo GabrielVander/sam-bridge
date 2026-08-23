@@ -35,7 +35,6 @@ pub struct StudentLessonsView {
 pub struct LessonItem {
     pub kind: LessonKind,
     pub id: String,
-    /// ISO-8601 (`YYYY-MM-DD`) — FRB-friendly primitive for the Dart side.
     pub date: String,
     pub phase: String,
     pub page: String,
@@ -128,7 +127,6 @@ fn range_label(range: Option<&student_management::api::domain::Range>) -> String
         .unwrap_or_default()
 }
 
-/// Region label kept for completeness of the view surface (e.g. future filters).
 pub fn region_label(region: &Region) -> String {
     match region {
         Region::AraraquaraSaoCarlos => "Araraquara – São Carlos".to_owned(),

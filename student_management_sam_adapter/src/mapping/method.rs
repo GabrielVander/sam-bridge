@@ -3,7 +3,6 @@ use student_management::api::domain::Lesson;
 
 use super::common::{parse_naive_date, parse_range};
 
-/// Option-preserving mapping: absent/unparseable SAM data stays absent.
 pub fn map(dto: &MtdLesson) -> Lesson {
     Lesson {
         id: dto.id.clone().filter(|s| !s.trim().is_empty()),

@@ -36,7 +36,6 @@ impl LessonsSource for SamClient<Authenticated> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sam::client::{MsaLesson, MtdLesson};
 
     async fn logged_in_client(uri: &str) -> SamClient<Authenticated> {
         SamClient::new(uri)
@@ -139,11 +138,5 @@ mod tests {
             assert_eq!(page.method.len(), 1);
             assert_eq!(page.method[0].id.as_deref(), Some("214020"));
         });
-    }
-
-    #[test]
-    fn dto_defaults_should_exist_for_stubs() {
-        let _: Vec<MsaLesson> = Vec::new();
-        let _: Vec<MtdLesson> = Vec::new();
     }
 }

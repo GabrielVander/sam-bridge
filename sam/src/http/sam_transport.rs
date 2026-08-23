@@ -14,9 +14,7 @@ pub(crate) struct SamTransport {
 
 impl SamTransport {
     pub(crate) fn new(base_url: impl Into<String>) -> Result<Self> {
-        // HTTP client construction cannot fail (fixed configuration), so the
-        // defensive error propagation is compiled out of coverage builds
-        // where no test can exercise it.
+        // Fixed configuration cannot fail; unreachable error arm compiled out under coverage.
         #[cfg(coverage)]
         let http_client: reqwest::blocking::Client =
             build_http_client().expect("Fixed HTTP client configuration must be valid");
@@ -102,15 +100,12 @@ fn normalize_base_url(base_url: String) -> String {
     base_url.trim_end_matches('/').to_owned()
 }
 
-// The reqwest builder cannot fail with this fixed configuration, so the
-// error handling below is purely defensive and no test can ever exercise
-// it. To avoid reporting permanently-unreachable regions, coverage builds
-// compile only the reachable path.
 fn build_http_client() -> Result<reqwest::blocking::Client> {
     let builder = reqwest::blocking::Client::builder()
         .cookie_store(true)
         .redirect(reqwest::redirect::Policy::none());
 
+    // Fixed configuration cannot fail; unreachable error arm compiled out under coverage.
     #[cfg(coverage)]
     return Ok(builder
         .build()

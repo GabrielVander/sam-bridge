@@ -20,9 +20,7 @@ pub struct Authenticated;
 
 impl SamClient<Unauthenticated> {
     pub fn new(base_url: impl Into<String>) -> Result<Self> {
-        // Transport construction cannot fail (fixed HTTP client
-        // configuration), so the defensive error propagation is compiled out
-        // of coverage builds where no test can exercise it.
+        // Fixed configuration cannot fail; unreachable error arm compiled out under coverage.
         #[cfg(coverage)]
         let transport: SamTransport =
             SamTransport::new(base_url).expect("Fixed HTTP client configuration must be valid");
@@ -66,8 +64,6 @@ impl SamClient<Authenticated> {
         parsing::parse_session_status(self.transport.visit_dashboard()?)
     }
 
-    /// MSA (approved) and Method lessons share a single endpoint whose HTML
-    /// page carries both tables; one fetch serves both.
     pub fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage> {
         let response: RawResponse = self.transport.fetch_student_lessons(student_id)?;
 

@@ -18,13 +18,9 @@ pub(crate) fn parse_student_lessons_page(
     response_status: reqwest::StatusCode,
     body: &str,
 ) -> anyhow::Result<StudentLessonsPage> {
-    use reqwest::StatusCode;
-
-    if response_status != StatusCode::OK {
+    if response_status != reqwest::StatusCode::OK {
         anyhow::bail!("Unexpected status for student lessons response: {response_status:?}");
     }
-
-    let _ = StatusCode::OK; // status contract documented above
 
     Ok(StudentLessonsPage {
         msa: parse_msa_lessons_body(body),
@@ -32,7 +28,6 @@ pub(crate) fn parse_student_lessons_page(
     })
 }
 
-/// Both lesson kinds from the single lessons endpoint's HTML page.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct StudentLessonsPage {
     pub msa: Vec<MsaLesson>,

@@ -24,7 +24,7 @@ where
 {
     async fn get_avaliable_records(&self) -> anyhow::Result<Vec<Student>> {
         let source = self.source.clone();
-        // sam is blocking — offload to thread pool so we don't block the async executor
+        // sam is blocking: run on smol's thread pool.
         let dtos = smol::unblock(move || source.students()).await?;
         dtos.iter().map(roster_mapping::map).collect()
     }

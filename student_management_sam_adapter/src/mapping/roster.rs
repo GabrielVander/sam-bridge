@@ -5,8 +5,6 @@ use student_management::api::domain::{
     MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
 };
 
-/// Tolerant mapping: SAM data is assumed to be potentially absent, so nothing
-/// here fails — absent values flow through as empty strings / `Unknown`.
 pub fn map(dto: &sam::client::SamStudent) -> anyhow::Result<Student> {
     let cleaned_location = clean_location(&dto.location);
     let (location, region) = split_location_bundle(&cleaned_location);

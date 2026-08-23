@@ -29,7 +29,7 @@ where
     ) -> anyhow::Result<StudentLessons> {
         let source = self.source.clone();
         let id = id.to_owned();
-        // sam is blocking — offload to thread pool so we don't block the async executor
+        // sam is blocking: run on smol's thread pool.
         let page: StudentLessonsPage = smol::unblock(move || source.student_lessons(&id)).await?;
 
         Ok(StudentLessons {
@@ -39,7 +39,6 @@ where
     }
 }
 
-/// Domain `Lesson` mapping happens in `crate::mapping`.
 #[cfg(test)]
 mod tests {
     use super::*;

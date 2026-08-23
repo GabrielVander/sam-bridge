@@ -10,13 +10,13 @@ struct Session {
     gateways: AppGateways,
 }
 
+// Process-global session. Tests serialize via test_lock because plain cargo test shares one process.
 static SESSION: OnceLock<RwLock<Option<Session>>> = OnceLock::new();
 
 fn session_slot() -> &'static RwLock<Option<Session>> {
     SESSION.get_or_init(|| RwLock::new(None))
 }
 
-/// Authenticates against SAM and keeps the session for subsequent calls.
 pub async fn login(base_url: String, username: String, password: String) -> anyhow::Result<()> {
     let client: SamClient<Authenticated> =
         slices::authentication::login(base_url, username, password).await?;
@@ -30,14 +30,12 @@ pub async fn login(base_url: String, username: String, password: String) -> anyh
     Ok(())
 }
 
-/// Clears the current session, if any.
 pub fn logout() {
     *session_slot()
         .write()
         .expect("Session lock should not be poisoned") = None;
 }
 
-/// Whether a session is currently active.
 pub fn is_logged_in() -> bool {
     session_slot()
         .read()
@@ -57,13 +55,11 @@ fn with_session<T>(
     Ok(f(&session.gateways))
 }
 
-/// Lists all students available in SAM.
 pub async fn retrieve_students() -> anyhow::Result<Vec<StudentListItem>> {
     let gateways = with_session(|g| g.clone())?;
     slices::roster::load(&gateways.roster).await
 }
 
-/// Loads both MSA and Method lessons for a student, most recent first.
 pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<StudentLessonsView> {
     let gateways = with_session(|g| g.clone())?;
     slices::lessons::load(&gateways.lessons, &student_id).await
@@ -73,9 +69,6 @@ pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<Stud
 mod tests {
     use super::*;
 
-    /// The SESSION slot is process-global. nextest isolates each test into
-    /// its own process, but plain `cargo test` shares one — serialize every
-    /// session-touching test so they cannot interleave.
     fn test_lock() -> std::sync::MutexGuard<'static, ()> {
         static LOCK: OnceLock<std::sync::Mutex<()>> = OnceLock::new();
         LOCK.get_or_init(|| std::sync::Mutex::new(()))
@@ -83,8 +76,6 @@ mod tests {
             .expect("Test mutex is never poisoned: no panics while held")
     }
 
-    /// nextest runs every test in its own process, so mutating the global
-    /// SESSION slot is safe here.
     async fn mock_sam() -> wiremock::MockServer {
         let server = wiremock::MockServer::start().await;
 
@@ -116,8 +107,6 @@ mod tests {
             .mount(&server)
             .await;
 
-        // MSA and Method share /licoes/index/{id}; the page already carries
-        // both tables, so no separate method endpoint is mocked.
 
         server
     }
@@ -137,8 +126,6 @@ mod tests {
     #[test]
     fn given_bad_credentials_should_fail_and_stay_logged_out() {
         let _session_guard = test_lock();
-        // The SESSION slot is process-global; clear it so this test is
-        // independent of sibling tests when run in a shared process.
         logout();
 
         smol::block_on(async {

@@ -22,7 +22,6 @@ final class AuthFailure extends AuthState {
   const AuthFailure(this.message);
 }
 
-/// Presenter for the authentication slice.
 class AuthCubitSignal extends CubitSignal<AuthState> {
   final SamPortal _portal;
 

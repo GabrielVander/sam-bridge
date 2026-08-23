@@ -27,35 +27,38 @@ final class _StudentScreenState extends State<StudentScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Always available escape hatch — even when lesson loading fails.
         _BackBar(),
         Expanded(
           child: BlocSignalBuilder<LessonsCubitSignal, LessonsState>(
             builder: (context, state) => switch (state) {
-              LessonsLoading() =>
-                const Center(child: CircularProgressIndicator()),
+              LessonsLoading() => const Center(
+                child: CircularProgressIndicator(),
+              ),
               LessonsLoaded(:final view) => _LessonsTabs(view: view),
               LessonsFailure(:final message) => Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.error_outline,
-                          size: 48, color: Theme.of(context).colorScheme.error),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Text(message, textAlign: TextAlign.center),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(message, textAlign: TextAlign.center),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.tonal(
+                      onPressed: () => context.read<LessonsCubitSignal>().load(
+                        widget.studentId,
                       ),
-                      const SizedBox(height: 16),
-                      FilledButton.tonal(
-                        onPressed: () => context
-                            .read<LessonsCubitSignal>()
-                            .load(widget.studentId),
-                        child: const Text('Tentar novamente'),
-                      ),
-                    ],
-                  ),
+                      child: const Text('Tentar novamente'),
+                    ),
+                  ],
                 ),
+              ),
               _ => const SizedBox.shrink(),
             },
           ),
@@ -146,9 +149,12 @@ final class _LessonList extends StatelessWidget {
               runSpacing: 4,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Text(lesson.date.isEmpty ? '—' : lesson.date,
-                    style: Theme.of(context).textTheme.titleMedium),
-                if (lesson.phase.isNotEmpty) _Chip(label: 'Fase ${lesson.phase}'),
+                Text(
+                  lesson.date.isEmpty ? '—' : lesson.date,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                if (lesson.phase.isNotEmpty)
+                  _Chip(label: 'Fase ${lesson.phase}'),
                 if (lesson.page.isNotEmpty) _Chip(label: 'Pág. ${lesson.page}'),
                 if (lesson.lesson.isNotEmpty)
                   _Chip(label: 'Lição ${lesson.lesson}'),
@@ -160,8 +166,10 @@ final class _LessonList extends StatelessWidget {
                 if (lesson.clef.isNotEmpty) Text('Clave: ${lesson.clef}'),
                 if (lesson.description.isNotEmpty) Text(lesson.description),
                 if (lesson.instructor.isNotEmpty)
-                  Text(lesson.instructor,
-                      style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    lesson.instructor,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
               ],
             ),
             isThreeLine: true,

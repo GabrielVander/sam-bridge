@@ -20,17 +20,13 @@ where
 {
     async fn login(&self, username: String, password: String) -> anyhow::Result<()> {
         let source = self.source.clone();
-        // sam is blocking — offload to thread pool so we don't block the async executor
+        // sam is blocking: run on smol's thread pool.
         smol::unblock(move || source.login(&username, &password))
             .await
             .map(|_| ())
     }
 }
 
-/// Full authentication orchestration: consumes an unauthenticated client and
-/// yields the authenticated session client (blocking core bridged via `smol`).
-/// Credential checking has no business rules yet, so this lives beside the
-/// gateway instead of a use-case; revisit when rules emerge.
 pub async fn login(
     client: sam::client::SamClient<sam::client::Unauthenticated>,
     username: String,
@@ -47,8 +43,6 @@ mod tests {
 
     #[derive(Clone)]
     struct StubAuthSource {
-        /// `None` simulates rejected credentials; `Some(base_url)` performs a
-        /// real login against that server so an Authenticated client is produced.
         base_url: Option<String>,
         seen_credentials: std::sync::Arc<std::sync::Mutex<Vec<(String, String)>>>,
     }
@@ -134,7 +128,6 @@ mod tests {
             let authenticated =
                 login(client, "u".to_owned(), "p".to_owned()).await.expect("Login should succeed");
 
-            // The authenticated client is usable: hitting the dashboard succeeds.
             let students_probe = authenticated.clone();
             let _ = students_probe; // session carried by cookie store
 

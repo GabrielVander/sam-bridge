@@ -24,7 +24,6 @@ final class StudentsFailure extends StudentsState {
   const StudentsFailure(this.message);
 }
 
-/// Presenter for the student roster slice.
 class StudentsCubitSignal extends CubitSignal<StudentsState> {
   final SamPortal _portal;
 

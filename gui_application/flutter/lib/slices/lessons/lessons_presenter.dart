@@ -24,7 +24,6 @@ final class LessonsFailure extends LessonsState {
   const LessonsFailure(this.message);
 }
 
-/// Presenter for the student lessons slice (MSA + Method, newest first).
 class LessonsCubitSignal extends CubitSignal<LessonsState> {
   final SamPortal _portal;
 

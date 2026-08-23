@@ -1,16 +1,11 @@
 use student_management_sam_adapter::{Authenticated, SamClient, gateways};
 
-/// Authenticates against SAM and returns the session client used to build the
-/// application gateways. Credential checking is pure infrastructure today —
-/// `LoginUseCase` remains in core for when business rules emerge.
 pub async fn login(
     base_url: String,
     username: String,
     password: String,
 ) -> anyhow::Result<SamClient<Authenticated>> {
-    // Client construction cannot fail with this fixed configuration; the
-    // defensive error propagation is compiled out of coverage builds (same
-    // pattern as sam/src/client/sam_client.rs).
+    // Fixed configuration cannot fail; unreachable error arm compiled out under coverage.
     #[cfg(coverage)]
     let client = new_client(base_url).expect("Fixed HTTP client configuration must be valid");
     #[cfg(not(coverage))]
@@ -20,9 +15,6 @@ pub async fn login(
 }
 
 fn new_client(base_url: String) -> anyhow::Result<SamClient<student_management_sam_adapter::Unauthenticated>> {
-    // Client construction cannot fail with this fixed configuration; the
-    // defensive error path is compiled out of coverage builds (same pattern
-    // as sam/src/http/sam_transport.rs).
     #[cfg(coverage)]
     return Ok(SamClient::new(base_url).expect("Fixed HTTP client configuration must be valid"));
 

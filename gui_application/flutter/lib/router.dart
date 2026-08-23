@@ -8,8 +8,6 @@ import 'package:flutter_application/slices/lessons/student_screen.dart';
 import 'package:flutter_application/slices/roster/students_screen.dart';
 import 'package:go_router/go_router.dart';
 
-/// Bridges a presenter's state stream into a [Listenable] so [GoRouter] can
-/// re-evaluate redirects on authentication changes.
 class PresenterRefreshListenable extends ChangeNotifier {
   StreamSubscription<dynamic>? _subscription;
 
@@ -64,7 +62,6 @@ GoRouter buildRouter({
   );
 }
 
-/// App shell with the version footer, wrapping every route.
 class MainScreen extends StatelessWidget {
   final String versionDisplay;
   final Widget child;
