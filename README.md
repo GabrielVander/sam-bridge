@@ -72,7 +72,7 @@ Common commands (from the repository root unless noted):
 # Rust
 cargo test --workspace
 cargo clippy --workspace --all-targets
-cargo llvm-cov nextest -p sam --summary-only
+cargo llvm-cov nextest -p sam --features test-support --summary-only
 cargo llvm-cov nextest -p student_management --summary-only
 cargo llvm-cov nextest -p student_management_sam_adapter --summary-only
 cargo llvm-cov nextest -p gui_application --summary-only \
@@ -88,6 +88,11 @@ flutter build linux --debug     # rm -rf build/linux if CMake cache goes stale
 # Regenerate FRB bindings after changing gui_application/src/api.rs
 cd gui_application/flutter && flutter_rust_bridge_codegen generate
 ```
+
+`sam` exposes its scripted-HTTP test server behind the `test-support`
+feature (enabled automatically for its own integration tests via a self
+dev-dependency). `bacon coverage` already excludes FRB generated files
+workspace-wide.
 
 Coverage gates are 100% regions/lines/functions for `sam`,
 `student_management`, `student_management_sam_adapter`, and

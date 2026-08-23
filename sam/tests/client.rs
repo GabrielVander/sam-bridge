@@ -1,6 +1,5 @@
-mod support;
 
-use support::{ScriptedResponse, spawn_scripted_http_server};
+use sam::test_support::{ScriptedResponse, spawn_scripted_http_server};
 
 use anyhow::{Error, Result};
 use sam::client::{

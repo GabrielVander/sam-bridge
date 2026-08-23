@@ -123,7 +123,14 @@ need_stdout = true
 allow_warnings = true
 
 [jobs.coverage]
-command = ["cargo", "llvm-cov", "nextest", "--workspace"]
+command = [
+  "cargo",
+  "llvm-cov",
+  "nextest",
+  "--workspace",
+  "--ignore-filename-regex",
+  "frb_generated\\.rs",
+]
 need_stdout = true
 analyzer = "nextest"
 

@@ -3,15 +3,8 @@ name = "sam"
 version = "0.1.0"
 edition = "2024"
 
-autotests = false
-
-[[test]]
-name = "client"
-path = "tests/client.rs"
-
-[[test]]
-name = "sam_http_capabilities"
-path = "tests/sam_http_capabilities_and_behaviour.rs"
+[features]
+test-support = []
 
 [dependencies]
 anyhow = { workspace = true }
@@ -27,8 +20,12 @@ scraper = "0.27.0"
 thiserror.workspace = true
 
 [dev-dependencies]
+sam = { path = ".", features = ["test-support"] }
 smol = "2.0.2"
 wiremock = "0.6.5"
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(coverage)',
+  'cfg(feature, values("test-support"))',
+] }

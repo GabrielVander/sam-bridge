@@ -1,8 +1,3 @@
-//! Shared integration-test support code.
-//!
-//! Not a test target itself: `autotests = false` in Cargo.toml and explicit
-//! `[[test]]` entries keep this file out of cargo's test discovery.
-
 pub enum ScriptedResponse {
     Http {
         status: u16,
@@ -16,12 +11,6 @@ pub enum ScriptedResponse {
     CloseConnection,
 }
 
-/// A minimal scripted HTTP server for simulating raw connection failures
-/// (dropped connections and truncated bodies) that mock servers cannot express.
-///
-/// Serves exactly one scripted response per accepted connection, sequentially,
-/// and shuts down once the script is exhausted. Responses are sent with
-/// `Connection: close` so each client request uses its own connection.
 pub fn spawn_scripted_http_server(script: Vec<ScriptedResponse>) -> std::net::SocketAddr {
     use std::io::{Read, Write};
     use std::net::{TcpListener, TcpStream};
@@ -30,12 +19,7 @@ pub fn spawn_scripted_http_server(script: Vec<ScriptedResponse>) -> std::net::So
         request.windows(4).position(|window| window == b"\r\n\r\n")
     }
 
-    fn write_response(
-        stream: &mut TcpStream,
-        status: u16,
-        declared_body_len: usize,
-        body: &str,
-    ) {
+    fn write_response(stream: &mut TcpStream, status: u16, declared_body_len: usize, body: &str) {
         let head: String = format!(
             "HTTP/1.1 {status} OK\r\nContent-Length: {declared_body_len}\r\nConnection: close\r\n\r\n"
         );
@@ -47,20 +31,20 @@ pub fn spawn_scripted_http_server(script: Vec<ScriptedResponse>) -> std::net::So
 
     fn handle_connection(mut stream: TcpStream, action: ScriptedResponse) {
         const HEADER_TERMINATOR_LEN: usize = 4;
+        const BUFFER_CAPACITY: usize = 4096;
 
-        let mut buffer: [u8; 4096] = [0; 4096];
+        let mut buffer: [u8; BUFFER_CAPACITY] = [0; BUFFER_CAPACITY];
         let mut received: Vec<u8> = Vec::new();
         let header_end: usize = loop {
-            let read_bytes: usize = match stream.read(&mut buffer) {
-                Ok(0) => return,
-                Ok(read_bytes) => read_bytes,
-                Err(_) => return,
-            };
+            let read_bytes: usize = stream.read(&mut buffer).unwrap_or(0);
+            if read_bytes == 0 {
+                return;
+            }
             received.extend_from_slice(&buffer[..read_bytes]);
 
             match find_header_end(&received) {
                 Some(header_end) => break header_end,
-                None if received.len() == buffer.len() => return,
+                None if received.len() == BUFFER_CAPACITY => return,
                 None => continue,
             }
         };
@@ -75,11 +59,10 @@ pub fn spawn_scripted_http_server(script: Vec<ScriptedResponse>) -> std::net::So
         let mut missing_body_bytes: usize = declared_body_len.saturating_sub(already_received);
 
         while missing_body_bytes > 0 {
-            let read_bytes: usize = match stream.read(&mut buffer) {
-                Ok(0) => break,
-                Ok(read_bytes) => read_bytes,
-                Err(_) => return,
-            };
+            let read_bytes: usize = stream.read(&mut buffer).unwrap_or(0);
+            if read_bytes == 0 {
+                break;
+            }
             missing_body_bytes -= missing_body_bytes.min(read_bytes);
         }
 
@@ -101,10 +84,9 @@ pub fn spawn_scripted_http_server(script: Vec<ScriptedResponse>) -> std::net::So
 
     std::thread::spawn(move || {
         for action in script {
-            let (stream, _) = match listener.accept() {
-                Ok(connection) => connection,
-                Err(_) => return,
-            };
+            let (stream, _) = listener
+                .accept()
+                .expect("accept succeeds while the script has pending responses");
             handle_connection(stream, action);
         }
     });
