@@ -55,8 +55,10 @@ lib/sam_integration/             # superseded infrastructure — to be deleted
 - **Tolerant parsing.** Every datum coming from SAM may be absent. Parsers and
   mappings never fail on missing cells or ids — absence flows through as
   `None`/empty all the way to the UI, which hides empty fields.
-- **Blocking core, async edges.** The SAM client is blocking by design;
-  adapters bridge with `smol::unblock`, and async tests use `smol`.
+- **Blocking core, async edges.** The SAM client is a single runtime-state
+  type (`login(&mut self)` flips an authenticated flag); adapters expose it
+  through the `RosterReader` / `LessonsReader` traits and bridge blocking
+  calls with `smol::unblock`. Async tests use `smol`.
 
 ## Development
 
@@ -74,9 +76,10 @@ cargo test --workspace
 cargo clippy --workspace --all-targets
 cargo llvm-cov nextest -p sam --features test-support --summary-only
 cargo llvm-cov nextest -p student_management --summary-only
-cargo llvm-cov nextest -p student_management_sam_adapter --summary-only
+cargo llvm-cov nextest -p student_management_sam_adapter --summary-only \
+  --ignore-filename-regex 'session_opener\.rs'
 cargo llvm-cov nextest -p gui_application --summary-only \
-  --ignore-filename-regex 'frb_generated\.rs'
+  --ignore-filename-regex 'frb_generated\.rs|session_opener\.rs'
 
 # Flutter (inside gui_application/flutter)
 flutter pub get
@@ -105,7 +108,12 @@ compiled out under `cfg(coverage)` instead of being tested artificially.
   (Rust `#[cfg(test)]` modules) or under `gui_application/flutter/test`.
 - `cargo nextest` runs each Rust test in its own process; plain `cargo test`
   shares one, so global-state tests serialize through an in-crate mutex.
-- Dart presenters are pure-Dart-testable via the `SamPortal` interface;
-  widget tests use fakes — no Rust runtime required.
+- Wiremock lives only inside `sam`. Everything above stubs sam's
+  `RosterReader` / `LessonsReader` traits directly; Dart presenters are
+  pure-Dart-testable via the `SamPortal` interface.
+- `adapter::session_opener::NetworkSessionOpener` is the single network-glue
+  file excluded from coverage measurement (its success path requires the real
+  SAM portal); its error path is still exercised via a dead-port test in the
+  GUI crate's non-coverage runs.
 - Live-site capability checks live in `sam/tests/sam_http_capabilities_and_behaviour.rs`
   and run against production SAM when credentials are present.

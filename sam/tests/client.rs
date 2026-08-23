@@ -3,8 +3,8 @@ use sam::test_support::{ScriptedResponse, spawn_scripted_http_server};
 
 use anyhow::{Error, Result};
 use sam::client::{
-    Authenticated, MsaLesson, MtdLesson, SamClient, SamCredentials, SamStudent,
-    StudentLessonsPage, Unauthenticated,
+    LessonsReader, MsaLesson, MtdLesson, RosterReader, SamClient, SamCredentials, SamStudent,
+    StudentLessonsPage,
 };
 
 #[test]
@@ -34,8 +34,9 @@ fn given_inaccessible_dashboard_students_should_fail_with_session_error() {
             .mount(&mock_server)
             .await;
 
-        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
-            .expect("Client should be created")
+        let mut client: SamClient = SamClient::new(mock_server.uri())
+            .expect("Client should be created");
+        client
             .login(&credentials)
             .expect("Login should succeed");
 
@@ -81,8 +82,9 @@ fn given_accessible_dashboard_students_should_visit_it_before_listing() {
             .mount(&mock_server)
             .await;
 
-        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
-            .expect("Client should be created")
+        let mut client: SamClient = SamClient::new(mock_server.uri())
+            .expect("Client should be created");
+        client
             .login(&credentials)
             .expect("Login should succeed");
 
@@ -137,10 +139,11 @@ fn given_unexpected_response_status_code_login_should_fail() {
         )
         .await;
 
-        let client: SamClient<Unauthenticated> =
+        let client: SamClient =
             SamClient::new(mock_server.uri()).expect("Client should be created");
 
-        let result: Result<SamClient<Authenticated>> = client.login(&credentials);
+        let mut client = client;
+        let result: Result<()> = client.login(&credentials);
         assert_eq!(
             result.unwrap_err().to_string(),
             "Http error. Received unexpected response"
@@ -161,10 +164,11 @@ fn given_unexpected_response_body_login_should_fail() {
         )
         .await;
 
-        let client: SamClient<Unauthenticated> =
+        let client: SamClient =
             SamClient::new(mock_server.uri()).expect("Client should be created");
 
-        let result: Result<SamClient<Authenticated>> = client.login(&credentials);
+        let mut client = client;
+        let result: Result<()> = client.login(&credentials);
         assert_eq!(
             result.unwrap_err().to_string(),
             "Http error. Received unexpected response"
@@ -185,10 +189,11 @@ fn given_invalid_credentials_login_should_fail() {
         )
         .await;
 
-        let client: SamClient<Unauthenticated> =
+        let client: SamClient =
             SamClient::new(mock_server.uri()).expect("Client should be created");
 
-        let result: Result<SamClient<Authenticated>> = client.login(&credentials);
+        let mut client = client;
+        let result: Result<()> = client.login(&credentials);
         assert_eq!(result.unwrap_err().to_string(), "Invalid credentials")
     });
 }
@@ -206,10 +211,11 @@ fn given_valid_credentials_login_should_succeed() {
         )
         .await;
 
-        let client: SamClient<Unauthenticated> =
+        let client: SamClient =
             SamClient::new(mock_server.uri()).expect("Client should be created");
 
-        let result: Result<SamClient<Authenticated>> = client.login(&credentials);
+        let mut client = client;
+        let result: Result<()> = client.login(&credentials);
         assert!(result.is_ok());
     });
 }
@@ -227,10 +233,9 @@ fn given_unexpected_status_for_students_listing_students_should_fail() {
         )
         .await;
 
-        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
-            .expect("Client should be created")
-            .login(&credentials)
-            .unwrap();
+        let mut client: SamClient = SamClient::new(mock_server.uri())
+            .expect("Client should be created");
+        client.login(&credentials).unwrap();
 
         let error_test_cases: Vec<(u16, &str)> = vec![
             (500, ""),
@@ -282,10 +287,9 @@ fn given_valid_students_listing_students_should_be_mapped() {
         )
         .await;
 
-        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
-            .expect("Client should be created")
-            .login(&credentials)
-            .unwrap();
+        let mut client: SamClient = SamClient::new(mock_server.uri())
+            .expect("Client should be created");
+        client.login(&credentials).unwrap();
 
         given_dashboard_endpoint_responds_with(&mock_server, build_simple_response(200)).await;
 
@@ -319,11 +323,11 @@ fn given_valid_students_listing_students_should_be_mapped() {
 fn given_unreachable_server_login_should_return_err_instead_of_panicking() {
     let unused_port: u16 = free_local_port();
 
-    let client: SamClient<Unauthenticated> =
+    let mut client: SamClient =
         SamClient::new(format!("http://127.0.0.1:{unused_port}"))
             .expect("Client should be created");
 
-    let result: Result<SamClient<Authenticated>> = client.login(&build_valid_credentials());
+    let result: Result<()> = client.login(&build_valid_credentials());
 
     assert!(
         result.is_err(),
@@ -349,8 +353,9 @@ fn given_server_becoming_unreachable_students_should_fail_with_session_error() {
         ScriptedResponse::CloseConnection,
     ]);
 
-    let client: SamClient<Authenticated> = SamClient::new(format!("http://{server_addr}"))
-        .expect("Client should be created")
+    let mut client: SamClient = SamClient::new(format!("http://{server_addr}"))
+        .expect("Client should be created");
+    client
         .login(&build_valid_credentials())
         .expect("Login should succeed");
 
@@ -384,8 +389,9 @@ fn given_listing_connection_dropped_students_should_fail() {
         ScriptedResponse::CloseConnection,
     ]);
 
-    let client: SamClient<Authenticated> = SamClient::new(format!("http://{server_addr}"))
-        .expect("Client should be created")
+    let mut client: SamClient = SamClient::new(format!("http://{server_addr}"))
+        .expect("Client should be created");
+    client
         .login(&build_valid_credentials())
         .expect("Login should succeed");
 
@@ -423,8 +429,9 @@ fn given_truncated_listing_body_students_should_fail() {
         },
     ]);
 
-    let client: SamClient<Authenticated> = SamClient::new(format!("http://{server_addr}"))
-        .expect("Client should be created")
+    let mut client: SamClient = SamClient::new(format!("http://{server_addr}"))
+        .expect("Client should be created");
+    client
         .login(&build_valid_credentials())
         .expect("Login should succeed");
 
@@ -486,8 +493,9 @@ fn given_student_lessons_page_should_parse_both_tables_from_a_single_fetch() {
             .mount(&mock_server)
             .await;
 
-        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
-            .expect("Client should be created")
+        let mut client: SamClient = SamClient::new(mock_server.uri())
+            .expect("Client should be created");
+        client
             .login(&credentials)
             .expect("Login should succeed");
 
@@ -567,8 +575,9 @@ fn given_page_without_method_table_should_return_empty_method_list() {
             .mount(&mock_server)
             .await;
 
-        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
-            .expect("Client should be created")
+        let mut client: SamClient = SamClient::new(mock_server.uri())
+            .expect("Client should be created");
+        client
             .login(&credentials)
             .expect("Login should succeed");
 
@@ -600,8 +609,9 @@ fn given_unexpected_status_for_lessons_should_fail_with_status_error() {
             .mount(&mock_server)
             .await;
 
-        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
-            .expect("Client should be created")
+        let mut client: SamClient = SamClient::new(mock_server.uri())
+            .expect("Client should be created");
+        client
             .login(&credentials)
             .expect("Login should succeed");
 
@@ -628,8 +638,9 @@ fn given_lessons_connection_dropped_should_fail() {
         ScriptedResponse::CloseConnection,
     ]);
 
-    let client: SamClient<Authenticated> = SamClient::new(format!("http://{server_addr}"))
-        .expect("Client should be created")
+    let mut client: SamClient = SamClient::new(format!("http://{server_addr}"))
+        .expect("Client should be created");
+    client
         .login(&build_valid_credentials())
         .expect("Login should succeed");
 
@@ -759,4 +770,12 @@ async fn given_credentials_authentication_endpoint_responds_with(
         .respond_with(response)
         .mount(server)
         .await;
+}
+
+#[test]
+fn readers_work_without_authentication_for_error_paths() {
+    let client = SamClient::new("http://127.0.0.1:1").expect("Client should be created");
+
+    assert!(RosterReader::students(&client).is_err());
+    assert!(LessonsReader::student_lessons(&client, "1").is_err());
 }

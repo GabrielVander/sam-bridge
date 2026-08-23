@@ -1,18 +1,15 @@
 use async_trait::async_trait;
-use sam::client::StudentLessonsPage;
+use sam::client::{LessonsReader, StudentLessonsPage};
 use student_management::api::{
     application::StudentLessonsGateway,
     domain::StudentLessons,
 };
 
-use crate::ports::LessonsSource;
-
-#[derive(Clone)]
-pub struct SamLessonsGateway<S: LessonsSource> {
+pub struct SamLessonsGateway<S: LessonsReader> {
     source: S,
 }
 
-impl<S: LessonsSource> SamLessonsGateway<S> {
+impl<S: LessonsReader> SamLessonsGateway<S> {
     pub fn new(source: S) -> Self {
         Self { source }
     }
@@ -21,12 +18,9 @@ impl<S: LessonsSource> SamLessonsGateway<S> {
 #[async_trait]
 impl<S> StudentLessonsGateway for SamLessonsGateway<S>
 where
-    S: LessonsSource + Clone + Send + Sync + 'static,
+    S: LessonsReader + Clone + Send + Sync + 'static,
 {
-    async fn get_all_for_student_with_id(
-        &self,
-        id: &str,
-    ) -> anyhow::Result<StudentLessons> {
+    async fn get_all_for_student_with_id(&self, id: &str) -> anyhow::Result<StudentLessons> {
         let source = self.source.clone();
         let id = id.to_owned();
         // sam is blocking: run on smol's thread pool.
@@ -45,32 +39,30 @@ mod tests {
     use sam::client::{MsaLesson, MtdLesson};
     use student_management::api::application::StudentLessonsGateway;
 
-    use crate::ports::LessonsSource;
-
     #[derive(Clone)]
-    struct StubLessonsSource {
+    struct StubLessonsReader {
         page: StudentLessonsPage,
     }
 
-    impl LessonsSource for StubLessonsSource {
+    impl LessonsReader for StubLessonsReader {
         fn student_lessons(&self, _id: &str) -> anyhow::Result<StudentLessonsPage> {
             Ok(self.page.clone())
         }
     }
 
     #[derive(Clone)]
-    struct FailingLessonsSource;
+    struct FailingLessonsReader;
 
-    impl LessonsSource for FailingLessonsSource {
+    impl LessonsReader for FailingLessonsReader {
         fn student_lessons(&self, _id: &str) -> anyhow::Result<StudentLessonsPage> {
             anyhow::bail!("Student lessons request failed")
         }
     }
 
     #[test]
-    fn given_lessons_gateway_should_map_both_kinds() {
+    fn maps_both_kinds_from_the_reader_page() {
         smol::block_on(async {
-            let stub = StubLessonsSource {
+            let stub = StubLessonsReader {
                 page: StudentLessonsPage {
                     msa: vec![MsaLesson {
                         id: Some("559783".to_owned()),
@@ -99,13 +91,13 @@ mod tests {
     }
 
     #[test]
-    fn given_empty_page_should_return_empty_bundle_not_error() {
+    fn empty_page_maps_to_empty_bundle() {
         smol::block_on(async {
-            let gateway = SamLessonsGateway::new(StubLessonsSource {
+            let gateway = SamLessonsGateway::new(StubLessonsReader {
                 page: StudentLessonsPage::default(),
             });
 
-            let lessons = gateway.get_all_for_student_with_id("500132").await.expect("Should load");
+            let lessons = gateway.get_all_for_student_with_id("1").await.expect("Should load");
 
             assert!(lessons.approved.is_empty());
             assert!(lessons.method.is_empty());
@@ -113,17 +105,13 @@ mod tests {
     }
 
     #[test]
-    fn given_source_failure_should_propagate_error() {
+    fn reader_errors_propagate() {
         smol::block_on(async {
-            let gateway = SamLessonsGateway::new(FailingLessonsSource);
-
-            let result = gateway.get_all_for_student_with_id("500132").await;
+            let gateway = SamLessonsGateway::new(FailingLessonsReader);
+            let result = gateway.get_all_for_student_with_id("1").await;
 
             assert!(result.is_err());
-            assert!(result
-                .unwrap_err()
-                .to_string()
-                .contains("Student lessons request failed"));
+            assert!(result.unwrap_err().to_string().contains("Student lessons"));
         });
     }
 }

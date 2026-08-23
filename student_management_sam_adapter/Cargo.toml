@@ -13,7 +13,6 @@ regex = "1.12.4"
 smol = "2.0.2"
 
 [dev-dependencies]
-wiremock = "0.6.5"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }

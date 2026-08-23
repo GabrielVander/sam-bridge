@@ -947,7 +947,6 @@ dependencies = [
  "smol",
  "student_management",
  "student_management_sam_adapter",
- "wiremock",
 ]
 
 [[package]]
@@ -2283,7 +2282,6 @@ dependencies = [
  "sam",
  "smol",
  "student_management",
- "wiremock",
 ]
 
 [[package]]

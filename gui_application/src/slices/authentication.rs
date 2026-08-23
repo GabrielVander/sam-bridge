@@ -1,95 +1,84 @@
-use student_management_sam_adapter::{Authenticated, SamClient, gateways};
+use anyhow::Result;
+use student_management_sam_adapter::{session_opener::SessionOpener, SamClient};
 
-pub async fn login(
-    base_url: String,
-    username: String,
-    password: String,
-) -> anyhow::Result<SamClient<Authenticated>> {
-    // Fixed configuration cannot fail; unreachable error arm compiled out under coverage.
-    #[cfg(coverage)]
-    let client = new_client(base_url).expect("Fixed HTTP client configuration must be valid");
-    #[cfg(not(coverage))]
-    let client = new_client(base_url)?;
-
-    gateways::login(client, username, password).await
-}
-
-fn new_client(base_url: String) -> anyhow::Result<SamClient<student_management_sam_adapter::Unauthenticated>> {
-    #[cfg(coverage)]
-    return Ok(SamClient::new(base_url).expect("Fixed HTTP client configuration must be valid"));
-
-    #[cfg(not(coverage))]
-    SamClient::new(base_url)
+pub async fn login<O>(opener: O, base_url: String, username: String, password: String) -> Result<SamClient>
+where
+    O: SessionOpener + Send + Sync + 'static,
+{
+    // sam is blocking: run on smol's thread pool.
+    smol::unblock(move || opener.open(&base_url, &username, &password)).await
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::{Arc, Mutex};
+    #[derive(Clone)]
+    struct FakeOpener {
+        fail: bool,
+        seen: Arc<Mutex<Vec<(String, String, String)>>>,
+    }
+
+    impl SessionOpener for FakeOpener {
+        fn open(&self, base_url: &str, username: &str, password: &str) -> Result<SamClient> {
+            self.seen
+                .lock()
+                .expect("lock")
+                .push((base_url.to_owned(), username.to_owned(), password.to_owned()));
+
+            if self.fail {
+                anyhow::bail!("Invalid credentials");
+            }
+            // Anonymous clients are network-free to fabricate.
+            SamClient::new("http://127.0.0.1:1")
+        }
+    }
 
     #[test]
-    fn given_valid_credentials_should_return_usable_authenticated_client() {
+    fn forwards_credentials_and_returns_the_opened_client() {
         smol::block_on(async {
-            let mock_server = wiremock::MockServer::start().await;
+            let seen = Arc::new(Mutex::new(Vec::new()));
+            let opener = FakeOpener {
+                fail: false,
+                seen: seen.clone(),
+            };
 
-            wiremock::Mock::given(wiremock::matchers::method("POST"))
-                .and(wiremock::matchers::path("/autenticar"))
-                .respond_with(wiremock::ResponseTemplate::new(303))
-                .mount(&mock_server)
-                .await;
-            wiremock::Mock::given(wiremock::matchers::method("GET"))
-                .and(wiremock::matchers::path("/painel"))
-                .respond_with(wiremock::ResponseTemplate::new(200))
-                .mount(&mock_server)
-                .await;
-            wiremock::Mock::given(wiremock::matchers::method("POST"))
-                .and(wiremock::matchers::path("/alunos/listagem"))
-                .respond_with(
-                    wiremock::ResponseTemplate::new(200).set_body_string(
-                        r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#,
-                    ),
-                )
-                .mount(&mock_server)
-                .await;
+            let client = login(
+                opener,
+                "http://sam.test".to_owned(),
+                "user".to_owned(),
+                "pass".to_owned(),
+            )
+            .await
+            .expect("should succeed");
 
-            let client = login(mock_server.uri(), "u".to_owned(), "p".to_owned())
-                .await
-                .expect("Login should succeed");
+            assert_eq!(
+                *seen.lock().expect("lock"),
+                vec![(
+                    "http://sam.test".to_owned(),
+                    "user".to_owned(),
+                    "pass".to_owned()
+                )]
+            );
 
-            let students =
-                student_management_sam_adapter::ports::RosterSource::students(&client);
-
-            assert!(students.is_ok(), "Session should be usable after login");
+            // The returned handle is a usable (anonymous) client type-wise.
+            let _: SamClient = client;
         });
     }
 
     #[test]
-    fn given_invalid_credentials_should_fail_with_invalid_credentials_error() {
+    fn propagates_opener_errors() {
         smol::block_on(async {
-            let mock_server = wiremock::MockServer::start().await;
+            let opener = FakeOpener {
+                fail: true,
+                seen: Arc::default(),
+            };
 
-            wiremock::Mock::given(wiremock::matchers::method("POST"))
-                .and(wiremock::matchers::path("/autenticar"))
-                .respond_with(
-                    wiremock::ResponseTemplate::new(200).set_body_string(
-                        "<p>* Oops... O usuário ou senha incorretos!</p>",
-                    ),
-                )
-                .mount(&mock_server)
-                .await;
-
-            let result = login(mock_server.uri(), "u".to_owned(), "wrong".to_owned()).await;
+            let result =
+                login(opener, "http://sam.test".to_owned(), "u".to_owned(), "p".to_owned()).await;
 
             assert!(result.is_err());
             assert!(result.unwrap_err().to_string().contains("Invalid credentials"));
-        });
-    }
-
-    #[test]
-    fn given_unreachable_server_should_fail_gracefully() {
-        smol::block_on(async {
-            let result = login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned()).await;
-
-            assert!(result.is_err());
         });
     }
 }

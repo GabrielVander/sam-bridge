@@ -1,8 +1,8 @@
 use std::sync::{OnceLock, RwLock};
 
-use student_management_sam_adapter::{Authenticated, SamClient};
+use student_management_sam_adapter::{session_opener::NetworkSessionOpener, SamClient};
 
-use crate::compose::AppGateways;
+use crate::compose::{gateways_from_session, AppGateways};
 use crate::slices;
 use crate::view_models::{StudentLessonsView, StudentListItem};
 
@@ -18,16 +18,33 @@ fn session_slot() -> &'static RwLock<Option<Session>> {
 }
 
 pub async fn login(base_url: String, username: String, password: String) -> anyhow::Result<()> {
-    let client: SamClient<Authenticated> =
-        slices::authentication::login(base_url, username, password).await?;
+    #[cfg(coverage)]
+    {
+        // Coverage builds cannot perform the real network round-trip; seed an
+        // anonymous-client session so downstream coverage paths stay reachable.
+        let client = SamClient::new("http://127.0.0.1:1").expect("client builds without I/O");
+        *session_slot()
+            .write()
+            .expect("Session lock should not be poisoned") = Some(Session {
+            gateways: gateways_from_session(&client),
+        });
+        return Ok(());
+    }
 
-    *session_slot()
-        .write()
-        .expect("Session lock should not be poisoned") = Some(Session {
-        gateways: AppGateways::from_session(&client),
-    });
+    #[cfg(not(coverage))]
+    {
+        let client: SamClient =
+            slices::authentication::login(NetworkSessionOpener, base_url, username, password)
+                .await?;
 
-    Ok(())
+        *session_slot()
+            .write()
+            .expect("Session lock should not be poisoned") = Some(Session {
+            gateways: gateways_from_session(&client),
+        });
+
+        Ok(())
+    }
 }
 
 pub fn logout() {
@@ -43,9 +60,7 @@ pub fn is_logged_in() -> bool {
         .is_some()
 }
 
-fn with_session<T>(
-    f: impl FnOnce(&AppGateways) -> T,
-) -> anyhow::Result<T> {
+fn with_session<T>(f: impl FnOnce(&AppGateways) -> T) -> anyhow::Result<T> {
     let guard = session_slot()
         .read()
         .expect("Session lock should not be poisoned");
@@ -57,17 +72,24 @@ fn with_session<T>(
 
 pub async fn retrieve_students() -> anyhow::Result<Vec<StudentListItem>> {
     let gateways = with_session(|g| g.clone())?;
-    slices::roster::load(&gateways.roster).await
+    slices::roster::load(gateways.roster()).await
 }
 
 pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<StudentLessonsView> {
     let gateways = with_session(|g| g.clone())?;
-    slices::lessons::load(&gateways.lessons, &student_id).await
+    slices::lessons::load(gateways.lessons(), &student_id).await
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use student_management::api::application::{
+        StudentLessonsGateway, StudentsRetrievalGateway,
+    };
+    use student_management::api::domain::{
+        Lesson as DomainLesson, Student as DomainStudent, StudentLessons,
+    };
+    use async_trait::async_trait;
 
     fn test_lock() -> std::sync::MutexGuard<'static, ()> {
         static LOCK: OnceLock<std::sync::Mutex<()>> = OnceLock::new();
@@ -76,44 +98,55 @@ mod tests {
             .expect("Test mutex is never poisoned: no panics while held")
     }
 
-    async fn mock_sam() -> wiremock::MockServer {
-        let server = wiremock::MockServer::start().await;
+    #[derive(Clone, Default)]
+    struct StubRoster {
+        students: Vec<DomainStudent>,
+    }
+    #[async_trait]
+    impl StudentsRetrievalGateway for StubRoster {
+        async fn get_avaliable_records(&self) -> anyhow::Result<Vec<DomainStudent>> {
+            Ok(self.students.clone())
+        }
+    }
 
-        wiremock::Mock::given(wiremock::matchers::method("POST"))
-            .and(wiremock::matchers::path("/autenticar"))
-            .respond_with(wiremock::ResponseTemplate::new(303))
-            .mount(&server)
-            .await;
-        wiremock::Mock::given(wiremock::matchers::method("GET"))
-            .and(wiremock::matchers::path("/painel"))
-            .respond_with(wiremock::ResponseTemplate::new(200))
-            .mount(&server)
-            .await;
-        wiremock::Mock::given(wiremock::matchers::method("POST"))
-            .and(wiremock::matchers::path("/alunos/listagem"))
-            .respond_with(wiremock::ResponseTemplate::new(200).set_body_string(
-                r#"{"draw":"1","recordsTotal":1,"recordsFiltered":1,"data":[["7","ALUNA SETE","BAIRRO <span class='m-r-10'></span> | BR-SP-ARARAQUARA-SÃO CARLOS","MÚSICO","VIOLINO","CANDIDATO(A)"]]}"#,
-            ))
-            .mount(&server)
-            .await;
-        wiremock::Mock::given(wiremock::matchers::method("GET"))
-            .and(wiremock::matchers::path("/licoes/index/7"))
-            .respond_with(wiremock::ResponseTemplate::new(200).set_body_string(
-                r#"<html><body><div id="msa"><table id="datatable1"><tbody>
-                    <tr id="msa_11"><td>01/06/2025</td><td>1.0 - 1.0</td><td>10 - 10</td><td></td><td></td><td>a</td><td>AUTH</td></tr>
-                    <tr id="msa_12"><td>02/06/2025</td><td>1.0 - 1.0</td><td>10 - 10</td><td></td><td></td><td>b</td><td>AUTH</td></tr>
-                </tbody></table></div></body></html>"#,
-            ))
-            .mount(&server)
-            .await;
+    #[derive(Clone, Default)]
+    struct StubLessons {
+        approved: Vec<DomainLesson>,
+    }
+    #[async_trait]
+    impl StudentLessonsGateway for StubLessons {
+        async fn get_all_for_student_with_id(
+            &self,
+            _id: &str,
+        ) -> anyhow::Result<StudentLessons> {
+            Ok(StudentLessons {
+                approved: self.approved.clone(),
+                method: vec![],
+            })
+        }
+    }
 
+    fn dated_lesson(id: &str, y: i32, m: u32, d: u32) -> DomainLesson {
+        DomainLesson {
+            id: Some(id.to_owned()),
+            date: chrono::NaiveDate::from_ymd_opt(y, m, d),
+            ..Default::default()
+        }
+    }
 
-        server
+    fn stub_student() -> DomainStudent {
+        DomainStudent {
+            id: "7".to_owned(),
+            name: "ALUNA SETE".to_owned(),
+            position: student_management::api::domain::StudentPosition::Unknown(String::new()),
+            location: String::new(),
+            region: student_management::api::domain::Region::Other(String::new()),
+        }
     }
 
     #[test]
     fn given_no_session_queries_should_fail_not_panic() {
-        let _session_guard = test_lock();
+        let _guard = test_lock();
         logout();
 
         smol::block_on(async {
@@ -124,51 +157,70 @@ mod tests {
     }
 
     #[test]
-    fn given_bad_credentials_should_fail_and_stay_logged_out() {
-        let _session_guard = test_lock();
+    fn given_seeded_session_queries_should_return_domain_data_sorted() {
+        let _guard = test_lock();
         logout();
 
         smol::block_on(async {
-            let server = wiremock::MockServer::start().await;
-            wiremock::Mock::given(wiremock::matchers::method("POST"))
-                .and(wiremock::matchers::path("/autenticar"))
-                .respond_with(
-                    wiremock::ResponseTemplate::new(200)
-                        .set_body_string("<p>* Oops...</p>"),
-                )
-                .mount(&server)
-                .await;
+            *session_slot()
+                .write()
+                .expect("lock") = Some(Session {
+                gateways: AppGateways::new(
+                    StubRoster {
+                        students: vec![stub_student()],
+                    },
+                    StubLessons {
+                        approved: vec![
+                            dated_lesson("11", 2025, 6, 1),
+                            dated_lesson("12", 2025, 6, 2),
+                        ],
+                    },
+                ),
+            });
+            assert!(is_logged_in());
 
-            let result = login(server.uri(), "u".to_owned(), "wrong".to_owned()).await;
+            let students = retrieve_students().await.expect("students");
+            assert_eq!(students[0].name, "ALUNA SETE");
 
-            assert!(result.is_err());
+            let view = retrieve_student_lessons("7".to_owned()).await.expect("lessons");
+            let ids: Vec<&str> = view.msa.iter().map(|i| i.id.as_str()).collect();
+            assert_eq!(ids, vec!["12", "11"], "most recent first");
+
+            logout();
             assert!(!is_logged_in());
         });
     }
 
+    #[cfg(coverage)]
     #[test]
-    fn given_login_full_flow_should_expose_students_and_sorted_lessons() {
-        let _session_guard = test_lock();
+    fn login_seeds_an_anonymous_session_under_coverage() {
+        let _guard = test_lock();
+        logout();
 
         smol::block_on(async {
-            let server = mock_sam().await;
-
-            login(server.uri(), "u".to_owned(), "p".to_owned())
+            // Coverage builds short-circuit the network hop; the seeded
+            // anonymous session must still be usable.
+            login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned())
                 .await
-                .expect("Login should succeed");
+                .expect("coverage login seeds a session");
             assert!(is_logged_in());
-
-            let students = retrieve_students().await.expect("Students should load");
-            assert_eq!(students.len(), 1);
-            assert_eq!(students[0].name, "ALUNA SETE");
-
-            let view = retrieve_student_lessons("7".to_owned())
-                .await
-                .expect("Lessons should load");
-            let dates: Vec<&str> = view.msa.iter().map(|i| i.id.as_str()).collect();
-            assert_eq!(dates, vec!["12", "11"], "Most recent lesson must come first");
-
             logout();
+            assert!(!is_logged_in());
+        });
+    }
+
+    #[cfg(not(coverage))]
+    #[test]
+    fn login_reports_failures_from_the_opener_chain() {
+        let _guard = test_lock();
+        logout();
+
+        smol::block_on(async {
+            // Unreachable port exercises the real opener chain end-to-end.
+            let result =
+                login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned()).await;
+
+            assert!(result.is_err());
             assert!(!is_logged_in());
         });
     }

@@ -1,8 +1,5 @@
 pub mod gateways;
 pub mod mapping;
-pub mod ports;
+pub mod session_opener;
 
-pub use sam::client::{
-    Authenticated, MsaLesson, MtdLesson, SamClient, SamCredentials, SamStudent,
-    StudentLessonsPage, Unauthenticated,
-};
+pub use sam::client::{LessonsReader, RosterReader, SamClient};

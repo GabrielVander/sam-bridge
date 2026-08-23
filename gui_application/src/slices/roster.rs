@@ -1,7 +1,7 @@
 use crate::view_models::StudentListItem;
 use student_management::api::application::StudentsRetrievalGateway;
 
-pub async fn load(gateway: &impl StudentsRetrievalGateway) -> anyhow::Result<Vec<StudentListItem>> {
+pub async fn load(gateway: &(dyn StudentsRetrievalGateway + Send + Sync)) -> anyhow::Result<Vec<StudentListItem>> {
     let students = gateway.get_avaliable_records().await?;
     Ok(students.iter().map(StudentListItem::from).collect())
 }
