@@ -401,6 +401,32 @@ fn student_lessons_contains_msa_lessons() {
     assert!(response_content.contains("<tr id=\"msa_42763\">\n            <td>19/09/2023</td>\n            <td>4.4 - 4.5</td>\n            <td>38 - 39</td>\n            <td>13 - 14</td>\n            <td>Sol</td>\n            <td>Estudar o praticar solfejo </td>\n            <td>THIAGO SOUZA SANTOS</td>\n            <td>\n                                    <button type=\"button\" class=\"btn btn-danger btn-sm\" data-toggle=\"tooltip\" title=\"Excluir\"\n                            onclick=\"delete_lancamento_msa(42763)\">\n                        <i class=\"fa fa-trash\"></i> Apagar\n                    </button>\n                            </td>\n        </tr>"));
 }
 
+#[test]
+fn student_lessons_contains_instrument_lessons() {
+    let site: SamSiteConfig = require_sam_site();
+    if site.base_url.is_empty() {
+        return;
+    }
+
+    let client: reqwest::blocking::Client = build_http_client();
+
+    let valid_student_id: String = "545039".to_string();
+
+    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
+    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
+
+    let response: reqwest::blocking::Response = client
+        .get(build_sam_student_lessons_url(&site, &valid_student_id))
+        .header(reqwest::header::COOKIE, session_cookie)
+        .send()
+        .unwrap();
+
+    let response_content: String = response.text().unwrap();
+    println!("{:#?}", response_content);
+
+    assert!(response_content.contains("<tr id=\"mtd_214020\">\n            <td>00</td>\n            <td>00</td>\n            <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>\n            <td>04/12/2023</td>\n            <td>MURILO FAGNER CARDOSO</td>\n            <td>04/12/2023 21:17:17</td>\n            <td>Postura do violino </td>\n            <td>\n                                <button type=\"button\" class=\"btn btn-danger btn-sm\" data-toggle=\"tooltip\" title=\"Excluir\"\n                    onclick=\"delete_lancamento_mtd(214020)\">\n                    <i class=\"fa fa-trash\"></i> Apagar\n                </button>\n                            </td>\n        </tr>"));
+}
+
 fn build_http_client() -> reqwest::blocking::Client {
     reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())

@@ -12,12 +12,12 @@ pub struct MsaLesson {
     pub authorizer: String,
 }
 
-pub(crate) fn parse_student_lessons(
+pub(crate) fn parse_msa_lessons(
     response_status: reqwest::StatusCode,
     body: &str,
 ) -> anyhow::Result<Vec<MsaLesson>> {
     if response_status != reqwest::StatusCode::OK {
-        bail!("Unexpected status for student lessons response: {response_status:?}");
+        bail!("Unexpected status for MSA lessons response: {response_status:?}");
     }
 
     if body.trim().is_empty() {
@@ -114,8 +114,8 @@ fn extract_cell_text(element: scraper::ElementRef) -> String {
 }
 
 #[cfg(test)]
-mod student_lessons_tests {
-    use super::{MsaLesson, parse_student_lessons};
+mod msa_lessons_tests {
+    use super::{MsaLesson, parse_msa_lessons};
     use reqwest::StatusCode;
 
     fn msa_lessons_page(rows_html: &str) -> String {
@@ -153,7 +153,7 @@ mod student_lessons_tests {
         </tr>"#,
         );
 
-        let result = parse_student_lessons(StatusCode::OK, response_body);
+        let result = parse_msa_lessons(StatusCode::OK, response_body);
 
         assert_eq!(
             result.expect("Parsing should succeed"),
@@ -186,7 +186,7 @@ mod student_lessons_tests {
 
     #[test]
     fn given_row_with_empty_table_should_return_no_lessons() {
-        let result = parse_student_lessons(StatusCode::OK, &msa_lessons_page(""));
+        let result = parse_msa_lessons(StatusCode::OK, &msa_lessons_page(""));
 
         assert_eq!(result.expect("Parsing should succeed"), vec![]);
     }
@@ -203,7 +203,7 @@ mod student_lessons_tests {
         </tr>"#;
 
         let result =
-            parse_student_lessons(StatusCode::OK, &msa_lessons_page(missing_authorizer_row));
+            parse_msa_lessons(StatusCode::OK, &msa_lessons_page(missing_authorizer_row));
 
         assert!(
             result.is_err(),
@@ -230,7 +230,7 @@ mod student_lessons_tests {
         ];
 
         for (row_html, expected_error) in error_test_cases {
-            let result = parse_student_lessons(StatusCode::OK, &msa_lessons_page(row_html));
+            let result = parse_msa_lessons(StatusCode::OK, &msa_lessons_page(row_html));
 
             assert!(
                 result.is_err(),
@@ -256,7 +256,7 @@ mod student_lessons_tests {
             <td>ELIAS BRANDE</td>
         </tr>"#;
 
-        let result = parse_student_lessons(StatusCode::OK, &msa_lessons_page(row_without_id));
+        let result = parse_msa_lessons(StatusCode::OK, &msa_lessons_page(row_without_id));
 
         assert!(
             result.is_err(),
@@ -267,7 +267,7 @@ mod student_lessons_tests {
 
     #[test]
     fn given_html_without_msa_table_should_fail_with_table_error() {
-        let result = parse_student_lessons(
+        let result = parse_msa_lessons(
             StatusCode::OK,
             "<html><body><h1>Lições Aprovadas</h1></body></html>",
         );
@@ -289,7 +289,7 @@ mod student_lessons_tests {
     #[test]
     fn given_empty_body_should_return_no_lessons() {
         for empty_body in ["", "   "] {
-            let result = parse_student_lessons(StatusCode::OK, empty_body);
+            let result = parse_msa_lessons(StatusCode::OK, empty_body);
 
             assert_eq!(
                 result.expect("Parsing should succeed"),
@@ -301,7 +301,7 @@ mod student_lessons_tests {
 
     #[test]
     fn given_unexpected_response_status_should_fail_with_status_error() {
-        let result = parse_student_lessons(
+        let result = parse_msa_lessons(
             StatusCode::TEMPORARY_REDIRECT,
             &msa_lessons_page(
                 "<tr id=\"msa_1\"><td>d</td><td>p</td><td>pg</td><td></td><td></td><td>obs</td><td>a</td></tr>",
@@ -313,7 +313,7 @@ mod student_lessons_tests {
             result
                 .unwrap_err()
                 .to_string()
-                .starts_with("Unexpected status for student lessons response: 307"),
+                .starts_with("Unexpected status for MSA lessons response: 307"),
             "Expected an unexpected-status error"
         );
     }

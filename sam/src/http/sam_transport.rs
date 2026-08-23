@@ -60,14 +60,24 @@ impl SamTransport {
         self.read_raw_response(response, "Unable to read students listing response body")
     }
 
-    pub(crate) fn fetch_student_lessons(&self, student_id: &str) -> Result<RawResponse> {
+    pub(crate) fn fetch_msa_lessons(&self, student_id: &str) -> Result<RawResponse> {
         let response: reqwest::blocking::Response = self
             .http_client
-            .get(self.student_lessons_endpoint(student_id))
+            .get(self.msa_lessons_endpoint(student_id))
             .send()
-            .context("Student lessons request failed")?;
+            .context("MSA lessons request failed")?;
 
-        self.read_raw_response(response, "Unable to read student lessons response body")
+        self.read_raw_response(response, "Unable to read MSA lessons response body")
+    }
+
+    pub(crate) fn fetch_method_lessons(&self, student_id: &str) -> Result<RawResponse> {
+        let response: reqwest::blocking::Response = self
+            .http_client
+            .get(self.method_lessons_endpoint(student_id))
+            .send()
+            .context("Method lessons request failed")?;
+
+        self.read_raw_response(response, "Unable to read method lessons response body")
     }
 
     fn read_raw_response(
@@ -93,8 +103,12 @@ impl SamTransport {
         format!("{}/alunos/listagem", self.base_url)
     }
 
-    fn student_lessons_endpoint(&self, student_id: &str) -> String {
+    fn msa_lessons_endpoint(&self, student_id: &str) -> String {
         format!("{}/licoes/index/{student_id}", self.base_url)
+    }
+
+    fn method_lessons_endpoint(&self, student_id: &str) -> String {
+        format!("{}/metodo/licoes/{student_id}", self.base_url)
     }
 }
 

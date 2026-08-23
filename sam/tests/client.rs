@@ -3,7 +3,9 @@ mod support;
 use support::{ScriptedResponse, spawn_scripted_http_server};
 
 use anyhow::{Error, Result};
-use sam::client::{Authenticated, MsaLesson, SamClient, SamCredentials, SamStudent, Unauthenticated};
+use sam::client::{
+    Authenticated, MsaLesson, MtdLesson, SamClient, SamCredentials, SamStudent, Unauthenticated,
+};
 
 #[test]
 fn given_inaccessible_dashboard_students_should_fail_with_session_error() {
@@ -85,7 +87,11 @@ fn given_accessible_dashboard_students_should_visit_it_before_listing() {
             .expect("Login should succeed");
 
         let result: Result<Vec<SamStudent>> = client.students();
-        assert!(result.is_ok(), "Expected students retrieval to succeed but got {:#?}", result);
+        assert!(
+            result.is_ok(),
+            "Expected students retrieval to succeed but got {:#?}",
+            result
+        );
 
         mock_server.verify().await;
 
@@ -251,8 +257,9 @@ fn given_unexpected_status_for_students_listing_students_should_fail() {
 
             let err: Error = result.unwrap_err();
             assert!(
-                format!("{:?}", err)
-                    .starts_with(&format!("Unexpected status for student listing response: {status_code}")),
+                format!("{:?}", err).starts_with(&format!(
+                    "Unexpected status for student listing response: {status_code}"
+                )),
                 "Expected an unexpected-status error but got {:#?}",
                 err
             );
@@ -313,7 +320,8 @@ fn given_unreachable_server_login_should_return_err_instead_of_panicking() {
     let unused_port: u16 = free_local_port();
 
     let client: SamClient<Unauthenticated> =
-        SamClient::new(format!("http://127.0.0.1:{unused_port}")).expect("Client should be created");
+        SamClient::new(format!("http://127.0.0.1:{unused_port}"))
+            .expect("Client should be created");
 
     let result: Result<SamClient<Authenticated>> = client.login(&build_valid_credentials());
 
@@ -323,7 +331,10 @@ fn given_unreachable_server_login_should_return_err_instead_of_panicking() {
         result
     );
     assert!(
-        result.unwrap_err().to_string().starts_with("Login request failed"),
+        result
+            .unwrap_err()
+            .to_string()
+            .starts_with("Login request failed"),
         "Expected a login request failure"
     );
 }
@@ -331,7 +342,10 @@ fn given_unreachable_server_login_should_return_err_instead_of_panicking() {
 #[test]
 fn given_server_becoming_unreachable_students_should_fail_with_session_error() {
     let server_addr: std::net::SocketAddr = spawn_scripted_http_server(vec![
-        ScriptedResponse::Http { status: 303, body: "" },
+        ScriptedResponse::Http {
+            status: 303,
+            body: "",
+        },
         ScriptedResponse::CloseConnection,
     ]);
 
@@ -359,8 +373,14 @@ fn given_server_becoming_unreachable_students_should_fail_with_session_error() {
 #[test]
 fn given_listing_connection_dropped_students_should_fail() {
     let server_addr: std::net::SocketAddr = spawn_scripted_http_server(vec![
-        ScriptedResponse::Http { status: 303, body: "" },
-        ScriptedResponse::Http { status: 200, body: "<html>dashboard</html>" },
+        ScriptedResponse::Http {
+            status: 303,
+            body: "",
+        },
+        ScriptedResponse::Http {
+            status: 200,
+            body: "<html>dashboard</html>",
+        },
         ScriptedResponse::CloseConnection,
     ]);
 
@@ -388,8 +408,14 @@ fn given_listing_connection_dropped_students_should_fail() {
 #[test]
 fn given_truncated_listing_body_students_should_fail() {
     let server_addr: std::net::SocketAddr = spawn_scripted_http_server(vec![
-        ScriptedResponse::Http { status: 303, body: "" },
-        ScriptedResponse::Http { status: 200, body: "<html>dashboard</html>" },
+        ScriptedResponse::Http {
+            status: 303,
+            body: "",
+        },
+        ScriptedResponse::Http {
+            status: 200,
+            body: "<html>dashboard</html>",
+        },
         ScriptedResponse::TruncatedHttp {
             status: 200,
             declared_body_len: 1000,
@@ -419,7 +445,7 @@ fn given_truncated_listing_body_students_should_fail() {
 }
 
 #[test]
-fn given_valid_student_lessons_page_lessons_should_be_mapped_without_dashboard_warmup() {
+fn given_valid_msa_lessons_page_lessons_should_be_mapped_without_dashboard_warmup() {
     smol::block_on(async {
         let mock_server: wiremock::MockServer = wiremock::MockServer::start().await;
         let credentials: SamCredentials = build_valid_credentials();
@@ -433,9 +459,8 @@ fn given_valid_student_lessons_page_lessons_should_be_mapped_without_dashboard_w
 
         wiremock::Mock::given(wiremock::matchers::method("GET"))
             .and(wiremock::matchers::path("/licoes/index/500132"))
-            .respond_with(
-                build_student_lessons_response(&msa_lessons_page(
-                    r#"<tr id="msa_559783" role="row" class="even">
+            .respond_with(build_msa_lessons_response(&msa_lessons_page(
+                r#"<tr id="msa_559783" role="row" class="even">
                         <td>09/09/2025</td>
                         <td>4.5 - 4.5</td>
                         <td>38 - 38</td>
@@ -444,8 +469,7 @@ fn given_valid_student_lessons_page_lessons_should_be_mapped_without_dashboard_w
                         <td>Passou lições 7 e 8, estudar próximas lições.</td>
                         <td>MARCOS ROGÉRIO COSME</td>
                     </tr>"#,
-                )),
-            )
+            )))
             .mount(&mock_server)
             .await;
 
@@ -454,7 +478,7 @@ fn given_valid_student_lessons_page_lessons_should_be_mapped_without_dashboard_w
             .login(&credentials)
             .expect("Login should succeed");
 
-        let result: Result<Vec<MsaLesson>> = client.student_lessons("500132");
+        let result: Result<Vec<MsaLesson>> = client.msa_lessons("500132");
 
         assert_eq!(
             result.expect("Lessons retrieval should succeed"),
@@ -479,15 +503,18 @@ fn given_valid_student_lessons_page_lessons_should_be_mapped_without_dashboard_w
             received_requests
                 .iter()
                 .all(|request| request.url.path() != "/painel"),
-            "Student lessons should not require a dashboard warm-up"
+            "MSA lessons should not require a dashboard warm-up"
         );
     });
 }
 
 #[test]
-fn given_lessons_connection_dropped_student_lessons_should_fail() {
+fn given_msa_lessons_connection_dropped_should_fail() {
     let server_addr: std::net::SocketAddr = spawn_scripted_http_server(vec![
-        ScriptedResponse::Http { status: 303, body: "" },
+        ScriptedResponse::Http {
+            status: 303,
+            body: "",
+        },
         ScriptedResponse::CloseConnection,
     ]);
 
@@ -496,7 +523,7 @@ fn given_lessons_connection_dropped_student_lessons_should_fail() {
         .login(&build_valid_credentials())
         .expect("Login should succeed");
 
-    let result: Result<Vec<MsaLesson>> = client.student_lessons("500132");
+    let result: Result<Vec<MsaLesson>> = client.msa_lessons("500132");
 
     assert!(
         result.is_err(),
@@ -507,8 +534,8 @@ fn given_lessons_connection_dropped_student_lessons_should_fail() {
         result
             .unwrap_err()
             .to_string()
-            .starts_with("Student lessons request failed"),
-        "Expected a student lessons request failure"
+            .starts_with("MSA lessons request failed"),
+        "Expected a MSA lessons request failure"
     );
 }
 
@@ -521,7 +548,7 @@ fn msa_lessons_page(rows_html: &str) -> String {
     )
 }
 
-fn build_student_lessons_response(body: &str) -> wiremock::ResponseTemplate {
+fn build_msa_lessons_response(body: &str) -> wiremock::ResponseTemplate {
     wiremock::ResponseTemplate::new(200)
         .set_body_string(body)
         .insert_header("Content-Type", "text/html")
@@ -609,4 +636,114 @@ async fn given_credentials_authentication_endpoint_responds_with(
         .respond_with(response)
         .mount(server)
         .await;
+}
+
+fn mtd_lessons_page(rows_html: &str) -> String {
+    format!(
+        r#"<html><body><table id="datatable3" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid">
+    <thead><tr><th>Páginas</th><th>Lição</th><th>Método</th><th>Data da Lição</th><th>Autorizante</th><th>Data de Cadastro</th><th>Observações</th><th>Ações</th></tr></thead>
+    <tbody>{rows_html}</tbody>
+</table></body></html>"#
+    )
+}
+
+fn build_method_lessons_response(body: &str) -> wiremock::ResponseTemplate {
+    wiremock::ResponseTemplate::new(200)
+        .set_body_string(body)
+        .insert_header("Content-Type", "text/html")
+}
+
+#[test]
+fn given_valid_method_lessons_page_lessons_should_be_mapped_without_dashboard_warmup() {
+    smol::block_on(async {
+        let mock_server: wiremock::MockServer = wiremock::MockServer::start().await;
+        let credentials: SamCredentials = build_valid_credentials();
+
+        given_credentials_authentication_endpoint_responds_with(
+            &mock_server,
+            &credentials,
+            build_valid_credentials_response(),
+        )
+        .await;
+
+        wiremock::Mock::given(wiremock::matchers::method("GET"))
+            .and(wiremock::matchers::path("/metodo/licoes/500132"))
+            .respond_with(build_method_lessons_response(&mtd_lessons_page(
+                r#"<tr id="mtd_214020" role="row" class="even">
+                        <td>00</td>
+                        <td>00</td>
+                        <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
+                        <td>04/12/2023</td>
+                        <td>MURILO FAGNER CARDOSO</td>
+                        <td>04/12/2023 21:17:17</td>
+                        <td>Postura do violino </td>
+                    </tr>"#,
+            )))
+            .mount(&mock_server)
+            .await;
+
+        let client: SamClient<Authenticated> = SamClient::new(mock_server.uri())
+            .expect("Client should be created")
+            .login(&credentials)
+            .expect("Login should succeed");
+
+        let result: Result<Vec<MtdLesson>> = client.method_lessons("500132");
+
+        assert_eq!(
+            result.expect("Lessons retrieval should succeed"),
+            vec![MtdLesson {
+                id: "214020".to_string(),
+                pages: "00".to_string(),
+                lesson: Some("00".to_string()),
+                method: "MÉTODO CCB - SCHIMOLL - VIOLINO".to_string(),
+                date: "04/12/2023".to_string(),
+                authorizer: "MURILO FAGNER CARDOSO".to_string(),
+                registration_date: "04/12/2023 21:17:17".to_string(),
+                observations: Some("Postura do violino".to_string()),
+            }]
+        );
+
+        let received_requests: Vec<wiremock::Request> = mock_server
+            .received_requests()
+            .await
+            .expect("All requests should have been recorded");
+
+        assert!(
+            received_requests
+                .iter()
+                .all(|request| request.url.path() != "/painel"),
+            "Method lessons should not require a dashboard warm-up"
+        );
+    });
+}
+
+#[test]
+fn given_method_lessons_connection_dropped_should_fail() {
+    let server_addr: std::net::SocketAddr = spawn_scripted_http_server(vec![
+        ScriptedResponse::Http {
+            status: 303,
+            body: "",
+        },
+        ScriptedResponse::CloseConnection,
+    ]);
+
+    let client: SamClient<Authenticated> = SamClient::new(format!("http://{server_addr}"))
+        .expect("Client should be created")
+        .login(&build_valid_credentials())
+        .expect("Login should succeed");
+
+    let result: Result<Vec<MtdLesson>> = client.method_lessons("500132");
+
+    assert!(
+        result.is_err(),
+        "Expected lessons retrieval to fail but got {:#?}",
+        result
+    );
+    assert!(
+        result
+            .unwrap_err()
+            .to_string()
+            .starts_with("Method lessons request failed"),
+        "Expected a method lessons request failure"
+    );
 }
