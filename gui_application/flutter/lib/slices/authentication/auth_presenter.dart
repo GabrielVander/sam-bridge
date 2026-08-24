@@ -48,5 +48,11 @@ class AuthCubitSignal extends CubitSignal<AuthState> {
 
   void reset() => emit(const AuthIdle());
 
+  /// Marks the session as restored from persisted credentials without
+  /// triggering a network round-trip (the Rust side already authenticated).
+  void markRestored() {
+    if (stateValue is! AuthSuccess) emit(const AuthSuccess());
+  }
+
   bool get isAuthenticated => stateValue is AuthSuccess;
 }

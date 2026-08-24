@@ -1,5 +1,6 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/api.dart' as api;
 import 'package:flutter_application/frb_generated.dart';
 import 'package:flutter_application/portal/sam_portal.dart';
 import 'package:flutter_application/router.dart';
@@ -12,27 +13,39 @@ Future<void> main() async {
   await RustLib.init();
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Attempt silent re-authentication from persisted credentials.
+  final restored = await api.tryRestoreSession();
+
   final packageInfo = await PackageInfo.fromPlatform();
   final versionDisplay = 'v${packageInfo.version}+${packageInfo.buildNumber}';
 
   runApp(
-    SamSiteApp(versionDisplay: versionDisplay, portal: const RustSamPortal()),
+    SamSiteApp(
+      versionDisplay: versionDisplay,
+      portal: const RustSamPortal(),
+      initiallyLoggedIn: restored,
+    ),
   );
 }
 
 class SamSiteApp extends StatelessWidget {
   final String versionDisplay;
   final SamPortal portal;
+  final bool initiallyLoggedIn;
 
   const SamSiteApp({
     super.key,
     required this.versionDisplay,
     required this.portal,
+    this.initiallyLoggedIn = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final authPresenter = AuthCubitSignal(portal);
+    if (initiallyLoggedIn) {
+      authPresenter.markRestored();
+    }
 
     return BlocSignalProvider<AuthCubitSignal>.value(
       value: authPresenter,
@@ -52,6 +65,7 @@ class SamSiteApp extends StatelessWidget {
               routerConfig: buildRouter(
                 appVersion: versionDisplay,
                 authPresenter: authPresenter,
+                initiallyLoggedIn: initiallyLoggedIn,
               ),
               debugShowCheckedModeBanner: true,
               theme: ThemeData(

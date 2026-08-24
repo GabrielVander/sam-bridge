@@ -31,6 +31,20 @@ final class FakeSamPortal implements SamPortal {
   @override
   Future<bool> isLoggedIn() async => loggedIn;
 
+  bool hasSaved = false;
+
+  @override
+  Future<bool> hasSavedCredentials() async => hasSaved;
+
+  @override
+  Future<bool> tryRestoreSession() async {
+    if (hasSaved) {
+      loggedIn = true;
+      return true;
+    }
+    return false;
+  }
+
   @override
   Future<List<StudentListItem>> retrieveStudents() async {
     if (studentsError != null) throw studentsError!;

@@ -8,10 +8,14 @@ student_management = { path = "../student_management" }
 student_management_sam_adapter = { path = "../student_management_sam_adapter" }
 anyhow = { workspace = true }
 chrono = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+dirs = "5"
 
 [dev-dependencies]
 async-trait = { workspace = true }
 smol = "2.0.2"
+tempfile = "3"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }

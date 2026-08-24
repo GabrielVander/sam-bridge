@@ -11,6 +11,8 @@ abstract interface class SamPortal {
   });
   Future<void> logout();
   Future<bool> isLoggedIn();
+  Future<bool> hasSavedCredentials();
+  Future<bool> tryRestoreSession();
   Future<List<StudentListItem>> retrieveStudents();
   Future<StudentLessonsView> retrieveStudentLessons({
     required String studentId,
@@ -32,6 +34,12 @@ final class RustSamPortal implements SamPortal {
 
   @override
   Future<bool> isLoggedIn() => api.isLoggedIn();
+
+  @override
+  Future<bool> hasSavedCredentials() => api.hasSavedCredentials();
+
+  @override
+  Future<bool> tryRestoreSession() => api.tryRestoreSession();
 
   @override
   Future<List<StudentListItem>> retrieveStudents() => api.retrieveStudents();

@@ -7,8 +7,16 @@ import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'view_models.dart';
 
-// These functions are ignored because they are not marked as `pub`: `session_slot`, `with_session`
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `Session`
+// These functions are ignored because they are not marked as `pub`: `app`
+
+/// Whether persisted credentials exist on disk (cheap synchronous check).
+Future<bool> hasSavedCredentials() =>
+    RustLib.instance.api.crateApiHasSavedCredentials();
+
+/// Attempts silent re-authentication using persisted credentials.
+/// Returns true when a usable session was established.
+Future<bool> tryRestoreSession() =>
+    RustLib.instance.api.crateApiTryRestoreSession();
 
 Future<void> login({
   required String baseUrl,
