@@ -6,194 +6,203 @@
 import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class CheckpointVm {
-  final String label;
-  final bool achieved;
-  final bool readyToAdvance;
-  final bool msaRequirementMet;
-  final bool methodRequirementMet;
+            
 
-  const CheckpointVm({
-    required this.label,
-    required this.achieved,
-    required this.readyToAdvance,
-    required this.msaRequirementMet,
-    required this.methodRequirementMet,
-  });
+            
 
-  @override
-  int get hashCode =>
-      label.hashCode ^
-      achieved.hashCode ^
-      readyToAdvance.hashCode ^
-      msaRequirementMet.hashCode ^
-      methodRequirementMet.hashCode;
+            class CheckpointVm  {
+                final String label;
+final bool achieved;
+final bool readyToAdvance;
+final bool msaRequirementMet;
+final bool methodRequirementMet;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CheckpointVm &&
-          runtimeType == other.runtimeType &&
-          label == other.label &&
-          achieved == other.achieved &&
-          readyToAdvance == other.readyToAdvance &&
-          msaRequirementMet == other.msaRequirementMet &&
-          methodRequirementMet == other.methodRequirementMet;
-}
+                const CheckpointVm({required this.label ,required this.achieved ,required this.readyToAdvance ,required this.msaRequirementMet ,required this.methodRequirementMet ,});
 
-class LessonItem {
-  final LessonKind kind;
-  final String id;
-  final String date;
-  final String phase;
-  final String page;
-  final String lesson;
-  final String clef;
-  final String description;
-  final String instructor;
-  final String method;
 
-  const LessonItem({
-    required this.kind,
-    required this.id,
-    required this.date,
-    required this.phase,
-    required this.page,
-    required this.lesson,
-    required this.clef,
-    required this.description,
-    required this.instructor,
-    required this.method,
-  });
 
-  @override
-  int get hashCode =>
-      kind.hashCode ^
-      id.hashCode ^
-      date.hashCode ^
-      phase.hashCode ^
-      page.hashCode ^
-      lesson.hashCode ^
-      clef.hashCode ^
-      description.hashCode ^
-      instructor.hashCode ^
-      method.hashCode;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LessonItem &&
-          runtimeType == other.runtimeType &&
-          kind == other.kind &&
-          id == other.id &&
-          date == other.date &&
-          phase == other.phase &&
-          page == other.page &&
-          lesson == other.lesson &&
-          clef == other.clef &&
-          description == other.description &&
-          instructor == other.instructor &&
-          method == other.method;
-}
 
-enum LessonKind { msa, method }
+        @override
+        int get hashCode => label.hashCode^achieved.hashCode^readyToAdvance.hashCode^msaRequirementMet.hashCode^methodRequirementMet.hashCode;
 
-class ProgressViewModel {
-  final double msaPercent;
-  final double methodPagePercent;
-  final double methodLessonPercent;
-  final double overallPercent;
-  final bool meetsYouthService;
-  final bool meetsOfficialService;
-  final bool meetsOfficialization;
-  final List<CheckpointVm> checkpoints;
 
-  const ProgressViewModel({
-    required this.msaPercent,
-    required this.methodPagePercent,
-    required this.methodLessonPercent,
-    required this.overallPercent,
-    required this.meetsYouthService,
-    required this.meetsOfficialService,
-    required this.meetsOfficialization,
-    required this.checkpoints,
-  });
 
-  @override
-  int get hashCode =>
-      msaPercent.hashCode ^
-      methodPagePercent.hashCode ^
-      methodLessonPercent.hashCode ^
-      overallPercent.hashCode ^
-      meetsYouthService.hashCode ^
-      meetsOfficialService.hashCode ^
-      meetsOfficialization.hashCode ^
-      checkpoints.hashCode;
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is CheckpointVm &&
+                runtimeType == other.runtimeType
+                && label == other.label&& achieved == other.achieved&& readyToAdvance == other.readyToAdvance&& msaRequirementMet == other.msaRequirementMet&& methodRequirementMet == other.methodRequirementMet;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ProgressViewModel &&
-          runtimeType == other.runtimeType &&
-          msaPercent == other.msaPercent &&
-          methodPagePercent == other.methodPagePercent &&
-          methodLessonPercent == other.methodLessonPercent &&
-          overallPercent == other.overallPercent &&
-          meetsYouthService == other.meetsYouthService &&
-          meetsOfficialService == other.meetsOfficialService &&
-          meetsOfficialization == other.meetsOfficialization &&
-          checkpoints == other.checkpoints;
-}
+            }
 
-class StudentLessonsView {
-  final List<LessonItem> msa;
-  final List<LessonItem> method;
+class LessonItem  {
+                final LessonKind kind;
+final String id;
+final String date;
+final String phase;
+final String page;
+final String lesson;
+final String clef;
+final String description;
+final String instructor;
+final String method;
 
-  const StudentLessonsView({required this.msa, required this.method});
+                const LessonItem({required this.kind ,required this.id ,required this.date ,required this.phase ,required this.page ,required this.lesson ,required this.clef ,required this.description ,required this.instructor ,required this.method ,});
 
-  @override
-  int get hashCode => msa.hashCode ^ method.hashCode;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StudentLessonsView &&
-          runtimeType == other.runtimeType &&
-          msa == other.msa &&
-          method == other.method;
-}
 
-class StudentListItem {
-  final String id;
-  final String name;
-  final String location;
-  final String position;
-  final String rawLevel;
 
-  const StudentListItem({
-    required this.id,
-    required this.name,
-    required this.location,
-    required this.position,
-    required this.rawLevel,
-  });
 
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      location.hashCode ^
-      position.hashCode ^
-      rawLevel.hashCode;
+        @override
+        int get hashCode => kind.hashCode^id.hashCode^date.hashCode^phase.hashCode^page.hashCode^lesson.hashCode^clef.hashCode^description.hashCode^instructor.hashCode^method.hashCode;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StudentListItem &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name &&
-          location == other.location &&
-          position == other.position &&
-          rawLevel == other.rawLevel;
-}
+
+
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is LessonItem &&
+                runtimeType == other.runtimeType
+                && kind == other.kind&& id == other.id&& date == other.date&& phase == other.phase&& page == other.page&& lesson == other.lesson&& clef == other.clef&& description == other.description&& instructor == other.instructor&& method == other.method;
+
+            }
+
+enum LessonKind {
+                    msa,
+method,
+                    ;
+                    
+                }
+
+            class ProgressResult  {
+                final bool isUnknown;
+final ProgressViewModel progress;
+final UnknownLevelVm unknown;
+
+                const ProgressResult({required this.isUnknown ,required this.progress ,required this.unknown ,});
+
+
+
+
+
+        @override
+        int get hashCode => isUnknown.hashCode^progress.hashCode^unknown.hashCode;
+
+
+
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is ProgressResult &&
+                runtimeType == other.runtimeType
+                && isUnknown == other.isUnknown&& progress == other.progress&& unknown == other.unknown;
+
+            }
+
+class ProgressViewModel  {
+                final double msaPercent;
+final double methodPagePercent;
+final double methodLessonPercent;
+final double overallPercent;
+final bool meetsYouthService;
+final bool meetsOfficialService;
+final bool meetsOfficialization;
+final List<CheckpointVm> checkpoints;
+
+                const ProgressViewModel({required this.msaPercent ,required this.methodPagePercent ,required this.methodLessonPercent ,required this.overallPercent ,required this.meetsYouthService ,required this.meetsOfficialService ,required this.meetsOfficialization ,required this.checkpoints ,});
+
+
+
+
+
+        @override
+        int get hashCode => msaPercent.hashCode^methodPagePercent.hashCode^methodLessonPercent.hashCode^overallPercent.hashCode^meetsYouthService.hashCode^meetsOfficialService.hashCode^meetsOfficialization.hashCode^checkpoints.hashCode;
+
+
+
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is ProgressViewModel &&
+                runtimeType == other.runtimeType
+                && msaPercent == other.msaPercent&& methodPagePercent == other.methodPagePercent&& methodLessonPercent == other.methodLessonPercent&& overallPercent == other.overallPercent&& meetsYouthService == other.meetsYouthService&& meetsOfficialService == other.meetsOfficialService&& meetsOfficialization == other.meetsOfficialization&& checkpoints == other.checkpoints;
+
+            }
+
+class StudentLessonsView  {
+                final List<LessonItem> msa;
+final List<LessonItem> method;
+
+                const StudentLessonsView({required this.msa ,required this.method ,});
+
+
+
+
+
+        @override
+        int get hashCode => msa.hashCode^method.hashCode;
+
+
+
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is StudentLessonsView &&
+                runtimeType == other.runtimeType
+                && msa == other.msa&& method == other.method;
+
+            }
+
+class StudentListItem  {
+                final String id;
+final String name;
+final String location;
+final String position;
+final String rawLevel;
+
+                const StudentListItem({required this.id ,required this.name ,required this.location ,required this.position ,required this.rawLevel ,});
+
+
+
+
+
+        @override
+        int get hashCode => id.hashCode^name.hashCode^location.hashCode^position.hashCode^rawLevel.hashCode;
+
+
+
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is StudentListItem &&
+                runtimeType == other.runtimeType
+                && id == other.id&& name == other.name&& location == other.location&& position == other.position&& rawLevel == other.rawLevel;
+
+            }
+
+class UnknownLevelVm  {
+                final String raw;
+final String message;
+
+                const UnknownLevelVm({required this.raw ,required this.message ,});
+
+
+
+
+
+        @override
+        int get hashCode => raw.hashCode^message.hashCode;
+
+
+
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is UnknownLevelVm &&
+                runtimeType == other.runtimeType
+                && raw == other.raw&& message == other.message;
+
+            }
+            

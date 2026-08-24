@@ -24,7 +24,7 @@ impl From<&Student> for StudentListItem {
 fn extract_raw_level(position: &StudentPosition) -> String {
     match position {
         StudentPosition::Musician { level } => level.name(),
-        _ => "Candidate".to_owned(),
+        _ => String::new(),
     }
 }
 
@@ -101,6 +101,8 @@ fn organist_level_label(level: &OrganistLevel) -> String {
         OrganistLevel::Practice => "Ensaio".to_owned(),
         OrganistLevel::YouthService => "RJM".to_owned(),
         OrganistLevel::OfficialService => "Culto Oficial".to_owned(),
+        OrganistLevel::HalfHour => "Meia hora".to_owned(),
+        #[allow(deprecated)]
         OrganistLevel::HafHour => "Meia hora".to_owned(),
         OrganistLevel::YouthServicePractice => "RJM / Ensaio".to_owned(),
         OrganistLevel::YouthServiceHafHour => "RJM / Meia hora".to_owned(),
@@ -173,9 +175,21 @@ impl From<&ProgressAssessment> for ProgressViewModel {
             method_page_percent: a.method_page_percent,
             method_lesson_percent: a.method_lesson_percent,
             overall_percent: a.overall_percent,
-            meets_youth_service: a.checkpoints.get(2).is_some_and(|c| c.ready_to_advance || c.achieved),
-            meets_official_service: a.checkpoints.get(3).is_some_and(|c| c.ready_to_advance),
-            meets_officialization: a.checkpoints.get(4).is_some_and(|c| c.ready_to_advance),
+            meets_youth_service: a
+                .checkpoints
+                .iter()
+                .find(|c| c.level == MusicianLevel::YouthService)
+                .is_some_and(|c| c.ready_to_advance || c.achieved),
+            meets_official_service: a
+                .checkpoints
+                .iter()
+                .find(|c| c.level == MusicianLevel::OfficialService)
+                .is_some_and(|c| c.ready_to_advance),
+            meets_officialization: a
+                .checkpoints
+                .iter()
+                .find(|c| c.level == MusicianLevel::Officialized)
+                .is_some_and(|c| c.ready_to_advance),
             checkpoints: a.checkpoints.iter().map(|c| CheckpointVm {
                 label: c.label.to_owned(),
                 achieved: c.achieved,
@@ -184,6 +198,37 @@ impl From<&ProgressAssessment> for ProgressViewModel {
                 method_requirement_met: c.method_requirement_met,
             }).collect(),
         }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct UnknownLevelVm {
+    pub raw: String,
+    pub message: String,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ProgressResult {
+    pub is_unknown: bool,
+    pub progress: ProgressViewModel,
+    pub unknown: UnknownLevelVm,
+}
+
+impl ProgressResult {
+    pub fn available(vm: ProgressViewModel) -> Self {
+        Self { is_unknown: false, progress: vm, unknown: UnknownLevelVm { raw: String::new(), message: String::new() } }
+    }
+    pub fn unknown(raw: String, message: String) -> Self {
+        Self { is_unknown: true, progress: ProgressViewModel { msa_percent: 0.0, method_page_percent: 0.0, method_lesson_percent: 0.0, overall_percent: 0.0, meets_youth_service: false, meets_official_service: false, meets_officialization: false, checkpoints: vec![] }, unknown: UnknownLevelVm { raw, message } }
+    }
+    pub fn is_unknown(&self) -> bool {
+        self.is_unknown
+    }
+}
+
+impl Default for ProgressViewModel {
+    fn default() -> Self {
+        Self { msa_percent: 0.0, method_page_percent: 0.0, method_lesson_percent: 0.0, overall_percent: 0.0, meets_youth_service: false, meets_official_service: false, meets_officialization: false, checkpoints: vec![] }
     }
 }
 

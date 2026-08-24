@@ -4,7 +4,7 @@ use app_bootstrap::App;
 use student_management::api::domain::{Student, StudentLessons};
 
 use crate::slices::{lessons as lessons_mapper, roster as roster_mapper};
-use crate::view_models::{ProgressViewModel, StudentLessonsView, StudentListItem};
+use crate::view_models::{ProgressResult, ProgressViewModel, StudentLessonsView, StudentListItem};
 
 static APP: OnceLock<App> = OnceLock::new();
 
@@ -43,10 +43,22 @@ pub async fn retrieve_students() -> anyhow::Result<Vec<StudentListItem>> {
 pub async fn retrieve_student_progress(
     student_id: String,
     assigned_level: String,
-) -> anyhow::Result<ProgressViewModel> {
+) -> anyhow::Result<ProgressResult> {
     let level = student_management::api::domain::MusicianLevel::parse_named(&assigned_level);
-    let report = app().calculate_progress(&student_id, &level).await?;
-    Ok(ProgressViewModel::from(&report))
+    if level.is_unknown() {
+        return Ok(ProgressResult::unknown(
+            level.unknown_raw().unwrap_or_default().to_owned(),
+            "nível não reconhecido".to_owned(),
+        ));
+    }
+    match app().calculate_progress(&student_id, &level).await {
+        Ok(report) => Ok(ProgressResult::available(ProgressViewModel::from(&report))),
+        Err(e) if e.to_string().contains("nível não reconhecido") => Ok(ProgressResult::unknown(
+            assigned_level,
+            "nível não reconhecido".to_owned(),
+        )),
+        Err(e) => Err(e),
+    }
 }
 
 pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<StudentLessonsView> {
@@ -78,7 +90,7 @@ mod tests {
     }
     #[async_trait::async_trait]
     impl StudentsRetrievalGateway for StubRoster {
-        async fn get_avaliable_records(&self) -> anyhow::Result<Vec<Student>> {
+        async fn get_available_records(&self) -> anyhow::Result<Vec<Student>> {
             Ok(self.students.clone())
         }
     }
@@ -158,23 +170,6 @@ mod tests {
         assert!(!is_logged_in());
     }
 
-    #[cfg(coverage)]
-    #[test]
-    fn login_under_coverage_should_seed_session() {
-        let _guard = test_lock();
-        logout();
-
-        smol::block_on(async {
-            // Coverage builds skip the network hop inside authenticate().
-            login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned())
-                .await
-                .expect("coverage login seeds a session");
-            assert!(is_logged_in());
-        });
-    }
-
-    #[cfg(not(coverage))]
-    #[cfg(coverage)]
     #[test]
     fn try_restore_session_without_credentials_returns_false() {
         let _guard = test_lock();
@@ -195,7 +190,6 @@ mod tests {
         let _ = has_saved_credentials();
     }
 
-    #[cfg(not(coverage))]
     #[test]
     fn login_reports_failures_from_the_opener_chain() {
         let _guard = test_lock();

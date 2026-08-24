@@ -18,9 +18,46 @@ pub struct StudentLessons {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Range {
-    pub from: String,
-    pub to: String,
+pub struct Range<T = String> {
+    pub from: T,
+    pub to: T,
+}
+
+impl<T> Range<T> {
+    pub fn new(from: T, to: T) -> Self {
+        Self { from, to }
+    }
+    pub fn single(value: T) -> Self
+    where
+        T: Clone,
+    {
+        Self { from: value.clone(), to: value }
+    }
+    pub fn try_new(from: T, to: T) -> Result<Self, String>
+    where
+        T: PartialOrd + std::fmt::Display,
+    {
+        if from <= to {
+            Ok(Self { from, to })
+        } else {
+            Err(format!("inverted range {from} > {to}"))
+        }
+    }
+}
+
+impl<T> Range<T>
+where
+    T: std::str::FromStr + PartialOrd + std::fmt::Display,
+    T::Err: std::fmt::Display,
+{
+    pub fn try_from_str(from: &str, to: &str) -> Result<Self, String>
+    where
+        T: Clone,
+    {
+        let f: T = from.parse().map_err(|e| format!("{e}"))?;
+        let t: T = to.parse().map_err(|e| format!("{e}"))?;
+        Self::try_new(f, t)
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]

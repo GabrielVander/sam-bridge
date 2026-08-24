@@ -19,11 +19,16 @@ Future<void> main() async {
   final packageInfo = await PackageInfo.fromPlatform();
   final versionDisplay = 'v${packageInfo.version}+${packageInfo.buildNumber}';
 
+  // Create presenter before building router so initialLocation is correct.
+  final initialPortal = const RustSamPortal();
+  final initialAuth = AuthCubitSignal(initialPortal);
+  if (restored) initialAuth.markRestored();
+
   runApp(
     SamSiteApp(
       versionDisplay: versionDisplay,
       portal: const RustSamPortal(),
-      initiallyLoggedIn: restored,
+      authPresenter: initialAuth,
     ),
   );
 }
@@ -31,21 +36,18 @@ Future<void> main() async {
 class SamSiteApp extends StatelessWidget {
   final String versionDisplay;
   final SamPortal portal;
-  final bool initiallyLoggedIn;
+  final AuthCubitSignal? authPresenter;
 
   const SamSiteApp({
     super.key,
     required this.versionDisplay,
     required this.portal,
-    this.initiallyLoggedIn = false,
+    this.authPresenter,
   });
 
   @override
   Widget build(BuildContext context) {
-    final authPresenter = AuthCubitSignal(portal);
-    if (initiallyLoggedIn) {
-      authPresenter.markRestored();
-    }
+    final authPresenter = this.authPresenter ?? AuthCubitSignal(portal);
 
     return BlocSignalProvider<AuthCubitSignal>.value(
       value: authPresenter,
@@ -65,7 +67,6 @@ class SamSiteApp extends StatelessWidget {
               routerConfig: buildRouter(
                 appVersion: versionDisplay,
                 authPresenter: authPresenter,
-                initiallyLoggedIn: initiallyLoggedIn,
               ),
               debugShowCheckedModeBanner: true,
               theme: ThemeData(

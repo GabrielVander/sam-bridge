@@ -11,211 +11,164 @@ import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
 import 'view_models.dart';
 
-abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
-  RustLibApiImplPlatform({
-    required super.handler,
-    required super.wire,
-    required super.generalizedFrbRustBinding,
-    required super.portManager,
-  });
 
-  @protected
-  AnyhowException dco_decode_AnyhowException(dynamic raw);
 
-  @protected
-  String dco_decode_String(dynamic raw);
 
-  @protected
-  bool dco_decode_bool(dynamic raw);
+                abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
+                  RustLibApiImplPlatform({
+                    required super.handler,
+                    required super.wire,
+                    required super.generalizedFrbRustBinding,
+                    required super.portManager,
+                  });
 
-  @protected
-  CheckpointVm dco_decode_checkpoint_vm(dynamic raw);
+                  
 
-  @protected
-  double dco_decode_f_64(dynamic raw);
+                  @protected AnyhowException dco_decode_AnyhowException(dynamic raw);
 
-  @protected
-  int dco_decode_i_32(dynamic raw);
+@protected String dco_decode_String(dynamic raw);
 
-  @protected
-  LessonItem dco_decode_lesson_item(dynamic raw);
+@protected bool dco_decode_bool(dynamic raw);
 
-  @protected
-  LessonKind dco_decode_lesson_kind(dynamic raw);
+@protected ProgressViewModel dco_decode_box_autoadd_progress_view_model(dynamic raw);
 
-  @protected
-  List<CheckpointVm> dco_decode_list_checkpoint_vm(dynamic raw);
+@protected UnknownLevelVm dco_decode_box_autoadd_unknown_level_vm(dynamic raw);
 
-  @protected
-  List<LessonItem> dco_decode_list_lesson_item(dynamic raw);
+@protected CheckpointVm dco_decode_checkpoint_vm(dynamic raw);
 
-  @protected
-  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+@protected double dco_decode_f_64(dynamic raw);
 
-  @protected
-  List<StudentListItem> dco_decode_list_student_list_item(dynamic raw);
+@protected int dco_decode_i_32(dynamic raw);
 
-  @protected
-  ProgressViewModel dco_decode_progress_view_model(dynamic raw);
+@protected LessonItem dco_decode_lesson_item(dynamic raw);
 
-  @protected
-  StudentLessonsView dco_decode_student_lessons_view(dynamic raw);
+@protected LessonKind dco_decode_lesson_kind(dynamic raw);
 
-  @protected
-  StudentListItem dco_decode_student_list_item(dynamic raw);
+@protected List<CheckpointVm> dco_decode_list_checkpoint_vm(dynamic raw);
 
-  @protected
-  int dco_decode_u_8(dynamic raw);
+@protected List<LessonItem> dco_decode_list_lesson_item(dynamic raw);
 
-  @protected
-  void dco_decode_unit(dynamic raw);
+@protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
-  @protected
-  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+@protected List<StudentListItem> dco_decode_list_student_list_item(dynamic raw);
 
-  @protected
-  String sse_decode_String(SseDeserializer deserializer);
+@protected ProgressResult dco_decode_progress_result(dynamic raw);
 
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
+@protected ProgressViewModel dco_decode_progress_view_model(dynamic raw);
 
-  @protected
-  CheckpointVm sse_decode_checkpoint_vm(SseDeserializer deserializer);
+@protected StudentLessonsView dco_decode_student_lessons_view(dynamic raw);
 
-  @protected
-  double sse_decode_f_64(SseDeserializer deserializer);
+@protected StudentListItem dco_decode_student_list_item(dynamic raw);
 
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
+@protected int dco_decode_u_8(dynamic raw);
 
-  @protected
-  LessonItem sse_decode_lesson_item(SseDeserializer deserializer);
+@protected void dco_decode_unit(dynamic raw);
 
-  @protected
-  LessonKind sse_decode_lesson_kind(SseDeserializer deserializer);
+@protected UnknownLevelVm dco_decode_unknown_level_vm(dynamic raw);
 
-  @protected
-  List<CheckpointVm> sse_decode_list_checkpoint_vm(
-    SseDeserializer deserializer,
-  );
+@protected AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
-  @protected
-  List<LessonItem> sse_decode_list_lesson_item(SseDeserializer deserializer);
+@protected String sse_decode_String(SseDeserializer deserializer);
 
-  @protected
-  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+@protected bool sse_decode_bool(SseDeserializer deserializer);
 
-  @protected
-  List<StudentListItem> sse_decode_list_student_list_item(
-    SseDeserializer deserializer,
-  );
+@protected ProgressViewModel sse_decode_box_autoadd_progress_view_model(SseDeserializer deserializer);
 
-  @protected
-  ProgressViewModel sse_decode_progress_view_model(
-    SseDeserializer deserializer,
-  );
+@protected UnknownLevelVm sse_decode_box_autoadd_unknown_level_vm(SseDeserializer deserializer);
 
-  @protected
-  StudentLessonsView sse_decode_student_lessons_view(
-    SseDeserializer deserializer,
-  );
+@protected CheckpointVm sse_decode_checkpoint_vm(SseDeserializer deserializer);
 
-  @protected
-  StudentListItem sse_decode_student_list_item(SseDeserializer deserializer);
+@protected double sse_decode_f_64(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_u_8(SseDeserializer deserializer);
+@protected int sse_decode_i_32(SseDeserializer deserializer);
 
-  @protected
-  void sse_decode_unit(SseDeserializer deserializer);
+@protected LessonItem sse_decode_lesson_item(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_AnyhowException(
-    AnyhowException self,
-    SseSerializer serializer,
-  );
+@protected LessonKind sse_decode_lesson_kind(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_String(String self, SseSerializer serializer);
+@protected List<CheckpointVm> sse_decode_list_checkpoint_vm(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
+@protected List<LessonItem> sse_decode_list_lesson_item(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_checkpoint_vm(CheckpointVm self, SseSerializer serializer);
+@protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_f_64(double self, SseSerializer serializer);
+@protected List<StudentListItem> sse_decode_list_student_list_item(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
+@protected ProgressResult sse_decode_progress_result(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_lesson_item(LessonItem self, SseSerializer serializer);
+@protected ProgressViewModel sse_decode_progress_view_model(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_lesson_kind(LessonKind self, SseSerializer serializer);
+@protected StudentLessonsView sse_decode_student_lessons_view(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_list_checkpoint_vm(
-    List<CheckpointVm> self,
-    SseSerializer serializer,
-  );
+@protected StudentListItem sse_decode_student_list_item(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_list_lesson_item(
-    List<LessonItem> self,
-    SseSerializer serializer,
-  );
+@protected int sse_decode_u_8(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_list_prim_u_8_strict(
-    Uint8List self,
-    SseSerializer serializer,
-  );
+@protected void sse_decode_unit(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_list_student_list_item(
-    List<StudentListItem> self,
-    SseSerializer serializer,
-  );
+@protected UnknownLevelVm sse_decode_unknown_level_vm(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_progress_view_model(
-    ProgressViewModel self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_AnyhowException(AnyhowException self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_student_lessons_view(
-    StudentLessonsView self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_String(String self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_student_list_item(
-    StudentListItem self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_bool(bool self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_u_8(int self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_progress_view_model(ProgressViewModel self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_unit(void self, SseSerializer serializer);
-}
+@protected void sse_encode_box_autoadd_unknown_level_vm(UnknownLevelVm self, SseSerializer serializer);
+
+@protected void sse_encode_checkpoint_vm(CheckpointVm self, SseSerializer serializer);
+
+@protected void sse_encode_f_64(double self, SseSerializer serializer);
+
+@protected void sse_encode_i_32(int self, SseSerializer serializer);
+
+@protected void sse_encode_lesson_item(LessonItem self, SseSerializer serializer);
+
+@protected void sse_encode_lesson_kind(LessonKind self, SseSerializer serializer);
+
+@protected void sse_encode_list_checkpoint_vm(List<CheckpointVm> self, SseSerializer serializer);
+
+@protected void sse_encode_list_lesson_item(List<LessonItem> self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer);
+
+@protected void sse_encode_list_student_list_item(List<StudentListItem> self, SseSerializer serializer);
+
+@protected void sse_encode_progress_result(ProgressResult self, SseSerializer serializer);
+
+@protected void sse_encode_progress_view_model(ProgressViewModel self, SseSerializer serializer);
+
+@protected void sse_encode_student_lessons_view(StudentLessonsView self, SseSerializer serializer);
+
+@protected void sse_encode_student_list_item(StudentListItem self, SseSerializer serializer);
+
+@protected void sse_encode_u_8(int self, SseSerializer serializer);
+
+@protected void sse_encode_unit(void self, SseSerializer serializer);
+
+@protected void sse_encode_unknown_level_vm(UnknownLevelVm self, SseSerializer serializer);
+                }
+                
+
 
 // Section: wire_class
 
-class RustLibWire implements BaseWire {
-  factory RustLibWire.fromExternalLibrary(ExternalLibrary lib) =>
-      RustLibWire(lib.ffiDynamicLibrary);
 
-  /// Holds the symbol lookup function.
-  final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
-  _lookup;
+        class RustLibWire implements BaseWire {
 
-  /// The symbols are looked up in [dynamicLibrary].
-  RustLibWire(ffi.DynamicLibrary dynamicLibrary)
-    : _lookup = dynamicLibrary.lookup;
-}
+            factory RustLibWire.fromExternalLibrary(ExternalLibrary lib) =>
+              RustLibWire(lib.ffiDynamicLibrary);
+        
+            /// Holds the symbol lookup function.
+            final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
+                _lookup;
+  
+            /// The symbols are looked up in [dynamicLibrary].
+            RustLibWire(ffi.DynamicLibrary dynamicLibrary)
+                : _lookup = dynamicLibrary.lookup;
+
+            
+        }
+        

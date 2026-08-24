@@ -10,7 +10,7 @@ impl<'a, T: StudentsRetrievalGateway> RetrieveStudentsUseCase<'a, T> {
     }
 
     pub async fn execute(&self) -> anyhow::Result<Vec<Student>> {
-        self.gateway.get_avaliable_records().await
+        self.gateway.get_available_records().await
     }
 }
 
@@ -27,7 +27,7 @@ mod tests {
 
     #[async_trait]
     impl StudentsRetrievalGateway for FakeStudentsRetrievalGateway {
-        async fn get_avaliable_records(&self) -> anyhow::Result<Vec<Student>> {
+        async fn get_available_records(&self) -> anyhow::Result<Vec<Student>> {
             if self.fail {
                 anyhow::bail!("Session invalid or expired");
             }

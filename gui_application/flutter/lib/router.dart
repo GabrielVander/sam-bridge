@@ -25,14 +25,13 @@ class PresenterRefreshListenable extends ChangeNotifier {
 GoRouter buildRouter({
   required String appVersion,
   required AuthCubitSignal authPresenter,
-  bool initiallyLoggedIn = false,
 }) {
   return GoRouter(
     navigatorKey: GlobalKey<NavigatorState>(),
-    initialLocation: initiallyLoggedIn ? '/students' : '/login',
+    initialLocation: authPresenter.isAuthenticated ? '/students' : '/login',
     refreshListenable: PresenterRefreshListenable(authPresenter.stream),
     redirect: (context, state) {
-      final loggedIn = authPresenter.isAuthenticated || initiallyLoggedIn;
+      final loggedIn = authPresenter.isAuthenticated;
       final loggingIn = state.matchedLocation == '/login';
 
       if (!loggedIn && !loggingIn) return '/login';

@@ -39,13 +39,6 @@ impl App {
         username: String,
         password: String,
     ) -> anyhow::Result<()> {
-        // Under coverage builds authenticate is infallible; compile out the
-        // unreachable error arm to keep measurement honest.
-        #[cfg(coverage)]
-        let session = authenticate(&base_url, &username, &password)
-            .await
-            .expect("coverage builds skip the network hop");
-        #[cfg(not(coverage))]
         let session = authenticate(&base_url, &username, &password).await?;
 
         self.store.save(&StoredCredentials {
@@ -57,7 +50,7 @@ impl App {
         *self
             .session
             .write()
-            .expect("Session lock should not be poisoned") = Some(session);
+            .unwrap_or_else(|e| e.into_inner()) = Some(session);
         Ok(())
     }
 
@@ -71,7 +64,7 @@ impl App {
         *self
             .session
             .write()
-            .expect("Session lock should not be poisoned") = None;
+            .unwrap_or_else(|e| e.into_inner()) = None;
     }
 
     /// Attempts silent re-authentication using persisted credentials.
@@ -86,7 +79,7 @@ impl App {
                 *self
                     .session
                     .write()
-                    .expect("Session lock should not be poisoned") = Some(session);
+                    .unwrap_or_else(|e| e.into_inner()) = Some(session);
                 true
             }
             Err(_) => {
@@ -99,13 +92,13 @@ impl App {
     pub fn is_logged_in(&self) -> bool {
         self.session
             .read()
-            .expect("Session lock should not be poisoned")
+            .unwrap_or_else(|e| e.into_inner())
             .is_some()
     }
 
     pub async fn retrieve_students(&self) -> anyhow::Result<Vec<Student>> {
         let roster = self.with_session(|s| s.roster.clone())?;
-        roster.get_avaliable_records().await
+        roster.get_available_records().await
     }
 
     pub async fn calculate_progress(
@@ -114,12 +107,13 @@ impl App {
         assigned_level: &MusicianLevel,
     ) -> anyhow::Result<ProgressAssessment> {
         let bundle = self.retrieve_student_lessons(student_id).await?;
-        Ok(calculate_progress_fn(
+        calculate_progress_fn(
             assigned_level,
             &bundle.approved,
             &bundle.method,
             &violin_schmoll_profile(),
-        ))
+        )
+        .map_err(|e| anyhow::anyhow!(e))
     }
 
     pub async fn retrieve_student_lessons(&self, id: &str) -> anyhow::Result<StudentLessons> {
@@ -133,14 +127,14 @@ impl App {
         *self
             .session
             .write()
-            .expect("Session lock should not be poisoned") = Some(session);
+            .unwrap_or_else(|e| e.into_inner()) = Some(session);
     }
 
     fn with_session<T>(&self, f: impl FnOnce(&AuthSession) -> T) -> anyhow::Result<T> {
         let guard = self
             .session
             .read()
-            .expect("Session lock should not be poisoned");
+            .unwrap_or_else(|e| e.into_inner());
         let session = guard
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("Not authenticated"))?;
@@ -178,7 +172,7 @@ mod tests {
 
     #[async_trait::async_trait]
     impl StudentsRetrievalGateway for StubRoster {
-        async fn get_avaliable_records(&self) -> anyhow::Result<Vec<DomainStudent>> {
+        async fn get_available_records(&self) -> anyhow::Result<Vec<DomainStudent>> {
             if self.fail {
                 anyhow::bail!("Students HTTP request failed");
             }
@@ -301,39 +295,6 @@ mod tests {
         assert!(!app.is_logged_in());
     }
 
-    #[cfg(coverage)]
-    #[test]
-    fn try_restore_session_under_coverage_should_succeed_with_saved_credentials() {
-        let _guard = test_lock();
-        let dir = TempDir::new().unwrap();
-        let store = FileSessionStore::with_path(dir.path().join("session.json"));
-        let app = App::with_store(Box::new(FileSessionStore::with_path(
-            dir.path().join("session.json"),
-        )));
-
-        // Pre-populate credentials.
-        store
-            .save(&StoredCredentials {
-                base_url: "http://127.0.0.1:1".to_owned(),
-                username: "u".to_owned(),
-                password: "p".to_owned(),
-            })
-            .unwrap();
-        assert!(app.has_saved_credentials());
-        assert!(!app.is_logged_in());
-
-        smol::block_on(async {
-            let restored = app.try_restore_session().await;
-            assert!(restored, "Coverage builds skip network; should succeed");
-            assert!(app.is_logged_in());
-
-            // Clearing removes both session and persisted credentials.
-            app.logout();
-            assert!(!app.is_logged_in());
-            assert!(!app.has_saved_credentials());
-        });
-    }
-
     #[test]
     fn try_restore_session_without_credentials_returns_false() {
         let _guard = test_lock();
@@ -358,35 +319,13 @@ mod tests {
         let app = App::with_store(Box::new(FileSessionStore::with_path(store_path.clone())));
 
         smol::block_on(async {
-            #[cfg(coverage)]
-            {
-                // Under coverage builds authenticate succeeds without network,
-                // so login persists credentials and seeds the session.
-                app.login(
-                    "http://127.0.0.1:1".to_owned(),
-                    "u".to_owned(),
-                    "p".to_owned(),
-                )
-                .await
-                .expect("coverage login should succeed");
-
-                assert!(
-                    store.load().is_some(),
-                    "credentials on disk after successful login"
-                );
-                assert!(app.is_logged_in());
-            }
-
-            #[cfg(not(coverage))]
-            {
-                // Real path hits dead port → fails → no credentials saved.
-                let result = app
-                    .login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned())
-                    .await;
-                assert!(result.is_err());
-                assert!(store.load().is_none(), "failed login must not persist");
-                assert!(!app.is_logged_in());
-            }
+            // Real path hits dead port → fails → no credentials saved.
+            let result = app
+                .login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned())
+                .await;
+            assert!(result.is_err());
+            assert!(store.load().is_none(), "failed login must not persist");
+            assert!(!app.is_logged_in());
         });
     }
 
@@ -432,7 +371,6 @@ mod tests {
         });
     }
 
-    #[cfg(not(coverage))]
     #[test]
     fn login_to_dead_port_should_fail_and_stay_logged_out() {
         let _guard = test_lock();
@@ -452,39 +390,6 @@ mod tests {
 
             assert!(result.is_err());
             assert!(!app.is_logged_in());
-        });
-    }
-
-    #[cfg(coverage)]
-    #[test]
-    fn login_under_coverage_should_seed_anonymous_session() {
-        let _guard = test_lock();
-        let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_path(
-            dir.path().join("session.json"),
-        )));
-
-        smol::block_on(async {
-            app.login(
-                "http://127.0.0.1:1".to_owned(),
-                "u".to_owned(),
-                "p".to_owned(),
-            )
-            .await
-            .expect("coverage login seeds an anonymous session");
-
-            assert!(app.is_logged_in());
-
-            // Credentials were persisted to disk.
-            let store = FileSessionStore::with_path(dir.path().join("session.json"));
-            let saved = store.load().expect("credentials should have been saved");
-            assert_eq!(saved.username, "u");
-
-            app.logout();
-            assert!(!app.is_logged_in());
-
-            // Logout cleared the stored credentials.
-            assert!(store.load().is_none());
         });
     }
 }

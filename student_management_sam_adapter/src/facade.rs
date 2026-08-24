@@ -30,34 +30,14 @@ impl AuthSession {
 
 /// Opens an authenticated session against the SAM portal and returns its
 /// gateways. This is the adapter's single public entry point.
-///
-/// Under coverage builds the network hop is skipped and an anonymous-session
-/// stand-in is returned instead, so downstream code remains fully measurable.
 pub async fn authenticate(base_url: &str, username: &str, password: &str) -> Result<AuthSession> {
-    #[cfg(coverage)]
-    {
-        use sam::client::SamClient;
+    let gateways =
+        SamGateways::open_with(NetworkSessionOpener, base_url, username, password).await?;
 
-        // Anonymous clients are network-free to fabricate.
-        let client: SamClient = SamClient::new("http://127.0.0.1:1")
-            .expect("client builds without I/O");
-        let gateways = SamGateways::from_client(&client);
-        return Ok(AuthSession::from_gateways(
-            Arc::new(gateways.clone()),
-            Arc::new(gateways),
-        ));
-    }
-
-    #[cfg(not(coverage))]
-    {
-        let gateways =
-            SamGateways::open_with(NetworkSessionOpener, base_url, username, password).await?;
-
-        Ok(AuthSession::from_gateways(
-            Arc::new(gateways.clone()),
-            Arc::new(gateways),
-        ))
-    }
+    Ok(AuthSession::from_gateways(
+        Arc::new(gateways.clone()),
+        Arc::new(gateways),
+    ))
 }
 
 #[cfg(test)]
@@ -71,7 +51,7 @@ mod tests {
     struct StubRoster;
     #[async_trait::async_trait]
     impl StudentsRetrievalGateway for StubRoster {
-        async fn get_avaliable_records(&self) -> Result<Vec<Student>> {
+        async fn get_available_records(&self) -> Result<Vec<Student>> {
             Ok(vec![Student {
                 id: "1".to_owned(),
                 name: "ALUNO".to_owned(),
@@ -105,7 +85,7 @@ mod tests {
         let session = AuthSession::from_gateways(Arc::new(StubRoster), Arc::new(StubLessons));
 
         smol::block_on(async {
-            let students = session.roster.get_avaliable_records().await.unwrap();
+            let students = session.roster.get_available_records().await.unwrap();
             assert_eq!(students.len(), 1);
 
             let lessons = session
@@ -127,19 +107,4 @@ mod tests {
         });
     }
 
-    #[cfg(coverage)]
-    #[test]
-    fn authenticate_seeds_an_anonymous_session_under_coverage() {
-        smol::block_on(async {
-            // Coverage builds skip the network hop; the returned session's
-            // gateways are fabricated clients pointing at a dead port.
-            let session = authenticate("http://127.0.0.1:1", "u", "p")
-                .await
-                .expect("coverage builds seed an anonymous session");
-
-            // Calling through them will fail at the dead port — but the
-            // important thing is that they exist and are callable.
-            assert!(session.roster.get_avaliable_records().await.is_err());
-        });
-    }
 }

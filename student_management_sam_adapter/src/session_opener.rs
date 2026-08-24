@@ -9,11 +9,6 @@ pub(crate) struct NetworkSessionOpener;
 
 impl SessionOpener for NetworkSessionOpener {
     fn open(&self, base_url: &str, username: &str, password: &str) -> Result<SamClient> {
-        // Fixed configuration cannot fail; unreachable error arm compiled out under coverage.
-        #[cfg(coverage)]
-        let mut client =
-            SamClient::new(base_url).expect("Fixed HTTP client configuration must be valid");
-        #[cfg(not(coverage))]
         let mut client = SamClient::new(base_url)?;
 
         client.login(&SamCredentials {

@@ -40,7 +40,8 @@ impl MusicianLevel {
     }
 
     /// Parses a canonical name back into a MusicianLevel.
-    /// Unknown names default to Candidate (lowest rank).
+    /// Unknown names are preserved as `Unknown(raw)` and must be handled
+    /// explicitly — they carry no rank and should not be used for progress.
     pub fn parse_named(raw: &str) -> Self {
         match raw {
             "Candidate" => Self::Candidate,
@@ -50,6 +51,14 @@ impl MusicianLevel {
             "Officialized" => Self::Officialized,
             other => Self::Unknown(other.to_owned()),
         }
+    }
+
+    pub fn is_unknown(&self) -> bool {
+        matches!(self, Self::Unknown(_))
+    }
+
+    pub fn unknown_raw(&self) -> Option<&str> {
+        if let Self::Unknown(raw) = self { Some(raw) } else { None }
     }
 
     pub fn rank(&self) -> u8 {
@@ -62,6 +71,13 @@ impl MusicianLevel {
             Self::Unknown(_) => u8::MAX,
         }
     }
+
+    pub fn rank_opt(&self) -> Option<u8> {
+        match self {
+            Self::Unknown(_) => None,
+            _ => Some(self.rank()),
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -69,7 +85,9 @@ pub enum OrganistLevel {
     Candidate,
     Practice,
     YouthService,
+    #[deprecated(note = "typo: use HalfHour")]
     HafHour,
+    HalfHour,
     OfficialService,
     YouthServiceHafHour,
     YouthServicePractice,

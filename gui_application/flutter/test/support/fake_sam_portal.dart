@@ -56,6 +56,31 @@ final class FakeSamPortal implements SamPortal {
     if (lessonsError != null) throw lessonsError!;
     return lessons;
   }
+
+  ProgressResult progress = ProgressResult(
+    isUnknown: false,
+    progress: ProgressViewModel(
+      msaPercent: 0,
+      methodPagePercent: 0,
+      methodLessonPercent: 0,
+      overallPercent: 0,
+      meetsYouthService: false,
+      meetsOfficialService: false,
+      meetsOfficialization: false,
+      checkpoints: [],
+    ),
+    unknown: UnknownLevelVm(raw: '', message: ''),
+  );
+  Object? progressError;
+
+  @override
+  Future<ProgressResult> retrieveStudentProgress({
+    required String studentId,
+    required String assignedLevel,
+  }) async {
+    if (progressError != null) throw progressError!;
+    return progress;
+  }
 }
 
 /// Helper to build view fixtures without Rust.

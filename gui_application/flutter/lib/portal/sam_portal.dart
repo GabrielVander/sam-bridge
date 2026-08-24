@@ -17,6 +17,10 @@ abstract interface class SamPortal {
   Future<StudentLessonsView> retrieveStudentLessons({
     required String studentId,
   });
+  Future<ProgressResult> retrieveStudentProgress({
+    required String studentId,
+    required String assignedLevel,
+  });
 }
 
 final class RustSamPortal implements SamPortal {
@@ -48,4 +52,11 @@ final class RustSamPortal implements SamPortal {
   Future<StudentLessonsView> retrieveStudentLessons({
     required String studentId,
   }) => api.retrieveStudentLessons(studentId: studentId);
+
+  @override
+  Future<ProgressResult> retrieveStudentProgress({
+    required String studentId,
+    required String assignedLevel,
+  }) =>
+      api.retrieveStudentProgress(studentId: studentId, assignedLevel: assignedLevel);
 }

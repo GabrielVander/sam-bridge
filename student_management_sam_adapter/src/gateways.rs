@@ -49,7 +49,7 @@ impl SamGateways {
 
 #[async_trait::async_trait]
 impl StudentsRetrievalGateway for SamGateways {
-    async fn get_avaliable_records(&self) -> Result<Vec<Student>> {
+    async fn get_available_records(&self) -> Result<Vec<Student>> {
         let reader = self.reader.clone();
         // sam is blocking: run on smol's thread pool.
         let dtos = smol::unblock(move || reader.students()).await?;
@@ -159,7 +159,7 @@ mod tests {
         smol::block_on(async {
             let gateways = gateway(vec![student_dto("1")], false, false);
 
-            let students = gateways.get_avaliable_records().await.expect("roster");
+            let students = gateways.get_available_records().await.expect("roster");
             assert_eq!(students.len(), 1);
             assert_eq!(students[0].name, "ALUNO 1");
 
@@ -182,7 +182,7 @@ mod tests {
                 fail_lessons: false,
             }));
 
-            assert!(gateways.get_avaliable_records().await.unwrap().is_empty());
+            assert!(gateways.get_available_records().await.unwrap().is_empty());
 
             let lessons = gateways.get_all_for_student_with_id("1").await.unwrap();
             assert!(lessons.approved.is_empty());
@@ -195,7 +195,7 @@ mod tests {
         smol::block_on(async {
             let gateways = gateway(vec![], true, false);
 
-            let result = gateways.get_avaliable_records().await;
+            let result = gateways.get_available_records().await;
             assert!(result.is_err());
             assert!(result.unwrap_err().to_string().contains("Students HTTP"));
         });
@@ -220,7 +220,7 @@ mod tests {
 
             let gateways = gateway(vec![nameless], false, false);
 
-            let students = gateways.get_avaliable_records().await.expect("tolerance");
+            let students = gateways.get_available_records().await.expect("tolerance");
             assert_eq!(students[0].name, "");
         });
     }
@@ -250,7 +250,7 @@ mod tests {
 
             // The wrapped reader is the fabricated client; calling through it
             // would fail at the dead port, proving no hidden networking here.
-            assert!(gateways.get_avaliable_records().await.is_err());
+            assert!(gateways.get_available_records().await.is_err());
         });
     }
 }

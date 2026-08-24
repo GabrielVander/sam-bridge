@@ -27,11 +27,6 @@ impl SamReader for SamClient {
 
 impl SamClient {
     pub fn new(base_url: impl Into<String>) -> Result<Self> {
-        // Fixed configuration cannot fail; unreachable error arm compiled out under coverage.
-        #[cfg(coverage)]
-        let transport: SamTransport =
-            SamTransport::new(base_url).expect("Fixed HTTP client configuration must be valid");
-        #[cfg(not(coverage))]
         let transport: SamTransport = SamTransport::new(base_url)?;
 
         Ok(Self {
