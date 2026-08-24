@@ -11,8 +11,6 @@ void main() {
       versionDisplay: 'test',
       portal: FakeSamPortal()..students = [studentItem()],
     ));
-    // Deliberately deep-linking to a protected route:
-    // initialLocation is /login, so assert the login form is what renders.
     await tester.pumpAndSettle();
 
     expect(find.text('Login to SamSite'), findsOneWidget);
@@ -35,5 +33,4 @@ void main() {
   });
 }
 
-// Re-exported for convenience in future router-only tests.
 typedef SamPortalT = SamPortal;

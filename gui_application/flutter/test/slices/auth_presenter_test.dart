@@ -19,8 +19,6 @@ void main() {
     final portal = FakeSamPortal();
     final presenter = AuthCubitSignal(portal);
 
-    // Not awaited yet: CubitSignal emits synchronously, so the loading state
-    // must be observable before the first await inside submitLogin.
     final submitting = presenter.submitLogin('user', 'pass');
     expect(presenter.stateValue, isA<AuthLoading>());
 

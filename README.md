@@ -43,7 +43,6 @@ gui_application/                 # FRB crate: api surface, slices, composition r
 student_management/              # core: vertical-slice features, zero I/O deps
 student_management_sam_adapter/  # core gateways implemented over `sam`
 sam/                             # SAM portal client (blocking, session-aware)
-lib/sam_integration/             # superseded infrastructure — to be deleted
 ```
 
 ## Domain contracts
@@ -99,8 +98,7 @@ workspace-wide.
 
 Coverage gates are 100% regions/lines/functions for `sam`,
 `student_management`, `student_management_sam_adapter`, and
-`gui_application` (generated glue excluded). If a coverage build reports unreachable defensive arms, they are
-compiled out under `cfg(coverage)` instead of being tested artificially.
+`gui_application` (generated glue excluded).
 
 ## Testing conventions
 
@@ -113,7 +111,7 @@ compiled out under `cfg(coverage)` instead of being tested artificially.
   pure-Dart-testable via the `SamPortal` interface.
 - `adapter::session_opener::NetworkSessionOpener` is the single network-glue
   file excluded from coverage measurement (its success path requires the real
-  SAM portal); its error path is still exercised via a dead-port test in the
-  GUI crate's non-coverage runs.
+  SAM portal); its error path is exercised via a dead-port test in the
+  GUI crate.
 - Live-site capability checks live in `sam/tests/sam_http_capabilities_and_behaviour.rs`
   and run against production SAM when credentials are present.

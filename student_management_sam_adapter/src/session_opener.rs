@@ -29,6 +29,5 @@ pub(crate) async fn open_session<O>(
 where
     O: SessionOpener + Send + Sync + 'static,
 {
-    // sam is blocking: run on smol's thread pool.
     smol::unblock(move || opener.open(&base_url, &username, &password)).await
 }

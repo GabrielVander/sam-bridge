@@ -1,7 +1,6 @@
 use crate::view_models::{LessonItem, LessonKind, StudentLessonsView};
 use student_management::api::domain::StudentLessons;
 
-/// Maps a domain bundle to view models, each list most-recent-first.
 pub fn to_view(bundle: &StudentLessons) -> StudentLessonsView {
     let mut msa: Vec<LessonItem> = bundle
         .approved

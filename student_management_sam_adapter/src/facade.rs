@@ -8,18 +8,12 @@ use student_management::api::{
 use crate::gateways::SamGateways;
 use crate::session_opener::NetworkSessionOpener;
 
-/// Erased gateway pair for one authenticated SAM session.
-///
-/// Both fields are core-owned abstractions, so this type carries no
-/// infrastructure knowledge across crate boundaries.
 pub struct AuthSession {
     pub roster: Arc<dyn StudentsRetrievalGateway + Send + Sync>,
     pub lessons: Arc<dyn StudentLessonsGateway + Send + Sync>,
 }
 
 impl AuthSession {
-    /// Builds a session from any pair of core gateway implementations —
-    /// the injection seam for tests above this crate.
     pub fn from_gateways(
         roster: Arc<dyn StudentsRetrievalGateway + Send + Sync>,
         lessons: Arc<dyn StudentLessonsGateway + Send + Sync>,
@@ -28,8 +22,6 @@ impl AuthSession {
     }
 }
 
-/// Opens an authenticated session against the SAM portal and returns its
-/// gateways. This is the adapter's single public entry point.
 pub async fn authenticate(base_url: &str, username: &str, password: &str) -> Result<AuthSession> {
     let gateways =
         SamGateways::open_with(NetworkSessionOpener, base_url, username, password).await?;

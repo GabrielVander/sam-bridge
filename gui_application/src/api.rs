@@ -12,13 +12,10 @@ fn app() -> &'static App {
     APP.get_or_init(App::new)
 }
 
-/// Whether persisted credentials exist on disk (cheap synchronous check).
 pub fn has_saved_credentials() -> bool {
     app().has_saved_credentials()
 }
 
-/// Attempts silent re-authentication using persisted credentials.
-/// Returns true when a usable session was established.
 pub async fn try_restore_session() -> bool {
     app().try_restore_session().await
 }
@@ -186,7 +183,6 @@ mod tests {
     fn has_saved_credentials_delegates_to_app() {
         let _guard = test_lock();
         logout();
-        // Just exercises the delegation; the underlying store is file-backed.
         let _ = has_saved_credentials();
     }
 

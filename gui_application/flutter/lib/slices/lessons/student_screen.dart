@@ -55,7 +55,6 @@ final class _StudentScreenState extends State<StudentScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      // Look up assigned level; if roster not loaded, default to Unknown sentinel
       final studentsState = context.read<StudentsCubitSignal>().stateValue;
       String assignedLevel = '__UNKNOWN__';
       bool found = false;

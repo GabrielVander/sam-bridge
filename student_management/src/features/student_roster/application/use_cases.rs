@@ -59,7 +59,7 @@ mod tests {
                     student(
                         "2",
                         StudentPosition::Organist {
-                            level: OrganistLevel::HafHour,
+                            level: OrganistLevel::HalfHour,
                         },
                     ),
                 ],

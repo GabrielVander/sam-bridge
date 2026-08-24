@@ -11,7 +11,6 @@ pub enum Instrument {
     Violin,
 }
 
-/// Universal level path — same for every musician regardless of instrument.
 pub struct LevelDefinition {
     pub level: MusicianLevel,
     pub label: &'static str,
@@ -26,7 +25,6 @@ pub const LEVEL_PATH: &[LevelDefinition] = &[
     LevelDefinition { level: MusicianLevel::Officialized, label: "Oficialização", msa_phase: Some(16.0) },
 ];
 
-/// Instrument-specific method thresholds overlaid onto the universal path.
 #[derive(Debug, Clone, PartialEq)]
 pub struct MethodProfile {
     pub instrument: Instrument,
@@ -58,9 +56,7 @@ pub struct CheckpointStatus {
     pub label: &'static str,
     pub achieved: bool,
     pub ready_to_advance: bool,
-    /// Whether this checkpoint's MSA phase requirement is met by lesson data alone.
     pub msa_requirement_met: bool,
-    /// Whether this checkpoint's method page/lesson requirements are met by lesson data alone.
     pub method_requirement_met: bool,
 }
 
@@ -105,7 +101,6 @@ pub fn assess(
             let msa_met = def.msa_phase.is_none_or(|min| highest_msa_phase >= min);
             let method_met = method_req_met(&def.level, profile, highest_method_page, highest_method_lesson);
             let requirement_met = msa_met && method_met;
-            // Ensaio has no formal requirement; readiness is the conductor's call.
             let has_measurable_requirement = def.msa_phase.is_some();
 
             CheckpointStatus {
@@ -198,50 +193,47 @@ mod tests {
         let report = assess(&MusicianLevel::Candidate, &[], &[], &violin_schmoll_profile()).unwrap();
 
         assert!(!report.checkpoints.is_empty());
-        assert!(report.checkpoints[0].achieved); // Candidate auto-achieved
+        assert!(report.checkpoints[0].achieved);
         assert!(!report.meets_any_above());
         assert_eq!(report.overall_percent, 0.0);
     }
 
     #[test]
     fn supreme_rule_assigned_level_auto_achieves_below_and_at() {
-        // Student assigned Youth Service — all levels ≤ YS are achieved regardless of lessons.
-        let approved = vec![msa_lesson("3", "3")]; // way below Phase 12
-        let method = vec![method_lesson("10", "20")]; // way below page 46
+        let approved = vec![msa_lesson("3", "3")];
+        let method = vec![method_lesson("10", "20")];
 
         let report = assess(&MusicianLevel::YouthService, &approved, &method, &violin_schmoll_profile()).unwrap();
 
-        assert!(report.checkpoints[0].achieved); // Candidate
-        assert!(report.checkpoints[1].achieved); // Ensaio
-        assert!(report.checkpoints[2].achieved); // RJM — supreme rule
-        assert!(!report.checkpoints[3].achieved); // Culto Oficial — above assignment
+        assert!(report.checkpoints[0].achieved);
+        assert!(report.checkpoints[1].achieved);
+        assert!(report.checkpoints[2].achieved);
+        assert!(!report.checkpoints[3].achieved);
         assert!(!report.checkpoints[4].achieved);
     }
 
     #[test]
     fn requirements_met_but_not_assigned_shows_ready_to_advance() {
-        // Lessons meet RJM thresholds but student is still Candidate.
         let approved = vec![msa_lesson("12", "12")];
         let method = vec![method_lesson("46", "113")];
 
         let report = assess(&MusicianLevel::Candidate, &approved, &method, &violin_schmoll_profile()).unwrap();
 
-        assert!(report.checkpoints[0].achieved); // Candidate
-        assert!(!report.checkpoints[1].achieved); // Ensaio not assigned
-        assert!(!report.checkpoints[1].ready_to_advance); // no formal requirement
-        assert!(!report.checkpoints[2].achieved); // RJM not assigned yet
-        assert!(report.checkpoints[2].ready_to_advance); // requirements met
+        assert!(report.checkpoints[0].achieved);
+        assert!(!report.checkpoints[1].achieved);
+        assert!(!report.checkpoints[1].ready_to_advance);
+        assert!(!report.checkpoints[2].achieved);
+        assert!(report.checkpoints[2].ready_to_advance);
     }
 
     #[test]
     fn meets_culto_oficial_requires_phase_16() {
-        // Phase 15 is NOT enough for Culto Oficial.
-        let approved = vec![msa_lesson("15", "16")]; // reaches 16
+        let approved = vec![msa_lesson("15", "16")];
         let method = vec![method_lesson("67", "162")];
 
         let report = assess(&MusicianLevel::YouthService, &approved, &method, &violin_schmoll_profile()).unwrap();
 
-        assert!(report.checkpoints[3].ready_to_advance); // meets Culto Oficial reqs
+        assert!(report.checkpoints[3].ready_to_advance);
     }
 
     #[test]
@@ -252,7 +244,7 @@ mod tests {
 
         let report = assess(&student_level, &approved, &method, &violin_schmoll_profile()).unwrap();
 
-        assert!(report.checkpoints[4].ready_to_advance); // ready for Oficialização
+        assert!(report.checkpoints[4].ready_to_advance);
         assert!((report.overall_percent - 100.0).abs() < f64::EPSILON);
     }
 
@@ -300,7 +292,7 @@ mod tests {
         let approved = vec![msa_lesson("8", "8")];
         let report = assess(&MusicianLevel::Candidate, &approved, &[], &violin_schmoll_profile()).unwrap();
 
-        assert!((report.msa_phase_progress.percent - 50.0).abs() < 0.1); // 8/16
+        assert!((report.msa_phase_progress.percent - 50.0).abs() < 0.1);
     }
 
     #[test]
@@ -308,7 +300,7 @@ mod tests {
         let method = vec![method_lesson("40", "107")];
         let report = assess(&MusicianLevel::Candidate, &[], &method, &violin_schmoll_profile()).unwrap();
 
-        assert!((report.overall_percent - 50.0).abs() < 0.1); // 107/214
+        assert!((report.overall_percent - 50.0).abs() < 0.1);
     }
 
     #[test]

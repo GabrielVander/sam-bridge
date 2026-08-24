@@ -1,7 +1,6 @@
 use anyhow::{Context, Result};
 use std::path::{Path, PathBuf};
 
-/// Stored credentials — password is redacted in Debug output.
 #[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct StoredCredentials {
     pub base_url: String,
@@ -21,7 +20,6 @@ impl std::fmt::Debug for StoredCredentials {
 
 impl Drop for StoredCredentials {
     fn drop(&mut self) {
-        // Best-effort zeroize password on drop (no external crate needed).
         for b in unsafe { self.password.as_bytes_mut() } {
             *b = 0;
         }
@@ -37,7 +35,6 @@ pub trait SessionStore: Send + Sync {
 pub struct FileSessionStore {
     session_path: PathBuf,
     key_path: PathBuf,
-    legacy_path: PathBuf,
 }
 
 impl Default for FileSessionStore {
@@ -66,23 +63,6 @@ impl FileSessionStore {
         Self {
             session_path: dir.join("session.enc"),
             key_path: dir.join("key.bin"),
-            legacy_path: dir.join("session.json"),
-        }
-    }
-
-    #[cfg(test)]
-    pub(crate) fn with_path(path: PathBuf) -> Self {
-        // Legacy helper: path is session.json location; derive sibling paths.
-        let dir = path.parent().unwrap_or(Path::new(".")).to_path_buf();
-        let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("session");
-        if stem == "session" && path.extension().and_then(|s| s.to_str()) == Some("json") {
-            Self::with_dir(dir)
-        } else {
-            Self {
-                session_path: path.clone(),
-                key_path: dir.join("key.bin"),
-                legacy_path: dir.join("session.json"),
-            }
         }
     }
 
@@ -94,10 +74,8 @@ impl FileSessionStore {
                 return Ok(key);
             }
         }
-        // Generate new key
         let mut key = [0u8; 32];
         getrandom::getrandom(&mut key).context("Failed to generate encryption key")?;
-        // Atomic write with 0o600
         let dir = self.key_path.parent().unwrap_or(Path::new("."));
         let _ = std::fs::create_dir_all(dir);
         let tmp = dir.join(".key.bin.tmp");
@@ -170,49 +148,22 @@ impl SessionStore for FileSessionStore {
     fn save(&self, credentials: &StoredCredentials) -> Result<()> {
         let json = serde_json::to_vec(credentials).expect("Serializing String fields cannot fail");
         let ciphertext = self.encrypt(&json)?;
-        self.atomic_write(&self.session_path, &ciphertext)?;
-        // Remove legacy plaintext if present after successful migration
-        let _ = std::fs::remove_file(&self.legacy_path);
-        Ok(())
+        self.atomic_write(&self.session_path, &ciphertext)
     }
 
     fn load(&self) -> Option<StoredCredentials> {
-        // Prefer encrypted file
-        if let Ok(ciphertext) = std::fs::read(&self.session_path) {
-            if let Some(plaintext) = self.decrypt(&ciphertext) {
-                if let Ok(creds) = serde_json::from_slice::<StoredCredentials>(&plaintext) {
-                    return Some(creds);
-                } else {
-                    eprintln!("Corrupt decrypted session file, ignoring");
-                    return None;
-                }
-            } else {
-                eprintln!("Failed to decrypt session file (tampered or wrong key), ignoring");
-                return None;
-            }
-        }
-        // Migration: try legacy plaintext
-        if let Ok(content) = std::fs::read_to_string(&self.legacy_path) {
-            if let Ok(creds) = serde_json::from_str::<StoredCredentials>(&content) {
-                // Re-encrypt and remove legacy
-                let _ = self.save(&creds);
-                let _ = std::fs::remove_file(&self.legacy_path);
-                return Some(creds);
-            } else if !content.trim().is_empty() {
-                // Only warn if there was something to migrate
-                if content != "{invalid json" {
-                    eprintln!("Corrupt session file, ignoring");
-                }
-                return None;
-            }
-        }
-        None
+        let ciphertext = std::fs::read(&self.session_path).ok()?;
+        let plaintext = self.decrypt(&ciphertext).or_else(|| {
+            eprintln!("Failed to decrypt session file (tampered or wrong key), ignoring");
+            None
+        })?;
+        serde_json::from_slice::<StoredCredentials>(&plaintext)
+            .map_err(|_| eprintln!("Corrupt decrypted session file, ignoring"))
+            .ok()
     }
 
     fn clear(&self) {
         let _ = std::fs::remove_file(&self.session_path);
-        // Keep key.bin for next login to avoid rotation churn; remove legacy too
-        let _ = std::fs::remove_file(&self.legacy_path);
     }
 }
 
@@ -266,8 +217,6 @@ mod tests {
             !raw_str.contains("test_pass"),
             "encrypted file must not contain plaintext password"
         );
-        // Legacy file should not exist
-        assert!(!store.legacy_path.exists());
     }
 
     #[test]
@@ -290,9 +239,7 @@ mod tests {
     #[test]
     fn corrupt_file_loads_as_none() {
         let (store, _dir) = temp_store();
-        // Write corrupt ciphertext directly to session.enc
         std::fs::write(&store.session_path, b"{invalid json").expect("write corrupt data");
-        // Ensure key exists so decrypt is attempted
         let _ = store.load_or_create_key();
 
         assert!(store.load().is_none());
@@ -308,26 +255,6 @@ mod tests {
             std::fs::write(&store.session_path, &data).expect("tamper");
         }
         assert!(store.load().is_none());
-    }
-
-    #[test]
-    fn migration_from_plaintext() {
-        let dir = tempfile::tempdir().expect("tempdir");
-        let legacy_path = dir.path().join("session.json");
-        let creds = credentials();
-        std::fs::write(
-            &legacy_path,
-            serde_json::to_string(&creds).expect("json"),
-        )
-        .expect("write legacy");
-        let store = FileSessionStore::with_dir(dir.path().to_path_buf());
-
-        let loaded = store.load().expect("should migrate");
-        assert_eq!(loaded, creds);
-        assert!(store.session_path.exists(), "enc file created");
-        assert!(!legacy_path.exists(), "legacy removed after migration");
-        // Second load still works
-        assert_eq!(store.load().expect("second load"), creds);
     }
 
     #[cfg(unix)]

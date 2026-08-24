@@ -102,10 +102,8 @@ fn organist_level_label(level: &OrganistLevel) -> String {
         OrganistLevel::YouthService => "RJM".to_owned(),
         OrganistLevel::OfficialService => "Culto Oficial".to_owned(),
         OrganistLevel::HalfHour => "Meia hora".to_owned(),
-        #[allow(deprecated)]
-        OrganistLevel::HafHour => "Meia hora".to_owned(),
         OrganistLevel::YouthServicePractice => "RJM / Ensaio".to_owned(),
-        OrganistLevel::YouthServiceHafHour => "RJM / Meia hora".to_owned(),
+        OrganistLevel::YouthServiceHalfHour => "RJM / Meia hora".to_owned(),
         OrganistLevel::YouthServiceOfficialService => "RJM / Culto Oficial".to_owned(),
         OrganistLevel::YouthServiceOfficialized => "RJM / Oficializado(a)".to_owned(),
         OrganistLevel::Unknown(raw) => raw.clone(),
@@ -247,7 +245,6 @@ mod tests {
         })
     }
 
-    // ... existing view model tests ...
     #[test]
     fn given_musician_levels_should_render_human_labels() {
         for (position, expected) in [

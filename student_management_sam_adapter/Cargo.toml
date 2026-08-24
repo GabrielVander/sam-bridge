@@ -13,6 +13,3 @@ regex = "1.12.4"
 smol = "2.0.2"
 
 [dev-dependencies]
-
-[lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }

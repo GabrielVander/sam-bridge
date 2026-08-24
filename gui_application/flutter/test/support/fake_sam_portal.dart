@@ -1,7 +1,6 @@
 import 'package:flutter_application/portal/sam_portal.dart';
 import 'package:flutter_application/view_models.dart';
 
-/// Scriptable [SamPortal] fake for presenter/widget tests.
 final class FakeSamPortal implements SamPortal {
   Object? loginError;
   bool loggedIn = false;
@@ -83,7 +82,6 @@ final class FakeSamPortal implements SamPortal {
   }
 }
 
-/// Helper to build view fixtures without Rust.
 final class StudentLessonsViewT {
   final List<LessonItem> msa;
   final List<LessonItem> method;

@@ -18,6 +18,3 @@ getrandom = "0.2"
 async-trait = { workspace = true }
 smol = "2.0.2"
 tempfile = "3"
-
-[lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }

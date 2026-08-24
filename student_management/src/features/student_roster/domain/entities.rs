@@ -26,8 +26,6 @@ pub enum MusicianLevel {
 }
 
 impl MusicianLevel {
-    /// Ordinal rank for level comparison. Higher = more advanced.
-    /// Canonical name for serialization / lookup round-trips.
     pub fn name(&self) -> String {
         match self {
             Self::Candidate => "Candidate".to_owned(),
@@ -39,9 +37,6 @@ impl MusicianLevel {
         }
     }
 
-    /// Parses a canonical name back into a MusicianLevel.
-    /// Unknown names are preserved as `Unknown(raw)` and must be handled
-    /// explicitly — they carry no rank and should not be used for progress.
     pub fn parse_named(raw: &str) -> Self {
         match raw {
             "Candidate" => Self::Candidate,
@@ -85,11 +80,9 @@ pub enum OrganistLevel {
     Candidate,
     Practice,
     YouthService,
-    #[deprecated(note = "typo: use HalfHour")]
-    HafHour,
     HalfHour,
     OfficialService,
-    YouthServiceHafHour,
+    YouthServiceHalfHour,
     YouthServicePractice,
     YouthServiceOfficialService,
     YouthServiceOfficialized,

@@ -1,9 +1,3 @@
-//! Exploration tests exercising the real SAM site's HTTP behavior.
-//!
-//! These document observed site behavior (redirects, session cookies,
-//! endpoint quirks) and double as opt-in smoke tests. They run only when
-//! `SAM_USERNAME` and `SAM_PASSWORD` are set; otherwise each test reports
-//! a skip. `SAM_BASE_URL` optionally overrides the target site.
 
 struct SamSiteConfig {
     base_url: String,

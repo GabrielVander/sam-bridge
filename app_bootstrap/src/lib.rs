@@ -54,7 +54,6 @@ impl App {
         Ok(())
     }
 
-    /// Whether persisted credentials exist on disk.
     pub fn has_saved_credentials(&self) -> bool {
         self.store.load().is_some()
     }
@@ -67,8 +66,6 @@ impl App {
             .unwrap_or_else(|e| e.into_inner()) = None;
     }
 
-    /// Attempts silent re-authentication using persisted credentials.
-    /// Returns true when a usable session was established.
     pub async fn try_restore_session(&self) -> bool {
         let Some(creds) = self.store.load() else {
             return false;
@@ -121,7 +118,6 @@ impl App {
         lessons.get_all_for_student_with_id(id).await
     }
 
-    /// Test seam: installs a pre-built session without going through login.
     #[doc(hidden)]
     pub fn seed_session(&self, session: AuthSession) {
         *self
@@ -223,8 +219,8 @@ mod tests {
     fn new_app_is_logged_out_and_has_no_saved_credentials() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_path(
-            dir.path().join("session.json"),
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
         )));
 
         assert!(!app.is_logged_in());
@@ -236,8 +232,8 @@ mod tests {
     fn seeded_session_exposes_students_and_sorted_lessons() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_path(
-            dir.path().join("session.json"),
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
         )));
 
         app.seed_session(AuthSession::from_gateways(
@@ -271,9 +267,7 @@ mod tests {
 
     #[test]
     fn default_constructor_creates_file_backed_app() {
-        // Exercises App::new() → FileSessionStore::new() → dirs::data_local_dir().
         let _app = App::new();
-        // No assertion needed beyond "it doesn't panic".
     }
 
     #[test]
@@ -287,8 +281,8 @@ mod tests {
     fn has_saved_credentials_reflects_login_state() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_path(
-            dir.path().join("session.json"),
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
         )));
 
         assert!(!app.has_saved_credentials());
@@ -299,8 +293,8 @@ mod tests {
     fn try_restore_session_without_credentials_returns_false() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_path(
-            dir.path().join("session.json"),
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
         )));
 
         smol::block_on(async {
@@ -314,12 +308,10 @@ mod tests {
     fn login_persists_credentials_to_disk() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let store_path = dir.path().join("session.json");
-        let store = FileSessionStore::with_path(store_path.clone());
-        let app = App::with_store(Box::new(FileSessionStore::with_path(store_path.clone())));
+        let store = FileSessionStore::with_dir(dir.path().to_path_buf());
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
 
         smol::block_on(async {
-            // Real path hits dead port → fails → no credentials saved.
             let result = app
                 .login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned())
                 .await;
@@ -333,11 +325,9 @@ mod tests {
     fn logout_clears_persisted_credentials() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let store_path = dir.path().join("session.json");
-        let store = FileSessionStore::with_path(store_path.clone());
-        let app = App::with_store(Box::new(FileSessionStore::with_path(store_path.clone())));
+        let store = FileSessionStore::with_dir(dir.path().to_path_buf());
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
 
-        // Simulate previously saved credentials.
         store
             .save(&StoredCredentials {
                 base_url: "http://x".to_owned(),
@@ -356,8 +346,8 @@ mod tests {
     fn gateway_errors_propagate() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_path(
-            dir.path().join("session.json"),
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
         )));
 
         app.seed_session(AuthSession::from_gateways(
@@ -375,8 +365,8 @@ mod tests {
     fn login_to_dead_port_should_fail_and_stay_logged_out() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_path(
-            dir.path().join("session.json"),
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
         )));
 
         smol::block_on(async {

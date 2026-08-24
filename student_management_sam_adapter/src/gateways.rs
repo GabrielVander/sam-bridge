@@ -9,10 +9,6 @@ use student_management::api::{
 
 use crate::session_opener::{open_session, SessionOpener};
 
-/// Concrete gateway pair over one authenticated SAM session.
-///
-/// Implements both core ports; hand it around as `&dyn` or erased `Arc`s
-/// wherever the core's abstractions are expected.
 #[derive(Clone)]
 pub struct SamGateways {
     reader: Arc<dyn SamReader + Send + Sync>,
@@ -51,7 +47,6 @@ impl SamGateways {
 impl StudentsRetrievalGateway for SamGateways {
     async fn get_available_records(&self) -> Result<Vec<Student>> {
         let reader = self.reader.clone();
-        // sam is blocking: run on smol's thread pool.
         let dtos = smol::unblock(move || reader.students()).await?;
         dtos.iter().map(crate::mapping::roster::map).collect()
     }
@@ -62,7 +57,6 @@ impl StudentLessonsGateway for SamGateways {
     async fn get_all_for_student_with_id(&self, id: &str) -> Result<StudentLessons> {
         let reader = self.reader.clone();
         let id = id.to_owned();
-        // sam is blocking: run on smol's thread pool.
         let page = smol::unblock(move || reader.student_lessons(&id)).await?;
 
         Ok(StudentLessons {
@@ -248,8 +242,6 @@ mod tests {
             .await
                     .expect("delegation should succeed");
 
-            // The wrapped reader is the fabricated client; calling through it
-            // would fail at the dead port, proving no hidden networking here.
             assert!(gateways.get_available_records().await.is_err());
         });
     }

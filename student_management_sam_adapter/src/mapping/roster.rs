@@ -55,7 +55,7 @@ fn into_organist_level(level: &str) -> OrganistLevel {
         "MEIA HORA" => OrganistLevel::HalfHour,
         "RJM / CULTO OFICIAL" => OrganistLevel::YouthServiceOfficialService,
         "RJM / ENSAIO" => OrganistLevel::YouthServicePractice,
-        "RJM / MEIA HORA" => OrganistLevel::YouthServiceHafHour,
+        "RJM / MEIA HORA" => OrganistLevel::YouthServiceHalfHour,
         "RJM / OFICIALIZADO(A)" => OrganistLevel::YouthServiceOfficialized,
         other => OrganistLevel::Unknown(other.to_owned()),
     }
@@ -205,7 +205,7 @@ mod tests {
             ("MEIA HORA", OrganistLevel::HalfHour),
             ("RJM / CULTO OFICIAL", OrganistLevel::YouthServiceOfficialService),
             ("RJM / ENSAIO", OrganistLevel::YouthServicePractice),
-            ("RJM / MEIA HORA", OrganistLevel::YouthServiceHafHour),
+            ("RJM / MEIA HORA", OrganistLevel::YouthServiceHalfHour),
             ("RJM / OFICIALIZADO(A)", OrganistLevel::YouthServiceOfficialized),
             ("EXÓTICO", OrganistLevel::Unknown("EXÓTICO".to_owned())),
         ] {

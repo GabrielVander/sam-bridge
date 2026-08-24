@@ -13,13 +13,11 @@ Future<void> main() async {
   await RustLib.init();
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Attempt silent re-authentication from persisted credentials.
   final restored = await api.tryRestoreSession();
 
   final packageInfo = await PackageInfo.fromPlatform();
   final versionDisplay = 'v${packageInfo.version}+${packageInfo.buildNumber}';
 
-  // Create presenter before building router so initialLocation is correct.
   final initialPortal = const RustSamPortal();
   final initialAuth = AuthCubitSignal(initialPortal);
   if (restored) initialAuth.markRestored();
