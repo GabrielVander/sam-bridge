@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0-beta.2";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1852862368;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -223611624;
 
 // Section: executor
 
@@ -221,6 +221,47 @@ fn wire__crate__api__retrieve_student_lessons_impl(
         },
     )
 }
+fn wire__crate__api__retrieve_student_progress_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "retrieve_student_progress",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_student_id = <String>::sse_decode(&mut deserializer);
+            let api_assigned_level = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let output_ok = crate::api::retrieve_student_progress(
+                            api_student_id,
+                            api_assigned_level,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__retrieve_students_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -318,6 +359,31 @@ impl SseDecode for bool {
     }
 }
 
+impl SseDecode for crate::view_models::CheckpointVm {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_label = <String>::sse_decode(deserializer);
+        let mut var_achieved = <bool>::sse_decode(deserializer);
+        let mut var_readyToAdvance = <bool>::sse_decode(deserializer);
+        let mut var_msaRequirementMet = <bool>::sse_decode(deserializer);
+        let mut var_methodRequirementMet = <bool>::sse_decode(deserializer);
+        return crate::view_models::CheckpointVm {
+            label: var_label,
+            achieved: var_achieved,
+            ready_to_advance: var_readyToAdvance,
+            msa_requirement_met: var_msaRequirementMet,
+            method_requirement_met: var_methodRequirementMet,
+        };
+    }
+}
+
+impl SseDecode for f64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_f64::<NativeEndian>().unwrap()
+    }
+}
+
 impl SseDecode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -365,6 +431,18 @@ impl SseDecode for crate::view_models::LessonKind {
     }
 }
 
+impl SseDecode for Vec<crate::view_models::CheckpointVm> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::view_models::CheckpointVm>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::view_models::LessonItem> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -403,6 +481,30 @@ impl SseDecode for Vec<crate::view_models::StudentListItem> {
     }
 }
 
+impl SseDecode for crate::view_models::ProgressViewModel {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_msaPercent = <f64>::sse_decode(deserializer);
+        let mut var_methodPagePercent = <f64>::sse_decode(deserializer);
+        let mut var_methodLessonPercent = <f64>::sse_decode(deserializer);
+        let mut var_overallPercent = <f64>::sse_decode(deserializer);
+        let mut var_meetsYouthService = <bool>::sse_decode(deserializer);
+        let mut var_meetsOfficialService = <bool>::sse_decode(deserializer);
+        let mut var_meetsOfficialization = <bool>::sse_decode(deserializer);
+        let mut var_checkpoints = <Vec<crate::view_models::CheckpointVm>>::sse_decode(deserializer);
+        return crate::view_models::ProgressViewModel {
+            msa_percent: var_msaPercent,
+            method_page_percent: var_methodPagePercent,
+            method_lesson_percent: var_methodLessonPercent,
+            overall_percent: var_overallPercent,
+            meets_youth_service: var_meetsYouthService,
+            meets_official_service: var_meetsOfficialService,
+            meets_officialization: var_meetsOfficialization,
+            checkpoints: var_checkpoints,
+        };
+    }
+}
+
 impl SseDecode for crate::view_models::StudentLessonsView {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -422,11 +524,13 @@ impl SseDecode for crate::view_models::StudentListItem {
         let mut var_name = <String>::sse_decode(deserializer);
         let mut var_location = <String>::sse_decode(deserializer);
         let mut var_position = <String>::sse_decode(deserializer);
+        let mut var_rawLevel = <String>::sse_decode(deserializer);
         return crate::view_models::StudentListItem {
             id: var_id,
             name: var_name,
             location: var_location,
             position: var_position,
+            raw_level: var_rawLevel,
         };
     }
 }
@@ -457,8 +561,9 @@ fn pde_ffi_dispatcher_primary_impl(
         3 => wire__crate__api__login_impl(port, ptr, rust_vec_len, data_len),
         4 => wire__crate__api__logout_impl(port, ptr, rust_vec_len, data_len),
         5 => wire__crate__api__retrieve_student_lessons_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__api__retrieve_students_impl(port, ptr, rust_vec_len, data_len),
-        7 => wire__crate__api__try_restore_session_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__api__retrieve_student_progress_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__retrieve_students_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__try_restore_session_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -477,6 +582,30 @@ fn pde_ffi_dispatcher_sync_impl(
 
 // Section: rust2dart
 
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::view_models::CheckpointVm {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.label.into_into_dart().into_dart(),
+            self.achieved.into_into_dart().into_dart(),
+            self.ready_to_advance.into_into_dart().into_dart(),
+            self.msa_requirement_met.into_into_dart().into_dart(),
+            self.method_requirement_met.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::view_models::CheckpointVm
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::view_models::CheckpointVm>
+    for crate::view_models::CheckpointVm
+{
+    fn into_into_dart(self) -> crate::view_models::CheckpointVm {
+        self
+    }
+}
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::view_models::LessonItem {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -528,6 +657,33 @@ impl flutter_rust_bridge::IntoIntoDart<crate::view_models::LessonKind>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::view_models::ProgressViewModel {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.msa_percent.into_into_dart().into_dart(),
+            self.method_page_percent.into_into_dart().into_dart(),
+            self.method_lesson_percent.into_into_dart().into_dart(),
+            self.overall_percent.into_into_dart().into_dart(),
+            self.meets_youth_service.into_into_dart().into_dart(),
+            self.meets_official_service.into_into_dart().into_dart(),
+            self.meets_officialization.into_into_dart().into_dart(),
+            self.checkpoints.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::view_models::ProgressViewModel
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::view_models::ProgressViewModel>
+    for crate::view_models::ProgressViewModel
+{
+    fn into_into_dart(self) -> crate::view_models::ProgressViewModel {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::view_models::StudentLessonsView {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -556,6 +712,7 @@ impl flutter_rust_bridge::IntoDart for crate::view_models::StudentListItem {
             self.name.into_into_dart().into_dart(),
             self.location.into_into_dart().into_dart(),
             self.position.into_into_dart().into_dart(),
+            self.raw_level.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -590,6 +747,24 @@ impl SseEncode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         serializer.cursor.write_u8(self as _).unwrap();
+    }
+}
+
+impl SseEncode for crate::view_models::CheckpointVm {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.label, serializer);
+        <bool>::sse_encode(self.achieved, serializer);
+        <bool>::sse_encode(self.ready_to_advance, serializer);
+        <bool>::sse_encode(self.msa_requirement_met, serializer);
+        <bool>::sse_encode(self.method_requirement_met, serializer);
+    }
+}
+
+impl SseEncode for f64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_f64::<NativeEndian>(self).unwrap();
     }
 }
 
@@ -632,6 +807,16 @@ impl SseEncode for crate::view_models::LessonKind {
     }
 }
 
+impl SseEncode for Vec<crate::view_models::CheckpointVm> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::view_models::CheckpointVm>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::view_models::LessonItem> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -662,6 +847,20 @@ impl SseEncode for Vec<crate::view_models::StudentListItem> {
     }
 }
 
+impl SseEncode for crate::view_models::ProgressViewModel {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <f64>::sse_encode(self.msa_percent, serializer);
+        <f64>::sse_encode(self.method_page_percent, serializer);
+        <f64>::sse_encode(self.method_lesson_percent, serializer);
+        <f64>::sse_encode(self.overall_percent, serializer);
+        <bool>::sse_encode(self.meets_youth_service, serializer);
+        <bool>::sse_encode(self.meets_official_service, serializer);
+        <bool>::sse_encode(self.meets_officialization, serializer);
+        <Vec<crate::view_models::CheckpointVm>>::sse_encode(self.checkpoints, serializer);
+    }
+}
+
 impl SseEncode for crate::view_models::StudentLessonsView {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -677,6 +876,7 @@ impl SseEncode for crate::view_models::StudentListItem {
         <String>::sse_encode(self.name, serializer);
         <String>::sse_encode(self.location, serializer);
         <String>::sse_encode(self.position, serializer);
+        <String>::sse_encode(self.raw_level, serializer);
     }
 }
 

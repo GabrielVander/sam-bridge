@@ -4,7 +4,7 @@ use app_bootstrap::App;
 use student_management::api::domain::{Student, StudentLessons};
 
 use crate::slices::{lessons as lessons_mapper, roster as roster_mapper};
-use crate::view_models::{StudentLessonsView, StudentListItem};
+use crate::view_models::{ProgressViewModel, StudentLessonsView, StudentListItem};
 
 static APP: OnceLock<App> = OnceLock::new();
 
@@ -38,6 +38,15 @@ pub fn is_logged_in() -> bool {
 pub async fn retrieve_students() -> anyhow::Result<Vec<StudentListItem>> {
     let students: Vec<Student> = app().retrieve_students().await?;
     Ok(roster_mapper::to_list_items(&students))
+}
+
+pub async fn retrieve_student_progress(
+    student_id: String,
+    assigned_level: String,
+) -> anyhow::Result<ProgressViewModel> {
+    let level = student_management::api::domain::MusicianLevel::parse_named(&assigned_level);
+    let report = app().calculate_progress(&student_id, &level).await?;
+    Ok(ProgressViewModel::from(&report))
 }
 
 pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<StudentLessonsView> {

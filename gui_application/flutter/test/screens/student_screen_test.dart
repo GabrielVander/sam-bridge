@@ -1,6 +1,7 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/slices/lessons/lessons_presenter.dart';
+import 'package:flutter_application/slices/roster/students_presenter.dart';
 import 'package:flutter_application/slices/lessons/student_screen.dart';
 import 'package:flutter_application/view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,10 +10,12 @@ import '../support/fake_sam_portal.dart';
 
 Widget harness(FakeSamPortal portal) {
   final presenter = LessonsCubitSignal(portal);
-  return BlocSignalProvider<LessonsCubitSignal>.value(
-    value: presenter,
-    child: const MaterialApp(home: StudentScreen(studentId: '7')),
-  );
+  final studentsPresenter = StudentsCubitSignal(portal)
+    ..emit(StudentsLoaded([studentItem(id: '7')]));
+  return MultiBlocSignalProvider(providers: [
+    BlocSignalProvider<LessonsCubitSignal>.value(value: presenter),
+    BlocSignalProvider<StudentsCubitSignal>.value(value: studentsPresenter),
+  ], child: const MaterialApp(home: Scaffold(body: StudentScreen(studentId: '7'))));
 }
 
 void main() {
@@ -40,7 +43,7 @@ void main() {
 
     expect(find.byTooltip('Voltar'), findsOneWidget,
         reason: 'Back navigation must exist on the detail screen');
-    expect(find.text('Aprovadas (MSA) (2)'), findsOneWidget);
+    expect(find.text('MSA (2)'), findsOneWidget);
     expect(find.text('Método (1)'), findsOneWidget);
 
     final newest = find.text('2025-06-02');

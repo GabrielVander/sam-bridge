@@ -2,7 +2,10 @@ mod session_store;
 
 use std::sync::RwLock;
 
-use student_management::api::domain::{Student, StudentLessons};
+use student_management::api::domain::{
+    violin_schmoll_profile, calculate_progress_fn,
+    MusicianLevel, ProgressAssessment, Student, StudentLessons,
+};
 pub use student_management_sam_adapter::{authenticate, AuthSession};
 
 pub use session_store::{FileSessionStore, SessionStore, StoredCredentials};
@@ -103,6 +106,20 @@ impl App {
     pub async fn retrieve_students(&self) -> anyhow::Result<Vec<Student>> {
         let roster = self.with_session(|s| s.roster.clone())?;
         roster.get_avaliable_records().await
+    }
+
+    pub async fn calculate_progress(
+        &self,
+        student_id: &str,
+        assigned_level: &MusicianLevel,
+    ) -> anyhow::Result<ProgressAssessment> {
+        let bundle = self.retrieve_student_lessons(student_id).await?;
+        Ok(calculate_progress_fn(
+            assigned_level,
+            &bundle.approved,
+            &bundle.method,
+            &violin_schmoll_profile(),
+        ))
     }
 
     pub async fn retrieve_student_lessons(&self, id: &str) -> anyhow::Result<StudentLessons> {

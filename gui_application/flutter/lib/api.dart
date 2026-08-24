@@ -35,6 +35,14 @@ Future<bool> isLoggedIn() => RustLib.instance.api.crateApiIsLoggedIn();
 Future<List<StudentListItem>> retrieveStudents() =>
     RustLib.instance.api.crateApiRetrieveStudents();
 
+Future<ProgressViewModel> retrieveStudentProgress({
+  required String studentId,
+  required String assignedLevel,
+}) => RustLib.instance.api.crateApiRetrieveStudentProgress(
+  studentId: studentId,
+  assignedLevel: assignedLevel,
+);
+
 Future<StudentLessonsView> retrieveStudentLessons({
   required String studentId,
 }) => RustLib.instance.api.crateApiRetrieveStudentLessons(studentId: studentId);

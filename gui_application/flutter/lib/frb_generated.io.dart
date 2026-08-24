@@ -29,6 +29,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
+  CheckpointVm dco_decode_checkpoint_vm(dynamic raw);
+
+  @protected
+  double dco_decode_f_64(dynamic raw);
+
+  @protected
   int dco_decode_i_32(dynamic raw);
 
   @protected
@@ -38,6 +44,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LessonKind dco_decode_lesson_kind(dynamic raw);
 
   @protected
+  List<CheckpointVm> dco_decode_list_checkpoint_vm(dynamic raw);
+
+  @protected
   List<LessonItem> dco_decode_list_lesson_item(dynamic raw);
 
   @protected
@@ -45,6 +54,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<StudentListItem> dco_decode_list_student_list_item(dynamic raw);
+
+  @protected
+  ProgressViewModel dco_decode_progress_view_model(dynamic raw);
 
   @protected
   StudentLessonsView dco_decode_student_lessons_view(dynamic raw);
@@ -68,6 +80,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
+  CheckpointVm sse_decode_checkpoint_vm(SseDeserializer deserializer);
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
@@ -77,6 +95,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LessonKind sse_decode_lesson_kind(SseDeserializer deserializer);
 
   @protected
+  List<CheckpointVm> sse_decode_list_checkpoint_vm(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<LessonItem> sse_decode_list_lesson_item(SseDeserializer deserializer);
 
   @protected
@@ -84,6 +107,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<StudentListItem> sse_decode_list_student_list_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ProgressViewModel sse_decode_progress_view_model(
     SseDeserializer deserializer,
   );
 
@@ -114,6 +142,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
+  void sse_encode_checkpoint_vm(CheckpointVm self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer);
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
@@ -121,6 +155,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_lesson_kind(LessonKind self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_checkpoint_vm(
+    List<CheckpointVm> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_lesson_item(
@@ -137,6 +177,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_student_list_item(
     List<StudentListItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_progress_view_model(
+    ProgressViewModel self,
     SseSerializer serializer,
   );
 

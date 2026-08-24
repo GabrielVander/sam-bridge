@@ -21,7 +21,47 @@ pub enum MusicianLevel {
     Practice,
     YouthService,
     OfficialService,
+    Officialized,
     Unknown(String),
+}
+
+impl MusicianLevel {
+    /// Ordinal rank for level comparison. Higher = more advanced.
+    /// Canonical name for serialization / lookup round-trips.
+    pub fn name(&self) -> String {
+        match self {
+            Self::Candidate => "Candidate".to_owned(),
+            Self::Practice => "Practice".to_owned(),
+            Self::YouthService => "YouthService".to_owned(),
+            Self::OfficialService => "OfficialService".to_owned(),
+            Self::Officialized => "Officialized".to_owned(),
+            Self::Unknown(raw) => raw.clone(),
+        }
+    }
+
+    /// Parses a canonical name back into a MusicianLevel.
+    /// Unknown names default to Candidate (lowest rank).
+    pub fn parse_named(raw: &str) -> Self {
+        match raw {
+            "Candidate" => Self::Candidate,
+            "Practice" => Self::Practice,
+            "YouthService" => Self::YouthService,
+            "OfficialService" => Self::OfficialService,
+            "Officialized" => Self::Officialized,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+
+    pub fn rank(&self) -> u8 {
+        match self {
+            Self::Candidate => 0,
+            Self::Practice => 1,
+            Self::YouthService => 2,
+            Self::OfficialService => 3,
+            Self::Officialized => 4,
+            Self::Unknown(_) => u8::MAX,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]

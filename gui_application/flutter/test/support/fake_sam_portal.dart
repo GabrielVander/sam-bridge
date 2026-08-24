@@ -98,5 +98,6 @@ StudentListItem studentItem({
   String name = 'ALUNA TESTE',
   String position = 'Músico · Candidato(a)',
   String location = 'BAIRRO',
+  String rawLevel = 'Candidate',
 }) =>
-    StudentListItem(id: id, name: name, location: location, position: position);
+    StudentListItem(id: id, name: name, location: location, position: position, rawLevel: rawLevel);

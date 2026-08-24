@@ -6,6 +6,41 @@
 import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class CheckpointVm {
+  final String label;
+  final bool achieved;
+  final bool readyToAdvance;
+  final bool msaRequirementMet;
+  final bool methodRequirementMet;
+
+  const CheckpointVm({
+    required this.label,
+    required this.achieved,
+    required this.readyToAdvance,
+    required this.msaRequirementMet,
+    required this.methodRequirementMet,
+  });
+
+  @override
+  int get hashCode =>
+      label.hashCode ^
+      achieved.hashCode ^
+      readyToAdvance.hashCode ^
+      msaRequirementMet.hashCode ^
+      methodRequirementMet.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CheckpointVm &&
+          runtimeType == other.runtimeType &&
+          label == other.label &&
+          achieved == other.achieved &&
+          readyToAdvance == other.readyToAdvance &&
+          msaRequirementMet == other.msaRequirementMet &&
+          methodRequirementMet == other.methodRequirementMet;
+}
+
 class LessonItem {
   final LessonKind kind;
   final String id;
@@ -63,6 +98,53 @@ class LessonItem {
 
 enum LessonKind { msa, method }
 
+class ProgressViewModel {
+  final double msaPercent;
+  final double methodPagePercent;
+  final double methodLessonPercent;
+  final double overallPercent;
+  final bool meetsYouthService;
+  final bool meetsOfficialService;
+  final bool meetsOfficialization;
+  final List<CheckpointVm> checkpoints;
+
+  const ProgressViewModel({
+    required this.msaPercent,
+    required this.methodPagePercent,
+    required this.methodLessonPercent,
+    required this.overallPercent,
+    required this.meetsYouthService,
+    required this.meetsOfficialService,
+    required this.meetsOfficialization,
+    required this.checkpoints,
+  });
+
+  @override
+  int get hashCode =>
+      msaPercent.hashCode ^
+      methodPagePercent.hashCode ^
+      methodLessonPercent.hashCode ^
+      overallPercent.hashCode ^
+      meetsYouthService.hashCode ^
+      meetsOfficialService.hashCode ^
+      meetsOfficialization.hashCode ^
+      checkpoints.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProgressViewModel &&
+          runtimeType == other.runtimeType &&
+          msaPercent == other.msaPercent &&
+          methodPagePercent == other.methodPagePercent &&
+          methodLessonPercent == other.methodLessonPercent &&
+          overallPercent == other.overallPercent &&
+          meetsYouthService == other.meetsYouthService &&
+          meetsOfficialService == other.meetsOfficialService &&
+          meetsOfficialization == other.meetsOfficialization &&
+          checkpoints == other.checkpoints;
+}
+
 class StudentLessonsView {
   final List<LessonItem> msa;
   final List<LessonItem> method;
@@ -86,17 +168,23 @@ class StudentListItem {
   final String name;
   final String location;
   final String position;
+  final String rawLevel;
 
   const StudentListItem({
     required this.id,
     required this.name,
     required this.location,
     required this.position,
+    required this.rawLevel,
   });
 
   @override
   int get hashCode =>
-      id.hashCode ^ name.hashCode ^ location.hashCode ^ position.hashCode;
+      id.hashCode ^
+      name.hashCode ^
+      location.hashCode ^
+      position.hashCode ^
+      rawLevel.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -106,5 +194,6 @@ class StudentListItem {
           id == other.id &&
           name == other.name &&
           location == other.location &&
-          position == other.position;
+          position == other.position &&
+          rawLevel == other.rawLevel;
 }

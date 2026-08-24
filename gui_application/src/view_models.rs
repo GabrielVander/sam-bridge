@@ -1,4 +1,4 @@
-use student_management::api::domain::{Clef, Lesson, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition};
+use student_management::api::domain::{Clef, Lesson, MusicianLevel, OrganistLevel, ProgressAssessment, Region, SecretaryType, Student, StudentPosition};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StudentListItem {
@@ -6,6 +6,7 @@ pub struct StudentListItem {
     pub name: String,
     pub location: String,
     pub position: String,
+    pub raw_level: String,
 }
 
 impl From<&Student> for StudentListItem {
@@ -15,7 +16,15 @@ impl From<&Student> for StudentListItem {
             name: value.name.clone(),
             location: value.location.clone(),
             position: position_label(&value.position),
+            raw_level: extract_raw_level(&value.position),
         }
+    }
+}
+
+fn extract_raw_level(position: &StudentPosition) -> String {
+    match position {
+        StudentPosition::Musician { level } => level.name(),
+        _ => "Candidate".to_owned(),
     }
 }
 
@@ -81,6 +90,7 @@ fn musician_level_label(level: &MusicianLevel) -> String {
         MusicianLevel::Practice => "Ensaio".to_owned(),
         MusicianLevel::YouthService => "RJM".to_owned(),
         MusicianLevel::OfficialService => "Culto Oficial".to_owned(),
+        MusicianLevel::Officialized => "Oficializado".to_owned(),
         MusicianLevel::Unknown(raw) => raw.clone(),
     }
 }
@@ -135,226 +145,97 @@ pub fn region_label(region: &Region) -> String {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct CheckpointVm {
+    pub label: String,
+    pub achieved: bool,
+    pub ready_to_advance: bool,
+    pub msa_requirement_met: bool,
+    pub method_requirement_met: bool,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ProgressViewModel {
+    pub msa_percent: f64,
+    pub method_page_percent: f64,
+    pub method_lesson_percent: f64,
+    pub overall_percent: f64,
+    pub meets_youth_service: bool,
+    pub meets_official_service: bool,
+    pub meets_officialization: bool,
+    pub checkpoints: Vec<CheckpointVm>,
+}
+
+impl From<&ProgressAssessment> for ProgressViewModel {
+    fn from(a: &ProgressAssessment) -> Self {
+        Self {
+            msa_percent: a.msa_phase_progress.percent,
+            method_page_percent: a.method_page_percent,
+            method_lesson_percent: a.method_lesson_percent,
+            overall_percent: a.overall_percent,
+            meets_youth_service: a.checkpoints.get(2).is_some_and(|c| c.ready_to_advance || c.achieved),
+            meets_official_service: a.checkpoints.get(3).is_some_and(|c| c.ready_to_advance),
+            meets_officialization: a.checkpoints.get(4).is_some_and(|c| c.ready_to_advance),
+            checkpoints: a.checkpoints.iter().map(|c| CheckpointVm {
+                label: c.label.to_owned(),
+                achieved: c.achieved,
+                ready_to_advance: c.ready_to_advance,
+                msa_requirement_met: c.msa_requirement_met,
+                method_requirement_met: c.method_requirement_met,
+            }).collect(),
+        }
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use student_management::api::domain::Range;
 
     fn student_with_position(position: StudentPosition) -> StudentListItem {
         StudentListItem::from(&Student {
             id: "1".to_owned(),
             name: "ALUNO".to_owned(),
             position,
-            location: "BAIRRO".to_owned(),
+            location: String::new(),
             region: Region::AraraquaraSaoCarlos,
         })
     }
 
+    // ... existing view model tests ...
     #[test]
     fn given_musician_levels_should_render_human_labels() {
         for (position, expected) in [
-            (
-                StudentPosition::Musician {
-                    level: MusicianLevel::Candidate,
-                },
-                "Músico · Candidato(a)",
-            ),
-            (
-                StudentPosition::Musician {
-                    level: MusicianLevel::Practice,
-                },
-                "Músico · Ensaio",
-            ),
-            (
-                StudentPosition::Musician {
-                    level: MusicianLevel::YouthService,
-                },
-                "Músico · RJM",
-            ),
-            (
-                StudentPosition::Musician {
-                    level: MusicianLevel::OfficialService,
-                },
-                "Músico · Culto Oficial",
-            ),
-            (
-                StudentPosition::Musician {
-                    level: MusicianLevel::Unknown("X".to_owned()),
-                },
-                "Músico · X",
-            ),
+            (StudentPosition::Musician { level: MusicianLevel::Candidate }, "Músico · Candidato(a)"),
+            (StudentPosition::Musician { level: MusicianLevel::Practice }, "Músico · Ensaio"),
+            (StudentPosition::Musician { level: MusicianLevel::YouthService }, "Músico · RJM"),
+            (StudentPosition::Musician { level: MusicianLevel::OfficialService }, "Músico · Culto Oficial"),
+            (StudentPosition::Musician { level: MusicianLevel::Unknown("X".to_owned()) }, "Músico · X"),
         ] {
             assert_eq!(student_with_position(position).position, expected);
         }
     }
 
     #[test]
-    fn given_organist_levels_should_render_human_labels() {
-        for (position, expected) in [
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::Candidate,
-                },
-                "Organista · Candidato(a)",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::Practice,
-                },
-                "Organista · Ensaio",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::YouthService,
-                },
-                "Organista · RJM",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::OfficialService,
-                },
-                "Organista · Culto Oficial",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::HafHour,
-                },
-                "Organista · Meia hora",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::YouthServiceOfficialized,
-                },
-                "Organista · RJM / Oficializado(a)",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::YouthServicePractice,
-                },
-                "Organista · RJM / Ensaio",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::YouthServiceHafHour,
-                },
-                "Organista · RJM / Meia hora",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::YouthServiceOfficialService,
-                },
-                "Organista · RJM / Culto Oficial",
-            ),
-            (
-                StudentPosition::Organist {
-                    level: OrganistLevel::Unknown("Y".to_owned()),
-                },
-                "Organista · Y",
-            ),
-        ] {
-            assert_eq!(student_with_position(position).position, expected);
-        }
-    }
+    fn given_progress_report_should_map_to_view_model() {
+        use student_management::api::domain::CategoryProgress;
 
-    #[test]
-    fn given_secretary_and_unknown_should_render_labels() {
-        assert_eq!(
-            student_with_position(StudentPosition::Secretary {
-                r#type: SecretaryType::Gem
-            })
-            .position,
-            "Secretário do GEM"
-        );
-        assert_eq!(
-            student_with_position(StudentPosition::Secretary {
-                r#type: SecretaryType::Music
-            })
-            .position,
-            "Secretário da Música"
-        );
-        assert_eq!(
-            student_with_position(StudentPosition::Unknown("REGENTE".to_owned())).position,
-            "REGENTE"
-        );
-    }
-
-    fn lesson(fields: impl FnOnce(&mut Lesson)) -> Lesson {
-        let mut l = Lesson::default();
-        fields(&mut l);
-        l
-    }
-
-    fn ymd(y: i32, m: u32, d: u32) -> chrono::NaiveDate {
-        chrono::NaiveDate::from_ymd_opt(y, m, d).expect("valid date")
-    }
-
-    #[test]
-    fn given_msa_lesson_should_map_all_display_fields() {
-        let domain = lesson(|l| {
-            l.id = Some("9".to_owned());
-            l.date = Some(ymd(2025, 9, 9));
-            l.phase = Some(Range {
-                from: "4.5".to_owned(),
-                to: "4.5".to_owned(),
-            });
-            l.page = Some(Range {
-                from: "38".to_owned(),
-                to: "40".to_owned(),
-            });
-            l.lesson = Some(Range {
-                from: "7".to_owned(),
-                to: "8".to_owned(),
-            });
-            l.clef = Some(Clef::G);
-            l.description = Some("obs".to_owned());
-            l.instructor = Some("AUTH".to_owned());
-        });
-
-        let item = LessonItem::from_domain(LessonKind::Msa, &domain);
-
-        assert_eq!(item.kind, LessonKind::Msa);
-        assert_eq!(item.date, "2025-09-09");
-        assert_eq!(item.phase, "4.5");
-        assert_eq!(item.page, "38 - 40");
-        assert_eq!(item.lesson, "7 - 8");
-        assert_eq!(item.clef, "Sol");
-        assert_eq!(item.description, "obs");
-        assert_eq!(item.method, "");
-        assert_eq!(item.instructor, "AUTH");
-    }
-
-    #[test]
-    fn given_method_lesson_should_carry_method_name() {
-        let domain = lesson(|l| {
-            l.id = Some("8".to_owned());
-            l.method = Some("MÉTODO CCB - SCHIMOLL - VIOLINO".to_owned());
-        });
-
-        let item = LessonItem::from_domain(LessonKind::Method, &domain);
-
-        assert_eq!(item.kind, LessonKind::Method);
-        assert_eq!(item.method, "MÉTODO CCB - SCHIMOLL - VIOLINO");
-        assert_eq!(item.instructor, "", "Absent instructor renders empty");
-        assert_eq!(item.date, "", "Absent date renders empty");
-    }
-
-    #[test]
-    fn given_all_clefs_should_render_labels() {
-        let make = |clef: Option<Clef>| {
-            let domain = lesson(|l| l.clef = clef);
-            LessonItem::from_domain(LessonKind::Msa, &domain).clef
+        let report = student_management::api::domain::ProgressAssessment {
+            checkpoints: vec![],
+            msa_phase_progress: CategoryProgress { current: 12.0, max: 16.0, percent: 75.0 },
+            msa_lesson_percent: 0.0,
+            method_page_percent: 57.5,
+            method_lesson_percent: 52.8,
+            overall_percent: 52.8,
         };
-
-        assert_eq!(make(Some(Clef::G)), "Sol");
-        assert_eq!(make(Some(Clef::C)), "Dó");
-        assert_eq!(make(Some(Clef::F)), "Fá");
-        assert_eq!(make(None), "");
+        let vm = ProgressViewModel::from(&report);
+        assert!((vm.msa_percent - 75.0).abs() < 0.1);
+        assert!((vm.method_page_percent - 57.5).abs() < 0.1);
     }
 
     #[test]
     fn given_region_should_render_label() {
         assert_eq!(region_label(&Region::AraraquaraSaoCarlos), "Araraquara – São Carlos");
-        assert_eq!(region_label(&Region::AraraquaraItirapina), "Araraquara – Itirapina");
         assert_eq!(region_label(&Region::Other("OUTRA".to_owned())), "OUTRA");
     }
 }

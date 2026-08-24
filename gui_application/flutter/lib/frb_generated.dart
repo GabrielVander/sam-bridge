@@ -65,7 +65,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => 1852862368;
+  int get rustContentHash => -223611624;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -91,6 +91,11 @@ abstract class RustLibApi extends BaseApi {
 
   Future<StudentLessonsView> crateApiRetrieveStudentLessons({
     required String studentId,
+  });
+
+  Future<ProgressViewModel> crateApiRetrieveStudentProgress({
+    required String studentId,
+    required String assignedLevel,
   });
 
   Future<List<StudentListItem>> crateApiRetrieveStudents();
@@ -257,6 +262,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<ProgressViewModel> crateApiRetrieveStudentProgress({
+    required String studentId,
+    required String assignedLevel,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(studentId, serializer);
+          sse_encode_String(assignedLevel, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_progress_view_model,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+        constMeta: kCrateApiRetrieveStudentProgressConstMeta,
+        argValues: [studentId, assignedLevel],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiRetrieveStudentProgressConstMeta =>
+      const TaskConstMeta(
+        debugName: "retrieve_student_progress",
+        argNames: ["studentId", "assignedLevel"],
+      );
+
+  @override
   Future<List<StudentListItem>> crateApiRetrieveStudents() {
     return handler.executeNormal(
       NormalTask(
@@ -265,7 +305,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 7,
             port: port_,
           );
         },
@@ -292,7 +332,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 8,
             port: port_,
           );
         },
@@ -329,6 +369,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CheckpointVm dco_decode_checkpoint_vm(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return CheckpointVm(
+      label: dco_decode_String(arr[0]),
+      achieved: dco_decode_bool(arr[1]),
+      readyToAdvance: dco_decode_bool(arr[2]),
+      msaRequirementMet: dco_decode_bool(arr[3]),
+      methodRequirementMet: dco_decode_bool(arr[4]),
+    );
+  }
+
+  @protected
+  double dco_decode_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
   int dco_decode_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -361,6 +422,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<CheckpointVm> dco_decode_list_checkpoint_vm(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_checkpoint_vm).toList();
+  }
+
+  @protected
   List<LessonItem> dco_decode_list_lesson_item(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_lesson_item).toList();
@@ -379,6 +446,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ProgressViewModel dco_decode_progress_view_model(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return ProgressViewModel(
+      msaPercent: dco_decode_f_64(arr[0]),
+      methodPagePercent: dco_decode_f_64(arr[1]),
+      methodLessonPercent: dco_decode_f_64(arr[2]),
+      overallPercent: dco_decode_f_64(arr[3]),
+      meetsYouthService: dco_decode_bool(arr[4]),
+      meetsOfficialService: dco_decode_bool(arr[5]),
+      meetsOfficialization: dco_decode_bool(arr[6]),
+      checkpoints: dco_decode_list_checkpoint_vm(arr[7]),
+    );
+  }
+
+  @protected
   StudentLessonsView dco_decode_student_lessons_view(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -394,13 +479,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   StudentListItem dco_decode_student_list_item(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return StudentListItem(
       id: dco_decode_String(arr[0]),
       name: dco_decode_String(arr[1]),
       location: dco_decode_String(arr[2]),
       position: dco_decode_String(arr[3]),
+      rawLevel: dco_decode_String(arr[4]),
     );
   }
 
@@ -434,6 +520,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  CheckpointVm sse_decode_checkpoint_vm(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_label = sse_decode_String(deserializer);
+    var var_achieved = sse_decode_bool(deserializer);
+    var var_readyToAdvance = sse_decode_bool(deserializer);
+    var var_msaRequirementMet = sse_decode_bool(deserializer);
+    var var_methodRequirementMet = sse_decode_bool(deserializer);
+    return CheckpointVm(
+      label: var_label,
+      achieved: var_achieved,
+      readyToAdvance: var_readyToAdvance,
+      msaRequirementMet: var_msaRequirementMet,
+      methodRequirementMet: var_methodRequirementMet,
+    );
+  }
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat64();
   }
 
   @protected
@@ -477,6 +586,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<CheckpointVm> sse_decode_list_checkpoint_vm(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <CheckpointVm>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_checkpoint_vm(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<LessonItem> sse_decode_list_lesson_item(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -510,6 +633,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ProgressViewModel sse_decode_progress_view_model(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_msaPercent = sse_decode_f_64(deserializer);
+    var var_methodPagePercent = sse_decode_f_64(deserializer);
+    var var_methodLessonPercent = sse_decode_f_64(deserializer);
+    var var_overallPercent = sse_decode_f_64(deserializer);
+    var var_meetsYouthService = sse_decode_bool(deserializer);
+    var var_meetsOfficialService = sse_decode_bool(deserializer);
+    var var_meetsOfficialization = sse_decode_bool(deserializer);
+    var var_checkpoints = sse_decode_list_checkpoint_vm(deserializer);
+    return ProgressViewModel(
+      msaPercent: var_msaPercent,
+      methodPagePercent: var_methodPagePercent,
+      methodLessonPercent: var_methodLessonPercent,
+      overallPercent: var_overallPercent,
+      meetsYouthService: var_meetsYouthService,
+      meetsOfficialService: var_meetsOfficialService,
+      meetsOfficialization: var_meetsOfficialization,
+      checkpoints: var_checkpoints,
+    );
+  }
+
+  @protected
   StudentLessonsView sse_decode_student_lessons_view(
     SseDeserializer deserializer,
   ) {
@@ -526,11 +674,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_name = sse_decode_String(deserializer);
     var var_location = sse_decode_String(deserializer);
     var var_position = sse_decode_String(deserializer);
+    var var_rawLevel = sse_decode_String(deserializer);
     return StudentListItem(
       id: var_id,
       name: var_name,
       location: var_location,
       position: var_position,
+      rawLevel: var_rawLevel,
     );
   }
 
@@ -567,6 +717,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_checkpoint_vm(CheckpointVm self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.label, serializer);
+    sse_encode_bool(self.achieved, serializer);
+    sse_encode_bool(self.readyToAdvance, serializer);
+    sse_encode_bool(self.msaRequirementMet, serializer);
+    sse_encode_bool(self.methodRequirementMet, serializer);
+  }
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat64(self);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
@@ -591,6 +757,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_lesson_kind(LessonKind self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_list_checkpoint_vm(
+    List<CheckpointVm> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_checkpoint_vm(item, serializer);
+    }
   }
 
   @protected
@@ -628,6 +806,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_progress_view_model(
+    ProgressViewModel self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_64(self.msaPercent, serializer);
+    sse_encode_f_64(self.methodPagePercent, serializer);
+    sse_encode_f_64(self.methodLessonPercent, serializer);
+    sse_encode_f_64(self.overallPercent, serializer);
+    sse_encode_bool(self.meetsYouthService, serializer);
+    sse_encode_bool(self.meetsOfficialService, serializer);
+    sse_encode_bool(self.meetsOfficialization, serializer);
+    sse_encode_list_checkpoint_vm(self.checkpoints, serializer);
+  }
+
+  @protected
   void sse_encode_student_lessons_view(
     StudentLessonsView self,
     SseSerializer serializer,
@@ -647,6 +841,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.name, serializer);
     sse_encode_String(self.location, serializer);
     sse_encode_String(self.position, serializer);
+    sse_encode_String(self.rawLevel, serializer);
   }
 
   @protected
