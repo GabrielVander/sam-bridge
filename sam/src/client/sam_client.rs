@@ -10,21 +10,16 @@ pub struct SamClient {
     authenticated: bool,
 }
 
-pub trait RosterReader {
+pub trait SamReader {
     fn students(&self) -> Result<Vec<SamStudent>>;
-}
-
-pub trait LessonsReader {
     fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage>;
 }
 
-impl RosterReader for SamClient {
+impl SamReader for SamClient {
     fn students(&self) -> Result<Vec<SamStudent>> {
         self.students()
     }
-}
 
-impl LessonsReader for SamClient {
     fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage> {
         self.student_lessons(student_id)
     }
@@ -121,10 +116,10 @@ mod tests {
     }
 
     #[test]
-    fn readers_reach_the_same_guards() {
+    fn reader_reaches_the_same_guards() {
         let client = SamClient::new("http://127.0.0.1:1").expect("client builds without I/O");
 
-        assert!(RosterReader::students(&client).is_err());
-        assert!(LessonsReader::student_lessons(&client, "1").is_err());
+        assert!(SamReader::students(&client).is_err());
+        assert!(SamReader::student_lessons(&client, "1").is_err());
     }
 }

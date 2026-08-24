@@ -1,5 +1,6 @@
-pub mod gateways;
-pub mod mapping;
-pub mod session_opener;
+mod facade;
+mod gateways;
+mod mapping;
+mod session_opener;
 
-pub use sam::client::{LessonsReader, RosterReader, SamClient};
+pub use facade::{authenticate, AuthSession};

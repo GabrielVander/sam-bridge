@@ -1,110 +1,64 @@
-use std::sync::{OnceLock, RwLock};
+use std::sync::OnceLock;
 
-use student_management_sam_adapter::{session_opener::NetworkSessionOpener, SamClient};
+use app_bootstrap::App;
+use student_management::api::domain::{Student, StudentLessons};
 
-use crate::compose::{gateways_from_session, AppGateways};
-use crate::slices;
+use crate::slices::{lessons as lessons_mapper, roster as roster_mapper};
 use crate::view_models::{StudentLessonsView, StudentListItem};
 
-struct Session {
-    gateways: AppGateways,
-}
+static APP: OnceLock<App> = OnceLock::new();
 
-// Process-global session. Tests serialize via test_lock because plain cargo test shares one process.
-static SESSION: OnceLock<RwLock<Option<Session>>> = OnceLock::new();
-
-fn session_slot() -> &'static RwLock<Option<Session>> {
-    SESSION.get_or_init(|| RwLock::new(None))
+fn app() -> &'static App {
+    APP.get_or_init(App::new)
 }
 
 pub async fn login(base_url: String, username: String, password: String) -> anyhow::Result<()> {
-    #[cfg(coverage)]
-    {
-        // Coverage builds cannot perform the real network round-trip; seed an
-        // anonymous-client session so downstream coverage paths stay reachable.
-        let client = SamClient::new("http://127.0.0.1:1").expect("client builds without I/O");
-        *session_slot()
-            .write()
-            .expect("Session lock should not be poisoned") = Some(Session {
-            gateways: gateways_from_session(&client),
-        });
-        return Ok(());
-    }
-
-    #[cfg(not(coverage))]
-    {
-        let client: SamClient =
-            slices::authentication::login(NetworkSessionOpener, base_url, username, password)
-                .await?;
-
-        *session_slot()
-            .write()
-            .expect("Session lock should not be poisoned") = Some(Session {
-            gateways: gateways_from_session(&client),
-        });
-
-        Ok(())
-    }
+    app().login(base_url, username, password).await
 }
 
 pub fn logout() {
-    *session_slot()
-        .write()
-        .expect("Session lock should not be poisoned") = None;
+    app().logout();
 }
 
 pub fn is_logged_in() -> bool {
-    session_slot()
-        .read()
-        .expect("Session lock should not be poisoned")
-        .is_some()
-}
-
-fn with_session<T>(f: impl FnOnce(&AppGateways) -> T) -> anyhow::Result<T> {
-    let guard = session_slot()
-        .read()
-        .expect("Session lock should not be poisoned");
-    let session = guard
-        .as_ref()
-        .ok_or_else(|| anyhow::anyhow!("Not authenticated"))?;
-    Ok(f(&session.gateways))
+    app().is_logged_in()
 }
 
 pub async fn retrieve_students() -> anyhow::Result<Vec<StudentListItem>> {
-    let gateways = with_session(|g| g.clone())?;
-    slices::roster::load(gateways.roster()).await
+    let students: Vec<Student> = app().retrieve_students().await?;
+    Ok(roster_mapper::to_list_items(&students))
 }
 
 pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<StudentLessonsView> {
-    let gateways = with_session(|g| g.clone())?;
-    slices::lessons::load(gateways.lessons(), &student_id).await
+    let bundle: StudentLessons =
+        app().retrieve_student_lessons(&student_id).await?;
+    Ok(lessons_mapper::to_view(&bundle))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use student_management::api::application::{
-        StudentLessonsGateway, StudentsRetrievalGateway,
+    use std::sync::Arc;
+    use app_bootstrap::AuthSession;
+    use student_management::api::{
+        application::{StudentLessonsGateway, StudentsRetrievalGateway},
+        domain::{Lesson as DomainLesson, Region, StudentLessons},
     };
-    use student_management::api::domain::{
-        Lesson as DomainLesson, Student as DomainStudent, StudentLessons,
-    };
-    use async_trait::async_trait;
 
     fn test_lock() -> std::sync::MutexGuard<'static, ()> {
         static LOCK: OnceLock<std::sync::Mutex<()>> = OnceLock::new();
         LOCK.get_or_init(|| std::sync::Mutex::new(()))
             .lock()
-            .expect("Test mutex is never poisoned: no panics while held")
+            .expect("Test mutex is never poisoned")
     }
 
     #[derive(Clone, Default)]
     struct StubRoster {
-        students: Vec<DomainStudent>,
+        students: Vec<Student>,
     }
-    #[async_trait]
+    #[async_trait::async_trait]
     impl StudentsRetrievalGateway for StubRoster {
-        async fn get_avaliable_records(&self) -> anyhow::Result<Vec<DomainStudent>> {
+        async fn get_avaliable_records(&self) -> anyhow::Result<Vec<Student>> {
             Ok(self.students.clone())
         }
     }
@@ -113,7 +67,7 @@ mod tests {
     struct StubLessons {
         approved: Vec<DomainLesson>,
     }
-    #[async_trait]
+    #[async_trait::async_trait]
     impl StudentLessonsGateway for StubLessons {
         async fn get_all_for_student_with_id(
             &self,
@@ -134,78 +88,68 @@ mod tests {
         }
     }
 
-    fn stub_student() -> DomainStudent {
-        DomainStudent {
-            id: "7".to_owned(),
-            name: "ALUNA SETE".to_owned(),
-            position: student_management::api::domain::StudentPosition::Unknown(String::new()),
-            location: String::new(),
-            region: student_management::api::domain::Region::Other(String::new()),
-        }
-    }
-
     #[test]
     fn given_no_session_queries_should_fail_not_panic() {
         let _guard = test_lock();
         logout();
 
-        smol::block_on(async {
-            assert!(!is_logged_in());
-            assert!(retrieve_students().await.is_err());
-            assert!(retrieve_student_lessons("7".to_owned()).await.is_err());
-        });
+        assert!(!is_logged_in());
+        assert!(smol::block_on(retrieve_students()).is_err());
+        assert!(smol::block_on(retrieve_student_lessons("7".to_owned())).is_err());
     }
 
     #[test]
     fn given_seeded_session_queries_should_return_domain_data_sorted() {
         let _guard = test_lock();
-        logout();
+        let app = app();
+
+        app.seed_session(AuthSession::from_gateways(
+            Arc::new(StubRoster {
+                students: vec![Student {
+                    id: "7".to_owned(),
+                    name: "ALUNA SETE".to_owned(),
+                    position: student_management::api::domain::StudentPosition::Unknown(
+                String::new(),
+            ),
+                    location: String::new(),
+                    region: Region::Other(String::new()),
+                }],
+            }),
+            Arc::new(StubLessons {
+                approved: vec![
+                    dated_lesson("11", 2025, 6, 1),
+                    dated_lesson("12", 2025, 6, 2),
+                ],
+            }),
+        ));
+
+        assert!(is_logged_in());
 
         smol::block_on(async {
-            *session_slot()
-                .write()
-                .expect("lock") = Some(Session {
-                gateways: AppGateways::new(
-                    StubRoster {
-                        students: vec![stub_student()],
-                    },
-                    StubLessons {
-                        approved: vec![
-                            dated_lesson("11", 2025, 6, 1),
-                            dated_lesson("12", 2025, 6, 2),
-                        ],
-                    },
-                ),
-            });
-            assert!(is_logged_in());
-
             let students = retrieve_students().await.expect("students");
             assert_eq!(students[0].name, "ALUNA SETE");
 
             let view = retrieve_student_lessons("7".to_owned()).await.expect("lessons");
             let ids: Vec<&str> = view.msa.iter().map(|i| i.id.as_str()).collect();
             assert_eq!(ids, vec!["12", "11"], "most recent first");
-
-            logout();
-            assert!(!is_logged_in());
         });
+
+        logout();
+        assert!(!is_logged_in());
     }
 
     #[cfg(coverage)]
     #[test]
-    fn login_seeds_an_anonymous_session_under_coverage() {
+    fn login_under_coverage_should_seed_session() {
         let _guard = test_lock();
         logout();
 
         smol::block_on(async {
-            // Coverage builds short-circuit the network hop; the seeded
-            // anonymous session must still be usable.
+            // Coverage builds skip the network hop inside authenticate().
             login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned())
                 .await
                 .expect("coverage login seeds a session");
             assert!(is_logged_in());
-            logout();
-            assert!(!is_logged_in());
         });
     }
 
@@ -216,7 +160,6 @@ mod tests {
         logout();
 
         smol::block_on(async {
-            // Unreachable port exercises the real opener chain end-to-end.
             let result =
                 login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned()).await;
 

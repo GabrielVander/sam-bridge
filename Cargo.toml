@@ -3,6 +3,7 @@ members = [
   "student_management",
   "sam",
   "student_management_sam_adapter",
+  "app_bootstrap",
   "gui_application",
 ]
 resolver = "3"

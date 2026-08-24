@@ -3,8 +3,7 @@ use sam::test_support::{ScriptedResponse, spawn_scripted_http_server};
 
 use anyhow::{Error, Result};
 use sam::client::{
-    LessonsReader, MsaLesson, MtdLesson, RosterReader, SamClient, SamCredentials, SamStudent,
-    StudentLessonsPage,
+    MsaLesson, MtdLesson, SamClient, SamCredentials, SamReader, SamStudent, StudentLessonsPage,
 };
 
 #[test]
@@ -776,6 +775,6 @@ async fn given_credentials_authentication_endpoint_responds_with(
 fn readers_work_without_authentication_for_error_paths() {
     let client = SamClient::new("http://127.0.0.1:1").expect("Client should be created");
 
-    assert!(RosterReader::students(&client).is_err());
-    assert!(LessonsReader::student_lessons(&client, "1").is_err());
+    assert!(SamReader::students(&client).is_err());
+    assert!(SamReader::student_lessons(&client, "1").is_err());
 }

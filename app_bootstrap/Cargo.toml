@@ -1,21 +1,17 @@
 [package]
-name = "gui_application"
+name = "app_bootstrap"
 version = "0.1.0"
-edition = "2021"
-
-[lib]
-crate-type = ["cdylib", "staticlib"]
+edition = "2024"
 
 [dependencies]
 student_management = { path = "../student_management" }
-app_bootstrap = { path = "../app_bootstrap" }
-flutter_rust_bridge = "=2.13.0-beta.2"
+student_management_sam_adapter = { path = "../student_management_sam_adapter" }
 anyhow = { workspace = true }
-async-trait = { workspace = true }
 chrono = { workspace = true }
-smol = "2.0.2"
 
 [dev-dependencies]
+async-trait = { workspace = true }
+smol = "2.0.2"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(coverage)'] }

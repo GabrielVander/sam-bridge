@@ -1,21 +1,21 @@
 use anyhow::Result;
-use sam::client::SamClient;
+use sam::client::{SamClient, SamCredentials};
 
-pub trait SessionOpener {
+pub(crate) trait SessionOpener {
     fn open(&self, base_url: &str, username: &str, password: &str) -> Result<SamClient>;
 }
 
-pub struct NetworkSessionOpener;
+pub(crate) struct NetworkSessionOpener;
 
 impl SessionOpener for NetworkSessionOpener {
     fn open(&self, base_url: &str, username: &str, password: &str) -> Result<SamClient> {
         // Fixed configuration cannot fail; unreachable error arm compiled out under coverage.
         #[cfg(coverage)]
-        let mut client = SamClient::new(base_url).expect("Fixed HTTP client configuration must be valid");
+        let mut client =
+            SamClient::new(base_url).expect("Fixed HTTP client configuration must be valid");
         #[cfg(not(coverage))]
         let mut client = SamClient::new(base_url)?;
 
-        use sam::client::SamCredentials;
         client.login(&SamCredentials {
             login: username.to_owned(),
             password: password.to_owned(),
@@ -23,4 +23,17 @@ impl SessionOpener for NetworkSessionOpener {
 
         Ok(client)
     }
+}
+
+pub(crate) async fn open_session<O>(
+    opener: O,
+    base_url: String,
+    username: String,
+    password: String,
+) -> Result<SamClient>
+where
+    O: SessionOpener + Send + Sync + 'static,
+{
+    // sam is blocking: run on smol's thread pool.
+    smol::unblock(move || opener.open(&base_url, &username, &password)).await
 }
