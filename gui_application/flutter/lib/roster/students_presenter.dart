@@ -1,7 +1,8 @@
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter_application/portal/sam_portal.dart';
-import 'package:flutter_application/view_models.dart';
+import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/roster/mapper.dart';
 import 'package:fuzzy/fuzzy.dart';
 
 sealed class StudentsState {
@@ -47,8 +48,8 @@ class StudentsCubitSignal extends CubitSignal<StudentsState> {
   Future<void> load() async {
     emit(const StudentsLoading());
     try {
-      final students = await _portal.retrieveStudents();
-      _all = students;
+      final dtos = await _portal.retrieveStudents();
+      _all = RosterMapper.toViewModels(dtos);
       emit(_filteredState());
     } catch (e) {
       emit(StudentsFailure(e.toString()));
@@ -58,7 +59,9 @@ class StudentsCubitSignal extends CubitSignal<StudentsState> {
   void filter({String? nameQuery, Set<String>? selectedLocations}) {
     if (stateValue is! StudentsLoaded && stateValue is! StudentsIdle) return;
     if (nameQuery != null) _nameQuery = nameQuery;
-    if (selectedLocations != null) _selectedLocations = Set.from(selectedLocations);
+    if (selectedLocations != null) {
+      _selectedLocations = Set.from(selectedLocations);
+    }
     if (stateValue is StudentsLoaded) {
       emit(_filteredState());
     }
@@ -77,9 +80,8 @@ class StudentsCubitSignal extends CubitSignal<StudentsState> {
   StudentsLoaded _filteredState() {
     final availableLocations = {
       for (final s in _all)
-        if (s.location.isNotEmpty) s.location
-    }.toList()
-      ..sort();
+        if (s.location.isNotEmpty) s.location,
+    }.toList()..sort();
 
     List<StudentListItem> filtered = _all;
 
@@ -112,7 +114,9 @@ class StudentsCubitSignal extends CubitSignal<StudentsState> {
     }
 
     if (_selectedLocations.isNotEmpty) {
-      filtered = filtered.where((s) => _selectedLocations.contains(s.location)).toList();
+      filtered = filtered
+          .where((s) => _selectedLocations.contains(s.location))
+          .toList();
     }
 
     return StudentsLoaded(

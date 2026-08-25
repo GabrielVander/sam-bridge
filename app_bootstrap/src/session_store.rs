@@ -67,19 +67,19 @@ impl FileSessionStore {
     }
 
     fn load_or_create_key(&self) -> Result<[u8; 32]> {
-        if let Ok(bytes) = std::fs::read(&self.key_path) {
-            if bytes.len() == 32 {
-                let mut key = [0u8; 32];
-                key.copy_from_slice(&bytes);
-                return Ok(key);
-            }
+        if let Ok(bytes) = std::fs::read(&self.key_path)
+            && bytes.len() == 32
+        {
+            let mut key = [0u8; 32];
+            key.copy_from_slice(&bytes);
+            return Ok(key);
         }
         let mut key = [0u8; 32];
         getrandom::getrandom(&mut key).context("Failed to generate encryption key")?;
         let dir = self.key_path.parent().unwrap_or(Path::new("."));
         let _ = std::fs::create_dir_all(dir);
         let tmp = dir.join(".key.bin.tmp");
-        std::fs::write(&tmp, &key).context("Failed to write key file")?;
+        std::fs::write(&tmp, key).context("Failed to write key file")?;
         #[cfg(unix)]
         {
             let _ =

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/dto.dart';
 import 'package:flutter_application/authentication/mapper.dart';
 import 'package:flutter_application/lessons/mapper.dart';
 import 'package:flutter_application/roster/mapper.dart';
@@ -10,8 +11,11 @@ import 'package:flutter_application/lessons/widgets/unknown_level_banner.dart';
 import 'package:flutter_application/widgets/checkpoint_timeline.dart';
 import 'package:flutter_application/widgets/info_chip.dart';
 import 'package:flutter_application/widgets/progress_bar.dart';
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support/fake_sam_portal.dart';
 
 void main() {
   testWidgets('AuthMapper', (tester) async {
@@ -19,15 +23,16 @@ void main() {
   });
 
   testWidgets('RosterMapper', (tester) async {
-    final item = StudentListItem(id: "1", name: "A", location: "B", position: "P", rawLevel: "R");
-    final mapped = RosterMapper.toViewModel(item);
+    final dto = studentItem(id: "1", name: "A", location: "B", levelName: "Candidate");
+    final mapped = RosterMapper.toViewModel(dto);
     expect(mapped.id, "1");
-    expect(RosterMapper.toViewModels([item]).length, 1);
+    expect(mapped.position, "Músico · Candidato(a)");
+    expect(RosterMapper.toViewModels([dto]).length, 1);
   });
 
   testWidgets('LessonsMapper', (tester) async {
-    final view = StudentLessonsView(msa: [], method: []);
-    expect(LessonsMapper.toViewModel(view).msa.isEmpty, true);
+    final dto = StudentLessonsDto(approved: const [], method: const []);
+    expect(LessonsMapper.toViewModel(dto).msa.isEmpty, true);
   });
 
   testWidgets('BackBar', (tester) async {
@@ -90,7 +95,18 @@ void main() {
 
   testWidgets('StudentDetailContent', (tester) async {
     final view = StudentLessonsView(msa: [], method: []);
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: StudentDetailContent(view: view, checkpoints: [], msaPercent: 0, methodLessonPercent: 0))));
+    const progress = ProgressViewModel(
+      msaRelativePercent: 0,
+      methodRelativePercent: 0,
+      combinedPercent: 0,
+      overallCheckpointPercent: 0,
+      nextLevelLabel: '',
+      meetsYouthService: false,
+      meetsOfficialService: false,
+      meetsOfficialization: false,
+      checkpoints: [],
+    );
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: StudentDetailContent(view: view, progress: progress))));
     expect(find.text("MSA (0)"), findsOneWidget);
     expect(find.text("Método (0)"), findsOneWidget);
   });

@@ -3,32 +3,43 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
+import 'dto.dart';
 import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'view_models.dart';
 
+// These functions are ignored because they are not marked as `pub`: `app`, `map_lesson`, `map_position`, `map_region`, `organist_name`, `secretary_name`
 
-            // These functions are ignored because they are not marked as `pub`: `app`
+Future<bool> hasSavedCredentials() =>
+    RustLib.instance.api.crateApiHasSavedCredentials();
 
+Future<bool> tryRestoreSession() =>
+    RustLib.instance.api.crateApiTryRestoreSession();
 
-            /// Whether persisted credentials exist on disk (cheap synchronous check).
-Future<bool>  hasSavedCredentials() => RustLib.instance.api.crateApiHasSavedCredentials();
+Future<void> login({
+  required String baseUrl,
+  required String username,
+  required String password,
+}) => RustLib.instance.api.crateApiLogin(
+  baseUrl: baseUrl,
+  username: username,
+  password: password,
+);
 
-/// Attempts silent re-authentication using persisted credentials.
-/// Returns true when a usable session was established.
-Future<bool>  tryRestoreSession() => RustLib.instance.api.crateApiTryRestoreSession();
+Future<void> logout() => RustLib.instance.api.crateApiLogout();
 
-Future<void>  login({required String baseUrl , required String username , required String password }) => RustLib.instance.api.crateApiLogin(baseUrl: baseUrl, username: username, password: password);
+Future<bool> isLoggedIn() => RustLib.instance.api.crateApiIsLoggedIn();
 
-Future<void>  logout() => RustLib.instance.api.crateApiLogout();
+Future<List<StudentSummaryDto>> retrieveStudents() =>
+    RustLib.instance.api.crateApiRetrieveStudents();
 
-Future<bool>  isLoggedIn() => RustLib.instance.api.crateApiIsLoggedIn();
+Future<ProgressResult> retrieveStudentProgress({
+  required String studentId,
+  required String assignedLevel,
+}) => RustLib.instance.api.crateApiRetrieveStudentProgress(
+  studentId: studentId,
+  assignedLevel: assignedLevel,
+);
 
-Future<List<StudentListItem>>  retrieveStudents() => RustLib.instance.api.crateApiRetrieveStudents();
-
-Future<ProgressResult>  retrieveStudentProgress({required String studentId , required String assignedLevel }) => RustLib.instance.api.crateApiRetrieveStudentProgress(studentId: studentId, assignedLevel: assignedLevel);
-
-Future<StudentLessonsView>  retrieveStudentLessons({required String studentId }) => RustLib.instance.api.crateApiRetrieveStudentLessons(studentId: studentId);
-
-            
-            
+Future<StudentLessonsDto> retrieveStudentLessons({required String studentId}) =>
+    RustLib.instance.api.crateApiRetrieveStudentLessons(studentId: studentId);

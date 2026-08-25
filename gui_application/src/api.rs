@@ -1,10 +1,12 @@
 use std::sync::OnceLock;
 
 use app_bootstrap::App;
-use student_management::api::application::{LoginInput, StudentLessonsDto, StudentSummaryDto};
+use student_management::api::application::LoginInput;
+use student_management::api::domain::{Clef, Region, SecretaryType, StudentPosition};
 
-use crate::{lessons as lessons_mapper, roster as roster_mapper};
-use crate::view_models::{ProgressResult, ProgressViewModel, StudentLessonsView, StudentListItem};
+pub use crate::dto::{LessonDto, RangeDto, StudentLessonsDto, StudentSummaryDto};
+use crate::dto::{DtoPosition, DtoRegion};
+use crate::view_models::{ProgressResult, ProgressViewModel};
 
 static APP: OnceLock<App> = OnceLock::new();
 
@@ -38,9 +40,59 @@ pub fn is_logged_in() -> bool {
     app().is_logged_in()
 }
 
-pub async fn retrieve_students() -> anyhow::Result<Vec<StudentListItem>> {
-    let dtos: Vec<StudentSummaryDto> = app().retrieve_students().await?;
-    Ok(roster_mapper::to_list_items(&dtos))
+pub async fn retrieve_students() -> anyhow::Result<Vec<StudentSummaryDto>> {
+    let students = app().retrieve_students().await?;
+    Ok(students
+        .into_iter()
+        .map(|s| StudentSummaryDto {
+            id: s.id,
+            name: s.name,
+            location: s.location,
+            position: map_position(s.position),
+            region: map_region(s.region),
+        })
+        .collect())
+}
+
+fn map_position(p: StudentPosition) -> DtoPosition {
+    match p {
+        StudentPosition::Musician { level } => DtoPosition::Musician { levelName: level.name() },
+        StudentPosition::Organist { level } => DtoPosition::Organist { levelName: organist_name(level) },
+        StudentPosition::Secretary { r#type } => DtoPosition::Secretary { typeName: secretary_name(r#type) },
+        StudentPosition::Unknown(raw) => DtoPosition::Unknown { raw },
+    }
+}
+
+fn organist_name(level: student_management::api::domain::OrganistLevel) -> String {
+    use student_management::api::domain::OrganistLevel as O;
+    #[allow(deprecated)]
+    match level {
+        O::Candidate => "Candidate".to_owned(),
+        O::Practice => "Practice".to_owned(),
+        O::YouthService => "YouthService".to_owned(),
+        O::HalfHour => "HalfHour".to_owned(),
+        O::OfficialService => "OfficialService".to_owned(),
+        O::YouthServiceHalfHour => "YouthServiceHalfHour".to_owned(),
+        O::YouthServicePractice => "YouthServicePractice".to_owned(),
+        O::YouthServiceOfficialService => "YouthServiceOfficialService".to_owned(),
+        O::YouthServiceOfficialized => "YouthServiceOfficialized".to_owned(),
+        O::Unknown(raw) => raw,
+    }
+}
+
+fn secretary_name(t: SecretaryType) -> String {
+    match t {
+        SecretaryType::Gem => "Gem".to_owned(),
+        SecretaryType::Music => "Music".to_owned(),
+    }
+}
+
+fn map_region(r: Region) -> DtoRegion {
+    match r {
+        Region::AraraquaraSaoCarlos => DtoRegion::AraraquaraSaoCarlos,
+        Region::AraraquaraItirapina => DtoRegion::AraraquaraItirapina,
+        Region::Other(raw) => DtoRegion::Other { raw },
+    }
 }
 
 pub async fn retrieve_student_progress(
@@ -64,9 +116,30 @@ pub async fn retrieve_student_progress(
     }
 }
 
-pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<StudentLessonsView> {
-    let bundle: StudentLessonsDto = app().retrieve_student_lessons(&student_id).await?;
-    Ok(lessons_mapper::to_view(&bundle))
+pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<StudentLessonsDto> {
+    let bundle = app().retrieve_student_lessons(&student_id).await?;
+    Ok(StudentLessonsDto {
+        approved: bundle.approved.into_iter().map(map_lesson).collect(),
+        method: bundle.method.into_iter().map(map_lesson).collect(),
+    })
+}
+
+fn map_lesson(l: student_management::api::domain::Lesson) -> LessonDto {
+    LessonDto {
+        id: l.id.unwrap_or_default(),
+        date: l.date.map(|d| d.to_string()).unwrap_or_default(),
+        phase: l.phase.map(|r| RangeDto { from: r.from, to: r.to }),
+        page: l.page.map(|r| RangeDto { from: r.from, to: r.to }),
+        lesson: l.lesson.map(|r| RangeDto { from: r.from, to: r.to }),
+        clef: l.clef.map(|c| match c {
+            Clef::G => "G".to_owned(),
+            Clef::C => "C".to_owned(),
+            Clef::F => "F".to_owned(),
+        }),
+        description: l.description.unwrap_or_default(),
+        instructor: l.instructor.unwrap_or_default(),
+        method: l.method.unwrap_or_default(),
+    }
 }
 
 #[cfg(test)]
@@ -163,9 +236,10 @@ mod tests {
             let students = retrieve_students().await.expect("students");
             assert_eq!(students[0].name, "ALUNA SETE");
 
-            let view = retrieve_student_lessons("7".to_owned()).await.expect("lessons");
-            let ids: Vec<&str> = view.msa.iter().map(|i| i.id.as_str()).collect();
-            assert_eq!(ids, vec!["12", "11"], "most recent first");
+            let dto = retrieve_student_lessons("7".to_owned()).await.expect("lessons");
+            let mut ids: Vec<&str> = dto.approved.iter().map(|i| i.id.as_str()).collect();
+            ids.sort();
+            assert_eq!(ids, vec!["11", "12"], "all lessons present; ordering owned by Dart presenter");
         });
 
         logout();

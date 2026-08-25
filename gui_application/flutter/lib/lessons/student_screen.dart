@@ -7,10 +7,13 @@ import 'package:flutter_application/lessons/widgets/category_lessons_view.dart';
 import 'package:flutter_application/lessons/widgets/student_detail_content.dart';
 import 'package:flutter_application/lessons/widgets/unknown_level_banner.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/view_models.dart';
 
-export 'package:flutter_application/lessons/widgets/category_lessons_view.dart' show LessonCategory;
-export 'package:flutter_application/widgets/checkpoint_timeline.dart' show CheckpointTimeline;
+export 'package:flutter_application/lessons/widgets/category_lessons_view.dart'
+    show LessonCategory;
+export 'package:flutter_application/widgets/checkpoint_timeline.dart'
+    show CheckpointTimeline;
 export 'package:flutter_application/widgets/info_chip.dart' show InfoChip;
 export 'package:flutter_application/widgets/progress_bar.dart' show ProgressBar;
 
@@ -59,7 +62,10 @@ final class _StudentScreenState extends State<StudentScreen> {
       String assignedLevel = '__UNKNOWN__';
       bool found = false;
       if (studentsState is StudentsLoaded) {
-        for (final s in studentsState.students) {
+        final list = studentsState.allStudents.isNotEmpty
+            ? studentsState.allStudents
+            : studentsState.students;
+        for (final s in list) {
           if (s.id == widget.studentId) {
             assignedLevel = s.rawLevel;
             found = true;
@@ -102,7 +108,9 @@ final class _StudentScreenState extends State<StudentScreen> {
           Expanded(
             child: BlocSignalBuilder<LessonsCubitSignal, LessonsState>(
               builder: (context, state) => switch (state) {
-                LessonsLoading() => const Center(child: CircularProgressIndicator()),
+                LessonsLoading() => const Center(
+                  child: CircularProgressIndicator(),
+                ),
                 LessonsLoaded(:final view) => _buildLoaded(view),
                 LessonsFailure(:final message) => Center(
                   child: Padding(
@@ -120,6 +128,17 @@ final class _StudentScreenState extends State<StudentScreen> {
   }
 
   Widget _buildLoaded(StudentLessonsView view) {
+    const emptyProgress = ProgressViewModel(
+      msaRelativePercent: 0,
+      methodRelativePercent: 0,
+      combinedPercent: 0,
+      overallCheckpointPercent: 0,
+      nextLevelLabel: '',
+      meetsYouthService: false,
+      meetsOfficialService: false,
+      meetsOfficialization: false,
+      checkpoints: [],
+    );
     return switch (_progress) {
       ProgressUnknown(:final raw) => Column(
         children: [
@@ -130,7 +149,12 @@ final class _StudentScreenState extends State<StudentScreen> {
               length: 2,
               child: Column(
                 children: [
-                  TabBar(tabs: [Tab(text: 'MSA (${view.msa.length})'), Tab(text: 'Método (${view.method.length})')]),
+                  TabBar(
+                    tabs: [
+                      Tab(text: 'MSA (${view.msa.length})'),
+                      Tab(text: 'Método (${view.method.length})'),
+                    ],
+                  ),
                   Expanded(
                     child: TabBarView(
                       children: [
@@ -157,26 +181,17 @@ final class _StudentScreenState extends State<StudentScreen> {
       ),
       ProgressAvailable(:final vm) => StudentDetailContent(
         view: view,
-        checkpoints: vm.checkpoints,
-        msaPercent: vm.msaPercent,
-        methodLessonPercent: vm.methodLessonPercent,
+        progress: vm,
       ),
       ProgressLoading() => StudentDetailContent(
         view: view,
-        checkpoints: const [],
-        msaPercent: 0,
-        methodLessonPercent: 0,
+        progress: emptyProgress,
       ),
       ProgressFailure(:final message) => Column(
         children: [
           Padding(padding: const EdgeInsets.all(24), child: Text(message)),
           Expanded(
-            child: StudentDetailContent(
-              view: view,
-              checkpoints: const [],
-              msaPercent: 0,
-              methodLessonPercent: 0,
-            ),
+            child: StudentDetailContent(view: view, progress: emptyProgress),
           ),
         ],
       ),

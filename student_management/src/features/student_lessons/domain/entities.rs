@@ -1,3 +1,6 @@
+use flutter_rust_bridge::frb;
+
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Lesson {
     pub id: Option<String>,
@@ -11,12 +14,14 @@ pub struct Lesson {
     pub method: Option<String>,
 }
 
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct StudentLessons {
     pub approved: Vec<Lesson>,
     pub method: Vec<Lesson>,
 }
 
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub struct Range<T = String> {
     pub from: T,
@@ -60,6 +65,7 @@ where
     }
 }
 
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum Clef {
     G,

@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 use crate::features::student_lessons::domain::entities::{Lesson, Range};
 use crate::features::student_roster::domain::entities::MusicianLevel;
 use thiserror::Error;
@@ -59,20 +61,14 @@ pub struct CheckpointStatus {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct CategoryProgress {
-    pub current: f64,
-    pub max: f64,
-    pub percent: f64,
-}
-
-#[derive(Debug, Clone, PartialEq)]
+#[allow(non_snake_case)]
 pub struct ProgressAssessment {
     pub checkpoints: Vec<CheckpointStatus>,
-    pub msa_phase_progress: CategoryProgress,
-    pub msa_lesson_percent: f64,
-    pub method_page_percent: f64,
-    pub method_lesson_percent: f64,
-    pub overall_percent: f64,
+    pub msaRelativePercent: f64,
+    pub methodRelativePercent: f64,
+    pub combinedPercent: f64,
+    pub overallCheckpointPercent: f64,
+    pub nextLevel: Option<MusicianLevel>,
 }
 
 pub fn assess(
@@ -85,7 +81,7 @@ pub fn assess(
         return Err(UnknownLevel(raw.clone()));
     }
     let highest_msa_phase = max_field(approved.iter().map(|l| &l.phase));
-    let highest_msa_lesson = max_field(approved.iter().map(|l| &l.lesson));
+    let _highest_msa_lesson = max_field(approved.iter().map(|l| &l.lesson));
     let highest_method_page = max_field(method.iter().map(|l| &l.page));
     let highest_method_lesson = max_field(method.iter().map(|l| &l.lesson));
 
@@ -111,22 +107,59 @@ pub fn assess(
         })
         .collect();
 
-    let total_phases = 16.0;
-    let total_msa_lessons = 113.0;
-    let total_pages = profile.total_pages as f64;
-    let total_lessons = profile.total_lessons as f64;
+    let achievedCount = checkpoints.iter().filter(|c| c.achieved).count();
+    let nextIdx = checkpoints
+        .iter()
+        .enumerate()
+        .find(|(_, c)| !c.achieved)
+        .map(|(i, _)| i)
+        .unwrap_or(checkpoints.len() - 1);
+    let nextMeasurableIdx = (nextIdx..checkpoints.len())
+        .find(|&i| LEVEL_PATH[i].msa_phase.is_some() || method_threshold_for_level(&LEVEL_PATH[i].level, profile) != (0, 0))
+        .unwrap_or(nextIdx);
+    let targetIdx = nextMeasurableIdx;
+    let prevIdx = targetIdx.saturating_sub(1);
+    // Ensure prev is the last achieved before target, or 0
+    let prevIdx = if checkpoints[prevIdx].achieved { prevIdx } else { 0 };
+    let nextDef = &LEVEL_PATH[targetIdx];
+    let prevMsa = LEVEL_PATH[prevIdx].msa_phase.unwrap_or(0.0);
+    let nextMsa = nextDef.msa_phase.unwrap_or(prevMsa);
+    let deltaMsa = (nextMsa - prevMsa).max(0.0);
+    let msaRelative = if deltaMsa == 0.0 {
+        0.0
+    } else {
+        pct((highest_msa_phase - prevMsa).max(0.0), deltaMsa)
+    };
+
+    let (prevPage, prevLesson) = method_threshold_for_level(&LEVEL_PATH[prevIdx].level, profile);
+    let (nextPage, nextLesson) = method_threshold_for_level(&nextDef.level, profile);
+    let deltaPage = nextPage.saturating_sub(prevPage) as f64;
+    let deltaLesson = nextLesson.saturating_sub(prevLesson) as f64;
+    let pageRelative = if deltaPage == 0.0 { 0.0 } else { pct((highest_method_page - prevPage as f64).max(0.0), deltaPage) };
+    let lessonRelative = if deltaLesson == 0.0 { 0.0 } else { pct((highest_method_lesson - prevLesson as f64).max(0.0), deltaLesson) };
+    let methodRelative = (pageRelative + lessonRelative) / 2.0;
+    let allZeroDelta = deltaMsa == 0.0 && deltaPage == 0.0 && deltaLesson == 0.0;
+    let combined = if allZeroDelta {
+        0.0
+    } else if deltaMsa == 0.0 {
+        methodRelative
+    } else {
+        (msaRelative + methodRelative) / 2.0
+    };
+    let overallCheckpoint = if checkpoints.iter().all(|c| c.achieved) {
+        100.0
+    } else {
+        (achievedCount as f64 + combined / 100.0) / checkpoints.len() as f64 * 100.0
+    };
+    let nextLevel = if checkpoints.iter().all(|c| c.achieved) { None } else { Some(nextDef.level.clone()) };
 
     Ok(ProgressAssessment {
         checkpoints,
-        msa_phase_progress: CategoryProgress {
-            current: highest_msa_phase,
-            max: total_phases,
-            percent: pct(highest_msa_phase, total_phases),
-        },
-        msa_lesson_percent: pct(highest_msa_lesson, total_msa_lessons),
-        method_page_percent: pct(highest_method_page, total_pages),
-        method_lesson_percent: pct(highest_method_lesson, total_lessons),
-        overall_percent: pct(highest_method_lesson, total_lessons),
+        msaRelativePercent: msaRelative,
+        methodRelativePercent: methodRelative,
+        combinedPercent: combined,
+        overallCheckpointPercent: overallCheckpoint,
+        nextLevel,
     })
 }
 
@@ -151,6 +184,16 @@ fn method_req_met(
                 && lesson >= profile.total_lessons as f64
         }
         MusicianLevel::Unknown(_) => unreachable!("assess early-returned for Unknown"),
+    }
+}
+
+fn method_threshold_for_level(level: &MusicianLevel, profile: &MethodProfile) -> (u32, u32) {
+    match level {
+        MusicianLevel::Candidate | MusicianLevel::Practice => (0, 0),
+        MusicianLevel::YouthService => (profile.youth_service_page, profile.youth_service_lesson),
+        MusicianLevel::OfficialService => (profile.culto_oficial_page, profile.culto_oficial_lesson),
+        MusicianLevel::Officialized => (profile.total_pages, profile.total_lessons),
+        MusicianLevel::Unknown(_) => (0, 0),
     }
 }
 
@@ -192,7 +235,9 @@ mod tests {
         assert!(!report.checkpoints.is_empty());
         assert!(report.checkpoints[0].achieved);
         assert!(!report.meets_any_above());
-        assert_eq!(report.overall_percent, 0.0);
+        assert!((report.overallCheckpointPercent - 20.0).abs() < 0.1);
+        assert_eq!(report.msaRelativePercent, 0.0);
+        assert_eq!(report.methodRelativePercent, 0.0);
     }
 
     #[test]
@@ -242,7 +287,8 @@ mod tests {
         let report = assess(&student_level, &approved, &method, &violin_schmoll_profile()).unwrap();
 
         assert!(report.checkpoints[4].ready_to_advance);
-        assert!((report.overall_percent - 100.0).abs() < f64::EPSILON);
+        assert!((report.overallCheckpointPercent - 100.0).abs() < f64::EPSILON);
+        assert!((report.combinedPercent - 100.0).abs() < f64::EPSILON);
     }
 
     #[test]
@@ -252,8 +298,9 @@ mod tests {
 
         let report = assess(&MusicianLevel::Candidate, &approved, &method, &violin_schmoll_profile()).unwrap();
 
-        assert_eq!(report.msa_phase_progress.current, 0.0);
-        assert_eq!(report.method_page_percent, 0.0);
+        assert_eq!(report.msaRelativePercent, 0.0);
+        assert_eq!(report.methodRelativePercent, 0.0);
+        assert_eq!(report.combinedPercent, 0.0);
     }
 
     #[test]
@@ -261,7 +308,7 @@ mod tests {
         let approved = vec![msa_lesson("abc", "def")];
         let report = assess(&MusicianLevel::Candidate, &approved, &[], &violin_schmoll_profile()).unwrap();
 
-        assert_eq!(report.msa_phase_progress.current, 0.0);
+        assert_eq!(report.msaRelativePercent, 0.0);
     }
 
     #[test]
@@ -273,7 +320,8 @@ mod tests {
         ];
         let report = assess(&MusicianLevel::Candidate, &approved, &[], &violin_schmoll_profile()).unwrap();
 
-        assert_eq!(report.msa_phase_progress.current, 14.0);
+        assert!((report.msaRelativePercent - 100.0).abs() < 0.1);
+        assert_eq!(report.nextLevel, Some(MusicianLevel::YouthService));
     }
 
     #[test]
@@ -281,7 +329,7 @@ mod tests {
         let approved = vec![msa_lesson("11", "13")];
         let report = assess(&MusicianLevel::Candidate, &approved, &[], &violin_schmoll_profile()).unwrap();
 
-        assert_eq!(report.msa_phase_progress.current, 13.0);
+        assert!((report.msaRelativePercent - 100.0).abs() < 0.1);
     }
 
     #[test]
@@ -289,7 +337,8 @@ mod tests {
         let approved = vec![msa_lesson("8", "8")];
         let report = assess(&MusicianLevel::Candidate, &approved, &[], &violin_schmoll_profile()).unwrap();
 
-        assert!((report.msa_phase_progress.percent - 50.0).abs() < 0.1);
+        assert!((report.msaRelativePercent - 66.6).abs() < 0.5);
+        assert!((report.combinedPercent - 33.3).abs() < 0.5);
     }
 
     #[test]
@@ -297,7 +346,8 @@ mod tests {
         let method = vec![method_lesson("40", "107")];
         let report = assess(&MusicianLevel::Candidate, &[], &method, &violin_schmoll_profile()).unwrap();
 
-        assert!((report.overall_percent - 50.0).abs() < 0.1);
+        assert!((report.methodRelativePercent - 90.0).abs() < 5.0);
+        assert!((report.overallCheckpointPercent - 29.0).abs() < 5.0);
     }
 
     #[test]

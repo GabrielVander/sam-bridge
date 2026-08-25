@@ -3,11 +3,11 @@ mod session_store;
 use std::sync::{Arc, RwLock};
 
 use student_management::api::{
-    application::{
-        LoginInput, LoginOutput, RetrieveStudentLessonsUseCase, RetrieveStudentsUseCase,
-        StudentLessonsDto, StudentSummaryDto,
+    application::{LoginInput, LoginOutput},
+    domain::{
+        MusicianLevel, ProgressAssessment, Student, StudentLessons, calculate_progress_fn,
+        violin_schmoll_profile,
     },
-    domain::{MusicianLevel, ProgressAssessment, calculate_progress_fn, violin_schmoll_profile},
 };
 use student_management_sam_adapter::session_opener::SamAuthGateway;
 pub use student_management_sam_adapter::{AuthSession, authenticate};
@@ -91,9 +91,11 @@ impl App {
             .is_some()
     }
 
-    pub async fn retrieve_students(&self) -> anyhow::Result<Vec<StudentSummaryDto>> {
+    pub async fn retrieve_students(&self) -> anyhow::Result<Vec<Student>> {
         let roster = self.with_session(|s| s.roster.clone())?;
-        RetrieveStudentsUseCase::new(roster).execute().await
+        let gateway = roster.as_ref();
+        let students = gateway.get_available_records().await?;
+        Ok(students)
     }
 
     pub async fn calculate_progress(
@@ -112,11 +114,10 @@ impl App {
         .map_err(|e| anyhow::anyhow!(e))
     }
 
-    pub async fn retrieve_student_lessons(&self, id: &str) -> anyhow::Result<StudentLessonsDto> {
+    pub async fn retrieve_student_lessons(&self, id: &str) -> anyhow::Result<StudentLessons> {
         let lessons = self.with_session(|s| s.lessons.clone())?;
-        RetrieveStudentLessonsUseCase::new(lessons)
-            .execute(id)
-            .await
+        let gateway = lessons.as_ref();
+        gateway.get_all_for_student_with_id(id).await
     }
 
     #[doc(hidden)]

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
-import 'package:flutter_application/view_models.dart';
 import 'package:go_router/go_router.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -46,7 +46,10 @@ final class _StudentsScreenState extends State<StudentsScreen> {
     });
   }
 
-  Future<void> _showLocationPicker(List<String> available, Set<String> selected) async {
+  Future<void> _showLocationPicker(
+    List<String> available,
+    Set<String> selected,
+  ) async {
     final temp = Set<String>.from(selected);
     final result = await showDialog<Set<String>>(
       context: context,
@@ -129,7 +132,9 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                             icon: const Icon(Icons.clear),
                             onPressed: () {
                               _searchController.clear();
-                              context.read<StudentsCubitSignal>().filter(nameQuery: '');
+                              context.read<StudentsCubitSignal>().filter(
+                                nameQuery: '',
+                              );
                             },
                           ),
                   ),
@@ -149,10 +154,14 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                               ? 'Filtrar por local'
                               : '${selectedLocations.length} ${selectedLocations.length == 1 ? 'local' : 'locais'}',
                         ),
-                        onPressed: () => _showLocationPicker(availableLocations, selectedLocations),
+                        onPressed: () => _showLocationPicker(
+                          availableLocations,
+                          selectedLocations,
+                        ),
                       ),
                     ),
-                    if (nameQuery.isNotEmpty || selectedLocations.isNotEmpty) ...[
+                    if (nameQuery.isNotEmpty ||
+                        selectedLocations.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       TextButton(
                         onPressed: () {
@@ -176,8 +185,11 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                         InputChip(
                           label: Text(loc),
                           onDeleted: () {
-                            final next = Set<String>.from(selectedLocations)..remove(loc);
-                            context.read<StudentsCubitSignal>().filter(selectedLocations: next);
+                            final next = Set<String>.from(selectedLocations)
+                              ..remove(loc);
+                            context.read<StudentsCubitSignal>().filter(
+                              selectedLocations: next,
+                            );
                           },
                         ),
                     ],
@@ -268,7 +280,8 @@ final class _StudentsListContent extends StatelessWidget {
                 ],
                 const SizedBox(height: 16),
                 FilledButton.tonal(
-                  onPressed: () => context.read<StudentsCubitSignal>().clearFilters(),
+                  onPressed: () =>
+                      context.read<StudentsCubitSignal>().clearFilters(),
                   child: const Text('Limpar filtros'),
                 ),
               ],

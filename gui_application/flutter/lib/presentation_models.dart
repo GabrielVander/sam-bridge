@@ -1,0 +1,106 @@
+class StudentListItem {  final String id;
+  final String name;
+  final String location;
+  final String position;
+  final String rawLevel;
+
+  const StudentListItem({
+    required this.id,
+    required this.name,
+    required this.location,
+    required this.position,
+    required this.rawLevel,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^ name.hashCode ^ location.hashCode ^ position.hashCode ^ rawLevel.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StudentListItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          location == other.location &&
+          position == other.position &&
+          rawLevel == other.rawLevel;
+}
+
+enum LessonKind { msa, method }
+
+class LessonItem {
+  final LessonKind kind;
+  final String id;
+  final String date;
+  final String phase;
+  final String page;
+  final String lesson;
+  final String clef;
+  final String description;
+  final String instructor;
+  final String method;
+
+  const LessonItem({
+    required this.kind,
+    required this.id,
+    required this.date,
+    required this.phase,
+    required this.page,
+    required this.lesson,
+    required this.clef,
+    required this.description,
+    required this.instructor,
+    required this.method,
+  });
+
+  @override
+  int get hashCode =>
+      kind.hashCode ^
+      id.hashCode ^
+      date.hashCode ^
+      phase.hashCode ^
+      page.hashCode ^
+      lesson.hashCode ^
+      clef.hashCode ^
+      description.hashCode ^
+      instructor.hashCode ^
+      method.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LessonItem &&
+          runtimeType == other.runtimeType &&
+          kind == other.kind &&
+          id == other.id &&
+          date == other.date &&
+          phase == other.phase &&
+          page == other.page &&
+          lesson == other.lesson &&
+          clef == other.clef &&
+          description == other.description &&
+          instructor == other.instructor &&
+          method == other.method;
+}
+
+class StudentLessonsView {
+  final List<LessonItem> msa;
+  final List<LessonItem> method;
+
+  const StudentLessonsView({required this.msa, required this.method});
+
+  factory StudentLessonsView.empty() => const StudentLessonsView(msa: [], method: []);
+
+  @override
+  int get hashCode => msa.hashCode ^ method.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StudentLessonsView &&
+          runtimeType == other.runtimeType &&
+          msa == other.msa &&
+          method == other.method;
+}

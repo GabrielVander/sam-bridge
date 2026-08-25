@@ -1,4 +1,5 @@
 import 'package:flutter_application/api.dart' as api;
+import 'package:flutter_application/dto.dart';
 import 'package:flutter_application/view_models.dart';
 
 const String kSamBaseUrl = 'https://musical.congregacao.org.br';
@@ -13,10 +14,8 @@ abstract interface class SamPortal {
   Future<bool> isLoggedIn();
   Future<bool> hasSavedCredentials();
   Future<bool> tryRestoreSession();
-  Future<List<StudentListItem>> retrieveStudents();
-  Future<StudentLessonsView> retrieveStudentLessons({
-    required String studentId,
-  });
+  Future<List<StudentSummaryDto>> retrieveStudents();
+  Future<StudentLessonsDto> retrieveStudentLessons({required String studentId});
   Future<ProgressResult> retrieveStudentProgress({
     required String studentId,
     required String assignedLevel,
@@ -46,10 +45,10 @@ final class RustSamPortal implements SamPortal {
   Future<bool> tryRestoreSession() => api.tryRestoreSession();
 
   @override
-  Future<List<StudentListItem>> retrieveStudents() => api.retrieveStudents();
+  Future<List<StudentSummaryDto>> retrieveStudents() => api.retrieveStudents();
 
   @override
-  Future<StudentLessonsView> retrieveStudentLessons({
+  Future<StudentLessonsDto> retrieveStudentLessons({
     required String studentId,
   }) => api.retrieveStudentLessons(studentId: studentId);
 
@@ -57,6 +56,8 @@ final class RustSamPortal implements SamPortal {
   Future<ProgressResult> retrieveStudentProgress({
     required String studentId,
     required String assignedLevel,
-  }) =>
-      api.retrieveStudentProgress(studentId: studentId, assignedLevel: assignedLevel);
+  }) => api.retrieveStudentProgress(
+    studentId: studentId,
+    assignedLevel: assignedLevel,
+  );
 }

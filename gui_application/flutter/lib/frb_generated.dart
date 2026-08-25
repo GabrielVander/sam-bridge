@@ -6,634 +6,1108 @@
 import 'api.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'dto.dart';
 import 'frb_generated.dart';
-import 'frb_generated.io.dart' if (dart.library.js_interop) 'frb_generated.web.dart';
+import 'frb_generated.io.dart'
+    if (dart.library.js_interop) 'frb_generated.web.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'view_models.dart';
 
+/// Main entrypoint of the Rust API
+class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
+  @internal
+  static final instance = RustLib._();
 
-                /// Main entrypoint of the Rust API
-                class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
-                  @internal
-                  static final instance = RustLib._();
+  RustLib._();
 
-                  RustLib._();
+  /// Initialize flutter_rust_bridge
+  static Future<void> init({
+    RustLibApi? api,
+    BaseHandler? handler,
+    ExternalLibrary? externalLibrary,
+    bool forceSameCodegenVersion = true,
+  }) async {
+    await instance.initImpl(
+      api: api,
+      handler: handler,
+      externalLibrary: externalLibrary,
+      forceSameCodegenVersion: forceSameCodegenVersion,
+    );
+  }
 
-                  /// Initialize flutter_rust_bridge
-                  static Future<void> init({
-                    RustLibApi? api,
-                    BaseHandler? handler,
-                    ExternalLibrary? externalLibrary,
-                    bool forceSameCodegenVersion = true,
-                  }) async {
-                    await instance.initImpl(
-                      api: api,
-                      handler: handler,
-                      externalLibrary: externalLibrary,
-                      forceSameCodegenVersion: forceSameCodegenVersion,
-                    );
-                  }
+  /// Initialize flutter_rust_bridge in mock mode.
+  /// No libraries for FFI are loaded.
+  static void initMock({required RustLibApi api}) {
+    instance.initMockImpl(api: api);
+  }
 
-                  /// Initialize flutter_rust_bridge in mock mode.
-                  /// No libraries for FFI are loaded.
-                  static void initMock({
-                    required RustLibApi api,
-                  }) {
-                    instance.initMockImpl(
-                      api: api,
-                    );
-                  }
+  /// Dispose flutter_rust_bridge
+  ///
+  /// The call to this function is optional, since flutter_rust_bridge (and everything else)
+  /// is automatically disposed when the app stops.
+  static void dispose() => instance.disposeImpl();
 
-                  /// Dispose flutter_rust_bridge
-                  ///
-                  /// The call to this function is optional, since flutter_rust_bridge (and everything else)
-                  /// is automatically disposed when the app stops.
-                  static void dispose() => instance.disposeImpl();
+  @override
+  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor =>
+      RustLibApiImpl.new;
 
-                  @override
-                  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor => RustLibApiImpl.new;
+  @override
+  WireConstructor<RustLibWire> get wireConstructor =>
+      RustLibWire.fromExternalLibrary;
 
-                  @override
-                  WireConstructor<RustLibWire> get wireConstructor => RustLibWire.fromExternalLibrary;
+  @override
+  Future<void> executeRustInitializers() async {}
 
-                  @override
-                  Future<void> executeRustInitializers() async {
-                    
-                    
-                  }
+  @override
+  ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig =>
+      kDefaultExternalLibraryLoaderConfig;
 
-                  @override
-                  ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig => kDefaultExternalLibraryLoaderConfig;
+  @override
+  String get codegenVersion => '2.13.0-beta.2';
 
-                  @override
-                  String get codegenVersion => '2.13.0-beta.2';
+  @override
+  int get rustContentHash => -223611624;
 
-                  @override
-                  int get rustContentHash => -223611624;
+  static const kDefaultExternalLibraryLoaderConfig =
+      ExternalLibraryLoaderConfig(
+        stem: 'gui_application',
+        ioDirectory: '../target/release/',
+        webPrefix: 'pkg/',
+        wasmBindgenName: 'wasm_bindgen',
+      );
+}
 
-                  static const kDefaultExternalLibraryLoaderConfig = ExternalLibraryLoaderConfig(
-                    stem: 'gui_application',
-                    ioDirectory: '../target/release/',
-                    webPrefix: 'pkg/',
-                    wasmBindgenName: 'wasm_bindgen',
-                  );
-                }
-                
+abstract class RustLibApi extends BaseApi {
+  Future<bool> crateApiHasSavedCredentials();
 
-                abstract class RustLibApi extends BaseApi {
-                  Future<bool> crateApiHasSavedCredentials();
+  Future<bool> crateApiIsLoggedIn();
 
-Future<bool> crateApiIsLoggedIn();
+  Future<void> crateApiLogin({
+    required String baseUrl,
+    required String username,
+    required String password,
+  });
 
-Future<void> crateApiLogin({required String baseUrl , required String username , required String password });
+  Future<void> crateApiLogout();
 
-Future<void> crateApiLogout();
+  Future<StudentLessonsDto> crateApiRetrieveStudentLessons({
+    required String studentId,
+  });
 
-Future<StudentLessonsView> crateApiRetrieveStudentLessons({required String studentId });
+  Future<ProgressResult> crateApiRetrieveStudentProgress({
+    required String studentId,
+    required String assignedLevel,
+  });
 
-Future<ProgressResult> crateApiRetrieveStudentProgress({required String studentId , required String assignedLevel });
+  Future<List<StudentSummaryDto>> crateApiRetrieveStudents();
 
-Future<List<StudentListItem>> crateApiRetrieveStudents();
+  Future<bool> crateApiTryRestoreSession();
+}
 
-Future<bool> crateApiTryRestoreSession();
+class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
+  RustLibApiImpl({
+    required super.handler,
+    required super.wire,
+    required super.generalizedFrbRustBinding,
+    required super.portManager,
+  });
 
-
-                }
-                
-
-                class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
-                  RustLibApiImpl({
-                    required super.handler,
-                    required super.wire,
-                    required super.generalizedFrbRustBinding,
-                    required super.portManager,
-                  });
-
-                  @override Future<bool> crateApiHasSavedCredentials()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
+  @override
+  Future<bool> crateApiHasSavedCredentials() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
           decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiHasSavedCredentialsConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
+        ),
+        constMeta: kCrateApiHasSavedCredentialsConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
 
+  TaskConstMeta get kCrateApiHasSavedCredentialsConstMeta =>
+      const TaskConstMeta(debugName: "has_saved_credentials", argNames: []);
 
-        TaskConstMeta get kCrateApiHasSavedCredentialsConstMeta => const TaskConstMeta(
-            debugName: "has_saved_credentials",
-            argNames: [],
-        );
-        
-
-@override Future<bool> crateApiIsLoggedIn()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
+  @override
+  Future<bool> crateApiIsLoggedIn() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
           decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiIsLoggedInConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
+        ),
+        constMeta: kCrateApiIsLoggedInConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
 
+  TaskConstMeta get kCrateApiIsLoggedInConstMeta =>
+      const TaskConstMeta(debugName: "is_logged_in", argNames: []);
 
-        TaskConstMeta get kCrateApiIsLoggedInConstMeta => const TaskConstMeta(
-            debugName: "is_logged_in",
-            argNames: [],
-        );
-        
-
-@override Future<void> crateApiLogin({required String baseUrl , required String username , required String password })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(baseUrl, serializer);
-sse_encode_String(username, serializer);
-sse_encode_String(password, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
+  @override
+  Future<void> crateApiLogin({
+    required String baseUrl,
+    required String username,
+    required String password,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(baseUrl, serializer);
+          sse_encode_String(username, serializer);
+          sse_encode_String(password, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_AnyhowException,
-        )
-        ,
-            constMeta: kCrateApiLoginConstMeta,
-            argValues: [baseUrl, username, password],
-            apiImpl: this,
-        )); }
+        ),
+        constMeta: kCrateApiLoginConstMeta,
+        argValues: [baseUrl, username, password],
+        apiImpl: this,
+      ),
+    );
+  }
 
+  TaskConstMeta get kCrateApiLoginConstMeta => const TaskConstMeta(
+    debugName: "login",
+    argNames: ["baseUrl", "username", "password"],
+  );
 
-        TaskConstMeta get kCrateApiLoginConstMeta => const TaskConstMeta(
-            debugName: "login",
-            argNames: ["baseUrl", "username", "password"],
-        );
-        
-
-@override Future<void> crateApiLogout()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
+  @override
+  Future<void> crateApiLogout() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiLogoutConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
+        ),
+        constMeta: kCrateApiLogoutConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
 
+  TaskConstMeta get kCrateApiLogoutConstMeta =>
+      const TaskConstMeta(debugName: "logout", argNames: []);
 
-        TaskConstMeta get kCrateApiLogoutConstMeta => const TaskConstMeta(
-            debugName: "logout",
-            argNames: [],
-        );
-        
-
-@override Future<StudentLessonsView> crateApiRetrieveStudentLessons({required String studentId })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(studentId, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_student_lessons_view,
+  @override
+  Future<StudentLessonsDto> crateApiRetrieveStudentLessons({
+    required String studentId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(studentId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_student_lessons_dto,
           decodeErrorData: sse_decode_AnyhowException,
-        )
-        ,
-            constMeta: kCrateApiRetrieveStudentLessonsConstMeta,
-            argValues: [studentId],
-            apiImpl: this,
-        )); }
+        ),
+        constMeta: kCrateApiRetrieveStudentLessonsConstMeta,
+        argValues: [studentId],
+        apiImpl: this,
+      ),
+    );
+  }
 
+  TaskConstMeta get kCrateApiRetrieveStudentLessonsConstMeta =>
+      const TaskConstMeta(
+        debugName: "retrieve_student_lessons",
+        argNames: ["studentId"],
+      );
 
-        TaskConstMeta get kCrateApiRetrieveStudentLessonsConstMeta => const TaskConstMeta(
-            debugName: "retrieve_student_lessons",
-            argNames: ["studentId"],
-        );
-        
-
-@override Future<ProgressResult> crateApiRetrieveStudentProgress({required String studentId , required String assignedLevel })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(studentId, serializer);
-sse_encode_String(assignedLevel, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
+  @override
+  Future<ProgressResult> crateApiRetrieveStudentProgress({
+    required String studentId,
+    required String assignedLevel,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(studentId, serializer);
+          sse_encode_String(assignedLevel, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
           decodeSuccessData: sse_decode_progress_result,
           decodeErrorData: sse_decode_AnyhowException,
-        )
-        ,
-            constMeta: kCrateApiRetrieveStudentProgressConstMeta,
-            argValues: [studentId, assignedLevel],
-            apiImpl: this,
-        )); }
+        ),
+        constMeta: kCrateApiRetrieveStudentProgressConstMeta,
+        argValues: [studentId, assignedLevel],
+        apiImpl: this,
+      ),
+    );
+  }
 
+  TaskConstMeta get kCrateApiRetrieveStudentProgressConstMeta =>
+      const TaskConstMeta(
+        debugName: "retrieve_student_progress",
+        argNames: ["studentId", "assignedLevel"],
+      );
 
-        TaskConstMeta get kCrateApiRetrieveStudentProgressConstMeta => const TaskConstMeta(
-            debugName: "retrieve_student_progress",
-            argNames: ["studentId", "assignedLevel"],
-        );
-        
-
-@override Future<List<StudentListItem>> crateApiRetrieveStudents()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_student_list_item,
+  @override
+  Future<List<StudentSummaryDto>> crateApiRetrieveStudents() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_student_summary_dto,
           decodeErrorData: sse_decode_AnyhowException,
-        )
-        ,
-            constMeta: kCrateApiRetrieveStudentsConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
+        ),
+        constMeta: kCrateApiRetrieveStudentsConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
 
+  TaskConstMeta get kCrateApiRetrieveStudentsConstMeta =>
+      const TaskConstMeta(debugName: "retrieve_students", argNames: []);
 
-        TaskConstMeta get kCrateApiRetrieveStudentsConstMeta => const TaskConstMeta(
-            debugName: "retrieve_students",
-            argNames: [],
-        );
-        
-
-@override Future<bool> crateApiTryRestoreSession()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
+  @override
+  Future<bool> crateApiTryRestoreSession() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 8,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
           decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiTryRestoreSessionConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTryRestoreSessionConstMeta => const TaskConstMeta(
-            debugName: "try_restore_session",
-            argNames: [],
-        );
-        
-
-
-
-                  @protected AnyhowException dco_decode_AnyhowException(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return AnyhowException(raw as String); }
-
-@protected String dco_decode_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as String; }
-
-@protected bool dco_decode_bool(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as bool; }
-
-@protected ProgressViewModel dco_decode_box_autoadd_progress_view_model(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_progress_view_model(raw); }
-
-@protected UnknownLevelVm dco_decode_box_autoadd_unknown_level_vm(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_unknown_level_vm(raw); }
-
-@protected CheckpointVm dco_decode_checkpoint_vm(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return CheckpointVm(label: dco_decode_String(arr[0]),
-achieved: dco_decode_bool(arr[1]),
-readyToAdvance: dco_decode_bool(arr[2]),
-msaRequirementMet: dco_decode_bool(arr[3]),
-methodRequirementMet: dco_decode_bool(arr[4]),); }
-
-@protected double dco_decode_f_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as double; }
-
-@protected int dco_decode_i_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as int; }
-
-@protected LessonItem dco_decode_lesson_item(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 10) throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
-                return LessonItem(kind: dco_decode_lesson_kind(arr[0]),
-id: dco_decode_String(arr[1]),
-date: dco_decode_String(arr[2]),
-phase: dco_decode_String(arr[3]),
-page: dco_decode_String(arr[4]),
-lesson: dco_decode_String(arr[5]),
-clef: dco_decode_String(arr[6]),
-description: dco_decode_String(arr[7]),
-instructor: dco_decode_String(arr[8]),
-method: dco_decode_String(arr[9]),); }
-
-@protected LessonKind dco_decode_lesson_kind(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return LessonKind.values[raw as int]; }
-
-@protected List<CheckpointVm> dco_decode_list_checkpoint_vm(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_checkpoint_vm).toList(); }
-
-@protected List<LessonItem> dco_decode_list_lesson_item(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_lesson_item).toList(); }
-
-@protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as Uint8List; }
-
-@protected List<StudentListItem> dco_decode_list_student_list_item(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_student_list_item).toList(); }
-
-@protected ProgressResult dco_decode_progress_result(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-                return ProgressResult(isUnknown: dco_decode_bool(arr[0]), progress: dco_decode_progress_view_model(arr[1]), unknown: dco_decode_unknown_level_vm(arr[2])); }
-
-@protected ProgressViewModel dco_decode_progress_view_model(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
-                return ProgressViewModel(msaPercent: dco_decode_f_64(arr[0]),
-methodPagePercent: dco_decode_f_64(arr[1]),
-methodLessonPercent: dco_decode_f_64(arr[2]),
-overallPercent: dco_decode_f_64(arr[3]),
-meetsYouthService: dco_decode_bool(arr[4]),
-meetsOfficialService: dco_decode_bool(arr[5]),
-meetsOfficialization: dco_decode_bool(arr[6]),
-checkpoints: dco_decode_list_checkpoint_vm(arr[7]),); }
-
-@protected StudentLessonsView dco_decode_student_lessons_view(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return StudentLessonsView(msa: dco_decode_list_lesson_item(arr[0]),
-method: dco_decode_list_lesson_item(arr[1]),); }
-
-@protected StudentListItem dco_decode_student_list_item(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return StudentListItem(id: dco_decode_String(arr[0]),
-name: dco_decode_String(arr[1]),
-location: dco_decode_String(arr[2]),
-position: dco_decode_String(arr[3]),
-rawLevel: dco_decode_String(arr[4]),); }
-
-@protected int dco_decode_u_8(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as int; }
-
-@protected void dco_decode_unit(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return; }
-
-@protected UnknownLevelVm dco_decode_unknown_level_vm(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return UnknownLevelVm(raw: dco_decode_String(arr[0]),
-message: dco_decode_String(arr[1]),); }
-
-@protected AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_String(deserializer);
-        return AnyhowException(inner); }
-
-@protected String sse_decode_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_list_prim_u_8_strict(deserializer);
-        return utf8.decoder.convert(inner); }
-
-@protected bool sse_decode_bool(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getUint8() != 0; }
-
-@protected ProgressViewModel sse_decode_box_autoadd_progress_view_model(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_progress_view_model(deserializer)); }
-
-@protected UnknownLevelVm sse_decode_box_autoadd_unknown_level_vm(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_unknown_level_vm(deserializer)); }
-
-@protected CheckpointVm sse_decode_checkpoint_vm(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_label = sse_decode_String(deserializer);
-var var_achieved = sse_decode_bool(deserializer);
-var var_readyToAdvance = sse_decode_bool(deserializer);
-var var_msaRequirementMet = sse_decode_bool(deserializer);
-var var_methodRequirementMet = sse_decode_bool(deserializer);
-return CheckpointVm(label: var_label, achieved: var_achieved, readyToAdvance: var_readyToAdvance, msaRequirementMet: var_msaRequirementMet, methodRequirementMet: var_methodRequirementMet); }
-
-@protected double sse_decode_f_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getFloat64(); }
-
-@protected int sse_decode_i_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getInt32(); }
-
-@protected LessonItem sse_decode_lesson_item(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_kind = sse_decode_lesson_kind(deserializer);
-var var_id = sse_decode_String(deserializer);
-var var_date = sse_decode_String(deserializer);
-var var_phase = sse_decode_String(deserializer);
-var var_page = sse_decode_String(deserializer);
-var var_lesson = sse_decode_String(deserializer);
-var var_clef = sse_decode_String(deserializer);
-var var_description = sse_decode_String(deserializer);
-var var_instructor = sse_decode_String(deserializer);
-var var_method = sse_decode_String(deserializer);
-return LessonItem(kind: var_kind, id: var_id, date: var_date, phase: var_phase, page: var_page, lesson: var_lesson, clef: var_clef, description: var_description, instructor: var_instructor, method: var_method); }
-
-@protected LessonKind sse_decode_lesson_kind(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_i_32(deserializer);
-        return LessonKind.values[inner]; }
-
-@protected List<CheckpointVm> sse_decode_list_checkpoint_vm(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <CheckpointVm>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_checkpoint_vm(deserializer)); }
-        return ans_;
-         }
-
-@protected List<LessonItem> sse_decode_list_lesson_item(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <LessonItem>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_lesson_item(deserializer)); }
-        return ans_;
-         }
-
-@protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var len_ = sse_decode_i_32(deserializer);
-                return deserializer.buffer.getUint8List(len_); }
-
-@protected List<StudentListItem> sse_decode_list_student_list_item(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <StudentListItem>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_student_list_item(deserializer)); }
-        return ans_;
-         }
-
-@protected ProgressResult sse_decode_progress_result(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_isUnknown = sse_decode_bool(deserializer);
-var var_progress = sse_decode_progress_view_model(deserializer);
-var var_unknown = sse_decode_unknown_level_vm(deserializer);
-return ProgressResult(isUnknown: var_isUnknown, progress: var_progress, unknown: var_unknown);
-             }
-
-@protected ProgressViewModel sse_decode_progress_view_model(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_msaPercent = sse_decode_f_64(deserializer);
-var var_methodPagePercent = sse_decode_f_64(deserializer);
-var var_methodLessonPercent = sse_decode_f_64(deserializer);
-var var_overallPercent = sse_decode_f_64(deserializer);
-var var_meetsYouthService = sse_decode_bool(deserializer);
-var var_meetsOfficialService = sse_decode_bool(deserializer);
-var var_meetsOfficialization = sse_decode_bool(deserializer);
-var var_checkpoints = sse_decode_list_checkpoint_vm(deserializer);
-return ProgressViewModel(msaPercent: var_msaPercent, methodPagePercent: var_methodPagePercent, methodLessonPercent: var_methodLessonPercent, overallPercent: var_overallPercent, meetsYouthService: var_meetsYouthService, meetsOfficialService: var_meetsOfficialService, meetsOfficialization: var_meetsOfficialization, checkpoints: var_checkpoints); }
-
-@protected StudentLessonsView sse_decode_student_lessons_view(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_msa = sse_decode_list_lesson_item(deserializer);
-var var_method = sse_decode_list_lesson_item(deserializer);
-return StudentLessonsView(msa: var_msa, method: var_method); }
-
-@protected StudentListItem sse_decode_student_list_item(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_id = sse_decode_String(deserializer);
-var var_name = sse_decode_String(deserializer);
-var var_location = sse_decode_String(deserializer);
-var var_position = sse_decode_String(deserializer);
-var var_rawLevel = sse_decode_String(deserializer);
-return StudentListItem(id: var_id, name: var_name, location: var_location, position: var_position, rawLevel: var_rawLevel); }
-
-@protected int sse_decode_u_8(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getUint8(); }
-
-@protected void sse_decode_unit(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
- }
-
-@protected UnknownLevelVm sse_decode_unknown_level_vm(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_raw = sse_decode_String(deserializer);
-var var_message = sse_decode_String(deserializer);
-return UnknownLevelVm(raw: var_raw, message: var_message); }
-
-@protected void sse_encode_AnyhowException(AnyhowException self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.message, serializer); }
-
-@protected void sse_encode_String(String self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer); }
-
-@protected void sse_encode_bool(bool self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putUint8(self ? 1 : 0); }
-
-@protected void sse_encode_box_autoadd_progress_view_model(ProgressViewModel self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_progress_view_model(self, serializer); }
-
-@protected void sse_encode_box_autoadd_unknown_level_vm(UnknownLevelVm self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_unknown_level_vm(self, serializer); }
-
-@protected void sse_encode_checkpoint_vm(CheckpointVm self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.label, serializer);
-sse_encode_bool(self.achieved, serializer);
-sse_encode_bool(self.readyToAdvance, serializer);
-sse_encode_bool(self.msaRequirementMet, serializer);
-sse_encode_bool(self.methodRequirementMet, serializer);
- }
-
-@protected void sse_encode_f_64(double self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putFloat64(self); }
-
-@protected void sse_encode_i_32(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putInt32(self); }
-
-@protected void sse_encode_lesson_item(LessonItem self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_lesson_kind(self.kind, serializer);
-sse_encode_String(self.id, serializer);
-sse_encode_String(self.date, serializer);
-sse_encode_String(self.phase, serializer);
-sse_encode_String(self.page, serializer);
-sse_encode_String(self.lesson, serializer);
-sse_encode_String(self.clef, serializer);
-sse_encode_String(self.description, serializer);
-sse_encode_String(self.instructor, serializer);
-sse_encode_String(self.method, serializer);
- }
-
-@protected void sse_encode_lesson_kind(LessonKind self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.index, serializer); }
-
-@protected void sse_encode_list_checkpoint_vm(List<CheckpointVm> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_checkpoint_vm(item, serializer); } }
-
-@protected void sse_encode_list_lesson_item(List<LessonItem> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_lesson_item(item, serializer); } }
-
-@protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-                    serializer.buffer.putUint8List(self); }
-
-@protected void sse_encode_list_student_list_item(List<StudentListItem> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_student_list_item(item, serializer); } }
-
-@protected void sse_encode_progress_result(ProgressResult self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_bool(self.isUnknown, serializer);
-sse_encode_progress_view_model(self.progress, serializer);
-sse_encode_unknown_level_vm(self.unknown, serializer); }
-
-@protected void sse_encode_progress_view_model(ProgressViewModel self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_f_64(self.msaPercent, serializer);
-sse_encode_f_64(self.methodPagePercent, serializer);
-sse_encode_f_64(self.methodLessonPercent, serializer);
-sse_encode_f_64(self.overallPercent, serializer);
-sse_encode_bool(self.meetsYouthService, serializer);
-sse_encode_bool(self.meetsOfficialService, serializer);
-sse_encode_bool(self.meetsOfficialization, serializer);
-sse_encode_list_checkpoint_vm(self.checkpoints, serializer);
- }
-
-@protected void sse_encode_student_lessons_view(StudentLessonsView self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_lesson_item(self.msa, serializer);
-sse_encode_list_lesson_item(self.method, serializer);
- }
-
-@protected void sse_encode_student_list_item(StudentListItem self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.id, serializer);
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.location, serializer);
-sse_encode_String(self.position, serializer);
-sse_encode_String(self.rawLevel, serializer);
- }
-
-@protected void sse_encode_u_8(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putUint8(self); }
-
-@protected void sse_encode_unit(void self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
- }
-
-@protected void sse_encode_unknown_level_vm(UnknownLevelVm self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.raw, serializer);
-sse_encode_String(self.message, serializer);
- }
-                }
-                
+        ),
+        constMeta: kCrateApiTryRestoreSessionConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTryRestoreSessionConstMeta =>
+      const TaskConstMeta(debugName: "try_restore_session", argNames: []);
+
+  @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AnyhowException(raw as String);
+  }
+
+  @protected
+  String dco_decode_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as String;
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  RangeDto dco_decode_box_autoadd_range_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_range_dto(raw);
+  }
+
+  @protected
+  CheckpointVm dco_decode_checkpoint_vm(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return CheckpointVm(
+      label: dco_decode_String(arr[0]),
+      achieved: dco_decode_bool(arr[1]),
+      readyToAdvance: dco_decode_bool(arr[2]),
+      msaRequirementMet: dco_decode_bool(arr[3]),
+      methodRequirementMet: dco_decode_bool(arr[4]),
+    );
+  }
+
+  @protected
+  DtoPosition dco_decode_dto_position(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return DtoPosition_Musician(levelName: dco_decode_String(raw[1]));
+      case 1:
+        return DtoPosition_Organist(levelName: dco_decode_String(raw[1]));
+      case 2:
+        return DtoPosition_Secretary(typeName: dco_decode_String(raw[1]));
+      case 3:
+        return DtoPosition_Unknown(raw: dco_decode_String(raw[1]));
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  DtoRegion dco_decode_dto_region(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return DtoRegion_AraraquaraSaoCarlos();
+      case 1:
+        return DtoRegion_AraraquaraItirapina();
+      case 2:
+        return DtoRegion_Other(raw: dco_decode_String(raw[1]));
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  double dco_decode_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  LessonDto dco_decode_lesson_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return LessonDto(
+      id: dco_decode_String(arr[0]),
+      date: dco_decode_String(arr[1]),
+      phase: dco_decode_opt_box_autoadd_range_dto(arr[2]),
+      page: dco_decode_opt_box_autoadd_range_dto(arr[3]),
+      lesson: dco_decode_opt_box_autoadd_range_dto(arr[4]),
+      clef: dco_decode_opt_String(arr[5]),
+      description: dco_decode_String(arr[6]),
+      instructor: dco_decode_String(arr[7]),
+      method: dco_decode_String(arr[8]),
+    );
+  }
+
+  @protected
+  List<CheckpointVm> dco_decode_list_checkpoint_vm(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_checkpoint_vm).toList();
+  }
+
+  @protected
+  List<LessonDto> dco_decode_list_lesson_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_lesson_dto).toList();
+  }
+
+  @protected
+  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Uint8List;
+  }
+
+  @protected
+  List<StudentSummaryDto> dco_decode_list_student_summary_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_student_summary_dto).toList();
+  }
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  RangeDto? dco_decode_opt_box_autoadd_range_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_range_dto(raw);
+  }
+
+  @protected
+  ProgressResult dco_decode_progress_result(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ProgressResult(
+      isUnknown: dco_decode_bool(arr[0]),
+      progress: dco_decode_progress_view_model(arr[1]),
+      unknown: dco_decode_unknown_level_vm(arr[2]),
+    );
+  }
+
+  @protected
+  ProgressViewModel dco_decode_progress_view_model(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return ProgressViewModel(
+      msaRelativePercent: dco_decode_f_64(arr[0]),
+      methodRelativePercent: dco_decode_f_64(arr[1]),
+      combinedPercent: dco_decode_f_64(arr[2]),
+      overallCheckpointPercent: dco_decode_f_64(arr[3]),
+      nextLevelLabel: dco_decode_String(arr[4]),
+      meetsYouthService: dco_decode_bool(arr[5]),
+      meetsOfficialService: dco_decode_bool(arr[6]),
+      meetsOfficialization: dco_decode_bool(arr[7]),
+      checkpoints: dco_decode_list_checkpoint_vm(arr[8]),
+    );
+  }
+
+  @protected
+  RangeDto dco_decode_range_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return RangeDto(
+      from: dco_decode_String(arr[0]),
+      to: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  StudentLessonsDto dco_decode_student_lessons_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return StudentLessonsDto(
+      approved: dco_decode_list_lesson_dto(arr[0]),
+      method: dco_decode_list_lesson_dto(arr[1]),
+    );
+  }
+
+  @protected
+  StudentSummaryDto dco_decode_student_summary_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return StudentSummaryDto(
+      id: dco_decode_String(arr[0]),
+      name: dco_decode_String(arr[1]),
+      location: dco_decode_String(arr[2]),
+      position: dco_decode_dto_position(arr[3]),
+      region: dco_decode_dto_region(arr[4]),
+    );
+  }
+
+  @protected
+  int dco_decode_u_8(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  void dco_decode_unit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return;
+  }
+
+  @protected
+  UnknownLevelVm dco_decode_unknown_level_vm(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return UnknownLevelVm(
+      raw: dco_decode_String(arr[0]),
+      message: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_String(deserializer);
+    return AnyhowException(inner);
+  }
+
+  @protected
+  String sse_decode_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  RangeDto sse_decode_box_autoadd_range_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_range_dto(deserializer));
+  }
+
+  @protected
+  CheckpointVm sse_decode_checkpoint_vm(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_label = sse_decode_String(deserializer);
+    var var_achieved = sse_decode_bool(deserializer);
+    var var_readyToAdvance = sse_decode_bool(deserializer);
+    var var_msaRequirementMet = sse_decode_bool(deserializer);
+    var var_methodRequirementMet = sse_decode_bool(deserializer);
+    return CheckpointVm(
+      label: var_label,
+      achieved: var_achieved,
+      readyToAdvance: var_readyToAdvance,
+      msaRequirementMet: var_msaRequirementMet,
+      methodRequirementMet: var_methodRequirementMet,
+    );
+  }
+
+  @protected
+  DtoPosition sse_decode_dto_position(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_levelName = sse_decode_String(deserializer);
+        return DtoPosition_Musician(levelName: var_levelName);
+      case 1:
+        var var_levelName = sse_decode_String(deserializer);
+        return DtoPosition_Organist(levelName: var_levelName);
+      case 2:
+        var var_typeName = sse_decode_String(deserializer);
+        return DtoPosition_Secretary(typeName: var_typeName);
+      case 3:
+        var var_raw = sse_decode_String(deserializer);
+        return DtoPosition_Unknown(raw: var_raw);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  DtoRegion sse_decode_dto_region(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        return DtoRegion_AraraquaraSaoCarlos();
+      case 1:
+        return DtoRegion_AraraquaraItirapina();
+      case 2:
+        var var_raw = sse_decode_String(deserializer);
+        return DtoRegion_Other(raw: var_raw);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat64();
+  }
+
+  @protected
+  LessonDto sse_decode_lesson_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_date = sse_decode_String(deserializer);
+    var var_phase = sse_decode_opt_box_autoadd_range_dto(deserializer);
+    var var_page = sse_decode_opt_box_autoadd_range_dto(deserializer);
+    var var_lesson = sse_decode_opt_box_autoadd_range_dto(deserializer);
+    var var_clef = sse_decode_opt_String(deserializer);
+    var var_description = sse_decode_String(deserializer);
+    var var_instructor = sse_decode_String(deserializer);
+    var var_method = sse_decode_String(deserializer);
+    return LessonDto(
+      id: var_id,
+      date: var_date,
+      phase: var_phase,
+      page: var_page,
+      lesson: var_lesson,
+      clef: var_clef,
+      description: var_description,
+      instructor: var_instructor,
+      method: var_method,
+    );
+  }
+
+  @protected
+  List<CheckpointVm> sse_decode_list_checkpoint_vm(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <CheckpointVm>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_checkpoint_vm(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<LessonDto> sse_decode_list_lesson_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <LessonDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_lesson_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  List<StudentSummaryDto> sse_decode_list_student_summary_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <StudentSummaryDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_student_summary_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  RangeDto? sse_decode_opt_box_autoadd_range_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_range_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ProgressResult sse_decode_progress_result(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_isUnknown = sse_decode_bool(deserializer);
+    var var_progress = sse_decode_progress_view_model(deserializer);
+    var var_unknown = sse_decode_unknown_level_vm(deserializer);
+    return ProgressResult(
+      isUnknown: var_isUnknown,
+      progress: var_progress,
+      unknown: var_unknown,
+    );
+  }
+
+  @protected
+  ProgressViewModel sse_decode_progress_view_model(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_msaRelativePercent = sse_decode_f_64(deserializer);
+    var var_methodRelativePercent = sse_decode_f_64(deserializer);
+    var var_combinedPercent = sse_decode_f_64(deserializer);
+    var var_overallCheckpointPercent = sse_decode_f_64(deserializer);
+    var var_nextLevelLabel = sse_decode_String(deserializer);
+    var var_meetsYouthService = sse_decode_bool(deserializer);
+    var var_meetsOfficialService = sse_decode_bool(deserializer);
+    var var_meetsOfficialization = sse_decode_bool(deserializer);
+    var var_checkpoints = sse_decode_list_checkpoint_vm(deserializer);
+    return ProgressViewModel(
+      msaRelativePercent: var_msaRelativePercent,
+      methodRelativePercent: var_methodRelativePercent,
+      combinedPercent: var_combinedPercent,
+      overallCheckpointPercent: var_overallCheckpointPercent,
+      nextLevelLabel: var_nextLevelLabel,
+      meetsYouthService: var_meetsYouthService,
+      meetsOfficialService: var_meetsOfficialService,
+      meetsOfficialization: var_meetsOfficialization,
+      checkpoints: var_checkpoints,
+    );
+  }
+
+  @protected
+  RangeDto sse_decode_range_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_from = sse_decode_String(deserializer);
+    var var_to = sse_decode_String(deserializer);
+    return RangeDto(from: var_from, to: var_to);
+  }
+
+  @protected
+  StudentLessonsDto sse_decode_student_lessons_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_approved = sse_decode_list_lesson_dto(deserializer);
+    var var_method = sse_decode_list_lesson_dto(deserializer);
+    return StudentLessonsDto(approved: var_approved, method: var_method);
+  }
+
+  @protected
+  StudentSummaryDto sse_decode_student_summary_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_location = sse_decode_String(deserializer);
+    var var_position = sse_decode_dto_position(deserializer);
+    var var_region = sse_decode_dto_region(deserializer);
+    return StudentSummaryDto(
+      id: var_id,
+      name: var_name,
+      location: var_location,
+      position: var_position,
+      region: var_region,
+    );
+  }
+
+  @protected
+  int sse_decode_u_8(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8();
+  }
+
+  @protected
+  void sse_decode_unit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  UnknownLevelVm sse_decode_unknown_level_vm(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_raw = sse_decode_String(deserializer);
+    var var_message = sse_decode_String(deserializer);
+    return UnknownLevelVm(raw: var_raw, message: var_message);
+  }
+
+  @protected
+  int sse_decode_i_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  void sse_encode_AnyhowException(
+    AnyhowException self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void sse_encode_String(String self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_range_dto(
+    RangeDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_range_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_checkpoint_vm(CheckpointVm self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.label, serializer);
+    sse_encode_bool(self.achieved, serializer);
+    sse_encode_bool(self.readyToAdvance, serializer);
+    sse_encode_bool(self.msaRequirementMet, serializer);
+    sse_encode_bool(self.methodRequirementMet, serializer);
+  }
+
+  @protected
+  void sse_encode_dto_position(DtoPosition self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case DtoPosition_Musician(levelName: final levelName):
+        sse_encode_i_32(0, serializer);
+        sse_encode_String(levelName, serializer);
+      case DtoPosition_Organist(levelName: final levelName):
+        sse_encode_i_32(1, serializer);
+        sse_encode_String(levelName, serializer);
+      case DtoPosition_Secretary(typeName: final typeName):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(typeName, serializer);
+      case DtoPosition_Unknown(raw: final raw):
+        sse_encode_i_32(3, serializer);
+        sse_encode_String(raw, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_dto_region(DtoRegion self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case DtoRegion_AraraquaraSaoCarlos():
+        sse_encode_i_32(0, serializer);
+      case DtoRegion_AraraquaraItirapina():
+        sse_encode_i_32(1, serializer);
+      case DtoRegion_Other(raw: final raw):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(raw, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat64(self);
+  }
+
+  @protected
+  void sse_encode_lesson_dto(LessonDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.date, serializer);
+    sse_encode_opt_box_autoadd_range_dto(self.phase, serializer);
+    sse_encode_opt_box_autoadd_range_dto(self.page, serializer);
+    sse_encode_opt_box_autoadd_range_dto(self.lesson, serializer);
+    sse_encode_opt_String(self.clef, serializer);
+    sse_encode_String(self.description, serializer);
+    sse_encode_String(self.instructor, serializer);
+    sse_encode_String(self.method, serializer);
+  }
+
+  @protected
+  void sse_encode_list_checkpoint_vm(
+    List<CheckpointVm> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_checkpoint_vm(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_lesson_dto(
+    List<LessonDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_lesson_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_strict(
+    Uint8List self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_list_student_summary_dto(
+    List<StudentSummaryDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_student_summary_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_range_dto(
+    RangeDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_range_dto(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_progress_result(
+    ProgressResult self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self.isUnknown, serializer);
+    sse_encode_progress_view_model(self.progress, serializer);
+    sse_encode_unknown_level_vm(self.unknown, serializer);
+  }
+
+  @protected
+  void sse_encode_progress_view_model(
+    ProgressViewModel self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_64(self.msaRelativePercent, serializer);
+    sse_encode_f_64(self.methodRelativePercent, serializer);
+    sse_encode_f_64(self.combinedPercent, serializer);
+    sse_encode_f_64(self.overallCheckpointPercent, serializer);
+    sse_encode_String(self.nextLevelLabel, serializer);
+    sse_encode_bool(self.meetsYouthService, serializer);
+    sse_encode_bool(self.meetsOfficialService, serializer);
+    sse_encode_bool(self.meetsOfficialization, serializer);
+    sse_encode_list_checkpoint_vm(self.checkpoints, serializer);
+  }
+
+  @protected
+  void sse_encode_range_dto(RangeDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.from, serializer);
+    sse_encode_String(self.to, serializer);
+  }
+
+  @protected
+  void sse_encode_student_lessons_dto(
+    StudentLessonsDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_lesson_dto(self.approved, serializer);
+    sse_encode_list_lesson_dto(self.method, serializer);
+  }
+
+  @protected
+  void sse_encode_student_summary_dto(
+    StudentSummaryDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.location, serializer);
+    sse_encode_dto_position(self.position, serializer);
+    sse_encode_dto_region(self.region, serializer);
+  }
+
+  @protected
+  void sse_encode_u_8(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self);
+  }
+
+  @protected
+  void sse_encode_unit(void self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_unknown_level_vm(
+    UnknownLevelVm self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.raw, serializer);
+    sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putInt32(self);
+  }
+}

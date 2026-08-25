@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/view_models.dart';
 import 'package:flutter_application/widgets/checkpoint_timeline.dart';
 import 'package:flutter_application/widgets/progress_bar.dart';

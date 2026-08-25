@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/view_models.dart';
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/widgets/info_chip.dart';
 
 final class LessonCard extends StatelessWidget {
@@ -21,9 +21,11 @@ final class LessonCard extends StatelessWidget {
               lesson.date.isEmpty ? '—' : lesson.date,
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            if (lesson.phase.isNotEmpty) InfoChip(label: 'Fase ${lesson.phase}'),
+            if (lesson.phase.isNotEmpty)
+              InfoChip(label: 'Fase ${lesson.phase}'),
             if (lesson.page.isNotEmpty) InfoChip(label: 'Pág. ${lesson.page}'),
-            if (lesson.lesson.isNotEmpty) InfoChip(label: 'Lição ${lesson.lesson}'),
+            if (lesson.lesson.isNotEmpty)
+              InfoChip(label: 'Lição ${lesson.lesson}'),
           ],
         ),
         subtitle: Column(
@@ -32,7 +34,10 @@ final class LessonCard extends StatelessWidget {
             if (lesson.clef.isNotEmpty) Text('Clave: ${lesson.clef}'),
             if (lesson.description.isNotEmpty) Text(lesson.description),
             if (lesson.instructor.isNotEmpty)
-              Text(lesson.instructor, style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                lesson.instructor,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
           ],
         ),
         isThreeLine: true,

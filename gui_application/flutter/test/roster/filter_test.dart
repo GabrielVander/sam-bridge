@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/roster/mapper.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/roster/students_screen.dart';
-import 'package:flutter_application/view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_sam_portal.dart';
 
 void main() {
   test('RosterMapper identity', () {
-    final item = StudentListItem(id: "1", name: "A", location: "L", position: "P", rawLevel: "R");
-    expect(RosterMapper.toViewModel(item).id, "1");
-    expect(RosterMapper.toViewModels([item]).length, 1);
+    final dto = studentItem(id: "1", name: "A", location: "L");
+    expect(RosterMapper.toViewModel(dto).id, "1");
+    expect(RosterMapper.toViewModels([dto]).length, 1);
   });
 
   testWidgets('StudentsScreen search filters', (tester) async {

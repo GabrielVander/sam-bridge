@@ -1,11 +1,12 @@
+import 'package:flutter_application/dto.dart';
 import 'package:flutter_application/portal/sam_portal.dart';
 import 'package:flutter_application/view_models.dart';
 
 final class FakeSamPortal implements SamPortal {
   Object? loginError;
   bool loggedIn = false;
-  List<StudentListItem> students = [];
-  StudentLessonsView lessons = const StudentLessonsViewT().view;
+  List<StudentSummaryDto> students = [];
+  StudentLessonsDto lessons = const StudentLessonsViewT().dto;
   Object? studentsError;
   Object? lessonsError;
 
@@ -45,13 +46,13 @@ final class FakeSamPortal implements SamPortal {
   }
 
   @override
-  Future<List<StudentListItem>> retrieveStudents() async {
+  Future<List<StudentSummaryDto>> retrieveStudents() async {
     if (studentsError != null) throw studentsError!;
     return students;
   }
 
   @override
-  Future<StudentLessonsView> retrieveStudentLessons({required String studentId}) async {
+  Future<StudentLessonsDto> retrieveStudentLessons({required String studentId}) async {
     if (lessonsError != null) throw lessonsError!;
     return lessons;
   }
@@ -59,10 +60,11 @@ final class FakeSamPortal implements SamPortal {
   ProgressResult progress = ProgressResult(
     isUnknown: false,
     progress: ProgressViewModel(
-      msaPercent: 0,
-      methodPagePercent: 0,
-      methodLessonPercent: 0,
-      overallPercent: 0,
+      msaRelativePercent: 0,
+      methodRelativePercent: 0,
+      combinedPercent: 0,
+      overallCheckpointPercent: 0,
+      nextLevelLabel: '',
       meetsYouthService: false,
       meetsOfficialService: false,
       meetsOfficialization: false,
@@ -83,18 +85,17 @@ final class FakeSamPortal implements SamPortal {
 }
 
 final class StudentLessonsViewT {
-  final List<LessonItem> msa;
-  final List<LessonItem> method;
+  final List<LessonDto> msa;
+  final List<LessonDto> method;
 
   const StudentLessonsViewT({this.msa = const [], this.method = const []});
 
-  StudentLessonsView get view => StudentLessonsView(msa: msa, method: method);
+  StudentLessonsDto get dto => StudentLessonsDto(approved: msa, method: method);
 }
 
-LessonItem lessonItem({
+LessonDto lessonItem({
   required String id,
   required String date,
-  LessonKind kind = LessonKind.msa,
   String phase = '',
   String page = '',
   String lesson = '',
@@ -103,24 +104,36 @@ LessonItem lessonItem({
   String instructor = 'AUTH',
   String method = '',
 }) =>
-    LessonItem(
-      kind: kind,
+    LessonDto(
       id: id,
       date: date,
-      phase: phase,
-      page: page,
-      lesson: lesson,
-      clef: clef,
+      phase: phase.isEmpty ? null : RangeDto(from: phase, to: phase),
+      page: page.isEmpty ? null : RangeDto(from: page, to: page),
+      lesson: lesson.isEmpty ? null : RangeDto(from: lesson, to: lesson),
+      clef: clef.isEmpty ? null : clef,
       description: description,
       instructor: instructor,
       method: method,
     );
 
-StudentListItem studentItem({
+StudentSummaryDto studentItem({
   String id = '1',
   String name = 'ALUNA TESTE',
-  String position = 'Músico · Candidato(a)',
+  String levelName = 'Candidate',
+  DtoPositionKind kind = DtoPositionKind.musician,
   String location = 'BAIRRO',
-  String rawLevel = 'Candidate',
 }) =>
-    StudentListItem(id: id, name: name, location: location, position: position, rawLevel: rawLevel);
+    StudentSummaryDto(
+      id: id,
+      name: name,
+      location: location,
+      position: switch (kind) {
+        DtoPositionKind.musician => DtoPosition.musician(levelName: levelName),
+        DtoPositionKind.organist => DtoPosition.organist(levelName: levelName),
+        DtoPositionKind.secretary => DtoPosition.secretary(typeName: levelName),
+        DtoPositionKind.unknown => DtoPosition.unknown(raw: levelName),
+      },
+      region: const DtoRegion.araraquaraSaoCarlos(),
+    );
+
+enum DtoPositionKind { musician, organist, secretary, unknown }

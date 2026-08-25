@@ -16,7 +16,7 @@ void main() {
           lessonItem(id: '12', date: '2025-06-02'),
           lessonItem(id: '11', date: '2025-06-01'),
         ],
-      ).view;
+      ).dto;
     final presenter = LessonsCubitSignal(portal);
 
     await presenter.load('7');

@@ -1,3 +1,6 @@
+use flutter_rust_bridge::frb;
+
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub struct Student {
     pub id: String,
@@ -7,6 +10,7 @@ pub struct Student {
     pub region: Region,
 }
 
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum StudentPosition {
     Musician { level: MusicianLevel },
@@ -15,6 +19,7 @@ pub enum StudentPosition {
     Unknown(String),
 }
 
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum MusicianLevel {
     Candidate,
@@ -75,6 +80,7 @@ impl MusicianLevel {
     }
 }
 
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum OrganistLevel {
     Candidate,
@@ -89,6 +95,7 @@ pub enum OrganistLevel {
     Unknown(String),
 }
 
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum Region {
     AraraquaraSaoCarlos,
@@ -96,6 +103,7 @@ pub enum Region {
     Other(String),
 }
 
+#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum SecretaryType {
     Gem,

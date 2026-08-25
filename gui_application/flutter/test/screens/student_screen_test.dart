@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/lessons/student_screen.dart';
-import 'package:flutter_application/view_models.dart';
+import 'package:flutter_application/roster/mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_sam_portal.dart';
@@ -11,7 +11,7 @@ import '../support/fake_sam_portal.dart';
 Widget harness(FakeSamPortal portal) {
   final presenter = LessonsCubitSignal(portal);
   final studentsPresenter = StudentsCubitSignal(portal)
-    ..emit(StudentsLoaded([studentItem(id: '7')]));
+    ..emit(StudentsLoaded([RosterMapper.toViewModel(studentItem(id: '7'))]));
   return MultiBlocSignalProvider(providers: [
     BlocSignalProvider<LessonsCubitSignal>.value(value: presenter),
     BlocSignalProvider<StudentsCubitSignal>.value(value: studentsPresenter),
@@ -30,13 +30,13 @@ void main() {
             phase: '4.5',
             page: '38 - 38',
             lesson: '7 - 8',
-            clef: 'Sol',
+            clef: 'G',
             description: 'Estudar próximas lições.',
           ),
           lessonItem(id: '11', date: '2025-01-15', page: '30 - 34'),
         ],
-        method: [lessonItem(id: 'm1', date: '2023-12-04', kind: LessonKind.method)],
-      ).view;
+        method: [lessonItem(id: 'm1', date: '2023-12-04')],
+      ).dto;
 
     await tester.pumpWidget(harness(portal));
     await tester.pumpAndSettle();
@@ -66,12 +66,11 @@ void main() {
           lessonItem(
             id: 'm1',
             date: '2023-12-04',
-            kind: LessonKind.method,
             page: '00',
             description: 'Postura do violino',
           ),
         ],
-      ).view;
+      ).dto;
 
     await tester.pumpWidget(harness(portal));
     await tester.pumpAndSettle();

@@ -166,11 +166,13 @@ pub struct CheckpointVm {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+#[allow(non_snake_case)]
 pub struct ProgressViewModel {
-    pub msa_percent: f64,
-    pub method_page_percent: f64,
-    pub method_lesson_percent: f64,
-    pub overall_percent: f64,
+    pub msaRelativePercent: f64,
+    pub methodRelativePercent: f64,
+    pub combinedPercent: f64,
+    pub overallCheckpointPercent: f64,
+    pub nextLevelLabel: String,
     pub meets_youth_service: bool,
     pub meets_official_service: bool,
     pub meets_officialization: bool,
@@ -180,10 +182,11 @@ pub struct ProgressViewModel {
 impl From<&ProgressAssessment> for ProgressViewModel {
     fn from(a: &ProgressAssessment) -> Self {
         Self {
-            msa_percent: a.msa_phase_progress.percent,
-            method_page_percent: a.method_page_percent,
-            method_lesson_percent: a.method_lesson_percent,
-            overall_percent: a.overall_percent,
+            msaRelativePercent: a.msaRelativePercent,
+            methodRelativePercent: a.methodRelativePercent,
+            combinedPercent: a.combinedPercent,
+            overallCheckpointPercent: a.overallCheckpointPercent,
+            nextLevelLabel: a.nextLevel.as_ref().map(|l| checkpoint_label(l).to_owned()).unwrap_or_default(),
             meets_youth_service: a
                 .checkpoints
                 .iter()
@@ -228,7 +231,7 @@ impl ProgressResult {
         Self { is_unknown: false, progress: vm, unknown: UnknownLevelVm { raw: String::new(), message: String::new() } }
     }
     pub fn unknown(raw: String, message: String) -> Self {
-        Self { is_unknown: true, progress: ProgressViewModel { msa_percent: 0.0, method_page_percent: 0.0, method_lesson_percent: 0.0, overall_percent: 0.0, meets_youth_service: false, meets_official_service: false, meets_officialization: false, checkpoints: vec![] }, unknown: UnknownLevelVm { raw, message } }
+        Self { is_unknown: true, progress: ProgressViewModel { msaRelativePercent: 0.0, methodRelativePercent: 0.0, combinedPercent: 0.0, overallCheckpointPercent: 0.0, nextLevelLabel: String::new(), meets_youth_service: false, meets_official_service: false, meets_officialization: false, checkpoints: vec![] }, unknown: UnknownLevelVm { raw, message } }
     }
     pub fn is_unknown(&self) -> bool {
         self.is_unknown
@@ -237,7 +240,7 @@ impl ProgressResult {
 
 impl Default for ProgressViewModel {
     fn default() -> Self {
-        Self { msa_percent: 0.0, method_page_percent: 0.0, method_lesson_percent: 0.0, overall_percent: 0.0, meets_youth_service: false, meets_official_service: false, meets_officialization: false, checkpoints: vec![] }
+        Self { msaRelativePercent: 0.0, methodRelativePercent: 0.0, combinedPercent: 0.0, overallCheckpointPercent: 0.0, nextLevelLabel: String::new(), meets_youth_service: false, meets_official_service: false, meets_officialization: false, checkpoints: vec![] }
     }
 }
 
@@ -272,19 +275,19 @@ mod tests {
 
     #[test]
     fn given_progress_report_should_map_to_view_model() {
-        use student_management::api::domain::CategoryProgress;
-
         let report = student_management::api::domain::ProgressAssessment {
             checkpoints: vec![],
-            msa_phase_progress: CategoryProgress { current: 12.0, max: 16.0, percent: 75.0 },
-            msa_lesson_percent: 0.0,
-            method_page_percent: 57.5,
-            method_lesson_percent: 52.8,
-            overall_percent: 52.8,
+            msaRelativePercent: 75.0,
+            methodRelativePercent: 57.5,
+            combinedPercent: 66.0,
+            overallCheckpointPercent: 33.0,
+            nextLevel: None,
         };
         let vm = ProgressViewModel::from(&report);
-        assert!((vm.msa_percent - 75.0).abs() < 0.1);
-        assert!((vm.method_page_percent - 57.5).abs() < 0.1);
+        assert!((vm.msaRelativePercent - 75.0).abs() < 0.1);
+        assert!((vm.methodRelativePercent - 57.5).abs() < 0.1);
+        assert!((vm.combinedPercent - 66.0).abs() < 0.1);
+        assert!((vm.overallCheckpointPercent - 33.0).abs() < 0.1);
     }
 
     #[test]
@@ -360,7 +363,7 @@ mod tests {
 
     #[test]
     fn given_progress_view_model_with_checkpoints() {
-        use student_management::api::domain::{CategoryProgress, CheckpointStatus, ProgressAssessment};
+        use student_management::api::domain::{CheckpointStatus, ProgressAssessment};
         let checkpoints = vec![
             CheckpointStatus { level: MusicianLevel::Candidate, achieved: true, ready_to_advance: false, msa_requirement_met: true, method_requirement_met: true },
             CheckpointStatus { level: MusicianLevel::Practice, achieved: true, ready_to_advance: false, msa_requirement_met: true, method_requirement_met: true },
@@ -370,18 +373,21 @@ mod tests {
         ];
         let report = ProgressAssessment {
             checkpoints,
-            msa_phase_progress: CategoryProgress { current: 12.0, max: 16.0, percent: 75.0 },
-            msa_lesson_percent: 50.0,
-            method_page_percent: 60.0,
-            method_lesson_percent: 70.0,
-            overall_percent: 80.0,
+            msaRelativePercent: 75.0,
+            methodRelativePercent: 60.0,
+            combinedPercent: 67.5,
+            overallCheckpointPercent: 53.5,
+            nextLevel: Some(MusicianLevel::YouthService),
         };
         let vm = ProgressViewModel::from(&report);
         assert!(vm.meets_youth_service);
         assert!(!vm.meets_official_service);
         assert!(!vm.meets_officialization);
         assert_eq!(vm.checkpoints.len(), 5);
-        assert_eq!(vm.msa_percent, 75.0);
+        assert!((vm.msaRelativePercent - 75.0).abs() < 0.1);
+        assert!((vm.methodRelativePercent - 60.0).abs() < 0.1);
+        assert!((vm.combinedPercent - 67.5).abs() < 0.1);
+        assert_eq!(vm.nextLevelLabel, "Reunião de Jovens e Menores");
         let unknown = ProgressResult::unknown("X".to_owned(), "nível não reconhecido".to_owned());
         assert!(unknown.is_unknown());
         let available = ProgressResult::available(vm.clone());

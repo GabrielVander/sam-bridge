@@ -16,3 +16,6 @@ chrono = { workspace = true }
 smol = "2.0.2"
 
 [dev-dependencies]
+
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(frb_expand)'] }

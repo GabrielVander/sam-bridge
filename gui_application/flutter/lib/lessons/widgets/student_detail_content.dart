@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/view_models.dart';
 import 'package:flutter_application/widgets/checkpoint_timeline.dart';
 import 'category_lessons_view.dart';
 
 final class StudentDetailContent extends StatelessWidget {
   final StudentLessonsView view;
-  final List<CheckpointVm> checkpoints;
-  final double msaPercent;
-  final double methodLessonPercent;
+  final ProgressViewModel progress;
 
   const StudentDetailContent({
     super.key,
     required this.view,
-    required this.checkpoints,
-    required this.msaPercent,
-    required this.methodLessonPercent,
+    required this.progress,
   });
 
   @override
@@ -25,8 +22,23 @@ final class StudentDetailContent extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: CheckpointTimeline(checkpoints: checkpoints, filter: null),
+            child: CheckpointTimeline(
+              checkpoints: progress.checkpoints,
+              filter: null,
+              msaRelative: progress.msaRelativePercent,
+              methodRelative: progress.methodRelativePercent,
+              combinedPercent: progress.combinedPercent,
+              overallCheckpointPercent: progress.overallCheckpointPercent,
+            ),
           ),
+          if (progress.nextLevelLabel.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                'Próximo: ${progress.nextLevelLabel}',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ),
           TabBar(
             tabs: [
               Tab(text: 'MSA (${view.msa.length})'),
@@ -39,16 +51,16 @@ final class StudentDetailContent extends StatelessWidget {
                 CategoryLessonsView(
                   lessons: view.msa,
                   emptyMessage: 'Nenhuma lição aprovada registrada.',
-                  checkpoints: checkpoints,
+                  checkpoints: progress.checkpoints,
                   category: LessonCategory.msa,
-                  msaPhasePercent: msaPercent,
+                  msaPhasePercent: progress.msaRelativePercent,
                 ),
                 CategoryLessonsView(
                   lessons: view.method,
                   emptyMessage: 'Nenhuma lição de método registrada.',
-                  checkpoints: checkpoints,
+                  checkpoints: progress.checkpoints,
                   category: LessonCategory.method,
-                  methodLessonPercent: methodLessonPercent,
+                  methodLessonPercent: progress.methodRelativePercent,
                 ),
               ],
             ),

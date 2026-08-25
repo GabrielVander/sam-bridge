@@ -20,7 +20,7 @@ pub mod api {
         pub use crate::features::{
             student_lessons::domain::entities::{Clef, Lesson, Range, StudentLessons},
             student_lessons::domain::progress::{
-                CategoryProgress, CheckpointStatus, MethodProfile, ProgressAssessment, UnknownLevel,
+                CheckpointStatus, MethodProfile, ProgressAssessment, UnknownLevel,
                 assess as calculate_progress_fn, violin_schmoll_profile,
             },
             student_roster::domain::entities::{

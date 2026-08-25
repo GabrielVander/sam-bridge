@@ -19,7 +19,7 @@ void main() {
     final portal = FakeSamPortal()
       ..students = [
         studentItem(id: '1', name: 'ALUNA UM'),
-        studentItem(id: '2', name: 'ALUNO DOIS', position: 'Organista · Meia hora'),
+        studentItem(id: '2', name: 'ALUNO DOIS', levelName: 'HalfHour', kind: DtoPositionKind.organist),
       ];
     await tester.pumpWidget(harness(portal));
     await tester.pumpAndSettle();
