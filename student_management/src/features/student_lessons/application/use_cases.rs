@@ -1,23 +1,46 @@
-use crate::api::{application::StudentLessonsGateway, domain::StudentLessons};
+#![allow(non_snake_case)]
+use std::sync::Arc;
 
-pub struct RetrieveStudentLessonsUseCase<'a, T: StudentLessonsGateway> {
-    gateway: &'a T,
+use crate::features::student_lessons::application::dto::{LessonDto, StudentLessonsDto};
+use crate::features::student_lessons::application::gateways::StudentLessonsGateway;
+use crate::features::student_lessons::domain::entities::Lesson;
+
+pub struct RetrieveStudentLessonsUseCase {
+    gateway: Arc<dyn StudentLessonsGateway>,
 }
 
-impl<'a, T: StudentLessonsGateway> RetrieveStudentLessonsUseCase<'a, T> {
-    pub fn new(gateway: &'a T) -> Self {
+impl RetrieveStudentLessonsUseCase {
+    pub fn new(gateway: Arc<dyn StudentLessonsGateway>) -> Self {
         Self { gateway }
     }
 
-    pub async fn execute(&self, student_id: &str) -> anyhow::Result<StudentLessons> {
-        self.gateway.get_all_for_student_with_id(student_id).await
+    pub async fn execute(&self, studentId: &str) -> anyhow::Result<StudentLessonsDto> {
+        let bundle = self.gateway.get_all_for_student_with_id(studentId).await?;
+        Ok(StudentLessonsDto {
+            approved: bundle.approved.iter().map(mapLesson).collect(),
+            method: bundle.method.iter().map(mapLesson).collect(),
+        })
+    }
+}
+
+fn mapLesson(l: &Lesson) -> LessonDto {
+    LessonDto {
+        id: l.id.clone(),
+        date: l.date,
+        phase: l.phase.clone(),
+        page: l.page.clone(),
+        lesson: l.lesson.clone(),
+        clef: l.clef.clone(),
+        description: l.description.clone(),
+        instructor: l.instructor.clone(),
+        method: l.method.clone(),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::api::domain::{Clef, Lesson, Range};
+    use crate::api::domain::{Clef, Lesson, Range, StudentLessons};
     use async_trait::async_trait;
     use chrono::NaiveDate;
 
@@ -30,7 +53,7 @@ mod tests {
     impl StudentLessonsGateway for FakeStudentLessonsGateway {
         async fn get_all_for_student_with_id(
             &self,
-            _student_id: &str,
+            _studentId: &str,
         ) -> anyhow::Result<StudentLessons> {
             if self.fail {
                 anyhow::bail!("Student lessons request failed");
@@ -39,7 +62,7 @@ mod tests {
         }
     }
 
-    fn fixture_bundle() -> StudentLessons {
+    fn fixtureBundle() -> StudentLessons {
         StudentLessons {
             approved: vec![Lesson {
                 id: Some("559783".to_owned()),
@@ -62,16 +85,20 @@ mod tests {
     #[test]
     fn returns_the_bundle_from_the_gateway() {
         smol::block_on(async {
-            let bundle = fixture_bundle();
+            let bundle = fixtureBundle();
             let gateway = FakeStudentLessonsGateway {
                 bundle: bundle.clone(),
                 fail: false,
             };
-            let use_case = RetrieveStudentLessonsUseCase::new(&gateway);
+            let use_case = RetrieveStudentLessonsUseCase::new(Arc::new(gateway));
 
             let result = use_case.execute("500132").await.expect("should succeed");
 
-            assert_eq!(result, bundle);
+            assert_eq!(result.approved.len(), 1);
+            assert_eq!(result.approved[0].id, Some("559783".to_owned()));
+            assert_eq!(result.approved[0].phase, Some(Range { from: "4.5".to_owned(), to: "4.5".to_owned() }));
+            assert_eq!(result.approved[0].clef, Some(Clef::G));
+            assert_eq!(result.method.len(), 1);
         });
     }
 
@@ -82,7 +109,7 @@ mod tests {
                 bundle: StudentLessons::default(),
                 fail: true,
             };
-            let use_case = RetrieveStudentLessonsUseCase::new(&gateway);
+            let use_case = RetrieveStudentLessonsUseCase::new(Arc::new(gateway));
 
             let result = use_case.execute("500132").await;
 

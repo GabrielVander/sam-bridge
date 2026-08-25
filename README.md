@@ -35,9 +35,9 @@ adapter --> sam
 ### Workspace layout
 
 ```
-gui_application/                 # FRB crate: api surface, slices, composition root
+gui_application/                 # FRB crate: api surface, composition root
   src/api.rs                     #   session + FRB-exposed functions
-  src/slices/{authentication,roster,lessons}/
+  src/{roster,lessons}/          #   display mappers
   src/view_models.rs             #   display DTOs crossing the FFI boundary
   flutter/                       # the Flutter application (presentation only)
 student_management/              # core: vertical-slice features, zero I/O deps

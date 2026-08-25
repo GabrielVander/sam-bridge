@@ -1,6 +1,8 @@
+pub mod gateways;
 mod facade;
-mod gateways;
 mod mapping;
-mod session_opener;
+pub mod session_opener;
 
 pub use facade::{authenticate, AuthSession};
+pub use gateways::SamGateways;
+pub use session_opener::SamAuthGateway;

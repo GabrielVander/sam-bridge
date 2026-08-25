@@ -101,3 +101,48 @@ pub enum SecretaryType {
     Gem,
     Music,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn musician_level_name_and_parse() {
+        assert_eq!(MusicianLevel::Candidate.name(), "Candidate");
+        assert_eq!(MusicianLevel::parse_named("Candidate"), MusicianLevel::Candidate);
+        assert_eq!(MusicianLevel::parse_named("UnknownX"), MusicianLevel::Unknown("UnknownX".to_owned()));
+        assert!(MusicianLevel::Unknown("x".to_owned()).is_unknown());
+        assert_eq!(MusicianLevel::Candidate.unknown_raw(), None);
+        assert_eq!(MusicianLevel::Unknown("raw".to_owned()).unknown_raw(), Some("raw"));
+    }
+
+    #[test]
+    fn musician_level_rank() {
+        assert_eq!(MusicianLevel::Candidate.rank(), 0);
+        assert_eq!(MusicianLevel::Officialized.rank(), 4);
+        assert_eq!(MusicianLevel::Unknown("x".to_owned()).rank(), u8::MAX);
+        assert_eq!(MusicianLevel::Unknown("x".to_owned()).rank_opt(), None);
+        assert_eq!(MusicianLevel::Candidate.rank_opt(), Some(0));
+    }
+
+    #[test]
+    fn student_clone_and_position() {
+        let s = Student {
+            id: "1".to_owned(),
+            name: "A".to_owned(),
+            position: StudentPosition::Musician { level: MusicianLevel::Candidate },
+            location: "LOC".to_owned(),
+            region: Region::AraraquaraSaoCarlos,
+        };
+        assert_eq!(s.clone().id, "1");
+        let o = StudentPosition::Organist { level: OrganistLevel::HalfHour };
+        assert_eq!(o.clone(), o);
+        let sec = StudentPosition::Secretary { r#type: SecretaryType::Gem };
+        assert!(matches!(sec, StudentPosition::Secretary { r#type: SecretaryType::Gem }));
+        let unk = StudentPosition::Unknown("x".to_owned());
+        assert_eq!(unk.clone(), unk);
+        assert_eq!(Region::Other("x".to_owned()).clone(), Region::Other("x".to_owned()));
+        assert_eq!(OrganistLevel::YouthServiceHalfHour.clone(), OrganistLevel::YouthServiceHalfHour);
+        assert_eq!(SecretaryType::Music.clone(), SecretaryType::Music);
+    }
+}

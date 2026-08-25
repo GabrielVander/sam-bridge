@@ -1,9 +1,9 @@
 use std::sync::OnceLock;
 
 use app_bootstrap::App;
-use student_management::api::domain::{Student, StudentLessons};
+use student_management::api::application::{LoginInput, StudentLessonsDto, StudentSummaryDto};
 
-use crate::slices::{lessons as lessons_mapper, roster as roster_mapper};
+use crate::{lessons as lessons_mapper, roster as roster_mapper};
 use crate::view_models::{ProgressResult, ProgressViewModel, StudentLessonsView, StudentListItem};
 
 static APP: OnceLock<App> = OnceLock::new();
@@ -21,7 +21,13 @@ pub async fn try_restore_session() -> bool {
 }
 
 pub async fn login(base_url: String, username: String, password: String) -> anyhow::Result<()> {
-    app().login(base_url, username, password).await
+    app().login(LoginInput {
+        baseUrl: base_url,
+        username,
+        password,
+    })
+    .await
+    .map(|_| ())
 }
 
 pub fn logout() {
@@ -33,8 +39,8 @@ pub fn is_logged_in() -> bool {
 }
 
 pub async fn retrieve_students() -> anyhow::Result<Vec<StudentListItem>> {
-    let students: Vec<Student> = app().retrieve_students().await?;
-    Ok(roster_mapper::to_list_items(&students))
+    let dtos: Vec<StudentSummaryDto> = app().retrieve_students().await?;
+    Ok(roster_mapper::to_list_items(&dtos))
 }
 
 pub async fn retrieve_student_progress(
@@ -50,7 +56,7 @@ pub async fn retrieve_student_progress(
     }
     match app().calculate_progress(&student_id, &level).await {
         Ok(report) => Ok(ProgressResult::available(ProgressViewModel::from(&report))),
-        Err(e) if e.to_string().contains("nível não reconhecido") => Ok(ProgressResult::unknown(
+        Err(e) if e.to_string().contains("UnknownLevel") => Ok(ProgressResult::unknown(
             assigned_level,
             "nível não reconhecido".to_owned(),
         )),
@@ -59,8 +65,7 @@ pub async fn retrieve_student_progress(
 }
 
 pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<StudentLessonsView> {
-    let bundle: StudentLessons =
-        app().retrieve_student_lessons(&student_id).await?;
+    let bundle: StudentLessonsDto = app().retrieve_student_lessons(&student_id).await?;
     Ok(lessons_mapper::to_view(&bundle))
 }
 
@@ -71,14 +76,14 @@ mod tests {
     use app_bootstrap::AuthSession;
     use student_management::api::{
         application::{StudentLessonsGateway, StudentsRetrievalGateway},
-        domain::{Lesson as DomainLesson, Region, StudentLessons},
+        domain::{Lesson as DomainLesson, Region, Student, StudentLessons},
     };
 
     fn test_lock() -> std::sync::MutexGuard<'static, ()> {
         static LOCK: OnceLock<std::sync::Mutex<()>> = OnceLock::new();
         LOCK.get_or_init(|| std::sync::Mutex::new(()))
             .lock()
-            .expect("Test mutex is never poisoned")
+            .unwrap_or_else(|e| e.into_inner())
     }
 
     #[derive(Clone, Default)]
@@ -198,5 +203,43 @@ mod tests {
             assert!(result.is_err());
             assert!(!is_logged_in());
         });
+    }
+
+    #[test]
+    fn retrieve_student_progress_known_and_unknown() {
+        let _guard = test_lock();
+        let app = app();
+        app.seed_session(AuthSession::from_gateways(
+            Arc::new(StubRoster { students: vec![] }),
+            Arc::new(StubLessons { approved: vec![] }),
+        ));
+        smol::block_on(async {
+            let known = retrieve_student_progress("7".to_owned(), "Candidate".to_owned()).await.expect("known should succeed");
+            assert!(!known.is_unknown);
+            assert!(!known.unknown.raw.contains("Candidate"));
+            let unknown = retrieve_student_progress("7".to_owned(), "UnknownLevelXYZ".to_owned()).await.expect("unknown should return ProgressResult not err");
+            assert!(unknown.is_unknown);
+            assert_eq!(unknown.unknown.raw, "UnknownLevelXYZ");
+            let via_calculate_error = retrieve_student_progress("7".to_owned(), "Candidate".to_owned()).await;
+            assert!(via_calculate_error.is_ok());
+        });
+        logout();
+    }
+
+    #[test]
+    fn retrieve_students_empty_and_progress_default() {
+        let _guard = test_lock();
+        let app = app();
+        app.seed_session(AuthSession::from_gateways(
+            Arc::new(StubRoster { students: vec![] }),
+            Arc::new(StubLessons { approved: vec![] }),
+        ));
+        smol::block_on(async {
+            let students = retrieve_students().await.expect("students");
+            assert!(students.is_empty());
+            let progress = retrieve_student_progress("7".to_owned(), "Candidate".to_owned()).await.expect("progress");
+            assert!(!progress.is_unknown);
+        });
+        logout();
     }
 }

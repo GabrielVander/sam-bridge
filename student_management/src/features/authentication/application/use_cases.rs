@@ -1,16 +1,21 @@
-use crate::api::application::AuthGateway;
+#![allow(non_snake_case)]
+use std::sync::Arc;
 
-pub struct LoginUseCase<'a, T: AuthGateway> {
-    gateway: &'a T,
+use crate::features::authentication::application::dto::{LoginInput, LoginOutput};
+use crate::features::authentication::application::gateways::AuthGateway;
+
+pub struct LoginUseCase {
+    gateway: Arc<dyn AuthGateway>,
 }
 
-impl<'a, T: AuthGateway> LoginUseCase<'a, T> {
-    pub fn new(gateway: &'a T) -> Self {
+impl LoginUseCase {
+    pub fn new(gateway: Arc<dyn AuthGateway>) -> Self {
         Self { gateway }
     }
 
-    pub async fn execute(&self, username: String, password: String) -> anyhow::Result<()> {
-        self.gateway.login(username, password).await
+    pub async fn execute(&self, input: LoginInput) -> anyhow::Result<LoginOutput> {
+        self.gateway.login(input.username, input.password).await?;
+        Ok(LoginOutput)
     }
 }
 
@@ -40,11 +45,15 @@ mod tests {
     #[test]
     fn forwards_credentials_and_succeeds() {
         smol::block_on(async {
-            let gateway = FakeAuthGateway::default();
-            let use_case = LoginUseCase::new(&gateway);
+            let gateway = Arc::new(FakeAuthGateway::default());
+            let use_case = LoginUseCase::new(gateway.clone());
 
             use_case
-                .execute("user".to_owned(), "pass".to_owned())
+                .execute(LoginInput {
+                    baseUrl: String::new(),
+                    username: "user".to_owned(),
+                    password: "pass".to_owned(),
+                })
                 .await
                 .expect("should succeed");
 
@@ -58,13 +67,19 @@ mod tests {
     #[test]
     fn propagates_gateway_errors() {
         smol::block_on(async {
-            let gateway = FakeAuthGateway {
+            let gateway = Arc::new(FakeAuthGateway {
                 fail: true,
                 ..Default::default()
-            };
-            let use_case = LoginUseCase::new(&gateway);
+            });
+            let use_case = LoginUseCase::new(gateway);
 
-            let result = use_case.execute("u".to_owned(), "p".to_owned()).await;
+            let result = use_case
+                .execute(LoginInput {
+                    baseUrl: String::new(),
+                    username: "u".to_owned(),
+                    password: "p".to_owned(),
+                })
+                .await;
 
             assert!(result.is_err());
             assert!(result.unwrap_err().to_string().contains("Invalid credentials"));

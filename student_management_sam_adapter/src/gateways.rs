@@ -15,7 +15,7 @@ pub struct SamGateways {
 }
 
 impl SamGateways {
-    pub(crate) fn from_client(client: &SamClient) -> Self {
+    pub fn from_client(client: &SamClient) -> Self {
         Self {
             reader: Arc::new(client.clone()),
         }

@@ -1,7 +1,7 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/slices/authentication/auth_presenter.dart';
-import 'package:flutter_application/slices/authentication/login_screen.dart';
+import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/authentication/login_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,8 +1,8 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/slices/lessons/lessons_presenter.dart';
-import 'package:flutter_application/slices/roster/students_presenter.dart';
-import 'package:flutter_application/slices/lessons/student_screen.dart';
+import 'package:flutter_application/lessons/lessons_presenter.dart';
+import 'package:flutter_application/roster/students_presenter.dart';
+import 'package:flutter_application/lessons/student_screen.dart';
 import 'package:flutter_application/view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,4 +1,4 @@
-import 'package:flutter_application/slices/lessons/lessons_presenter.dart';
+import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_sam_portal.dart';

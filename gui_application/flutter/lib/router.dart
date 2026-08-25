@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/slices/authentication/auth_presenter.dart';
-import 'package:flutter_application/slices/authentication/login_screen.dart';
-import 'package:flutter_application/slices/lessons/student_screen.dart';
-import 'package:flutter_application/slices/roster/students_screen.dart';
+import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/authentication/login_screen.dart';
+import 'package:flutter_application/lessons/student_screen.dart';
+import 'package:flutter_application/roster/students_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class PresenterRefreshListenable extends ChangeNotifier {

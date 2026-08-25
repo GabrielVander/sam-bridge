@@ -89,6 +89,10 @@ impl SamTransport {
     fn student_lessons_endpoint(&self, student_id: &str) -> String {
         format!("{}/licoes/index/{student_id}", self.base_url)
     }
+
+    pub fn base_url(&self) -> &str {
+        &self.base_url
+    }
 }
 
 fn normalize_base_url(base_url: String) -> String {

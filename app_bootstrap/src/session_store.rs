@@ -82,10 +82,8 @@ impl FileSessionStore {
         std::fs::write(&tmp, &key).context("Failed to write key file")?;
         #[cfg(unix)]
         {
-            let _ = std::fs::set_permissions(
-                &tmp,
-                std::os::unix::fs::PermissionsExt::from_mode(0o600),
-            );
+            let _ =
+                std::fs::set_permissions(&tmp, std::os::unix::fs::PermissionsExt::from_mode(0o600));
         }
         std::fs::rename(&tmp, &self.key_path).context("Failed to persist key file")?;
         #[cfg(unix)]
@@ -118,27 +116,24 @@ impl FileSessionStore {
         cocoon.unwrap(ciphertext).ok()
     }
 
-
-
     fn atomic_write(&self, path: &Path, data: &[u8]) -> Result<()> {
         let dir = path.parent().unwrap_or(Path::new("."));
         let _ = std::fs::create_dir_all(dir);
-        let tmp = dir.join(format!(".{}.tmp", path.file_name().unwrap_or_default().to_string_lossy()));
+        let tmp = dir.join(format!(
+            ".{}.tmp",
+            path.file_name().unwrap_or_default().to_string_lossy()
+        ));
         std::fs::write(&tmp, data).context("Failed to write session file")?;
         #[cfg(unix)]
         {
-            let _ = std::fs::set_permissions(
-                &tmp,
-                std::os::unix::fs::PermissionsExt::from_mode(0o600),
-            );
+            let _ =
+                std::fs::set_permissions(&tmp, std::os::unix::fs::PermissionsExt::from_mode(0o600));
         }
         std::fs::rename(&tmp, path).context("Failed to persist session file")?;
         #[cfg(unix)]
         {
-            let _ = std::fs::set_permissions(
-                path,
-                std::os::unix::fs::PermissionsExt::from_mode(0o600),
-            );
+            let _ =
+                std::fs::set_permissions(path, std::os::unix::fs::PermissionsExt::from_mode(0o600));
         }
         Ok(())
     }
@@ -267,5 +262,51 @@ mod tests {
         assert_eq!(meta.permissions().mode() & 0o777, 0o600);
         let key_meta = std::fs::metadata(&store.key_path).expect("key meta");
         assert_eq!(key_meta.permissions().mode() & 0o777, 0o600);
+    }
+
+    #[test]
+    fn load_or_create_key_reuses_existing() {
+        let (store, _dir) = temp_store();
+        store.save(&credentials()).expect("save");
+        let key1 = std::fs::read(&store.key_path).expect("key1");
+        store.save(&credentials()).expect("save again");
+        let key2 = std::fs::read(&store.key_path).expect("key2");
+        assert_eq!(key1, key2);
+        assert_eq!(store.load().expect("load").username, "test_user");
+    }
+
+    #[test]
+    fn truncated_key_is_regenerated() {
+        let (store, _dir) = temp_store();
+        std::fs::write(&store.key_path, b"short").expect("write short key");
+        store.save(&credentials()).expect("save should regenerate key");
+        let key = std::fs::read(&store.key_path).expect("key");
+        assert_eq!(key.len(), 32);
+        assert!(store.load().is_some());
+    }
+
+    #[test]
+    fn decrypt_with_wrong_key_returns_none() {
+        let dir1 = tempfile::tempdir().expect("dir1");
+        let store1 = FileSessionStore::with_dir(dir1.path().to_path_buf());
+        store1.save(&credentials()).expect("save1");
+        let data = std::fs::read(&store1.session_path).expect("data");
+        let dir2 = tempfile::tempdir().expect("dir2");
+        let store2 = FileSessionStore::with_dir(dir2.path().to_path_buf());
+        store2.save(&credentials()).expect("save2 to create different key");
+        std::fs::write(&store2.session_path, &data).expect("copy data with wrong key");
+        assert!(store2.load().is_none());
+    }
+
+    #[test]
+    fn clear_is_idempotent() {
+        let (store, _dir) = temp_store();
+        store.clear();
+        store.clear();
+        assert!(store.load().is_none());
+        store.save(&credentials()).expect("save");
+        store.clear();
+        store.clear();
+        assert!(store.load().is_none());
     }
 }

@@ -1,4 +1,4 @@
-import 'package:flutter_application/slices/authentication/auth_presenter.dart';
+import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_sam_portal.dart';

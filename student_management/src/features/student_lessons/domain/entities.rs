@@ -66,3 +66,48 @@ pub enum Clef {
     C,
     F,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn range_new_and_single() {
+        let r = Range::new("a".to_owned(), "b".to_owned());
+        assert_eq!(r.from, "a");
+        assert_eq!(r.to, "b");
+        let s = Range::single("x".to_owned());
+        assert_eq!(s.from, "x");
+        assert_eq!(s.to, "x");
+        let n = Range::new(3, 5);
+        assert_eq!(n.from, 3);
+    }
+
+    #[test]
+    fn range_try_new_inverted() {
+        assert!(Range::try_new(1, 2).is_ok());
+        assert_eq!(Range::try_new(5, 3).unwrap_err(), "inverted range 5 > 3");
+        assert_eq!(Range::try_new("b".to_owned(), "a".to_owned()).unwrap_err(), "inverted range b > a");
+    }
+
+    #[test]
+    fn range_try_from_str() {
+        let r: Range<i32> = Range::try_from_str("3", "5").unwrap();
+        assert_eq!(r.from, 3);
+        assert_eq!(r.to, 5);
+        let r2: Range<i32> = Range::try_from_str("7", "7").unwrap();
+        assert_eq!(r2.from, 7);
+        assert!(Range::<i32>::try_from_str("a", "b").is_err());
+        assert!(Range::<i32>::try_from_str("5", "3").is_err());
+    }
+
+    #[test]
+    fn lesson_default_and_clone() {
+        let l = Lesson::default();
+        assert!(l.id.is_none());
+        let sl = StudentLessons::default();
+        assert!(sl.approved.is_empty());
+        assert_eq!(l.clone(), Lesson::default());
+        assert_eq!(Clef::G.clone(), Clef::G);
+    }
+}

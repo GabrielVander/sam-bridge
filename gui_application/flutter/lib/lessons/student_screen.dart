@@ -1,15 +1,15 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/portal/sam_portal.dart';
-import 'package:flutter_application/slices/lessons/lessons_presenter.dart';
-import 'package:flutter_application/slices/lessons/widgets/back_bar.dart';
-import 'package:flutter_application/slices/lessons/widgets/category_lessons_view.dart';
-import 'package:flutter_application/slices/lessons/widgets/student_detail_content.dart';
-import 'package:flutter_application/slices/lessons/widgets/unknown_level_banner.dart';
-import 'package:flutter_application/slices/roster/students_presenter.dart';
+import 'package:flutter_application/lessons/lessons_presenter.dart';
+import 'package:flutter_application/lessons/widgets/back_bar.dart';
+import 'package:flutter_application/lessons/widgets/category_lessons_view.dart';
+import 'package:flutter_application/lessons/widgets/student_detail_content.dart';
+import 'package:flutter_application/lessons/widgets/unknown_level_banner.dart';
+import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/view_models.dart';
 
-export 'package:flutter_application/slices/lessons/widgets/category_lessons_view.dart' show LessonCategory;
+export 'package:flutter_application/lessons/widgets/category_lessons_view.dart' show LessonCategory;
 export 'package:flutter_application/widgets/checkpoint_timeline.dart' show CheckpointTimeline;
 export 'package:flutter_application/widgets/info_chip.dart' show InfoChip;
 export 'package:flutter_application/widgets/progress_bar.dart' show ProgressBar;

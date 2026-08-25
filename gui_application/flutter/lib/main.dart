@@ -4,9 +4,9 @@ import 'package:flutter_application/api.dart' as api;
 import 'package:flutter_application/frb_generated.dart';
 import 'package:flutter_application/portal/sam_portal.dart';
 import 'package:flutter_application/router.dart';
-import 'package:flutter_application/slices/authentication/auth_presenter.dart';
-import 'package:flutter_application/slices/lessons/lessons_presenter.dart';
-import 'package:flutter_application/slices/roster/students_presenter.dart';
+import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/lessons/lessons_presenter.dart';
+import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 Future<void> main() async {

@@ -3,7 +3,7 @@ use crate::features::student_roster::domain::entities::MusicianLevel;
 use thiserror::Error;
 
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
-#[error("nível não reconhecido: {0}")]
+#[error("UnknownLevel")]
 pub struct UnknownLevel(pub String);
 
 #[derive(Debug, Clone, PartialEq)]
@@ -13,16 +13,15 @@ pub enum Instrument {
 
 pub struct LevelDefinition {
     pub level: MusicianLevel,
-    pub label: &'static str,
     pub msa_phase: Option<f64>,
 }
 
 pub const LEVEL_PATH: &[LevelDefinition] = &[
-    LevelDefinition { level: MusicianLevel::Candidate, label: "Candidato", msa_phase: None },
-    LevelDefinition { level: MusicianLevel::Practice, label: "Ensaio", msa_phase: None },
-    LevelDefinition { level: MusicianLevel::YouthService, label: "Reunião de Jovens e Menores", msa_phase: Some(12.0) },
-    LevelDefinition { level: MusicianLevel::OfficialService, label: "Culto Oficial", msa_phase: Some(16.0) },
-    LevelDefinition { level: MusicianLevel::Officialized, label: "Oficialização", msa_phase: Some(16.0) },
+    LevelDefinition { level: MusicianLevel::Candidate, msa_phase: None },
+    LevelDefinition { level: MusicianLevel::Practice, msa_phase: None },
+    LevelDefinition { level: MusicianLevel::YouthService, msa_phase: Some(12.0) },
+    LevelDefinition { level: MusicianLevel::OfficialService, msa_phase: Some(16.0) },
+    LevelDefinition { level: MusicianLevel::Officialized, msa_phase: Some(16.0) },
 ];
 
 #[derive(Debug, Clone, PartialEq)]
@@ -53,7 +52,6 @@ pub fn violin_schmoll_profile() -> MethodProfile {
 #[derive(Debug, Clone, PartialEq)]
 pub struct CheckpointStatus {
     pub level: MusicianLevel,
-    pub label: &'static str,
     pub achieved: bool,
     pub ready_to_advance: bool,
     pub msa_requirement_met: bool,
@@ -105,7 +103,6 @@ pub fn assess(
 
             CheckpointStatus {
                 level: def.level.clone(),
-                label: def.label,
                 achieved,
                 ready_to_advance: !achieved && has_measurable_requirement && requirement_met,
                 msa_requirement_met: msa_met,
@@ -324,7 +321,7 @@ mod tests {
         )
         .unwrap_err();
         assert_eq!(err.0, "EXÓTICO");
-        assert!(err.to_string().contains("nível não reconhecido"));
+        assert!(err.to_string().contains("UnknownLevel"));
     }
 
     #[test]

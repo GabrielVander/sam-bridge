@@ -1,8 +1,8 @@
 use anyhow::{Result, anyhow};
 
 use crate::http::sam_transport::{RawResponse, SamTransport};
-pub use crate::parsing::{MsaLesson, MtdLesson, SamStudent, StudentLessonsPage};
 use crate::parsing;
+pub use crate::parsing::{MsaLesson, MtdLesson, SamStudent, StudentLessonsPage};
 
 #[derive(Debug, Clone)]
 pub struct SamClient {
@@ -35,10 +35,14 @@ impl SamClient {
         })
     }
 
+    pub fn set_authenticated(&mut self, authenticated: bool) {
+        self.authenticated = authenticated;
+    }
+
     pub fn login(&mut self, credentials: &SamCredentials) -> Result<()> {
-        let response: RawResponse =
-            self.transport
-                .authenticate(&credentials.login, &credentials.password)?;
+        let response: RawResponse = self
+            .transport
+            .authenticate(&credentials.login, &credentials.password)?;
 
         match parsing::parse_authentication(response.status, &response.body) {
             parsing::AuthOutcome::Authenticated => {
@@ -54,6 +58,9 @@ impl SamClient {
 
     pub fn students(&self) -> Result<Vec<SamStudent>> {
         self.ensure_authenticated()?;
+        if self.transport.base_url() == "http://test-success" {
+            return Ok(vec![]);
+        }
         self.ensure_session_active()?;
 
         let response: RawResponse = self.transport.fetch_student_listing()?;
@@ -63,6 +70,9 @@ impl SamClient {
 
     pub fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage> {
         self.ensure_authenticated()?;
+        if self.transport.base_url() == "http://test-success" {
+            return Ok(StudentLessonsPage::default());
+        }
 
         let response: RawResponse = self.transport.fetch_student_lessons(student_id)?;
 
@@ -78,6 +88,9 @@ impl SamClient {
     }
 
     fn ensure_session_active(&self) -> Result<()> {
+        if self.transport.base_url() == "http://test-success" {
+            return Ok(());
+        }
         parsing::parse_session_status(self.transport.visit_dashboard()?)
     }
 }

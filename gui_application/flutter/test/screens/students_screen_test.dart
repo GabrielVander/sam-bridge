@@ -1,7 +1,7 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/slices/roster/students_presenter.dart';
-import 'package:flutter_application/slices/roster/students_screen.dart';
+import 'package:flutter_application/roster/students_presenter.dart';
+import 'package:flutter_application/roster/students_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_sam_portal.dart';

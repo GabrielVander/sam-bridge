@@ -1,4 +1,5 @@
 mod frb_generated;
 pub mod api;
-pub mod slices;
+pub mod lessons;
+pub mod roster;
 pub mod view_models;
