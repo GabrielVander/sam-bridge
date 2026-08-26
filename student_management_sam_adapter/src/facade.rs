@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use student_management::api::{
-    application::{StudentLessonsGateway, StudentsRetrievalGateway},
-};
+use student_management::application::gateways::{StudentLessonsGateway, StudentsRetrievalGateway};
 
 use crate::gateways::SamGateways;
 use crate::session_opener::NetworkSessionOpener;
@@ -35,9 +33,9 @@ pub async fn authenticate(base_url: &str, username: &str, password: &str) -> Res
 #[cfg(test)]
 mod tests {
     use super::*;
-    use student_management::api::domain::{Student, StudentLessons};
     use crate::session_opener::SessionOpener;
     use sam::client::SamClient;
+    use student_management::domain::entities::{Region, Student, StudentLessons, StudentPosition};
 
     #[derive(Clone, Default)]
     struct StubRoster;
@@ -47,9 +45,9 @@ mod tests {
             Ok(vec![Student {
                 id: "1".to_owned(),
                 name: "ALUNO".to_owned(),
-                position: student_management::api::domain::StudentPosition::Unknown(String::new()),
+                position: StudentPosition::Unknown(String::new()),
                 location: String::new(),
-                region: student_management::api::domain::Region::Other(String::new()),
+                region: Region::Other(String::new()),
             }])
         }
     }
@@ -92,11 +90,11 @@ mod tests {
     #[test]
     fn authenticate_delegates_to_the_session_opener() {
         smol::block_on(async {
-            let result = crate::gateways::SamGateways::open_with(FailingOpener, "b", "u", "p").await;
+            let result =
+                crate::gateways::SamGateways::open_with(FailingOpener, "b", "u", "p").await;
 
             let err = result.err().expect("expected opener failure");
             assert!(err.to_string().contains("Login request failed"));
         });
     }
-
 }

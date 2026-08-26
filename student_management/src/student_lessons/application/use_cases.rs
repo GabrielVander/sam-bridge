@@ -1,4 +1,6 @@
-use crate::api::{application::StudentLessonsGateway, domain::StudentLessons};
+use crate::student_lessons::{
+    application::gateways::StudentLessonsGateway, domain::entities::StudentLessons,
+};
 
 pub struct RetrieveStudentLessonsUseCase<'a, T: StudentLessonsGateway> {
     gateway: &'a T,
@@ -16,8 +18,9 @@ impl<'a, T: StudentLessonsGateway> RetrieveStudentLessonsUseCase<'a, T> {
 
 #[cfg(test)]
 mod tests {
+    use crate::student_lessons::domain::entities::{Clef, Lesson, Range};
+
     use super::*;
-    use crate::api::domain::{Clef, Lesson, Range, StudentLessons};
     use async_trait::async_trait;
     use chrono::NaiveDate;
 

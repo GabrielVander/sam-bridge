@@ -1,7 +1,7 @@
 use std::sync::OnceLock;
 
 use regex::Regex;
-use student_management::api::domain::{
+use student_management::domain::entities::{
     MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
 };
 
@@ -164,7 +164,10 @@ mod tests {
     #[test]
     fn given_unknown_role_or_level_should_preserve_raw_value() {
         let unknown_role = map(&dto_with(|d| d.role = "REGENTE".to_owned())).unwrap();
-        assert_eq!(unknown_role.position, StudentPosition::Unknown("REGENTE".to_owned()));
+        assert_eq!(
+            unknown_role.position,
+            StudentPosition::Unknown("REGENTE".to_owned())
+        );
 
         let unknown_level = map(&dto_with(|d| d.level = "AVANÇADO".to_owned())).unwrap();
         assert_eq!(
@@ -203,10 +206,16 @@ mod tests {
             ("ENSAIO", OrganistLevel::Practice),
             ("RJM", OrganistLevel::YouthService),
             ("MEIA HORA", OrganistLevel::HalfHour),
-            ("RJM / CULTO OFICIAL", OrganistLevel::YouthServiceOfficialService),
+            (
+                "RJM / CULTO OFICIAL",
+                OrganistLevel::YouthServiceOfficialService,
+            ),
             ("RJM / ENSAIO", OrganistLevel::YouthServicePractice),
             ("RJM / MEIA HORA", OrganistLevel::YouthServiceHalfHour),
-            ("RJM / OFICIALIZADO(A)", OrganistLevel::YouthServiceOfficialized),
+            (
+                "RJM / OFICIALIZADO(A)",
+                OrganistLevel::YouthServiceOfficialized,
+            ),
             ("EXÓTICO", OrganistLevel::Unknown("EXÓTICO".to_owned())),
         ] {
             let student = map(&dto_with(|d| {
@@ -245,8 +254,10 @@ mod tests {
 
     #[test]
     fn given_unrecognized_region_should_other_the_region_part() {
-        let student = map(&dto_with(|d| d.location = "BAIRRO ALTO <span></span> | SP-CAMPINAS".to_owned()))
-            .expect("Mapping should succeed");
+        let student = map(&dto_with(|d| {
+            d.location = "BAIRRO ALTO <span></span> | SP-CAMPINAS".to_owned()
+        }))
+        .expect("Mapping should succeed");
 
         assert_eq!(student.location, "BAIRRO ALTO");
         assert_eq!(student.region, Region::Other("SP-CAMPINAS".to_owned()));
@@ -254,9 +265,10 @@ mod tests {
 
     #[test]
     fn given_itirapina_region_should_map() {
-        let student =
-            map(&dto_with(|d| d.location = "CENTRO | BR-SP-ARARAQUARA-ITIRAPINA".to_owned()))
-                .expect("Mapping should succeed");
+        let student = map(&dto_with(|d| {
+            d.location = "CENTRO | BR-SP-ARARAQUARA-ITIRAPINA".to_owned()
+        }))
+        .expect("Mapping should succeed");
 
         assert_eq!(student.region, Region::AraraquaraItirapina);
     }

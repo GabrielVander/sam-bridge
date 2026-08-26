@@ -1,8 +1,6 @@
-#![allow(non_snake_case)]
 use std::sync::Arc;
 
-use crate::features::authentication::application::dto::{LoginInput, LoginOutput};
-use crate::features::authentication::application::gateways::AuthGateway;
+use crate::authentication::application::gateways::AuthGateway;
 
 pub struct LoginUseCase {
     gateway: Arc<dyn AuthGateway>,
@@ -18,6 +16,16 @@ impl LoginUseCase {
         Ok(LoginOutput)
     }
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct LoginInput {
+    pub base_url: String,
+    pub username: String,
+    pub password: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct LoginOutput;
 
 #[cfg(test)]
 mod tests {
@@ -50,7 +58,7 @@ mod tests {
 
             use_case
                 .execute(LoginInput {
-                    baseUrl: String::new(),
+                    base_url: String::new(),
                     username: "user".to_owned(),
                     password: "pass".to_owned(),
                 })
@@ -75,14 +83,19 @@ mod tests {
 
             let result = use_case
                 .execute(LoginInput {
-                    baseUrl: String::new(),
+                    base_url: String::new(),
                     username: "u".to_owned(),
                     password: "p".to_owned(),
                 })
                 .await;
 
             assert!(result.is_err());
-            assert!(result.unwrap_err().to_string().contains("Invalid credentials"));
+            assert!(
+                result
+                    .unwrap_err()
+                    .to_string()
+                    .contains("Invalid credentials")
+            );
         });
     }
 }

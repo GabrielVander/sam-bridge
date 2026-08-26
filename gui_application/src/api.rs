@@ -1,11 +1,15 @@
 use std::sync::OnceLock;
 
 use app_bootstrap::App;
-use student_management::api::application::LoginInput;
-use student_management::api::domain::{Clef, Region, SecretaryType, StudentPosition};
+use student_management::{
+    application::use_cases::LoginInput,
+    domain::entities::{
+        Clef, Lesson, MusicianLevel, OrganistLevel, Region, SecretaryType, StudentPosition,
+    },
+};
 
-pub use crate::dto::{LessonDto, RangeDto, StudentLessonsDto, StudentSummaryDto};
 use crate::dto::{DtoPosition, DtoRegion};
+pub use crate::dto::{LessonDto, RangeDto, StudentLessonsDto, StudentSummaryDto};
 use crate::view_models::{ProgressResult, ProgressViewModel};
 
 static APP: OnceLock<App> = OnceLock::new();
@@ -23,13 +27,14 @@ pub async fn try_restore_session() -> bool {
 }
 
 pub async fn login(base_url: String, username: String, password: String) -> anyhow::Result<()> {
-    app().login(LoginInput {
-        baseUrl: base_url,
-        username,
-        password,
-    })
-    .await
-    .map(|_| ())
+    app()
+        .login(LoginInput {
+            base_url,
+            username,
+            password,
+        })
+        .await
+        .map(|_| ())
 }
 
 pub fn logout() {
@@ -56,15 +61,22 @@ pub async fn retrieve_students() -> anyhow::Result<Vec<StudentSummaryDto>> {
 
 fn map_position(p: StudentPosition) -> DtoPosition {
     match p {
-        StudentPosition::Musician { level } => DtoPosition::Musician { levelName: level.name() },
-        StudentPosition::Organist { level } => DtoPosition::Organist { levelName: organist_name(level) },
-        StudentPosition::Secretary { r#type } => DtoPosition::Secretary { typeName: secretary_name(r#type) },
+        StudentPosition::Musician { level } => DtoPosition::Musician {
+            levelName: level.name(),
+        },
+        StudentPosition::Organist { level } => DtoPosition::Organist {
+            levelName: organist_name(level),
+        },
+        StudentPosition::Secretary { r#type } => DtoPosition::Secretary {
+            typeName: secretary_name(r#type),
+        },
         StudentPosition::Unknown(raw) => DtoPosition::Unknown { raw },
     }
 }
 
-fn organist_name(level: student_management::api::domain::OrganistLevel) -> String {
-    use student_management::api::domain::OrganistLevel as O;
+fn organist_name(level: OrganistLevel) -> String {
+    use student_management::domain::entities::OrganistLevel as O;
+
     #[allow(deprecated)]
     match level {
         O::Candidate => "Candidate".to_owned(),
@@ -99,7 +111,7 @@ pub async fn retrieve_student_progress(
     student_id: String,
     assigned_level: String,
 ) -> anyhow::Result<ProgressResult> {
-    let level = student_management::api::domain::MusicianLevel::parse_named(&assigned_level);
+    let level = MusicianLevel::parse_named(&assigned_level);
     if level.is_unknown() {
         return Ok(ProgressResult::unknown(
             level.unknown_raw().unwrap_or_default().to_owned(),
@@ -124,13 +136,22 @@ pub async fn retrieve_student_lessons(student_id: String) -> anyhow::Result<Stud
     })
 }
 
-fn map_lesson(l: student_management::api::domain::Lesson) -> LessonDto {
+fn map_lesson(l: Lesson) -> LessonDto {
     LessonDto {
         id: l.id.unwrap_or_default(),
         date: l.date.map(|d| d.to_string()).unwrap_or_default(),
-        phase: l.phase.map(|r| RangeDto { from: r.from, to: r.to }),
-        page: l.page.map(|r| RangeDto { from: r.from, to: r.to }),
-        lesson: l.lesson.map(|r| RangeDto { from: r.from, to: r.to }),
+        phase: l.phase.map(|r| RangeDto {
+            from: r.from,
+            to: r.to,
+        }),
+        page: l.page.map(|r| RangeDto {
+            from: r.from,
+            to: r.to,
+        }),
+        lesson: l.lesson.map(|r| RangeDto {
+            from: r.from,
+            to: r.to,
+        }),
         clef: l.clef.map(|c| match c {
             Clef::G => "G".to_owned(),
             Clef::C => "C".to_owned(),
@@ -144,16 +165,21 @@ fn map_lesson(l: student_management::api::domain::Lesson) -> LessonDto {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::sync::Arc;
     use app_bootstrap::AuthSession;
-    use student_management::api::{
-        application::{StudentLessonsGateway, StudentsRetrievalGateway},
-        domain::{Lesson as DomainLesson, Region, Student, StudentLessons},
+    use std::sync::{Arc, OnceLock};
+    use student_management::{
+        application::gateways::{StudentLessonsGateway, StudentsRetrievalGateway},
+        domain::entities::{Lesson, Region, Student, StudentLessons, StudentPosition},
+    };
+
+    use crate::api::{
+        app, has_saved_credentials, is_logged_in, login, logout, retrieve_student_lessons,
+        retrieve_student_progress, retrieve_students, try_restore_session,
     };
 
     fn test_lock() -> std::sync::MutexGuard<'static, ()> {
         static LOCK: OnceLock<std::sync::Mutex<()>> = OnceLock::new();
+
         LOCK.get_or_init(|| std::sync::Mutex::new(()))
             .lock()
             .unwrap_or_else(|e| e.into_inner())
@@ -172,14 +198,11 @@ mod tests {
 
     #[derive(Clone, Default)]
     struct StubLessons {
-        approved: Vec<DomainLesson>,
+        approved: Vec<Lesson>,
     }
     #[async_trait::async_trait]
     impl StudentLessonsGateway for StubLessons {
-        async fn get_all_for_student_with_id(
-            &self,
-            _id: &str,
-        ) -> anyhow::Result<StudentLessons> {
+        async fn get_all_for_student_with_id(&self, _id: &str) -> anyhow::Result<StudentLessons> {
             Ok(StudentLessons {
                 approved: self.approved.clone(),
                 method: vec![],
@@ -187,8 +210,8 @@ mod tests {
         }
     }
 
-    fn dated_lesson(id: &str, y: i32, m: u32, d: u32) -> DomainLesson {
-        DomainLesson {
+    fn dated_lesson(id: &str, y: i32, m: u32, d: u32) -> Lesson {
+        Lesson {
             id: Some(id.to_owned()),
             date: chrono::NaiveDate::from_ymd_opt(y, m, d),
             ..Default::default()
@@ -215,9 +238,7 @@ mod tests {
                 students: vec![Student {
                     id: "7".to_owned(),
                     name: "ALUNA SETE".to_owned(),
-                    position: student_management::api::domain::StudentPosition::Unknown(
-                String::new(),
-            ),
+                    position: StudentPosition::Unknown(String::new()),
                     location: String::new(),
                     region: Region::Other(String::new()),
                 }],
@@ -236,10 +257,16 @@ mod tests {
             let students = retrieve_students().await.expect("students");
             assert_eq!(students[0].name, "ALUNA SETE");
 
-            let dto = retrieve_student_lessons("7".to_owned()).await.expect("lessons");
+            let dto = retrieve_student_lessons("7".to_owned())
+                .await
+                .expect("lessons");
             let mut ids: Vec<&str> = dto.approved.iter().map(|i| i.id.as_str()).collect();
             ids.sort();
-            assert_eq!(ids, vec!["11", "12"], "all lessons present; ordering owned by Dart presenter");
+            assert_eq!(
+                ids,
+                vec!["11", "12"],
+                "all lessons present; ordering owned by Dart presenter"
+            );
         });
 
         logout();
@@ -271,8 +298,12 @@ mod tests {
         logout();
 
         smol::block_on(async {
-            let result =
-                login("http://127.0.0.1:1".to_owned(), "u".to_owned(), "p".to_owned()).await;
+            let result = login(
+                "http://127.0.0.1:1".to_owned(),
+                "u".to_owned(),
+                "p".to_owned(),
+            )
+            .await;
 
             assert!(result.is_err());
             assert!(!is_logged_in());
@@ -288,13 +319,18 @@ mod tests {
             Arc::new(StubLessons { approved: vec![] }),
         ));
         smol::block_on(async {
-            let known = retrieve_student_progress("7".to_owned(), "Candidate".to_owned()).await.expect("known should succeed");
+            let known = retrieve_student_progress("7".to_owned(), "Candidate".to_owned())
+                .await
+                .expect("known should succeed");
             assert!(!known.is_unknown);
             assert!(!known.unknown.raw.contains("Candidate"));
-            let unknown = retrieve_student_progress("7".to_owned(), "UnknownLevelXYZ".to_owned()).await.expect("unknown should return ProgressResult not err");
+            let unknown = retrieve_student_progress("7".to_owned(), "UnknownLevelXYZ".to_owned())
+                .await
+                .expect("unknown should return ProgressResult not err");
             assert!(unknown.is_unknown);
             assert_eq!(unknown.unknown.raw, "UnknownLevelXYZ");
-            let via_calculate_error = retrieve_student_progress("7".to_owned(), "Candidate".to_owned()).await;
+            let via_calculate_error =
+                retrieve_student_progress("7".to_owned(), "Candidate".to_owned()).await;
             assert!(via_calculate_error.is_ok());
         });
         logout();
@@ -311,7 +347,9 @@ mod tests {
         smol::block_on(async {
             let students = retrieve_students().await.expect("students");
             assert!(students.is_empty());
-            let progress = retrieve_student_progress("7".to_owned(), "Candidate".to_owned()).await.expect("progress");
+            let progress = retrieve_student_progress("7".to_owned(), "Candidate".to_owned())
+                .await
+                .expect("progress");
             assert!(!progress.is_unknown);
         });
         logout();

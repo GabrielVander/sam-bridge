@@ -1,4 +1,7 @@
-use student_management::api::domain::{Clef, Lesson, MusicianLevel, OrganistLevel, ProgressAssessment, Region, SecretaryType, Student, StudentPosition};
+use student_management::domain::entities::{
+    Clef, Lesson, MusicianLevel, OrganistLevel, ProgressAssessment, Range, Region, SecretaryType,
+    Student, StudentPosition,
+};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StudentListItem {
@@ -125,7 +128,7 @@ pub fn clef_label(clef: &Clef) -> String {
     }
 }
 
-pub fn range_label(range: Option<&student_management::api::domain::Range>) -> String {
+pub fn range_label(range: Option<&Range>) -> String {
     range
         .map(|r| {
             if r.from == r.to {
@@ -186,7 +189,11 @@ impl From<&ProgressAssessment> for ProgressViewModel {
             methodRelativePercent: a.methodRelativePercent,
             combinedPercent: a.combinedPercent,
             overallCheckpointPercent: a.overallCheckpointPercent,
-            nextLevelLabel: a.nextLevel.as_ref().map(|l| checkpoint_label(l).to_owned()).unwrap_or_default(),
+            nextLevelLabel: a
+                .nextLevel
+                .as_ref()
+                .map(|l| checkpoint_label(l).to_owned())
+                .unwrap_or_default(),
             meets_youth_service: a
                 .checkpoints
                 .iter()
@@ -202,13 +209,17 @@ impl From<&ProgressAssessment> for ProgressViewModel {
                 .iter()
                 .find(|c| c.level == MusicianLevel::Officialized)
                 .is_some_and(|c| c.ready_to_advance),
-            checkpoints: a.checkpoints.iter().map(|c| CheckpointVm {
-                label: checkpoint_label(&c.level).to_owned(),
-                achieved: c.achieved,
-                ready_to_advance: c.ready_to_advance,
-                msa_requirement_met: c.msa_requirement_met,
-                method_requirement_met: c.method_requirement_met,
-            }).collect(),
+            checkpoints: a
+                .checkpoints
+                .iter()
+                .map(|c| CheckpointVm {
+                    label: checkpoint_label(&c.level).to_owned(),
+                    achieved: c.achieved,
+                    ready_to_advance: c.ready_to_advance,
+                    msa_requirement_met: c.msa_requirement_met,
+                    method_requirement_met: c.method_requirement_met,
+                })
+                .collect(),
         }
     }
 }
@@ -228,10 +239,31 @@ pub struct ProgressResult {
 
 impl ProgressResult {
     pub fn available(vm: ProgressViewModel) -> Self {
-        Self { is_unknown: false, progress: vm, unknown: UnknownLevelVm { raw: String::new(), message: String::new() } }
+        Self {
+            is_unknown: false,
+            progress: vm,
+            unknown: UnknownLevelVm {
+                raw: String::new(),
+                message: String::new(),
+            },
+        }
     }
     pub fn unknown(raw: String, message: String) -> Self {
-        Self { is_unknown: true, progress: ProgressViewModel { msaRelativePercent: 0.0, methodRelativePercent: 0.0, combinedPercent: 0.0, overallCheckpointPercent: 0.0, nextLevelLabel: String::new(), meets_youth_service: false, meets_official_service: false, meets_officialization: false, checkpoints: vec![] }, unknown: UnknownLevelVm { raw, message } }
+        Self {
+            is_unknown: true,
+            progress: ProgressViewModel {
+                msaRelativePercent: 0.0,
+                methodRelativePercent: 0.0,
+                combinedPercent: 0.0,
+                overallCheckpointPercent: 0.0,
+                nextLevelLabel: String::new(),
+                meets_youth_service: false,
+                meets_official_service: false,
+                meets_officialization: false,
+                checkpoints: vec![],
+            },
+            unknown: UnknownLevelVm { raw, message },
+        }
     }
     pub fn is_unknown(&self) -> bool {
         self.is_unknown
@@ -240,13 +272,24 @@ impl ProgressResult {
 
 impl Default for ProgressViewModel {
     fn default() -> Self {
-        Self { msaRelativePercent: 0.0, methodRelativePercent: 0.0, combinedPercent: 0.0, overallCheckpointPercent: 0.0, nextLevelLabel: String::new(), meets_youth_service: false, meets_official_service: false, meets_officialization: false, checkpoints: vec![] }
+        Self {
+            msaRelativePercent: 0.0,
+            methodRelativePercent: 0.0,
+            combinedPercent: 0.0,
+            overallCheckpointPercent: 0.0,
+            nextLevelLabel: String::new(),
+            meets_youth_service: false,
+            meets_official_service: false,
+            meets_officialization: false,
+            checkpoints: vec![],
+        }
     }
 }
 
-
 #[cfg(test)]
 mod tests {
+    use student_management::domain::entities::CheckpointStatus;
+
     use super::*;
 
     fn student_with_position(position: StudentPosition) -> StudentListItem {
@@ -262,12 +305,42 @@ mod tests {
     #[test]
     fn given_musician_levels_should_render_human_labels() {
         for (position, expected) in [
-            (StudentPosition::Musician { level: MusicianLevel::Candidate }, "Músico · Candidato(a)"),
-            (StudentPosition::Musician { level: MusicianLevel::Practice }, "Músico · Ensaio"),
-            (StudentPosition::Musician { level: MusicianLevel::YouthService }, "Músico · RJM"),
-            (StudentPosition::Musician { level: MusicianLevel::OfficialService }, "Músico · Culto Oficial"),
-            (StudentPosition::Musician { level: MusicianLevel::Officialized }, "Músico · Oficializado"),
-            (StudentPosition::Musician { level: MusicianLevel::Unknown("X".to_owned()) }, "Músico · X"),
+            (
+                StudentPosition::Musician {
+                    level: MusicianLevel::Candidate,
+                },
+                "Músico · Candidato(a)",
+            ),
+            (
+                StudentPosition::Musician {
+                    level: MusicianLevel::Practice,
+                },
+                "Músico · Ensaio",
+            ),
+            (
+                StudentPosition::Musician {
+                    level: MusicianLevel::YouthService,
+                },
+                "Músico · RJM",
+            ),
+            (
+                StudentPosition::Musician {
+                    level: MusicianLevel::OfficialService,
+                },
+                "Músico · Culto Oficial",
+            ),
+            (
+                StudentPosition::Musician {
+                    level: MusicianLevel::Officialized,
+                },
+                "Músico · Oficializado",
+            ),
+            (
+                StudentPosition::Musician {
+                    level: MusicianLevel::Unknown("X".to_owned()),
+                },
+                "Músico · X",
+            ),
         ] {
             assert_eq!(student_with_position(position).position, expected);
         }
@@ -275,7 +348,7 @@ mod tests {
 
     #[test]
     fn given_progress_report_should_map_to_view_model() {
-        let report = student_management::api::domain::ProgressAssessment {
+        let report = ProgressAssessment {
             checkpoints: vec![],
             msaRelativePercent: 75.0,
             methodRelativePercent: 57.5,
@@ -292,34 +365,133 @@ mod tests {
 
     #[test]
     fn given_region_should_render_label() {
-        assert_eq!(region_label(&Region::AraraquaraSaoCarlos), "Araraquara – São Carlos");
-        assert_eq!(region_label(&Region::AraraquaraItirapina), "Araraquara – Itirapina");
+        assert_eq!(
+            region_label(&Region::AraraquaraSaoCarlos),
+            "Araraquara – São Carlos"
+        );
+        assert_eq!(
+            region_label(&Region::AraraquaraItirapina),
+            "Araraquara – Itirapina"
+        );
         assert_eq!(region_label(&Region::Other("OUTRA".to_owned())), "OUTRA");
     }
 
     #[test]
     fn given_all_position_labels() {
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::Candidate }).position, "Organista · Candidato(a)");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::Practice }).position, "Organista · Ensaio");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::YouthService }).position, "Organista · RJM");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::OfficialService }).position, "Organista · Culto Oficial");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::HalfHour }).position, "Organista · Meia hora");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::YouthServicePractice }).position, "Organista · RJM / Ensaio");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::YouthServiceHalfHour }).position, "Organista · RJM / Meia hora");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::YouthServiceOfficialService }).position, "Organista · RJM / Culto Oficial");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::YouthServiceOfficialized }).position, "Organista · RJM / Oficializado(a)");
-        assert_eq!(student_with_position(StudentPosition::Secretary { r#type: SecretaryType::Gem }).position, "Secretário do GEM");
-        assert_eq!(student_with_position(StudentPosition::Secretary { r#type: SecretaryType::Music }).position, "Secretário da Música");
-        assert_eq!(student_with_position(StudentPosition::Unknown("REGENTE".to_owned())).position, "REGENTE");
-        assert_eq!(student_with_position(StudentPosition::Organist { level: OrganistLevel::Unknown("X".to_owned()) }).position, "Organista · X");
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::Candidate
+            })
+            .position,
+            "Organista · Candidato(a)"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::Practice
+            })
+            .position,
+            "Organista · Ensaio"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::YouthService
+            })
+            .position,
+            "Organista · RJM"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::OfficialService
+            })
+            .position,
+            "Organista · Culto Oficial"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::HalfHour
+            })
+            .position,
+            "Organista · Meia hora"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::YouthServicePractice
+            })
+            .position,
+            "Organista · RJM / Ensaio"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::YouthServiceHalfHour
+            })
+            .position,
+            "Organista · RJM / Meia hora"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::YouthServiceOfficialService
+            })
+            .position,
+            "Organista · RJM / Culto Oficial"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::YouthServiceOfficialized
+            })
+            .position,
+            "Organista · RJM / Oficializado(a)"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Secretary {
+                r#type: SecretaryType::Gem
+            })
+            .position,
+            "Secretário do GEM"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Secretary {
+                r#type: SecretaryType::Music
+            })
+            .position,
+            "Secretário da Música"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Unknown("REGENTE".to_owned())).position,
+            "REGENTE"
+        );
+        assert_eq!(
+            student_with_position(StudentPosition::Organist {
+                level: OrganistLevel::Unknown("X".to_owned())
+            })
+            .position,
+            "Organista · X"
+        );
     }
 
     #[test]
     fn given_extract_raw_level_only_musician() {
-        assert_eq!(extract_raw_level(&StudentPosition::Musician { level: MusicianLevel::Candidate }), "Candidate");
-        assert_eq!(extract_raw_level(&StudentPosition::Organist { level: OrganistLevel::Candidate }), "");
-        assert_eq!(extract_raw_level(&StudentPosition::Secretary { r#type: SecretaryType::Gem }), "");
-        assert_eq!(extract_raw_level(&StudentPosition::Unknown("x".to_owned())), "");
+        assert_eq!(
+            extract_raw_level(&StudentPosition::Musician {
+                level: MusicianLevel::Candidate
+            }),
+            "Candidate"
+        );
+        assert_eq!(
+            extract_raw_level(&StudentPosition::Organist {
+                level: OrganistLevel::Candidate
+            }),
+            ""
+        );
+        assert_eq!(
+            extract_raw_level(&StudentPosition::Secretary {
+                r#type: SecretaryType::Gem
+            }),
+            ""
+        );
+        assert_eq!(
+            extract_raw_level(&StudentPosition::Unknown("x".to_owned())),
+            ""
+        );
     }
 
     #[test]
@@ -328,19 +500,40 @@ mod tests {
         assert_eq!(clef_label(&Clef::C), "Dó");
         assert_eq!(clef_label(&Clef::F), "Fá");
         assert_eq!(range_label(None), "");
-        assert_eq!(range_label(Some(&student_management::api::domain::Range { from: "5".to_owned(), to: "5".to_owned() })), "5");
-        assert_eq!(range_label(Some(&student_management::api::domain::Range { from: "1".to_owned(), to: "3".to_owned() })), "1 - 3");
+        assert_eq!(
+            range_label(Some(&Range {
+                from: "5".to_owned(),
+                to: "5".to_owned()
+            })),
+            "5"
+        );
+        assert_eq!(
+            range_label(Some(&Range {
+                from: "1".to_owned(),
+                to: "3".to_owned()
+            })),
+            "1 - 3"
+        );
         assert_eq!(secretary_label(&SecretaryType::Gem), "Secretário do GEM");
-        assert_eq!(secretary_label(&SecretaryType::Music), "Secretário da Música");
+        assert_eq!(
+            secretary_label(&SecretaryType::Music),
+            "Secretário da Música"
+        );
     }
 
     #[test]
     fn given_lesson_item_from_domain() {
-        let lesson = student_management::api::domain::Lesson {
+        let lesson = Lesson {
             id: Some("1".to_owned()),
             date: Some(chrono::NaiveDate::from_ymd_opt(2025, 1, 15).unwrap()),
-            phase: Some(student_management::api::domain::Range { from: "1".to_owned(), to: "2".to_owned() }),
-            page: Some(student_management::api::domain::Range { from: "5".to_owned(), to: "5".to_owned() }),
+            phase: Some(Range {
+                from: "1".to_owned(),
+                to: "2".to_owned(),
+            }),
+            page: Some(Range {
+                from: "5".to_owned(),
+                to: "5".to_owned(),
+            }),
             lesson: None,
             clef: Some(Clef::G),
             description: Some("desc".to_owned()),
@@ -356,20 +549,49 @@ mod tests {
         assert_eq!(item.clef, "Sol");
         assert_eq!(item.description, "desc");
         assert_eq!(item.method, "met");
-        let empty = LessonItem::from_domain(LessonKind::Method, &student_management::api::domain::Lesson::default());
+        let empty = LessonItem::from_domain(LessonKind::Method, &Lesson::default());
         assert_eq!(empty.id, "");
         assert_eq!(empty.clef, "");
     }
 
     #[test]
     fn given_progress_view_model_with_checkpoints() {
-        use student_management::api::domain::{CheckpointStatus, ProgressAssessment};
         let checkpoints = vec![
-            CheckpointStatus { level: MusicianLevel::Candidate, achieved: true, ready_to_advance: false, msa_requirement_met: true, method_requirement_met: true },
-            CheckpointStatus { level: MusicianLevel::Practice, achieved: true, ready_to_advance: false, msa_requirement_met: true, method_requirement_met: true },
-            CheckpointStatus { level: MusicianLevel::YouthService, achieved: false, ready_to_advance: true, msa_requirement_met: true, method_requirement_met: true },
-            CheckpointStatus { level: MusicianLevel::OfficialService, achieved: false, ready_to_advance: false, msa_requirement_met: false, method_requirement_met: false },
-            CheckpointStatus { level: MusicianLevel::Officialized, achieved: false, ready_to_advance: false, msa_requirement_met: false, method_requirement_met: false },
+            CheckpointStatus {
+                level: MusicianLevel::Candidate,
+                achieved: true,
+                ready_to_advance: false,
+                msa_requirement_met: true,
+                method_requirement_met: true,
+            },
+            CheckpointStatus {
+                level: MusicianLevel::Practice,
+                achieved: true,
+                ready_to_advance: false,
+                msa_requirement_met: true,
+                method_requirement_met: true,
+            },
+            CheckpointStatus {
+                level: MusicianLevel::YouthService,
+                achieved: false,
+                ready_to_advance: true,
+                msa_requirement_met: true,
+                method_requirement_met: true,
+            },
+            CheckpointStatus {
+                level: MusicianLevel::OfficialService,
+                achieved: false,
+                ready_to_advance: false,
+                msa_requirement_met: false,
+                method_requirement_met: false,
+            },
+            CheckpointStatus {
+                level: MusicianLevel::Officialized,
+                achieved: false,
+                ready_to_advance: false,
+                msa_requirement_met: false,
+                method_requirement_met: false,
+            },
         ];
         let report = ProgressAssessment {
             checkpoints,

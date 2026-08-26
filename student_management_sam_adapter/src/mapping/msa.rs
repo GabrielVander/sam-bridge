@@ -1,7 +1,7 @@
 use sam::client::MsaLesson;
-use student_management::api::domain::Lesson;
+use student_management::domain::entities::Lesson;
 
-use super::common::{parse_clef, parse_naive_date, parse_range};
+use crate::mapping::common::{parse_clef, parse_naive_date, parse_range};
 
 pub fn map(dto: &MsaLesson) -> Lesson {
     Lesson {
@@ -27,23 +27,18 @@ pub fn map(dto: &MsaLesson) -> Lesson {
             .as_deref()
             .filter(|s| !s.trim().is_empty())
             .and_then(|s| parse_clef(s).ok()),
-        description: dto
-            .description
-            .clone()
-            .filter(|s| !s.trim().is_empty()),
-        instructor: dto
-            .authorizer
-            .clone()
-            .filter(|s| !s.trim().is_empty()),
+        description: dto.description.clone().filter(|s| !s.trim().is_empty()),
+        instructor: dto.authorizer.clone().filter(|s| !s.trim().is_empty()),
         method: None,
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use sam::client::MsaLesson;
-    use student_management::api::domain::{Clef, Range};
+    use student_management::domain::entities::{Clef, Lesson, Range};
+
+    use crate::mapping::msa::map;
 
     fn dto_with(overrides: impl FnOnce(&mut MsaLesson)) -> MsaLesson {
         let mut dto = MsaLesson {

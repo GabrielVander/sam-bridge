@@ -1,9 +1,5 @@
-#![allow(non_snake_case)]
+use crate::student_lessons::domain::entities::{Clef, Range};
 
-use crate::features::student_lessons::domain::entities::{Clef, Range};
-use flutter_rust_bridge::frb;
-
-#[frb(non_opaque)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct LessonDto {
     pub id: Option<String>,
@@ -17,7 +13,6 @@ pub struct LessonDto {
     pub method: Option<String>,
 }
 
-#[frb(non_opaque)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct StudentLessonsDto {
     pub approved: Vec<LessonDto>,

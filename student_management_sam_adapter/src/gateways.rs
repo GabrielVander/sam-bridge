@@ -2,12 +2,12 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use sam::client::{SamClient, SamReader};
-use student_management::api::{
-    application::{StudentLessonsGateway, StudentsRetrievalGateway},
-    domain::{Student, StudentLessons},
+use student_management::{
+    application::gateways::{StudentLessonsGateway, StudentsRetrievalGateway},
+    domain::entities::{Student, StudentLessons},
 };
 
-use crate::session_opener::{open_session, SessionOpener};
+use crate::session_opener::{SessionOpener, open_session};
 
 #[derive(Clone)]
 pub struct SamGateways {
@@ -35,12 +35,15 @@ impl SamGateways {
     where
         O: SessionOpener + Send + Sync + 'static,
     {
-        let client =
-            open_session(opener, base_url.to_owned(), username.to_owned(), password.to_owned())
-                .await?;
+        let client = open_session(
+            opener,
+            base_url.to_owned(),
+            username.to_owned(),
+            password.to_owned(),
+        )
+        .await?;
         Ok(Self::from_client(&client))
     }
-
 }
 
 #[async_trait::async_trait]
@@ -61,7 +64,11 @@ impl StudentLessonsGateway for SamGateways {
 
         Ok(StudentLessons {
             approved: page.msa.iter().map(crate::mapping::msa::map).collect(),
-            method: page.method.iter().map(crate::mapping::method::map).collect(),
+            method: page
+                .method
+                .iter()
+                .map(crate::mapping::method::map)
+                .collect(),
         })
     }
 }
@@ -233,14 +240,9 @@ mod tests {
     #[test]
     fn opens_with_any_session_opener_without_touching_the_network_here() {
         smol::block_on(async {
-            let gateways = SamGateways::open_with(
-                DeadPortOpener,
-                "http://127.0.0.1:1",
-                "u",
-                "p",
-            )
-            .await
-                    .expect("delegation should succeed");
+            let gateways = SamGateways::open_with(DeadPortOpener, "http://127.0.0.1:1", "u", "p")
+                .await
+                .expect("delegation should succeed");
 
             assert!(gateways.get_available_records().await.is_err());
         });

@@ -1,6 +1,3 @@
-use flutter_rust_bridge::frb;
-
-#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Lesson {
     pub id: Option<String>,
@@ -14,14 +11,12 @@ pub struct Lesson {
     pub method: Option<String>,
 }
 
-#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct StudentLessons {
     pub approved: Vec<Lesson>,
     pub method: Vec<Lesson>,
 }
 
-#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub struct Range<T = String> {
     pub from: T,
@@ -36,7 +31,10 @@ impl<T> Range<T> {
     where
         T: Clone,
     {
-        Self { from: value.clone(), to: value }
+        Self {
+            from: value.clone(),
+            to: value,
+        }
     }
     pub fn try_new(from: T, to: T) -> Result<Self, String>
     where
@@ -65,7 +63,6 @@ where
     }
 }
 
-#[frb(non_opaque)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum Clef {
     G,
@@ -93,7 +90,10 @@ mod tests {
     fn range_try_new_inverted() {
         assert!(Range::try_new(1, 2).is_ok());
         assert_eq!(Range::try_new(5, 3).unwrap_err(), "inverted range 5 > 3");
-        assert_eq!(Range::try_new("b".to_owned(), "a".to_owned()).unwrap_err(), "inverted range b > a");
+        assert_eq!(
+            Range::try_new("b".to_owned(), "a".to_owned()).unwrap_err(),
+            "inverted range b > a"
+        );
     }
 
     #[test]

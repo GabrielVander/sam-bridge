@@ -1,4 +1,6 @@
-use crate::api::{application::StudentsRetrievalGateway, domain::Student};
+use crate::student_roster::{
+    application::gateways::StudentsRetrievalGateway, domain::entities::Student,
+};
 
 pub struct RetrieveStudentsUseCase<'a, T: StudentsRetrievalGateway> {
     gateway: &'a T,
@@ -16,8 +18,11 @@ impl<'a, T: StudentsRetrievalGateway> RetrieveStudentsUseCase<'a, T> {
 
 #[cfg(test)]
 mod tests {
+    use crate::student_roster::domain::entities::{
+        MusicianLevel, OrganistLevel, Region, StudentPosition,
+    };
+
     use super::*;
-    use crate::api::domain::{MusicianLevel, OrganistLevel, Region, Student, StudentPosition};
     use async_trait::async_trait;
 
     struct FakeStudentsRetrievalGateway {

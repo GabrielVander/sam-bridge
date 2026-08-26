@@ -1,7 +1,7 @@
 use sam::client::MtdLesson;
-use student_management::api::domain::Lesson;
+use student_management::domain::entities::Lesson;
 
-use super::common::{parse_naive_date, parse_range};
+use crate::mapping::common::{parse_naive_date, parse_range};
 
 pub fn map(dto: &MtdLesson) -> Lesson {
     Lesson {
@@ -19,14 +19,8 @@ pub fn map(dto: &MtdLesson) -> Lesson {
             .filter(|s| !s.trim().is_empty())
             .and_then(|s| parse_range(s).ok()),
         clef: None,
-        description: dto
-            .observations
-            .clone()
-            .filter(|s| !s.trim().is_empty()),
-        instructor: dto
-            .authorizer
-            .clone()
-            .filter(|s| !s.trim().is_empty()),
+        description: dto.observations.clone().filter(|s| !s.trim().is_empty()),
+        instructor: dto.authorizer.clone().filter(|s| !s.trim().is_empty()),
         method: dto.method.clone().filter(|s| !s.trim().is_empty()),
     }
 }

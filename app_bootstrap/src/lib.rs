@@ -2,11 +2,10 @@ mod session_store;
 
 use std::sync::{Arc, RwLock};
 
-use student_management::api::{
-    application::{LoginInput, LoginOutput},
-    domain::{
-        MusicianLevel, ProgressAssessment, Student, StudentLessons, calculate_progress_fn,
-        violin_schmoll_profile,
+use student_management::{
+    application::use_cases::{LoginInput, LoginOutput, LoginUseCase},
+    domain::entities::{
+        MethodProfile, MusicianLevel, ProgressAssessment, Student, StudentLessons, assess,
     },
 };
 use student_management_sam_adapter::session_opener::SamAuthGateway;
@@ -38,9 +37,8 @@ impl App {
     }
 
     pub async fn login(&self, input: LoginInput) -> anyhow::Result<LoginOutput> {
-        let gateway = Arc::new(SamAuthGateway::new(input.baseUrl.clone()));
+        let gateway = Arc::new(SamAuthGateway::new(input.base_url.clone()));
         let output = {
-            use student_management::api::application::LoginUseCase;
             LoginUseCase::new(gateway.clone())
                 .execute(input.clone())
                 .await?
@@ -51,7 +49,7 @@ impl App {
         let gateways = student_management_sam_adapter::gateways::SamGateways::from_client(&client);
         let session = AuthSession::from_gateways(Arc::new(gateways.clone()), Arc::new(gateways));
         self.store.save(&StoredCredentials {
-            base_url: input.baseUrl,
+            base_url: input.base_url,
             username: input.username,
             password: input.password,
         })?;
@@ -105,11 +103,11 @@ impl App {
     ) -> anyhow::Result<ProgressAssessment> {
         let lessons = self.with_session(|s| s.lessons.clone())?;
         let bundle = lessons.get_all_for_student_with_id(student_id).await?;
-        calculate_progress_fn(
+        assess(
             assigned_level,
             &bundle.approved,
             &bundle.method,
-            &violin_schmoll_profile(),
+            &MethodProfile::violin_schmoll(),
         )
         .map_err(|e| anyhow::anyhow!(e))
     }
@@ -138,12 +136,9 @@ impl App {
 mod tests {
     use super::*;
     use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
-    use student_management::api::{
-        application::{StudentLessonsGateway, StudentsRetrievalGateway},
-        domain::{
-            Lesson, MusicianLevel, Region, Student as DomainStudent, StudentLessons,
-            StudentPosition,
-        },
+    use student_management::{
+        application::gateways::{AuthGateway, StudentLessonsGateway, StudentsRetrievalGateway},
+        domain::entities::{Lesson, Range, Region, Student, StudentPosition},
     };
     use tempfile::TempDir;
 
@@ -158,13 +153,13 @@ mod tests {
 
     #[derive(Clone, Default)]
     struct StubRoster {
-        students: Vec<DomainStudent>,
+        students: Vec<Student>,
         fail: bool,
     }
 
     #[async_trait::async_trait]
     impl StudentsRetrievalGateway for StubRoster {
-        async fn get_available_records(&self) -> anyhow::Result<Vec<DomainStudent>> {
+        async fn get_available_records(&self) -> anyhow::Result<Vec<Student>> {
             if self.fail {
                 anyhow::bail!("Students HTTP request failed");
             }
@@ -191,8 +186,8 @@ mod tests {
         }
     }
 
-    fn student(id: &str) -> DomainStudent {
-        DomainStudent {
+    fn student(id: &str) -> Student {
+        Student {
             id: id.to_owned(),
             name: format!("ALUNO {id}"),
             position: StudentPosition::Musician {
@@ -250,8 +245,18 @@ mod tests {
             assert_eq!(students[0].id, "1");
             let lessons = app.retrieve_student_lessons("7").await.expect("lessons");
             assert_eq!(lessons.approved.len(), 2);
-            assert!(lessons.approved.iter().any(|l| l.id.as_deref() == Some("old")));
-            assert!(lessons.approved.iter().any(|l| l.id.as_deref() == Some("newest")));
+            assert!(
+                lessons
+                    .approved
+                    .iter()
+                    .any(|l| l.id.as_deref() == Some("old"))
+            );
+            assert!(
+                lessons
+                    .approved
+                    .iter()
+                    .any(|l| l.id.as_deref() == Some("newest"))
+            );
         });
         app.logout();
         assert!(!app.is_logged_in());
@@ -305,7 +310,7 @@ mod tests {
         smol::block_on(async {
             let result = app
                 .login(LoginInput {
-                    baseUrl: "http://127.0.0.1:1".to_owned(),
+                    base_url: "http://127.0.0.1:1".to_owned(),
                     username: "u".to_owned(),
                     password: "p".to_owned(),
                 })
@@ -372,7 +377,7 @@ mod tests {
         smol::block_on(async {
             let result = app
                 .login(LoginInput {
-                    baseUrl: "http://127.0.0.1:1".to_owned(),
+                    base_url: "http://127.0.0.1:1".to_owned(),
                     username: "u".to_owned(),
                     password: "p".to_owned(),
                 })
@@ -387,11 +392,13 @@ mod tests {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
         let store = FileSessionStore::with_dir(dir.path().to_path_buf());
-        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
         smol::block_on(async {
             let result = app
                 .login(LoginInput {
-                    baseUrl: "http://test-success".to_owned(),
+                    base_url: "http://test-success".to_owned(),
                     username: "u".to_owned(),
                     password: "p".to_owned(),
                 })
@@ -417,7 +424,9 @@ mod tests {
                 password: "p".to_owned(),
             })
             .unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
         smol::block_on(async {
             let restored = app.try_restore_session().await;
             assert!(restored);
@@ -429,14 +438,22 @@ mod tests {
     fn calculate_progress_for_known_level_succeeds() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
         app.seed_session(AuthSession::from_gateways(
-            Arc::new(StubRoster { students: vec![], fail: false }),
+            Arc::new(StubRoster {
+                students: vec![],
+                fail: false,
+            }),
             Arc::new(StubLessons {
                 approved: vec![Lesson {
                     id: Some("1".to_owned()),
                     date: chrono::NaiveDate::from_ymd_opt(2025, 1, 15),
-                    phase: Some(student_management::api::domain::Range { from: "12".to_owned(), to: "12".to_owned() }),
+                    phase: Some(Range {
+                        from: "12".to_owned(),
+                        to: "12".to_owned(),
+                    }),
                     ..Default::default()
                 }],
                 fail: false,
@@ -455,13 +472,23 @@ mod tests {
     fn calculate_progress_for_unknown_level_fails() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
         app.seed_session(AuthSession::from_gateways(
-            Arc::new(StubRoster { students: vec![], fail: false }),
-            Arc::new(StubLessons { approved: vec![], fail: false }),
+            Arc::new(StubRoster {
+                students: vec![],
+                fail: false,
+            }),
+            Arc::new(StubLessons {
+                approved: vec![],
+                fail: false,
+            }),
         ));
         smol::block_on(async {
-            let result = app.calculate_progress("7", &MusicianLevel::Unknown("X".to_owned())).await;
+            let result = app
+                .calculate_progress("7", &MusicianLevel::Unknown("X".to_owned()))
+                .await;
             assert!(result.is_err());
             assert!(result.unwrap_err().to_string().contains("UnknownLevel"));
         });
@@ -471,7 +498,9 @@ mod tests {
     fn with_session_not_authenticated_fails() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
         smol::block_on(async {
             assert!(app.retrieve_students().await.is_err());
         });
@@ -482,8 +511,16 @@ mod tests {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
         let store = FileSessionStore::with_dir(dir.path().to_path_buf());
-        store.save(&StoredCredentials { base_url: "http://127.0.0.1:1".to_owned(), username: "u".to_owned(), password: "p".to_owned() }).unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
+        store
+            .save(&StoredCredentials {
+                base_url: "http://127.0.0.1:1".to_owned(),
+                username: "u".to_owned(),
+                password: "p".to_owned(),
+            })
+            .unwrap();
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
         smol::block_on(async {
             let restored = app.try_restore_session().await;
             assert!(!restored);
@@ -494,10 +531,10 @@ mod tests {
 
     #[test]
     fn login_take_client_failure_path() {
-        use student_management::api::application::AuthGateway;
-        // This tests the ok_or_else branch where take_client returns None (should not happen in normal flow, but we test via direct gateway)
-        let gw = student_management_sam_adapter::session_opener::SamAuthGateway::new("http://127.0.0.1:1".to_owned());
+        let gw = SamAuthGateway::new("http://127.0.0.1:1".to_owned());
+
         assert!(gw.take_client().is_none());
+
         smol::block_on(async {
             let res = gw.login("u".to_owned(), "p".to_owned()).await;
             assert!(res.is_err());
@@ -510,10 +547,20 @@ mod tests {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
         let store = FileSessionStore::with_dir(dir.path().to_path_buf());
-        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
-        store.save(&StoredCredentials { base_url: "http://x".to_owned(), username: "u".to_owned(), password: "p".to_owned() }).unwrap();
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
+        store
+            .save(&StoredCredentials {
+                base_url: "http://x".to_owned(),
+                username: "u".to_owned(),
+                password: "p".to_owned(),
+            })
+            .unwrap();
         // app's store is separate instance but same dir, so load should find it via file
-        let app2 = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
+        let app2 = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
         assert!(app2.has_saved_credentials());
         assert!(!app.has_saved_credentials() || app2.has_saved_credentials());
     }
@@ -522,9 +569,20 @@ mod tests {
     fn is_logged_in_true_after_seed() {
         let _guard = test_lock();
         let dir = TempDir::new().unwrap();
-        let app = App::with_store(Box::new(FileSessionStore::with_dir(dir.path().to_path_buf())));
+        let app = App::with_store(Box::new(FileSessionStore::with_dir(
+            dir.path().to_path_buf(),
+        )));
         assert!(!app.is_logged_in());
-        app.seed_session(AuthSession::from_gateways(Arc::new(StubRoster { students: vec![], fail: false }), Arc::new(StubLessons { approved: vec![], fail: false })));
+        app.seed_session(AuthSession::from_gateways(
+            Arc::new(StubRoster {
+                students: vec![],
+                fail: false,
+            }),
+            Arc::new(StubLessons {
+                approved: vec![],
+                fail: false,
+            }),
+        ));
         assert!(app.is_logged_in());
     }
 }

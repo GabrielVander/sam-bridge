@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use crate::features::student_roster::domain::entities::Student;
+use crate::student_roster::domain::entities::Student;
 
 #[async_trait]
 pub trait StudentsRetrievalGateway: Send + Sync {

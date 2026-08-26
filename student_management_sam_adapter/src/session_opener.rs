@@ -1,6 +1,7 @@
 use anyhow::Result;
 use sam::client::{SamClient, SamCredentials};
 use std::sync::Mutex;
+use student_management::application::gateways::AuthGateway;
 
 pub trait SessionOpener: Send + Sync {
     fn open(&self, base_url: &str, username: &str, password: &str) -> Result<SamClient>;
@@ -25,7 +26,7 @@ impl SamAuthGateway {
 }
 
 #[async_trait::async_trait]
-impl student_management::api::application::AuthGateway for SamAuthGateway {
+impl AuthGateway for SamAuthGateway {
     async fn login(&self, username: String, password: String) -> anyhow::Result<()> {
         if self.base_url == "http://test-success" {
             let mut client = SamClient::new(self.base_url.clone())?;
@@ -78,13 +79,14 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use student_management::api::application::AuthGateway;
 
     #[test]
     fn sam_auth_gateway_success_and_take_client() {
         smol::block_on(async {
             let gw = SamAuthGateway::new("http://test-success".to_owned());
-            gw.login("u".to_owned(), "p".to_owned()).await.expect("should succeed");
+            gw.login("u".to_owned(), "p".to_owned())
+                .await
+                .expect("should succeed");
             assert!(gw.take_client().is_some());
             assert!(gw.take_client().is_none());
         });
@@ -103,7 +105,9 @@ mod tests {
     #[test]
     fn network_opener_success_for_test_success() {
         let opener = NetworkSessionOpener;
-        let client = opener.open("http://test-success", "u", "p").expect("should succeed");
+        let client = opener
+            .open("http://test-success", "u", "p")
+            .expect("should succeed");
         assert!(client.students().is_ok());
         assert!(client.student_lessons("1").is_ok());
     }
@@ -117,9 +121,14 @@ mod tests {
     #[test]
     fn open_session_via_smol() {
         smol::block_on(async {
-            let _client = open_session(NetworkSessionOpener, "http://test-success".to_owned(), "u".to_owned(), "p".to_owned())
-                .await
-                .expect("should succeed");
+            let _client = open_session(
+                NetworkSessionOpener,
+                "http://test-success".to_owned(),
+                "u".to_owned(),
+                "p".to_owned(),
+            )
+            .await
+            .expect("should succeed");
         });
     }
 }
