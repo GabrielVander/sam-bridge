@@ -5,6 +5,7 @@ members = [
   "sam_adapter",
   "app_bootstrap",
   "gui_application",
+  "authentication",
 ]
 resolver = "3"
 
@@ -13,3 +14,5 @@ async-trait = "0.1.89"
 anyhow = "1.0.103"
 thiserror = "2.0.18"
 chrono = "0.4.45"
+pretty_assertions = "1.4.1"
+smol = "2.0.2"

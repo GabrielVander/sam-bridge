@@ -1,0 +1,11 @@
+[package]
+name = "authentication"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+async-trait = { workspace = true }
+
+[dev-dependencies]
+smol = { workspace = true }
+pretty_assertions = { workspace = true }
