@@ -1,5 +1,7 @@
-use crate::student_lessons::domain::entities::{Lesson, Range};
-use crate::student_roster::domain::entities::MusicianLevel;
+use crate::{
+    domain::entities::MusicianLevel,
+    student_lessons::domain::entities::{Lesson, Range},
+};
 use thiserror::Error;
 
 #[derive(Debug, Clone, PartialEq, Eq, Error)]

@@ -8,10 +8,7 @@ async-trait = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 chrono = { workspace = true }
-flutter_rust_bridge = "=2.13.0-beta.2"
 
 [dev-dependencies]
+pretty_assertions = "1.4.1"
 smol = "2.0.2"
-
-[lints.rust]
-unexpected_cfgs = { level = "allow", check-cfg = ['cfg(frb_expand)'] }
