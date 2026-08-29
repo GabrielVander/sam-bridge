@@ -16,7 +16,7 @@ impl LoginUseCase {
 
     pub async fn execute(&self, command: LoginCommand) -> LoginUseCaseResult {
         self.credential_gateway
-            .authorize(command.into())
+            .authorize(&command.into())
             .await
             .into()
     }

@@ -48,7 +48,7 @@ fn login_unsuccessful() {
 
 #[test]
 fn login_failure() {
-    let error_message = "Some error";
+    let error_message: &str = "Some error";
     let credential_gateway: Arc<dyn CredentialGateway> = Arc::new(FakeCredentialGatewayImpl::new(
         Err(error_message.to_string()),
     ));
@@ -84,7 +84,7 @@ impl FakeCredentialGatewayImpl {
 
 #[async_trait]
 impl CredentialGateway for FakeCredentialGatewayImpl {
-    async fn authorize(&self, _: Credential) -> Result<AuthorizationResult, String> {
+    async fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, String> {
         self.result.clone()
     }
 }

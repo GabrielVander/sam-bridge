@@ -6,10 +6,11 @@ edition = "2024"
 [dependencies]
 sam = { path = "../sam" }
 student_core = { path = "../student_core" }
+authentication = { path = "../authentication" }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 chrono = { workspace = true }
 regex = "1.12.4"
-smol = "2.0.2"
+smol = { workspace = true }
 
 [dev-dependencies]

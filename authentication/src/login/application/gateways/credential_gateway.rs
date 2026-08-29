@@ -4,7 +4,7 @@ use crate::login::domain::entities::Credential;
 
 #[async_trait]
 pub trait CredentialGateway {
-    async fn authorize(&self, credential: Credential) -> Result<AuthorizationResult, String>;
+    async fn authorize(&self, credential: &Credential) -> Result<AuthorizationResult, String>;
 }
 
 #[derive(Debug, Clone, PartialEq)]

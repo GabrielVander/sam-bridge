@@ -1,6 +1,6 @@
 pub struct Credential {
-    email: Email,
-    password: Password,
+    pub email: Email,
+    pub password: Password,
 }
 
 impl Credential {
