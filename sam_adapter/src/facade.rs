@@ -1,19 +1,19 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use student_management::application::gateways::{StudentLessonsGateway, StudentsRetrievalGateway};
+use student_core::application::gateways::{StudentGateway, StudentLessonsGateway};
 
 use crate::gateways::SamGateways;
 use crate::session_opener::NetworkSessionOpener;
 
 pub struct AuthSession {
-    pub roster: Arc<dyn StudentsRetrievalGateway + Send + Sync>,
+    pub roster: Arc<dyn StudentGateway + Send + Sync>,
     pub lessons: Arc<dyn StudentLessonsGateway + Send + Sync>,
 }
 
 impl AuthSession {
     pub fn from_gateways(
-        roster: Arc<dyn StudentsRetrievalGateway + Send + Sync>,
+        roster: Arc<dyn StudentGateway + Send + Sync>,
         lessons: Arc<dyn StudentLessonsGateway + Send + Sync>,
     ) -> Self {
         Self { roster, lessons }
@@ -35,12 +35,12 @@ mod tests {
     use super::*;
     use crate::session_opener::SessionOpener;
     use sam::client::SamClient;
-    use student_management::domain::entities::{Region, Student, StudentLessons, StudentPosition};
+    use student_core::domain::entities::{Region, Student, StudentLessons, StudentPosition};
 
     #[derive(Clone, Default)]
     struct StubRoster;
     #[async_trait::async_trait]
-    impl StudentsRetrievalGateway for StubRoster {
+    impl StudentGateway for StubRoster {
         async fn get_available_records(&self) -> Result<Vec<Student>> {
             Ok(vec![Student {
                 id: "1".to_owned(),

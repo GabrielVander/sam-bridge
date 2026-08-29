@@ -1,7 +1,7 @@
 use std::sync::OnceLock;
 
 use regex::Regex;
-use student_management::domain::entities::{
+use student_core::domain::entities::{
     MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
 };
 

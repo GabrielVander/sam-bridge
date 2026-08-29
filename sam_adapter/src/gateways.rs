@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use sam::client::{SamClient, SamReader};
-use student_management::{
-    application::gateways::{StudentLessonsGateway, StudentsRetrievalGateway},
+use student_core::{
+    application::gateways::{StudentGateway, StudentLessonsGateway},
     domain::entities::{Student, StudentLessons},
 };
 
@@ -47,7 +47,7 @@ impl SamGateways {
 }
 
 #[async_trait::async_trait]
-impl StudentsRetrievalGateway for SamGateways {
+impl StudentGateway for SamGateways {
     async fn get_available_records(&self) -> Result<Vec<Student>> {
         let reader = self.reader.clone();
         let dtos = smol::unblock(move || reader.students()).await?;

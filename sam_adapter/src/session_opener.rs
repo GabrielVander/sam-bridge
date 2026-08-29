@@ -1,7 +1,7 @@
 use anyhow::Result;
 use sam::client::{SamClient, SamCredentials};
 use std::sync::Mutex;
-use student_management::application::gateways::AuthGateway;
+use student_core::application::gateways::AuthGateway;
 
 pub trait SessionOpener: Send + Sync {
     fn open(&self, base_url: &str, username: &str, password: &str) -> Result<SamClient>;

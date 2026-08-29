@@ -1,11 +1,11 @@
 [package]
-name = "student_management_sam_adapter"
+name = "sam_adapter"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 sam = { path = "../sam" }
-student_management = { path = "../student_management" }
+student_core = { path = "../student_core" }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 chrono = { workspace = true }

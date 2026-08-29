@@ -1,5 +1,5 @@
 use anyhow::{Context, bail};
-use student_management::domain::entities::{Clef, Range};
+use student_core::domain::entities::{Clef, Range};
 
 pub fn parse_range(raw: &str) -> anyhow::Result<Range> {
     let trimmed = raw.trim();

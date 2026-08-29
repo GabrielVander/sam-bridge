@@ -2,7 +2,7 @@
 members = [
   "student_core",
   "sam",
-  "student_management_sam_adapter",
+  "sam_adapter",
   "app_bootstrap",
   "gui_application",
 ]

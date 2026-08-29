@@ -1,5 +1,5 @@
 use sam::client::MtdLesson;
-use student_management::domain::entities::Lesson;
+use student_core::domain::entities::Lesson;
 
 use crate::mapping::common::{parse_naive_date, parse_range};
 

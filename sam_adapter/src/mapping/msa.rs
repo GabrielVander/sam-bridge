@@ -1,5 +1,5 @@
 use sam::client::MsaLesson;
-use student_management::domain::entities::Lesson;
+use student_core::domain::entities::Lesson;
 
 use crate::mapping::common::{parse_clef, parse_naive_date, parse_range};
 
@@ -36,7 +36,7 @@ pub fn map(dto: &MsaLesson) -> Lesson {
 #[cfg(test)]
 mod tests {
     use sam::client::MsaLesson;
-    use student_management::domain::entities::{Clef, Lesson, Range};
+    use student_core::domain::entities::{Clef, Lesson, Range};
 
     use crate::mapping::msa::map;
 
