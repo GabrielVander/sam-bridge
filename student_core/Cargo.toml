@@ -10,5 +10,5 @@ thiserror = { workspace = true }
 chrono = { workspace = true }
 
 [dev-dependencies]
-pretty_assertions = "1.4.1"
-smol = "2.0.2"
+pretty_assertions = { workspace = true }
+smol = { workspace = true }

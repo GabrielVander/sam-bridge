@@ -21,7 +21,7 @@ thiserror.workspace = true
 
 [dev-dependencies]
 sam = { path = ".", features = ["test-support"] }
-smol = "2.0.2"
+smol = { workspace = true }
 wiremock = "0.6.5"
 
 [lints.rust]

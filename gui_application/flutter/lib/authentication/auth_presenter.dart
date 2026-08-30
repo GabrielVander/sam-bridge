@@ -1,5 +1,6 @@
 import 'package:bloc_signals/bloc_signals.dart';
-import 'package:flutter_application/portal/sam_portal.dart';
+import 'package:flutter_application/authentication/application/use_cases/login_use_case.dart';
+import 'package:flutter_application/rust/bootstrap/infra/application.dart';
 
 sealed class AuthState {
   const AuthState();
@@ -22,10 +23,11 @@ final class AuthFailure extends AuthState {
   const AuthFailure(this.message);
 }
 
-class AuthCubitSignal extends CubitSignal<AuthState> {
-  final SamPortal _portal;
+class AuthPresenter extends CubitSignal<AuthState> {
+  final LoginUseCase loginUseCase;
 
-  AuthCubitSignal(this._portal) : super(initialState: const AuthIdle());
+  AuthPresenter({required this.loginUseCase})
+    : super(initialState: const AuthIdle());
 
   Future<void> submitLogin(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
@@ -34,15 +36,19 @@ class AuthCubitSignal extends CubitSignal<AuthState> {
     }
 
     emit(const AuthLoading());
-    try {
-      await _portal.login(
-        baseUrl: kSamBaseUrl,
-        username: username,
-        password: password,
-      );
-      emit(const AuthSuccess());
-    } catch (e) {
-      emit(AuthFailure(e.toString()));
+    final LoginResult loginResult = await loginUseCase(
+      email: username,
+      password: password,
+    );
+
+    switch (loginResult) {
+      case LoginResult_Successful():
+        emit(const AuthSuccess());
+
+      case LoginResult_InvalidEmailOrPassword():
+        emit(const AuthFailure('Usuárrio ou Senha inválido(a)'));
+      case LoginResult_UnableToPerformAuthorization(:final String context):
+        emit(AuthFailure(context));
     }
   }
 

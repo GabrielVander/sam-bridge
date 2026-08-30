@@ -8,17 +8,19 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSignalListener<AuthCubitSignal, AuthState>(
-      listener: (context, state) {
+    return BlocSignalListener<AuthPresenter, AuthState>(
+      listener: (BuildContext context, AuthState state) {
         if (state is AuthSuccess) {
           context.go('/students');
         }
       },
-      child: BlocSignalBuilder<AuthCubitSignal, AuthState>(
-        builder: (context, state) => switch (state) {
+      child: BlocSignalBuilder<AuthPresenter, AuthState>(
+        builder: (BuildContext context, AuthState state) => switch (state) {
           AuthLoading() => const Center(child: CircularProgressIndicator()),
           AuthSuccess() => const Center(child: Icon(Icons.check_rounded)),
-          AuthFailure(:final message) => _LoginFormCard(errorMessage: message),
+          AuthFailure(:final String message) => _LoginFormCard(
+            errorMessage: message,
+          ),
           _ => const _LoginFormCard(),
         },
       ),
@@ -48,7 +50,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
 
   void _submit(BuildContext context) {
     FocusScope.of(context).unfocus();
-    context.read<AuthCubitSignal>().submitLogin(_username.text, _password.text);
+    context.read<AuthPresenter>().submitLogin(_username.text, _password.text);
   }
 
   @override

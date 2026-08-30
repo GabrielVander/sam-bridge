@@ -1,6 +1,4 @@
 import 'package:bloc_signals/bloc_signals.dart';
-import 'package:flutter_application/lessons/mapper.dart';
-import 'package:flutter_application/portal/sam_portal.dart';
 import 'package:flutter_application/presentation_models.dart';
 
 sealed class LessonsState {
@@ -26,15 +24,13 @@ final class LessonsFailure extends LessonsState {
 }
 
 class LessonsCubitSignal extends CubitSignal<LessonsState> {
-  final SamPortal _portal;
-
-  LessonsCubitSignal(this._portal) : super(initialState: const LessonsIdle());
+  LessonsCubitSignal() : super(initialState: const LessonsIdle());
 
   Future<void> load(String studentId) async {
     emit(const LessonsLoading());
     try {
-      final dto = await _portal.retrieveStudentLessons(studentId: studentId);
-      emit(LessonsLoaded(LessonsMapper.toViewModel(dto)));
+      // final dto = await _portal.retrieveStudentLessons(studentId: studentId);
+      // emit(LessonsLoaded(LessonsMapper.toViewModel(dto)));
     } catch (e) {
       emit(LessonsFailure(e.toString()));
     }

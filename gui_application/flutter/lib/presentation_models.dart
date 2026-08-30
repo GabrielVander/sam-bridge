@@ -1,4 +1,5 @@
-class StudentListItem {  final String id;
+class StudentListItem {
+  final String id;
   final String name;
   final String location;
   final String position;
@@ -14,7 +15,11 @@ class StudentListItem {  final String id;
 
   @override
   int get hashCode =>
-      id.hashCode ^ name.hashCode ^ location.hashCode ^ position.hashCode ^ rawLevel.hashCode;
+      id.hashCode ^
+      name.hashCode ^
+      location.hashCode ^
+      position.hashCode ^
+      rawLevel.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -91,7 +96,8 @@ class StudentLessonsView {
 
   const StudentLessonsView({required this.msa, required this.method});
 
-  factory StudentLessonsView.empty() => const StudentLessonsView(msa: [], method: []);
+  factory StudentLessonsView.empty() =>
+      const StudentLessonsView(msa: [], method: []);
 
   @override
   int get hashCode => msa.hashCode ^ method.hashCode;

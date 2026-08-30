@@ -1,8 +1,6 @@
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:diacritic/diacritic.dart';
-import 'package:flutter_application/portal/sam_portal.dart';
 import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/roster/mapper.dart';
 import 'package:fuzzy/fuzzy.dart';
 
 sealed class StudentsState {
@@ -38,18 +36,17 @@ final class StudentsFailure extends StudentsState {
 }
 
 class StudentsCubitSignal extends CubitSignal<StudentsState> {
-  final SamPortal _portal;
   List<StudentListItem> _all = [];
   String _nameQuery = '';
   Set<String> _selectedLocations = {};
 
-  StudentsCubitSignal(this._portal) : super(initialState: const StudentsIdle());
+  StudentsCubitSignal() : super(initialState: const StudentsIdle());
 
   Future<void> load() async {
     emit(const StudentsLoading());
     try {
-      final dtos = await _portal.retrieveStudents();
-      _all = RosterMapper.toViewModels(dtos);
+      // final dtos = await _portal.retrieveStudents();
+      // _all = RosterMapper.toViewModels(dtos);
       emit(_filteredState());
     } catch (e) {
       emit(StudentsFailure(e.toString()));

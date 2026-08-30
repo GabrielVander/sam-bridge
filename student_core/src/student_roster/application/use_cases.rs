@@ -5,6 +5,7 @@ use crate::{
     student_roster::{application::gateways::StudentGateway, domain::entities::Student},
 };
 
+#[derive(Clone)]
 pub struct RetrieveAllAvailableStudentsUseCase {
     student_gateway: Arc<dyn StudentGateway + Send + Sync>,
 }

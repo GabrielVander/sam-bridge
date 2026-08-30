@@ -24,15 +24,15 @@ class PresenterRefreshListenable extends ChangeNotifier {
 
 GoRouter buildRouter({
   required String appVersion,
-  required AuthCubitSignal authPresenter,
+  required AuthPresenter authPresenter,
 }) {
   return GoRouter(
     navigatorKey: GlobalKey<NavigatorState>(),
     initialLocation: authPresenter.isAuthenticated ? '/students' : '/login',
     refreshListenable: PresenterRefreshListenable(authPresenter.stream),
-    redirect: (context, state) {
-      final loggedIn = authPresenter.isAuthenticated;
-      final loggingIn = state.matchedLocation == '/login';
+    redirect: (BuildContext context, GoRouterState state) {
+      final bool loggedIn = authPresenter.isAuthenticated;
+      final bool loggingIn = state.matchedLocation == '/login';
 
       if (!loggedIn && !loggingIn) return '/login';
       if (loggedIn && loggingIn) return '/students';
@@ -40,17 +40,21 @@ GoRouter buildRouter({
     },
     routes: [
       ShellRoute(
-        builder: (context, state, child) =>
+        builder: (BuildContext context, GoRouterState state, Widget child) =>
             MainScreen(versionDisplay: appVersion, child: child),
         routes: [
-          GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
+          GoRoute(
+            path: '/login',
+            builder: (BuildContext _, GoRouterState _) => const LoginScreen(),
+          ),
           GoRoute(
             path: '/students',
-            builder: (_, _) => const StudentsScreen(),
+            builder: (BuildContext _, GoRouterState _) =>
+                const StudentsScreen(),
             routes: [
               GoRoute(
                 path: ':studentId',
-                builder: (_, state) => StudentScreen(
+                builder: (BuildContext _, GoRouterState state) => StudentScreen(
                   studentId: state.pathParameters['studentId']!,
                 ),
               ),

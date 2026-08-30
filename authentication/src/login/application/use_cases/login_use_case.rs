@@ -5,16 +5,17 @@ use crate::{
     domain::entities::{Credential, Email, Password},
 };
 
+#[derive(Clone)]
 pub struct LoginUseCase {
-    credential_gateway: Arc<dyn CredentialGateway>,
+    credential_gateway: Arc<dyn CredentialGateway + Send + Sync>,
 }
 
 impl LoginUseCase {
-    pub fn new(credential_gateway: Arc<dyn CredentialGateway>) -> Self {
+    pub fn new(credential_gateway: Arc<dyn CredentialGateway + Send + Sync>) -> Self {
         Self { credential_gateway }
     }
 
-    pub async fn execute(&self, command: LoginCommand) -> LoginUseCaseResult {
+    pub async fn execute(&self, command: LoginCommand) -> LoginResult {
         self.credential_gateway
             .authorize(&command.into())
             .await
@@ -34,7 +35,7 @@ impl LoginCommand {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum LoginUseCaseResult {
+pub enum LoginResult {
     Successful,
     InvalidEmailOrPassword,
     UnableToPerformAuthorization { context: String },
@@ -46,20 +47,20 @@ impl From<LoginCommand> for Credential {
     }
 }
 
-impl From<Result<AuthorizationResult, String>> for LoginUseCaseResult {
+impl From<Result<AuthorizationResult, String>> for LoginResult {
     fn from(result: Result<AuthorizationResult, String>) -> Self {
         match result {
             Ok(auth_result) => auth_result.into(),
-            Err(err) => LoginUseCaseResult::UnableToPerformAuthorization { context: err },
+            Err(err) => LoginResult::UnableToPerformAuthorization { context: err },
         }
     }
 }
 
-impl From<AuthorizationResult> for LoginUseCaseResult {
+impl From<AuthorizationResult> for LoginResult {
     fn from(result: AuthorizationResult) -> Self {
         match result {
-            AuthorizationResult::Authorized => LoginUseCaseResult::Successful,
-            AuthorizationResult::Unauthorized => LoginUseCaseResult::InvalidEmailOrPassword,
+            AuthorizationResult::Authorized => LoginResult::Successful,
+            AuthorizationResult::Unauthorized => LoginResult::InvalidEmailOrPassword,
         }
     }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/view_models.dart';
 import 'package:flutter_application/widgets/checkpoint_timeline.dart';
 import 'package:flutter_application/widgets/progress_bar.dart';
 import 'lesson_card.dart';
@@ -10,7 +9,7 @@ enum LessonCategory { msa, method }
 final class CategoryLessonsView extends StatelessWidget {
   final List<LessonItem> lessons;
   final String emptyMessage;
-  final List<CheckpointVm> checkpoints;
+  // final List<CheckpointVm> checkpoints;
   final LessonCategory category;
   final double? msaPhasePercent;
   final double? methodLessonPercent;
@@ -19,7 +18,7 @@ final class CategoryLessonsView extends StatelessWidget {
     super.key,
     required this.lessons,
     required this.emptyMessage,
-    required this.checkpoints,
+    // required this.checkpoints,
     required this.category,
     this.msaPhasePercent,
     this.methodLessonPercent,
@@ -32,7 +31,7 @@ final class CategoryLessonsView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
-        CheckpointTimeline(checkpoints: checkpoints, filter: categoryKey),
+        CheckpointTimeline(filter: categoryKey),
         const SizedBox(height: 12),
         if (category == LessonCategory.msa && msaPhasePercent != null)
           ProgressBar(label: 'Fases', percent: msaPhasePercent!),

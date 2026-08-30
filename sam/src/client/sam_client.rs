@@ -1,63 +1,53 @@
-use anyhow::{Result, anyhow};
-
 use crate::http::sam_transport::{RawResponse, SamTransport};
 use crate::parsing;
 pub use crate::parsing::{MsaLesson, MtdLesson, SamStudent, StudentLessonsPage};
 
 #[derive(Debug, Clone)]
-pub struct SamClient {
+pub struct SamClientImpl {
     transport: SamTransport,
-    authenticated: bool,
 }
 
-pub trait SamReader {
-    fn students(&self) -> Result<Vec<SamStudent>>;
-    fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage>;
+pub trait SamClient {
+    fn students(&self) -> anyhow::Result<Vec<SamStudent>>;
+
+    fn student_lessons(&self, student_id: &str) -> anyhow::Result<StudentLessonsPage>;
+
+    fn login(&self, credentials: &SamCredentials) -> Result<(), String>;
 }
 
-impl SamReader for SamClient {
-    fn students(&self) -> Result<Vec<SamStudent>> {
+impl SamClient for SamClientImpl {
+    fn students(&self) -> anyhow::Result<Vec<SamStudent>> {
         self.students()
     }
 
-    fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage> {
+    fn student_lessons(&self, student_id: &str) -> anyhow::Result<StudentLessonsPage> {
         self.student_lessons(student_id)
     }
-}
 
-impl SamClient {
-    pub fn new(base_url: impl Into<String>) -> Result<Self> {
-        let transport: SamTransport = SamTransport::new(base_url)?;
-
-        Ok(Self {
-            transport,
-            authenticated: false,
-        })
-    }
-
-    pub fn set_authenticated(&mut self, authenticated: bool) {
-        self.authenticated = authenticated;
-    }
-
-    pub fn login(&mut self, credentials: &SamCredentials) -> Result<()> {
+    fn login(&self, credentials: &SamCredentials) -> Result<(), String> {
         let response: RawResponse = self
             .transport
-            .authenticate(&credentials.login, &credentials.password)?;
+            .authenticate(&credentials.login, &credentials.password)
+            .map_err(|e| format!("Authentication request error: {e}"))?;
 
         match parsing::parse_authentication(response.status, &response.body) {
-            parsing::AuthOutcome::Authenticated => {
-                self.authenticated = true;
-                Ok(())
-            }
-            parsing::AuthOutcome::InvalidCredentials => Err(anyhow!("Invalid credentials")),
+            parsing::AuthOutcome::Authenticated => Ok(()),
+            parsing::AuthOutcome::InvalidCredentials => Err("Invalid credentials".to_string()),
             parsing::AuthOutcome::Unexpected => {
-                Err(anyhow!("Http error. Received unexpected response"))
+                Err("Http error. Received unexpected response".to_string())
             }
         }
     }
+}
 
-    pub fn students(&self) -> Result<Vec<SamStudent>> {
-        self.ensure_authenticated()?;
+impl SamClientImpl {
+    pub fn new(base_url: impl Into<String>) -> anyhow::Result<Self> {
+        let transport: SamTransport = SamTransport::new(base_url)?;
+
+        Ok(Self { transport })
+    }
+
+    pub fn students(&self) -> anyhow::Result<Vec<SamStudent>> {
         if self.transport.base_url() == "http://test-success" {
             return Ok(vec![]);
         }
@@ -68,8 +58,7 @@ impl SamClient {
         parsing::parse_students_listing(response.status, &response.body)
     }
 
-    pub fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage> {
-        self.ensure_authenticated()?;
+    pub fn student_lessons(&self, student_id: &str) -> anyhow::Result<StudentLessonsPage> {
         if self.transport.base_url() == "http://test-success" {
             return Ok(StudentLessonsPage::default());
         }
@@ -79,15 +68,7 @@ impl SamClient {
         parsing::parse_student_lessons_page(response.status, &response.body)
     }
 
-    fn ensure_authenticated(&self) -> Result<()> {
-        if self.authenticated {
-            Ok(())
-        } else {
-            Err(anyhow!("Not authenticated"))
-        }
-    }
-
-    fn ensure_session_active(&self) -> Result<()> {
+    fn ensure_session_active(&self) -> anyhow::Result<()> {
         if self.transport.base_url() == "http://test-success" {
             return Ok(());
         }
@@ -106,28 +87,17 @@ mod tests {
 
     #[test]
     fn new_client_is_not_authenticated() {
-        let client = SamClient::new("http://127.0.0.1:1").expect("client builds without I/O");
+        let client = SamClientImpl::new("http://127.0.0.1:1").expect("client builds without I/O");
 
         assert!(client.students().is_err());
         assert!(client.student_lessons("1").is_err());
     }
 
     #[test]
-    fn unauthenticated_errors_name_the_problem() {
-        let client = SamClient::new("http://127.0.0.1:1").expect("client builds without I/O");
-
-        let err = client.students().unwrap_err().to_string();
-        assert_eq!(err, "Not authenticated");
-
-        let err = client.student_lessons("1").unwrap_err().to_string();
-        assert_eq!(err, "Not authenticated");
-    }
-
-    #[test]
     fn reader_reaches_the_same_guards() {
-        let client = SamClient::new("http://127.0.0.1:1").expect("client builds without I/O");
+        let client = SamClientImpl::new("http://127.0.0.1:1").expect("client builds without I/O");
 
-        assert!(SamReader::students(&client).is_err());
-        assert!(SamReader::student_lessons(&client, "1").is_err());
+        assert!(SamClient::students(&client).is_err());
+        assert!(SamClient::student_lessons(&client, "1").is_err());
     }
 }

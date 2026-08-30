@@ -1136,8 +1136,8 @@ name = "gui_application"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "app_bootstrap",
  "async-trait",
+ "authentication",
  "chrono",
  "flutter_rust_bridge",
  "sam",

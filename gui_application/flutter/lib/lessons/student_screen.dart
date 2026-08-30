@@ -1,6 +1,5 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/portal/sam_portal.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/lessons/widgets/back_bar.dart';
 import 'package:flutter_application/lessons/widgets/category_lessons_view.dart';
@@ -8,7 +7,6 @@ import 'package:flutter_application/lessons/widgets/student_detail_content.dart'
 import 'package:flutter_application/lessons/widgets/unknown_level_banner.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/view_models.dart';
 
 export 'package:flutter_application/lessons/widgets/category_lessons_view.dart'
     show LessonCategory;
@@ -19,9 +17,8 @@ export 'package:flutter_application/widgets/progress_bar.dart' show ProgressBar;
 
 class StudentScreen extends StatefulWidget {
   final String studentId;
-  final SamPortal? portal;
 
-  const StudentScreen({super.key, required this.studentId, this.portal});
+  const StudentScreen({super.key, required this.studentId});
 
   @override
   State<StudentScreen> createState() => _StudentScreenState();
@@ -36,8 +33,7 @@ final class ProgressLoading extends ProgressState {
 }
 
 final class ProgressAvailable extends ProgressState {
-  final ProgressViewModel vm;
-  const ProgressAvailable(this.vm);
+  const ProgressAvailable();
 }
 
 final class ProgressUnknown extends ProgressState {
@@ -79,23 +75,22 @@ final class _StudentScreenState extends State<StudentScreen> {
         return;
       }
 
-      try {
-        final portal = widget.portal ?? const RustSamPortal();
-        final result = await portal.retrieveStudentProgress(
-          studentId: widget.studentId,
-          assignedLevel: assignedLevel,
-        );
-        if (!mounted) return;
-        if (result.isUnknown) {
-          setState(() => _progress = ProgressUnknown(result.unknown.raw));
-        } else {
-          setState(() => _progress = ProgressAvailable(result.progress));
-        }
-      } catch (e) {
-        if (mounted) {
-          setState(() => _progress = ProgressFailure(e.toString()));
-        }
-      }
+      // try {
+      //   final result = await portal.retrieveStudentProgress(
+      //     studentId: widget.studentId,
+      //     assignedLevel: assignedLevel,
+      //   );
+      //   if (!mounted) return;
+      //   if (result.isUnknown) {
+      //     setState(() => _progress = ProgressUnknown(result.unknown.raw));
+      //   } else {
+      //     setState(() => _progress = ProgressAvailable(result.progress));
+      //   }
+      // } catch (e) {
+      //   if (mounted) {
+      //     setState(() => _progress = ProgressFailure(e.toString()));
+      //   }
+      // }
     });
   }
 
@@ -128,17 +123,6 @@ final class _StudentScreenState extends State<StudentScreen> {
   }
 
   Widget _buildLoaded(StudentLessonsView view) {
-    const emptyProgress = ProgressViewModel(
-      msaRelativePercent: 0,
-      methodRelativePercent: 0,
-      combinedPercent: 0,
-      overallCheckpointPercent: 0,
-      nextLevelLabel: '',
-      meetsYouthService: false,
-      meetsOfficialService: false,
-      meetsOfficialization: false,
-      checkpoints: [],
-    );
     return switch (_progress) {
       ProgressUnknown(:final raw) => Column(
         children: [
@@ -161,13 +145,13 @@ final class _StudentScreenState extends State<StudentScreen> {
                         CategoryLessonsView(
                           lessons: view.msa,
                           emptyMessage: 'Nenhuma lição aprovada registrada.',
-                          checkpoints: const [],
+                          // checkpoints: const [],
                           category: LessonCategory.msa,
                         ),
                         CategoryLessonsView(
                           lessons: view.method,
                           emptyMessage: 'Nenhuma lição de método registrada.',
-                          checkpoints: const [],
+                          // checkpoints: const [],
                           category: LessonCategory.method,
                         ),
                       ],
@@ -179,22 +163,23 @@ final class _StudentScreenState extends State<StudentScreen> {
           ),
         ],
       ),
-      ProgressAvailable(:final vm) => StudentDetailContent(
-        view: view,
-        progress: vm,
-      ),
-      ProgressLoading() => StudentDetailContent(
-        view: view,
-        progress: emptyProgress,
-      ),
-      ProgressFailure(:final message) => Column(
-        children: [
-          Padding(padding: const EdgeInsets.all(24), child: Text(message)),
-          Expanded(
-            child: StudentDetailContent(view: view, progress: emptyProgress),
-          ),
-        ],
-      ),
+      _ => CircularProgressIndicator(),
+      // ProgressAvailable(:final vm) => StudentDetailContent(
+      //   view: view,
+      //   progress: vm,
+      // ),
+      // ProgressLoading() => StudentDetailContent(
+      //   view: view,
+      //   progress: emptyProgress,
+      // ),
+      // ProgressFailure(:final message) => Column(
+      //   children: [
+      //     Padding(padding: const EdgeInsets.all(24), child: Text(message)),
+      //     Expanded(
+      //       child: StudentDetailContent(view: view, progress: emptyProgress),
+      //     ),
+      //   ],
+      // ),
     };
   }
 }

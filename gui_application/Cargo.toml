@@ -7,8 +7,10 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-student_management = { path = "../student_management" }
-app_bootstrap = { path = "../app_bootstrap" }
+student_core = { path = "../student_core" }
+sam_adapter = { path = "../sam_adapter" }
+authentication = { path = "../authentication" }
+sam = { path = "../sam" }
 flutter_rust_bridge = "=2.13.0-beta.2"
 anyhow = { workspace = true }
 async-trait = { workspace = true }

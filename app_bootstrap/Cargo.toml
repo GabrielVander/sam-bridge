@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-student_management = { path = "../student_management" }
-student_management_sam_adapter = { path = "../student_management_sam_adapter" }
+student_core = { path = "../student_core" }
+sam_adapter = { path = "../sam_adapter" }
 anyhow = { workspace = true }
 chrono = { workspace = true }
 serde = { version = "1", features = ["derive"] }
@@ -16,5 +16,5 @@ getrandom = "0.2"
 
 [dev-dependencies]
 async-trait = { workspace = true }
-smol = "2.0.2"
+smol = { workspace = true }
 tempfile = "3"
