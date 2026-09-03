@@ -1,9 +1,13 @@
 import 'package:bloc_signals/bloc_signals.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_application/authentication/application/use_cases/login_use_case.dart';
 import 'package:flutter_application/rust/bootstrap/infra/application.dart';
 
-sealed class AuthState {
+sealed class AuthState extends Equatable {
   const AuthState();
+
+  @override
+  List<Object?> get props => [];
 }
 
 final class AuthIdle extends AuthState {
@@ -18,9 +22,21 @@ final class AuthSuccess extends AuthState {
   const AuthSuccess();
 }
 
+final class AuthMissingFields extends AuthState {
+  const AuthMissingFields();
+}
+
+final class AuthUnauthorized extends AuthState {
+  const AuthUnauthorized();
+}
+
 final class AuthFailure extends AuthState {
   final String message;
+
   const AuthFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }
 
 class AuthPresenter extends CubitSignal<AuthState> {
@@ -31,7 +47,7 @@ class AuthPresenter extends CubitSignal<AuthState> {
 
   Future<void> submitLogin(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
-      emit(const AuthFailure('Informe usuário e senha.'));
+      emit(const AuthMissingFields());
       return;
     }
 
@@ -46,16 +62,10 @@ class AuthPresenter extends CubitSignal<AuthState> {
         emit(const AuthSuccess());
 
       case LoginResult_InvalidEmailOrPassword():
-        emit(const AuthFailure('Usuárrio ou Senha inválido(a)'));
+        emit(const AuthUnauthorized());
       case LoginResult_UnableToPerformAuthorization(:final String context):
         emit(AuthFailure(context));
     }
-  }
-
-  void reset() => emit(const AuthIdle());
-
-  void markRestored() {
-    if (stateValue is! AuthSuccess) emit(const AuthSuccess());
   }
 
   bool get isAuthenticated => stateValue is AuthSuccess;

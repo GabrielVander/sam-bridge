@@ -16,12 +16,18 @@ class LoginScreen extends StatelessWidget {
       },
       child: BlocSignalBuilder<AuthPresenter, AuthState>(
         builder: (BuildContext context, AuthState state) => switch (state) {
+          AuthIdle() => const _LoginFormCard(),
           AuthLoading() => const Center(child: CircularProgressIndicator()),
           AuthSuccess() => const Center(child: Icon(Icons.check_rounded)),
+          AuthMissingFields() => _LoginFormCard(
+            errorMessage: 'Informe usuário e senha',
+          ),
+          AuthUnauthorized() => _LoginFormCard(
+            errorMessage: 'Usuário ou senha inválido(a)',
+          ),
           AuthFailure(:final String message) => _LoginFormCard(
             errorMessage: message,
           ),
-          _ => const _LoginFormCard(),
         },
       ),
     );
@@ -70,7 +76,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                   const Icon(Icons.lock_person, size: 48, color: Colors.cyan),
                   const SizedBox(height: 16),
                   Text(
-                    'Login to SamSite',
+                    'Entre com seu usuário SAM',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   if (widget.errorMessage != null) ...[
@@ -87,7 +93,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                   TextField(
                     controller: _username,
                     decoration: const InputDecoration(
-                      labelText: 'Username',
+                      labelText: 'Email',
                       prefixIcon: Icon(Icons.person),
                       border: OutlineInputBorder(),
                     ),
@@ -98,7 +104,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                     controller: _password,
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: 'Password',
+                      labelText: 'Senha',
                       prefixIcon: Icon(Icons.key),
                       border: OutlineInputBorder(),
                     ),
@@ -111,7 +117,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                     height: 48,
                     child: FilledButton(
                       onPressed: () => _submit(context),
-                      child: const Text('Login'),
+                      child: const Text('Entrar'),
                     ),
                   ),
                 ],

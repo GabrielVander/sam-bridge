@@ -29,7 +29,7 @@ impl Application {
 
     pub async fn login(&self, email: String, password: String) -> LoginResult {
         self.login_use_case
-            .execute(LoginCommand::new(email.into(), password.into()))
+            .execute(LoginCommand::new(email, password))
             .await
     }
 }
