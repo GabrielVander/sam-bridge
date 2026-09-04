@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 sam = { path = "../sam" }
-student_core = { path = "../student_core" }
+student = { path = "../student" }
 authentication = { path = "../authentication" }
 anyhow = { workspace = true }
 async-trait = { workspace = true }

@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "student_core",
+  "student",
   "sam",
   "sam_adapter",
   "app_bootstrap",

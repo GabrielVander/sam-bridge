@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-student_core = { path = "../student_core" }
+student = { path = "../student" }
 sam_adapter = { path = "../sam_adapter" }
 authentication = { path = "../authentication" }
 sam = { path = "../sam" }

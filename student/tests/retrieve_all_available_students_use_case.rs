@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use student_core::{
+use student::{
     application::{
         gateways::StudentGateway,
         use_cases::{

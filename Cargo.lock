@@ -118,7 +118,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smol",
- "student_core",
+ "student",
  "tempfile",
 ]
 
@@ -1143,7 +1143,7 @@ dependencies = [
  "sam",
  "sam_adapter",
  "smol",
- "student_core",
+ "student",
 ]
 
 [[package]]
@@ -2345,7 +2345,7 @@ dependencies = [
  "regex",
  "sam",
  "smol",
- "student_core",
+ "student",
 ]
 
 [[package]]
@@ -2620,7 +2620,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "student_core"
+name = "student"
 version = "0.1.0"
 dependencies = [
  "anyhow",
