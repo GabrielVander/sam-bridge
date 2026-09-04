@@ -1,4 +1,4 @@
-use crate::student_lessons::domain::entities::{Clef, Range};
+use crate::lessons::domain::entities::{Clef, Range};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct LessonDto {

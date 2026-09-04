@@ -1,4 +1,4 @@
-use crate::student_roster::domain::entities::{region::Region, student_position::StudentPosition};
+use crate::roster::domain::entities::{region::Region, student_position::StudentPosition};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Student {

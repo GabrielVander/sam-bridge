@@ -92,7 +92,7 @@ pub enum SecretaryType {
 
 #[cfg(test)]
 mod tests {
-    use crate::student_roster::domain::entities::student_position::MusicianLevel;
+    use crate::roster::domain::entities::student_position::MusicianLevel;
 
     #[test]
     fn musician_level_name_and_parse() {

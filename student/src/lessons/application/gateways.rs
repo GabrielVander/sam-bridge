@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use crate::student_lessons::domain::entities::StudentLessons;
+use crate::lessons::domain::entities::StudentLessons;
 
 #[async_trait]
 pub trait StudentLessonsGateway: Send + Sync {

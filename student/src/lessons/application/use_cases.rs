@@ -1,4 +1,4 @@
-use crate::student_lessons::{
+use crate::lessons::{
     application::gateways::StudentLessonsGateway, domain::entities::StudentLessons,
 };
 
@@ -18,7 +18,7 @@ impl<'a, T: StudentLessonsGateway> RetrieveStudentLessonsUseCase<'a, T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::student_lessons::domain::entities::{Clef, Lesson, Range};
+    use crate::lessons::domain::entities::{Clef, Lesson, Range};
 
     use super::*;
     use async_trait::async_trait;

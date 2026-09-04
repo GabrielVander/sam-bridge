@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     domain::entities::{MusicianLevel, OrganistLevel, SecretaryType, StudentPosition},
-    student_roster::{application::gateways::StudentGateway, domain::entities::Student},
+    roster::{application::gateways::StudentGateway, domain::entities::Student},
 };
 
 #[derive(Clone)]
@@ -136,7 +136,7 @@ mod tests {
     use crate::{
         application::use_cases::{StudentPositionDto, StudentSummaryDto},
         domain::entities::{OrganistLevel, Region, SecretaryType, Student, StudentPosition},
-        student_roster::domain::entities::MusicianLevel,
+        roster::domain::entities::MusicianLevel,
     };
 
     use pretty_assertions::assert_eq;

@@ -1,6 +1,6 @@
 use crate::{
     domain::entities::MusicianLevel,
-    student_lessons::domain::entities::{Lesson, Range},
+    lessons::domain::entities::{Lesson, Range},
 };
 use thiserror::Error;
 
