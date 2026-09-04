@@ -7,7 +7,7 @@ pub trait CredentialGateway {
     async fn authorize(&self, credential: &Credential) -> Result<AuthorizationResult, String>;
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AuthorizationResult {
     Authorized,
     Unauthorized,

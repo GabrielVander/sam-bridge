@@ -4,7 +4,8 @@ pub struct Credential {
 }
 
 impl Credential {
-    pub fn new(email: Email, password: Password) -> Self {
+    #[must_use]
+    pub const fn new(email: Email, password: Password) -> Self {
         Self { email, password }
     }
 }

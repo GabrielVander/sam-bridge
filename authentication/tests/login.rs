@@ -12,7 +12,7 @@ fn login_successful() {
         AuthorizationResult::Authorized,
     )));
 
-    let use_case: LoginUseCase = LoginUseCase::new(credential_gateway.clone());
+    let use_case: LoginUseCase = LoginUseCase::new(credential_gateway);
 
     smol::block_on(async {
         let result: LoginResult = use_case
@@ -28,11 +28,11 @@ fn login_successful() {
 
 #[test]
 fn login_unsuccessful() {
-    let credential_gateway: Arc<dyn CredentialGateway> = Arc::new(FakeCredentialGateway::new(Ok(
+    let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Ok(
         AuthorizationResult::Unauthorized,
     )));
 
-    let use_case: LoginUseCase = LoginUseCase::new(credential_gateway.clone());
+    let use_case: LoginUseCase = LoginUseCase::new(credential_gateway);
 
     smol::block_on(async {
         let result: LoginResult = use_case
@@ -49,10 +49,10 @@ fn login_unsuccessful() {
 #[test]
 fn login_failure() {
     let error_message: &str = "Some error";
-    let credential_gateway: Arc<dyn CredentialGateway> =
+    let credential_gateway: Arc<FakeCredentialGateway> =
         Arc::new(FakeCredentialGateway::new(Err(error_message.to_string())));
 
-    let use_case: LoginUseCase = LoginUseCase::new(credential_gateway.clone());
+    let use_case: LoginUseCase = LoginUseCase::new(credential_gateway);
 
     smol::block_on(async {
         let result: LoginResult = use_case
@@ -76,7 +76,7 @@ struct FakeCredentialGateway {
 }
 
 impl FakeCredentialGateway {
-    fn new(result: Result<AuthorizationResult, String>) -> Self {
+    const fn new(result: Result<AuthorizationResult, String>) -> Self {
         Self { result }
     }
 }
