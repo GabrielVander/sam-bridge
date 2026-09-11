@@ -5,9 +5,9 @@
     non_camel_case_types,
     unused,
     non_snake_case,
-    clippy::needless_return,
-    clippy::redundant_closure_call,
-    clippy::redundant_closure,
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
     clippy::useless_conversion,
     clippy::unit_arg,
     clippy::unused_unit,
@@ -22,6 +22,10 @@
     clippy::borrow_deref_ref,
     clippy::uninlined_format_args,
     clippy::needless_borrow,
+    clippy::unreachable,
+    clippy::unwrap_used,
+    clippy::as_conversions,
+    clippy::unimplemented,
     mismatched_lifetime_syntaxes
 )]
 
@@ -136,25 +140,14 @@ fn wire__crate__api__build_main_application_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             deserializer.end();
             move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok = Result::<_, ()>::Ok(crate::api::build_main_application())?;
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::build_main_application()?;
                     Ok(output_ok)
                 })())
             }
         },
     )
 }
-
-// Section: static_checks
-
-#[allow(clippy::unnecessary_literal_unwrap)]
-const _: fn() = || match None::<crate::bootstrap::infra::LoginResult>.unwrap() {
-    crate::bootstrap::infra::LoginResult::Successful => {}
-    crate::bootstrap::infra::LoginResult::InvalidEmailOrPassword => {}
-    crate::bootstrap::infra::LoginResult::UnableToPerformAuthorization { context } => {
-        let _: String = context;
-    }
-};
 
 // Section: related_funcs
 
@@ -192,6 +185,13 @@ impl SseDecode for String {
     }
 }
 
+impl SseDecode for i32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
+    }
+}
+
 impl SseDecode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -207,24 +207,13 @@ impl SseDecode for Vec<u8> {
 impl SseDecode for crate::bootstrap::infra::LoginResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut tag_ = <i32>::sse_decode(deserializer);
-        match tag_ {
-            0 => {
-                return crate::bootstrap::infra::LoginResult::Successful;
-            }
-            1 => {
-                return crate::bootstrap::infra::LoginResult::InvalidEmailOrPassword;
-            }
-            2 => {
-                let mut var_context = <String>::sse_decode(deserializer);
-                return crate::bootstrap::infra::LoginResult::UnableToPerformAuthorization {
-                    context: var_context,
-                };
-            }
-            _ => {
-                unimplemented!("");
-            }
-        }
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::bootstrap::infra::LoginResult::Successful,
+            1 => crate::bootstrap::infra::LoginResult::InvalidEmailOrPassword,
+            2 => crate::bootstrap::infra::LoginResult::UnableToPerformAuthorization,
+            _ => unreachable!("Invalid variant for LoginResult: {}", inner),
+        };
     }
 }
 
@@ -244,13 +233,6 @@ impl SseDecode for usize {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         deserializer.cursor.read_u64::<NativeEndian>().unwrap() as _
-    }
-}
-
-impl SseDecode for i32 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
     }
 }
 
@@ -311,31 +293,25 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Application>> for Application 
 }
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::bootstrap::infra::LoginResult> {
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::LoginResult {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self.0 {
-            crate::bootstrap::infra::LoginResult::Successful => [0.into_dart()].into_dart(),
-            crate::bootstrap::infra::LoginResult::InvalidEmailOrPassword => {
-                [1.into_dart()].into_dart()
-            }
-            crate::bootstrap::infra::LoginResult::UnableToPerformAuthorization { context } => {
-                [2.into_dart(), context.into_into_dart().into_dart()].into_dart()
-            }
-            _ => {
-                unimplemented!("");
-            }
+        match self {
+            Self::Successful => 0.into_dart(),
+            Self::InvalidEmailOrPassword => 1.into_dart(),
+            Self::UnableToPerformAuthorization => 2.into_dart(),
+            _ => unreachable!(),
         }
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<crate::bootstrap::infra::LoginResult>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::bootstrap::infra::LoginResult>>
     for crate::bootstrap::infra::LoginResult
 {
-    fn into_into_dart(self) -> FrbWrapper<crate::bootstrap::infra::LoginResult> {
-        self.into()
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::LoginResult>
+    for crate::bootstrap::infra::LoginResult
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::LoginResult {
+        self
     }
 }
 
@@ -364,6 +340,13 @@ impl SseEncode for String {
     }
 }
 
+impl SseEncode for i32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
+    }
+}
+
 impl SseEncode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -377,21 +360,17 @@ impl SseEncode for Vec<u8> {
 impl SseEncode for crate::bootstrap::infra::LoginResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        match self {
-            crate::bootstrap::infra::LoginResult::Successful => {
-                <i32>::sse_encode(0, serializer);
-            }
-            crate::bootstrap::infra::LoginResult::InvalidEmailOrPassword => {
-                <i32>::sse_encode(1, serializer);
-            }
-            crate::bootstrap::infra::LoginResult::UnableToPerformAuthorization { context } => {
-                <i32>::sse_encode(2, serializer);
-                <String>::sse_encode(context, serializer);
-            }
-            _ => {
-                unimplemented!("");
-            }
-        }
+        <i32>::sse_encode(
+            match self {
+                crate::bootstrap::infra::LoginResult::Successful => 0,
+                crate::bootstrap::infra::LoginResult::InvalidEmailOrPassword => 1,
+                crate::bootstrap::infra::LoginResult::UnableToPerformAuthorization => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -414,13 +393,6 @@ impl SseEncode for usize {
             .cursor
             .write_u64::<NativeEndian>(self as _)
             .unwrap();
-    }
-}
-
-impl SseEncode for i32 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
     }
 }
 

@@ -1,12 +1,5 @@
 [workspace]
-members = [
-  "student",
-  "sam",
-  "sam_adapter",
-  "app_bootstrap",
-  "gui_application",
-  "authentication",
-]
+members = ["student", "sam", "sam_adapter", "gui_application", "authentication"]
 resolver = "3"
 
 [workspace.dependencies]
@@ -16,6 +9,12 @@ thiserror = "2.0.18"
 chrono = "0.4.45"
 pretty_assertions = "1.4.1"
 smol = "2.0.2"
+reqwest = { version = "0.13.4", features = [
+  "blocking",
+  "form",
+  "cookies",
+  "json",
+] }
 
 [workspace.lints.clippy]
 pedantic = { level = "deny", priority = -1 } # UM, ACTUALLY
@@ -34,3 +33,4 @@ panic_in_result_fn = "deny"
 panic = "deny"
 exit = "deny"
 as_conversions = "deny"
+missing_errors_doc = "allow"

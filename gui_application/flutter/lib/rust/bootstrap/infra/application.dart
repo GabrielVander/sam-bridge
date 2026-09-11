@@ -5,24 +5,17 @@
 
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
-part 'application.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `new`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Application>>
 abstract class Application implements RustOpaqueInterface {
   Future<LoginResult> login({required String email, required String password});
 }
 
-@freezed
-sealed class LoginResult with _$LoginResult {
-  const LoginResult._();
-
-  const factory LoginResult.successful() = LoginResult_Successful;
-  const factory LoginResult.invalidEmailOrPassword() =
-      LoginResult_InvalidEmailOrPassword;
-  const factory LoginResult.unableToPerformAuthorization({
-    required String context,
-  }) = LoginResult_UnableToPerformAuthorization;
+enum LoginResult {
+  successful,
+  invalidEmailOrPassword,
+  unableToPerformAuthorization,
 }

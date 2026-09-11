@@ -1,6 +1,6 @@
 use anyhow::bail;
 
-pub(crate) fn parse_session_status(dashboard_status: reqwest::StatusCode) -> anyhow::Result<()> {
+pub fn parse_session_status(dashboard_status: reqwest::StatusCode) -> anyhow::Result<()> {
     if dashboard_status != reqwest::StatusCode::OK {
         bail!(
             "Session invalid or expired. Expected dashboard to return 200 OK but got {dashboard_status}"
@@ -37,7 +37,10 @@ mod session_tests {
                 result
             );
             assert!(
-                result.unwrap_err().to_string().contains("Session invalid or expired"),
+                result
+                    .unwrap_err()
+                    .to_string()
+                    .contains("Session invalid or expired"),
                 "Expected a session-related error for {status_code}"
             );
         }

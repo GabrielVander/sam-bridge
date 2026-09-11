@@ -1,5 +1,4 @@
-
-#[derive(Debug, PartialEq, Clone, Default)]
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct MsaLesson {
     pub id: Option<String>,
     pub date: Option<String>,
@@ -11,7 +10,7 @@ pub struct MsaLesson {
     pub authorizer: Option<String>,
 }
 
-pub(crate) fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
+pub fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
     if body.trim().is_empty() {
         return Vec::new();
     }
@@ -168,7 +167,13 @@ mod msa_lessons_tests {
 
         assert_eq!(
             result,
-            vec![MsaLesson::default(), MsaLesson { id: Some("1".to_owned()), ..Default::default() }],
+            vec![
+                MsaLesson::default(),
+                MsaLesson {
+                    id: Some("1".to_owned()),
+                    ..Default::default()
+                }
+            ],
             "Rows without authorizer or any other field must not be dropped"
         );
     }
@@ -182,8 +187,8 @@ mod msa_lessons_tests {
 
     #[test]
     fn given_html_without_msa_table_should_return_empty_list_not_error() {
-        let result = parse_msa_lessons_body("<html><body><h1>Informação não encontrada</h1></body></html>",
-        );
+        let result =
+            parse_msa_lessons_body("<html><body><h1>Informação não encontrada</h1></body></html>");
 
         assert_eq!(result, vec![]);
     }
@@ -193,12 +198,7 @@ mod msa_lessons_tests {
         for empty_body in ["", "   "] {
             let result = parse_msa_lessons_body(empty_body);
 
-            assert_eq!(
-                result,
-                vec![],
-                "Expected no lessons for '{empty_body}'"
-            );
+            assert_eq!(result, vec![], "Expected no lessons for '{empty_body}'");
         }
     }
-
 }

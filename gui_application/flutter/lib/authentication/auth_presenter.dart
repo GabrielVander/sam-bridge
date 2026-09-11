@@ -58,13 +58,13 @@ class AuthPresenter extends CubitSignal<AuthState> {
     );
 
     switch (loginResult) {
-      case LoginResult_Successful():
+      case LoginResult.successful:
         emit(const AuthSuccess());
 
-      case LoginResult_InvalidEmailOrPassword():
+      case LoginResult.invalidEmailOrPassword:
         emit(const AuthUnauthorized());
-      case LoginResult_UnableToPerformAuthorization(:final String context):
-        emit(AuthFailure(context));
+      case LoginResult.unableToPerformAuthorization:
+        emit(AuthFailure("Algo deu errado"));
     }
   }
 

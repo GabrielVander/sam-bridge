@@ -1,5 +1,4 @@
-
-#[derive(Debug, PartialEq, Clone, Default)]
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct MtdLesson {
     pub id: Option<String>,
     pub pages: Option<String>,
@@ -11,7 +10,7 @@ pub struct MtdLesson {
     pub observations: Option<String>,
 }
 
-pub(crate) fn parse_method_lessons_body(body: &str) -> Vec<MtdLesson> {
+pub fn parse_method_lessons_body(body: &str) -> Vec<MtdLesson> {
     if body.trim().is_empty() {
         return Vec::new();
     }
@@ -178,7 +177,8 @@ mod method_lessons_tests {
 
     #[test]
     fn given_html_without_mtd_table_should_return_empty_list_not_error() {
-        let result = parse_method_lessons_body("<html><body><h1>Informação não encontrada</h1></body></html>",
+        let result = parse_method_lessons_body(
+            "<html><body><h1>Informação não encontrada</h1></body></html>",
         );
 
         assert_eq!(result, vec![]);
@@ -189,12 +189,7 @@ mod method_lessons_tests {
         for empty_body in ["", "   "] {
             let result = parse_method_lessons_body(empty_body);
 
-            assert_eq!(
-                result,
-                vec![],
-                "Expected no lessons for '{empty_body}'"
-            );
+            assert_eq!(result, vec![], "Expected no lessons for '{empty_body}'");
         }
     }
-
 }

@@ -1,4 +1,3 @@
-
 struct SamSiteConfig {
     base_url: String,
     username: String,
@@ -40,12 +39,15 @@ fn invalid_url() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let response_result: reqwest::Result<reqwest::blocking::Response> =
         client.get(build_invalid_sam_base_url()).send();
 
-    println!("{:#?}", response_result);
+    println!("{response_result:#?}");
 
     assert!(response_result.is_err());
     assert_eq!(
@@ -64,18 +66,21 @@ fn login_page_returns_ui_html() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_authentication_url(&site))
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::OK);
 
     let response_content: String = response.text().unwrap();
-    println!("{:#?}", response_content);
+    println!("{response_content:#?}");
 
     assert_eq!(response_content.lines().next(), Some("<!DOCTYPE html>"));
 }
@@ -87,7 +92,10 @@ fn login_with_invalid_credentials_returns_error_in_html() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let form = [("login", "someuser"), ("password", "somepassword")];
 
@@ -96,12 +104,12 @@ fn login_with_invalid_credentials_returns_error_in_html() {
         .form(&form)
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::OK);
 
     let response_content: String = response.text().unwrap();
-    println!("{:#?}", response_content);
+    println!("{response_content:#?}");
 
     assert!(response_content.contains("<p>* Oops... O usuário ou senha incorretos!</p>"));
 }
@@ -113,7 +121,10 @@ fn login_with_valid_credentials_returns_session_id_cookie() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let response: reqwest::blocking::Response = client
         .post(build_sam_authentication_url(&site))
@@ -123,7 +134,7 @@ fn login_with_valid_credentials_returns_session_id_cookie() {
         ])
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::SEE_OTHER);
     assert!(
@@ -138,7 +149,7 @@ fn login_with_valid_credentials_returns_session_id_cookie() {
 
     let session_id_cookie: Option<reqwest::cookie::Cookie> =
         response.cookies().find(|i| i.name() == "PHPSESSID");
-    println!("{:#?}", session_id_cookie);
+    println!("{session_id_cookie:#?}");
 
     assert!(session_id_cookie.is_some());
 }
@@ -150,11 +161,14 @@ fn dashboard_is_unacessable_if_not_logged_in() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let response: reqwest::blocking::Response =
         client.get(build_sam_dashboard_url(&site)).send().unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::TEMPORARY_REDIRECT);
     assert!(
@@ -165,7 +179,7 @@ fn dashboard_is_unacessable_if_not_logged_in() {
             .to_str()
             .unwrap()
             .starts_with(build_sam_base_url(&site))
-    )
+    );
 }
 
 #[test]
@@ -175,25 +189,42 @@ fn dashboard_is_acessable_if_previously_logged_in() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
-    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
-    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
-    println!("{:#?}", session_cookie);
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
+    println!("{session_cookie:#?}");
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_dashboard_url(&site))
         .header(reqwest::header::COOKIE, session_cookie)
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::OK);
 
     let response_content: String = response.text().unwrap();
-    println!("{:#?}", response_content);
+    println!("{response_content:#?}");
 
-    assert!(response_content.contains("<span>Painel de Controle</span>"))
+    assert!(response_content.contains("<span>Painel de Controle</span>"));
 }
 
 #[test]
@@ -203,13 +234,16 @@ fn students_listing_is_unacessable_if_not_logged_in() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_students_listing_url(&site))
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::TEMPORARY_REDIRECT);
     assert!(
@@ -220,7 +254,7 @@ fn students_listing_is_unacessable_if_not_logged_in() {
             .to_str()
             .unwrap()
             .starts_with(build_sam_base_url(&site))
-    )
+    );
 }
 
 #[test]
@@ -230,18 +264,35 @@ fn students_listing_fails_even_if_previously_logged_in() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
-    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
-    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
-    println!("{:#?}", session_cookie);
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
+    println!("{session_cookie:#?}");
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_students_listing_url(&site))
         .header(reqwest::header::COOKIE, session_cookie)
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(
         response.status(),
@@ -256,25 +307,48 @@ fn students_listing_succeeds_if_previously_logged_in_and_has_visited_dashboard()
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
-    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
-    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
-    println!("{:#?}", session_cookie);
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
+    println!("{session_cookie:#?}");
 
-    visit_dashboard(&client, &site, &session_cookie);
+    {
+        client
+            .get(build_sam_dashboard_url(&site))
+            .header(reqwest::header::COOKIE, &session_cookie)
+            .send()
+            .unwrap();
+    };
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_students_listing_url(&site))
         .header(reqwest::header::COOKIE, session_cookie)
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::OK);
 
     let response_content: String = response.text().unwrap();
-    println!("{:#?}", response_content);
+    println!("{response_content:#?}");
 
     assert!(response_content.contains("recordsTotal"));
     assert!(response_content.contains("data"));
@@ -287,7 +361,10 @@ fn student_lessons_fail_if_not_logged_in() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let invalid_student_id: String = build_invalid_student_id();
 
@@ -295,7 +372,7 @@ fn student_lessons_fail_if_not_logged_in() {
         .get(build_sam_student_lessons_url(&site, &invalid_student_id))
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::TEMPORARY_REDIRECT);
     assert!(
@@ -316,25 +393,42 @@ fn student_lessons_returns_nothing_if_logged_in_but_invalid_student_id() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let invalid_student_id: String = build_invalid_student_id();
 
-    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
-    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
-    println!("{:#?}", session_cookie);
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
+    println!("{session_cookie:#?}");
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_student_lessons_url(&site, &invalid_student_id))
         .header(reqwest::header::COOKIE, session_cookie)
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::OK);
 
     let response_content: String = response.text().unwrap();
-    println!("{:#?}", response_content);
+    println!("{response_content:#?}");
 
     assert_eq!(response_content, "");
 }
@@ -346,25 +440,42 @@ fn student_lessons_succeeds_if_logged_in_and_valid_student_id() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let valid_student_id: String = build_valid_student_id();
 
-    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
-    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
-    println!("{:#?}", session_cookie);
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
+    println!("{session_cookie:#?}");
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_student_lessons_url(&site, &valid_student_id))
         .header(reqwest::header::COOKIE, session_cookie)
         .send()
         .unwrap();
-    println!("{:#?}", response);
+    println!("{response:#?}");
 
     assert_eq!(response.status(), reqwest::StatusCode::OK);
 
     let response_content: String = response.text().unwrap();
-    println!("{:#?}", response_content);
+    println!("{response_content:#?}");
 
     assert!(response_content.contains("Lições Aprovadas"));
 }
@@ -376,12 +487,29 @@ fn student_lessons_contains_msa_lessons() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let valid_student_id: String = build_valid_student_id();
 
-    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
-    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_student_lessons_url(&site, &valid_student_id))
@@ -390,7 +518,7 @@ fn student_lessons_contains_msa_lessons() {
         .unwrap();
 
     let response_content: String = response.text().unwrap();
-    println!("{:#?}", response_content);
+    println!("{response_content:#?}");
 
     assert!(response_content.contains("<tr id=\"msa_42763\">\n            <td>19/09/2023</td>\n            <td>4.4 - 4.5</td>\n            <td>38 - 39</td>\n            <td>13 - 14</td>\n            <td>Sol</td>\n            <td>Estudar o praticar solfejo </td>\n            <td>THIAGO SOUZA SANTOS</td>\n            <td>\n                                    <button type=\"button\" class=\"btn btn-danger btn-sm\" data-toggle=\"tooltip\" title=\"Excluir\"\n                            onclick=\"delete_lancamento_msa(42763)\">\n                        <i class=\"fa fa-trash\"></i> Apagar\n                    </button>\n                            </td>\n        </tr>"));
 }
@@ -402,12 +530,29 @@ fn student_lessons_contains_instrument_lessons() {
         return;
     }
 
-    let client: reqwest::blocking::Client = build_http_client();
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
 
     let valid_student_id: String = "545039".to_string();
 
-    let authorized_session_id: String = get_authenticated_session_id(&client, &site);
-    let session_cookie: String = format!("PHPSESSID={}", authorized_session_id);
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
 
     let response: reqwest::blocking::Response = client
         .get(build_sam_student_lessons_url(&site, &valid_student_id))
@@ -416,16 +561,9 @@ fn student_lessons_contains_instrument_lessons() {
         .unwrap();
 
     let response_content: String = response.text().unwrap();
-    println!("{:#?}", response_content);
+    println!("{response_content:#?}");
 
     assert!(response_content.contains("<tr id=\"mtd_214020\">\n            <td>00</td>\n            <td>00</td>\n            <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>\n            <td>04/12/2023</td>\n            <td>MURILO FAGNER CARDOSO</td>\n            <td>04/12/2023 21:17:17</td>\n            <td>Postura do violino </td>\n            <td>\n                                <button type=\"button\" class=\"btn btn-danger btn-sm\" data-toggle=\"tooltip\" title=\"Excluir\"\n                    onclick=\"delete_lancamento_mtd(214020)\">\n                    <i class=\"fa fa-trash\"></i> Apagar\n                </button>\n                            </td>\n        </tr>"));
-}
-
-fn build_http_client() -> reqwest::blocking::Client {
-    reqwest::blocking::Client::builder()
-        .redirect(reqwest::redirect::Policy::none())
-        .build()
-        .unwrap()
 }
 
 fn build_sam_authentication_url(site: &SamSiteConfig) -> String {
@@ -443,16 +581,16 @@ fn build_sam_students_listing_url(site: &SamSiteConfig) -> String {
 fn build_sam_student_lessons_url(site: &SamSiteConfig, student_id: &String) -> String {
     format!(
         "{}/licoes/index/{}",
-        build_sam_base_url(site).trim_end_matches("/"),
+        build_sam_base_url(site).trim_end_matches('/'),
         student_id
     )
 }
 
-fn build_invalid_sam_base_url() -> &'static str {
+const fn build_invalid_sam_base_url() -> &'static str {
     "https://musical.musical.invalid_url.org.br/"
 }
 
-fn build_sam_base_url(site: &SamSiteConfig) -> &str {
+const fn build_sam_base_url(site: &SamSiteConfig) -> &str {
     site.base_url.as_str()
 }
 
@@ -462,35 +600,4 @@ fn build_invalid_student_id() -> String {
 
 fn build_valid_student_id() -> String {
     "500132".to_string()
-}
-
-fn get_authenticated_session_id(
-    client: &reqwest::blocking::Client,
-    site: &SamSiteConfig,
-) -> String {
-    client
-        .post(build_sam_authentication_url(site))
-        .form(&[
-            ("login", site.username.as_str()),
-            ("password", site.password.as_str()),
-        ])
-        .send()
-        .unwrap()
-        .cookies()
-        .find(|i| i.name() == "PHPSESSID")
-        .unwrap()
-        .value()
-        .to_string()
-}
-
-fn visit_dashboard(
-    client: &reqwest::blocking::Client,
-    site: &SamSiteConfig,
-    session_cookie: &String,
-) {
-    client
-        .get(build_sam_dashboard_url(site))
-        .header(reqwest::header::COOKIE, session_cookie)
-        .send()
-        .unwrap();
 }

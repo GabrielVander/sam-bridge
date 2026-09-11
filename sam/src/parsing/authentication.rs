@@ -1,5 +1,5 @@
-#[derive(Debug, PartialEq)]
-pub(crate) enum AuthOutcome {
+#[derive(Debug, PartialEq, Eq)]
+pub enum AuthOutcome {
     Authenticated,
     InvalidCredentials,
     Unexpected,
@@ -7,7 +7,7 @@ pub(crate) enum AuthOutcome {
 
 const INVALID_CREDENTIALS_MARKER: &str = "<p>* Oops... O usuário ou senha incorretos!</p>";
 
-pub(crate) fn parse_authentication(status: reqwest::StatusCode, body: &str) -> AuthOutcome {
+pub fn parse_authentication(status: reqwest::StatusCode, body: &str) -> AuthOutcome {
     if status == reqwest::StatusCode::OK && body.contains(INVALID_CREDENTIALS_MARKER) {
         return AuthOutcome::InvalidCredentials;
     }
@@ -51,8 +51,7 @@ mod authentication_tests {
 
     #[test]
     fn given_ok_response_without_invalid_credentials_marker_should_be_unexpected() {
-        let outcome: AuthOutcome =
-            parse_authentication(StatusCode::OK, "<html>welcome</html>");
+        let outcome: AuthOutcome = parse_authentication(StatusCode::OK, "<html>welcome</html>");
 
         assert_eq!(outcome, AuthOutcome::Unexpected);
     }

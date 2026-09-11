@@ -1,0 +1,96 @@
+use thiserror::Error;
+
+#[derive(Debug, Clone)]
+pub struct SamOperations {
+    client: reqwest::blocking::Client,
+    authentication_url: String,
+    dashboard_url: String,
+}
+
+impl SamOperations {
+    #[must_use]
+    pub fn new(
+        client: reqwest::blocking::Client,
+        base_url: &str,
+        authentication_endpoint: &str,
+        dashboard_endpoint: &str,
+    ) -> Self {
+        let normalized_base_url: &str = base_url.trim_end_matches('/');
+
+        let authentication_url: String = format!("{normalized_base_url}/{authentication_endpoint}");
+        let dashboard_url: String = format!("{normalized_base_url}/{dashboard_endpoint}");
+
+        Self {
+            client,
+            authentication_url,
+            dashboard_url,
+        }
+    }
+
+    pub(crate) fn authenticate(
+        &self,
+        login: &str,
+        password: &str,
+    ) -> Result<SamResponse, SamOperationError> {
+        self.client
+            .post(self.authentication_url.clone())
+            .form(&[("login", login), ("password", password)])
+            .send()
+            .map_err(|e| SamOperationError::RequestError {
+                source: e,
+                operation: "authentication".to_string(),
+            })
+            .and_then(|r| {
+                SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
+                    source: e,
+                    operation: "authentication".to_string(),
+                })
+            })
+    }
+
+    pub(crate) fn dashboard(&self) -> Result<SamResponse, SamOperationError> {
+        self.client
+            .get(self.dashboard_url.clone())
+            .send()
+            .map_err(|e| SamOperationError::RequestError {
+                source: e,
+                operation: "dashboard".to_string(),
+            })
+            .and_then(|r| {
+                SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
+                    source: e,
+                    operation: "dashboard".to_string(),
+                })
+            })
+    }
+}
+
+pub struct SamResponse {
+    pub status: u16,
+    pub body: String,
+}
+
+impl SamResponse {
+    fn from_reqwest_response(
+        response: reqwest::blocking::Response,
+    ) -> Result<Self, reqwest::Error> {
+        Ok(Self {
+            status: response.status().as_u16(),
+            body: response.text()?,
+        })
+    }
+}
+
+#[derive(Error, Debug)]
+pub enum SamOperationError {
+    #[error("Request failed for operation '{operation}'")]
+    RequestError {
+        source: reqwest::Error,
+        operation: String,
+    },
+    #[error("Unable to decode response for operation '{operation}'")]
+    DecodeError {
+        source: reqwest::Error,
+        operation: String,
+    },
+}

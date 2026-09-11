@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use authentication::{
-    application::gateways::{AuthorizationResult, CredentialGateway},
+    application::gateways::{AuthorizationResult, CredentialGateway, CredentialGatewayError},
     domain::entities::Credential,
 };
-use sam::client::{SamClient, SamCredentials};
+use sam::client::{SamClient, SamClientError, SamCredentials};
 
 pub struct CredentialGatewaySamImpl {
     client: Arc<dyn SamClient + Send + Sync>,
@@ -19,14 +19,25 @@ impl CredentialGatewaySamImpl {
 
 #[async_trait]
 impl CredentialGateway for CredentialGatewaySamImpl {
-    async fn authorize(&self, credential: &Credential) -> Result<AuthorizationResult, String> {
+    async fn authorize(
+        &self,
+        credential: &Credential,
+    ) -> Result<AuthorizationResult, CredentialGatewayError> {
         let cred = CredentialWrapper::from(credential);
-        let result: Result<(), String> = self.client.login(&cred.into());
+        let result: Result<(), SamClientError> = self.client.login(&cred.into());
 
         match result {
             Ok(_) => Ok(AuthorizationResult::Authorized),
-            Err(e) if e.as_str() == "Invalid credentials" => Ok(AuthorizationResult::Unauthorized),
-            Err(e) => Err(e),
+            Err(e) => match e {
+                SamClientError::RequestError { http_error: _ } => {
+                    Err(CredentialGatewayError::UnableToPerformOperation)
+                }
+                SamClientError::UnexpectedResponse { context: _ } => {
+                    Err(CredentialGatewayError::UnableToPerformOperation)
+                }
+                SamClientError::InvalidCredentials => Ok(AuthorizationResult::Unauthorized),
+                SamClientError::SessionExpired => Ok(AuthorizationResult::Unauthorized),
+            },
         }
     }
 }
