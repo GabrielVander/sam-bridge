@@ -1,5 +1,5 @@
 [workspace]
-members = ["student", "sam", "sam_adapter", "gui_application", "authentication"]
+members = ["student", "sam", "gui_application", "authentication"]
 resolver = "3"
 
 [workspace.dependencies]

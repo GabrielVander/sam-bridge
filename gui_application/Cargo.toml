@@ -7,15 +7,11 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-student = { path = "../student" }
-sam_adapter = { path = "../sam_adapter" }
 authentication = { path = "../authentication" }
 sam = { path = "../sam" }
 flutter_rust_bridge = "=2.13.0-beta.2"
-smol = "2.0.2"
 anyhow = { workspace = true }
 async-trait = { workspace = true }
-chrono = { workspace = true }
 reqwest = { workspace = true }
 
 [dev-dependencies]

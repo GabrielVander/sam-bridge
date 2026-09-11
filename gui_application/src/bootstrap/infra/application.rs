@@ -1,8 +1,10 @@
 use std::sync::Arc;
 
 use authentication::application::use_cases::{LoginCommand, LoginUseCase, LoginUseCaseError};
-use sam::{client::SamClientImpl, http::SamOperations};
-use sam_adapter::adapters::gateways::CredentialGatewaySamImpl;
+use sam::{
+    authentication::adapters::gateways::CredentialGatewaySamImpl, client::SamClientImpl,
+    http::SamOperations,
+};
 
 use crate::infra::Config;
 
