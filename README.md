@@ -18,54 +18,19 @@ about HTTP or HTML.
 @startuml
 title SAM Bridge Component Diagram
 
-component "Presentation GUI" as ui <<gui_application::flutter>>
-component "FRB api + composition root" as app <<gui_application>>
-component "Core student domain" as core <<student_management>>
-component "Gateway implementations over the SAM client" as adapter <<student_management_sam_adapter>>
-component "SAM portal client" as sam <<sam>>
+component "gui_application::flutter" as ui <<Infrastructure>>
+component gui_application <<Main>>
+component authentication <<Domain>>
+component sam <<Adapter + Infrastructure>>
 
-ui --> app
-app --> core
-app --> adapter
-adapter --> core
-adapter --> sam
+ui --> gui_application
+gui_application --> authentication
+gui_application --> sam
+sam --> authentication
 @enduml
 ```
 
-### Workspace layout
-
-```
-gui_application/                 # FRB crate: api surface, composition root
-  src/api.rs                     #   session + FRB-exposed functions
-  src/{roster,lessons}/          #   display mappers
-  src/view_models.rs             #   display DTOs crossing the FFI boundary
-  flutter/                       # the Flutter application (presentation only)
-student_management/              # core: vertical-slice features, zero I/O deps
-student_management_sam_adapter/  # core gateways implemented over `sam`
-sam/                             # SAM portal client (blocking, session-aware)
-```
-
-## Domain contracts
-
-- **One lessons endpoint.** Approved ("MSA") and instrument-method lessons are
-  both rendered by `GET /licoes/index/{id}` as two HTML tables (`div#msa`,
-  `table#datatable3`). A single fetch feeds both parsers; a missing table
-  means "no lessons", not an error.
-- **Tolerant parsing.** Every datum coming from SAM may be absent. Parsers and
-  mappings never fail on missing cells or ids — absence flows through as
-  `None`/empty all the way to the UI, which hides empty fields.
-- **Blocking core, async edges.** The SAM client is a single runtime-state
-  type (`login(&mut self)` flips an authenticated flag); adapters expose it
-  through the `RosterReader` / `LessonsReader` traits and bridge blocking
-  calls with `smol::unblock`. Async tests use `smol`.
-
 ## Development
-
-Prerequisites:
-
-- Rust (channel pinned in `gui_application/rust-toolchain.toml`)
-- Flutter SDK (Dart ^3.12)
-- `flutter_rust_bridge_codegen` **2.13.0-beta.2** (exact version)
 
 Common commands (from the repository root unless noted):
 
@@ -73,12 +38,9 @@ Common commands (from the repository root unless noted):
 # Rust
 cargo test --workspace
 cargo clippy --workspace --all-targets
-cargo llvm-cov nextest -p sam --features test-support --summary-only
-cargo llvm-cov nextest -p student_management --summary-only
-cargo llvm-cov nextest -p student_management_sam_adapter --summary-only \
-  --ignore-filename-regex 'session_opener\.rs'
+cargo llvm-cov nextest -p sam --summary-only
 cargo llvm-cov nextest -p gui_application --summary-only \
-  --ignore-filename-regex 'frb_generated\.rs|session_opener\.rs'
+  --ignore-filename-regex 'frb_generated\.rs'
 
 # Flutter (inside gui_application/flutter)
 flutter pub get
@@ -89,29 +51,3 @@ flutter build linux --debug     # rm -rf build/linux if CMake cache goes stale
 
 # Regenerate FRB bindings after changing gui_application/src/api.rs
 cd gui_application/flutter && flutter_rust_bridge_codegen generate
-```
-
-`sam` exposes its scripted-HTTP test server behind the `test-support`
-feature (enabled automatically for its own integration tests via a self
-dev-dependency). `bacon coverage` already excludes FRB generated files
-workspace-wide.
-
-Coverage gates are 100% regions/lines/functions for `sam`,
-`student_management`, `student_management_sam_adapter`, and
-`gui_application` (generated glue excluded).
-
-## Testing conventions
-
-- Test-driven development everywhere; tests live next to the code they cover
-  (Rust `#[cfg(test)]` modules) or under `gui_application/flutter/test`.
-- `cargo nextest` runs each Rust test in its own process; plain `cargo test`
-  shares one, so global-state tests serialize through an in-crate mutex.
-- Wiremock lives only inside `sam`. Everything above stubs sam's
-  `RosterReader` / `LessonsReader` traits directly; Dart presenters are
-  pure-Dart-testable via the `SamPortal` interface.
-- `adapter::session_opener::NetworkSessionOpener` is the single network-glue
-  file excluded from coverage measurement (its success path requires the real
-  SAM portal); its error path is exercised via a dead-port test in the
-  GUI crate.
-- Live-site capability checks live in `sam/tests/sam_http_capabilities_and_behaviour.rs`
-  and run against production SAM when credentials are present.
