@@ -7,5 +7,5 @@ import 'bootstrap/infra/application.dart';
 import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<Application> buildMainApplication() =>
+Future<ApplicationFacade> buildMainApplication() =>
     RustLib.instance.api.crateApiBuildMainApplication();

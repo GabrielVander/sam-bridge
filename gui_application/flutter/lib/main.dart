@@ -15,7 +15,7 @@ Future<void> main() async {
   final String versionDisplay =
       'v${packageInfo.version}+${packageInfo.buildNumber}';
 
-  final Application application = await buildMainApplication();
+  final ApplicationFacade application = await buildMainApplication();
 
   final AuthPresenter authPresenter = AuthPresenter(
     loginUseCase: application.login,

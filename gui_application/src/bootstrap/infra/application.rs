@@ -8,11 +8,11 @@ use sam::{
 
 use crate::infra::Config;
 
-pub struct Application {
+pub struct ApplicationFacade {
     login_use_case: LoginUseCase,
 }
 
-impl Application {
+impl ApplicationFacade {
     pub(crate) fn new(config: &Config) -> Result<Self, String> {
         let reqwest_client = reqwest::blocking::Client::builder()
             .redirect(reqwest::redirect::Policy::none())

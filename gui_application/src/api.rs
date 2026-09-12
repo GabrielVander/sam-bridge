@@ -1,10 +1,10 @@
-use crate::infra::{Application, Config};
+use crate::infra::{ApplicationFacade, Config};
 
-pub fn build_main_application() -> Result<Application, String> {
+pub fn build_main_application() -> Result<ApplicationFacade, String> {
     let config: Config = Config {
         sam_client_base_url: "https://musical.congregacao.org.br".to_string(),
         sam_auth_endpoint: "/autenticar".to_string(),
     };
 
-    Application::new(&config)
+    ApplicationFacade::new(&config)
 }

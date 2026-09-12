@@ -65,7 +65,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => -1713911391;
+  int get rustContentHash => -1488496129;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -77,21 +77,22 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<LoginResult> crateBootstrapInfraApplicationApplicationLogin({
-    required Application that,
+  Future<LoginResult> crateBootstrapInfraApplicationApplicationFacadeLogin({
+    required ApplicationFacade that,
     required String email,
     required String password,
   });
 
-  Future<Application> crateApiBuildMainApplication();
+  Future<ApplicationFacade> crateApiBuildMainApplication();
 
   RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_Application;
+  get rust_arc_increment_strong_count_ApplicationFacade;
 
   RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_Application;
+  get rust_arc_decrement_strong_count_ApplicationFacade;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ApplicationPtr;
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_ApplicationFacadePtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -103,8 +104,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<LoginResult> crateBootstrapInfraApplicationApplicationLogin({
-    required Application that,
+  Future<LoginResult> crateBootstrapInfraApplicationApplicationFacadeLogin({
+    required ApplicationFacade that,
     required String email,
     required String password,
   }) {
@@ -112,7 +113,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
             that,
             serializer,
           );
@@ -129,21 +130,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_login_result,
           decodeErrorData: null,
         ),
-        constMeta: kCrateBootstrapInfraApplicationApplicationLoginConstMeta,
+        constMeta:
+            kCrateBootstrapInfraApplicationApplicationFacadeLoginConstMeta,
         argValues: [that, email, password],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateBootstrapInfraApplicationApplicationLoginConstMeta =>
+  TaskConstMeta
+  get kCrateBootstrapInfraApplicationApplicationFacadeLoginConstMeta =>
       const TaskConstMeta(
-        debugName: "Application_login",
+        debugName: "ApplicationFacade_login",
         argNames: ["that", "email", "password"],
       );
 
   @override
-  Future<Application> crateApiBuildMainApplication() {
+  Future<ApplicationFacade> crateApiBuildMainApplication() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -157,7 +160,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         },
         codec: SseCodec(
           decodeSuccessData:
-              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication,
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade,
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiBuildMainApplicationConstMeta,
@@ -171,38 +174,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "build_main_application", argNames: []);
 
   RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_Application => wire
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication;
+  get rust_arc_increment_strong_count_ApplicationFacade => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade;
 
   RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_Application => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication;
+  get rust_arc_decrement_strong_count_ApplicationFacade => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade;
 
   @protected
-  Application
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
+  ApplicationFacade
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ApplicationImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return ApplicationFacadeImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
-  Application
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
+  ApplicationFacade
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ApplicationImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return ApplicationFacadeImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
-  Application
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
+  ApplicationFacade
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ApplicationImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return ApplicationFacadeImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -248,36 +251,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Application
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
+  ApplicationFacade
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return ApplicationImpl.frbInternalSseDecode(
+    return ApplicationFacadeImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
   }
 
   @protected
-  Application
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
+  ApplicationFacade
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return ApplicationImpl.frbInternalSseDecode(
+    return ApplicationFacadeImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
   }
 
   @protected
-  Application
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
+  ApplicationFacade
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return ApplicationImpl.frbInternalSseDecode(
+    return ApplicationFacadeImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
@@ -335,39 +338,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
-    Application self,
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
+    ApplicationFacade self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-      (self as ApplicationImpl).frbInternalSseEncode(move: true),
+      (self as ApplicationFacadeImpl).frbInternalSseEncode(move: true),
       serializer,
     );
   }
 
   @protected
   void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
-    Application self,
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
+    ApplicationFacade self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-      (self as ApplicationImpl).frbInternalSseEncode(move: false),
+      (self as ApplicationFacadeImpl).frbInternalSseEncode(move: false),
       serializer,
     );
   }
 
   @protected
   void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplication(
-    Application self,
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
+    ApplicationFacade self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-      (self as ApplicationImpl).frbInternalSseEncode(move: null),
+      (self as ApplicationFacadeImpl).frbInternalSseEncode(move: null),
       serializer,
     );
   }
@@ -425,30 +428,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 }
 
 @sealed
-class ApplicationImpl extends RustOpaque implements Application {
+class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
   // Not to be used by end users
-  ApplicationImpl.frbInternalDcoDecode(List<dynamic> wire)
+  ApplicationFacadeImpl.frbInternalDcoDecode(List<dynamic> wire)
     : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
-  ApplicationImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+  ApplicationFacadeImpl.frbInternalSseDecode(
+    BigInt ptr,
+    int externalSizeOnNative,
+  ) : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_Application,
+        RustLib.instance.api.rust_arc_increment_strong_count_ApplicationFacade,
     rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_Application,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_ApplicationPtr,
+        RustLib.instance.api.rust_arc_decrement_strong_count_ApplicationFacade,
+    rustArcDecrementStrongCountPtr: RustLib
+        .instance
+        .api
+        .rust_arc_decrement_strong_count_ApplicationFacadePtr,
   );
 
   Future<LoginResult> login({
     required String email,
     required String password,
-  }) => RustLib.instance.api.crateBootstrapInfraApplicationApplicationLogin(
-    that: this,
-    email: email,
-    password: password,
-  );
+  }) =>
+      RustLib.instance.api.crateBootstrapInfraApplicationApplicationFacadeLogin(
+        that: this,
+        email: email,
+        password: password,
+      );
 }
