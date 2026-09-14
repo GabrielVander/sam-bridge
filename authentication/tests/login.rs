@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use async_trait::async_trait;
 use authentication::application::gateways::{
@@ -68,6 +68,35 @@ fn login_failure() {
     });
 }
 
+#[test]
+fn login_forwards_email_and_password_to_the_credential_gateway() {
+    let credential_gateway: Arc<SpyCredentialGateway> = Arc::new(SpyCredentialGateway::new());
+
+    let use_case: LoginUseCase = LoginUseCase::new(credential_gateway.clone());
+
+    smol::block_on(async {
+        use_case
+            .execute(LoginCommand::new(
+                "Some email".to_string(),
+                "secretpassword123".to_string(),
+            ))
+            .await
+    })
+    .expect("gateway is stubbed to authorize");
+
+    let received_credential: (String, String) = credential_gateway
+        .received_credential
+        .lock()
+        .expect("mutex is not poisoned")
+        .clone()
+        .expect("authorize should have been called");
+
+    assert_eq!(
+        received_credential,
+        ("Some email".to_string(), "secretpassword123".to_string())
+    );
+}
+
 struct FakeCredentialGateway {
     result: Result<AuthorizationResult, CredentialGatewayError>,
 }
@@ -85,5 +114,32 @@ impl CredentialGateway for FakeCredentialGateway {
         _: &Credential,
     ) -> Result<AuthorizationResult, CredentialGatewayError> {
         self.result.clone()
+    }
+}
+
+struct SpyCredentialGateway {
+    received_credential: Mutex<Option<(String, String)>>,
+}
+
+impl SpyCredentialGateway {
+    const fn new() -> Self {
+        Self {
+            received_credential: Mutex::new(None),
+        }
+    }
+}
+
+#[async_trait]
+impl CredentialGateway for SpyCredentialGateway {
+    async fn authorize(
+        &self,
+        credential: &Credential,
+    ) -> Result<AuthorizationResult, CredentialGatewayError> {
+        if let Ok(mut received_credential) = self.received_credential.lock() {
+            *received_credential =
+                Some((credential.email.0.clone(), credential.password.0.clone()));
+        }
+
+        Ok(AuthorizationResult::Authorized)
     }
 }
