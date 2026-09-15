@@ -1,6 +1,13 @@
 use std::sync::Arc;
 
-use authentication::application::use_cases::{LoginCommand, LoginUseCase, LoginUseCaseError};
+use authentication::{
+    application::use_cases::{
+        LoginCommand, LoginUseCase, LoginUseCaseError, RememberCredentialsUseCase,
+        RestoreSessionResult, RestoreSessionUseCase,
+    },
+    domain::entities::{Credential, Email, Password},
+};
+use credential_store::FileCredentialStore;
 use sam::{
     authentication::adapters::gateways::CredentialGatewaySamImpl, client::SamClientImpl,
     http::SamOperations, lessons::adapters::gateways::StudentLessonsGatewaySamImpl,
@@ -17,6 +24,8 @@ use crate::infra::{
 
 pub struct ApplicationFacade {
     login_use_case: LoginUseCase,
+    remember_credentials_use_case: RememberCredentialsUseCase,
+    restore_session_use_case: RestoreSessionUseCase,
     retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase,
     sam_student_lessons_gateway: Arc<StudentLessonsGatewaySamImpl>,
 }
@@ -43,7 +52,15 @@ impl ApplicationFacade {
         let sam_credential_gateway: Arc<CredentialGatewaySamImpl> =
             Arc::new(CredentialGatewaySamImpl::new(sam_client.clone()));
 
-        let login_use_case: LoginUseCase = LoginUseCase::new(sam_credential_gateway);
+        let login_use_case: LoginUseCase = LoginUseCase::new(sam_credential_gateway.clone());
+
+        let file_credential_store: Arc<FileCredentialStore> = Arc::new(FileCredentialStore::new());
+
+        let remember_credentials_use_case: RememberCredentialsUseCase =
+            RememberCredentialsUseCase::new(file_credential_store.clone());
+
+        let restore_session_use_case: RestoreSessionUseCase =
+            RestoreSessionUseCase::new(file_credential_store, sam_credential_gateway);
 
         let sam_student_gateway: Arc<StudentGatewaySamImpl> =
             Arc::new(StudentGatewaySamImpl::new(sam_client.clone()));
@@ -56,16 +73,39 @@ impl ApplicationFacade {
 
         Ok(Self {
             login_use_case,
+            remember_credentials_use_case,
+            restore_session_use_case,
             retrieve_all_available_students_use_case,
             sam_student_lessons_gateway,
         })
     }
 
     pub async fn login(&self, email: String, password: String) -> LoginResult {
-        self.login_use_case
-            .execute(LoginCommand::new(email, password))
-            .await
-            .into()
+        let result: Result<(), LoginUseCaseError> = self
+            .login_use_case
+            .execute(LoginCommand::new(email.clone(), password.clone()))
+            .await;
+
+        if result.is_ok() {
+            // Remembering credentials is a best-effort side effect: a failed
+            // save must never turn an otherwise-successful login into a
+            // failure for the user.
+            let _ = self
+                .remember_credentials_use_case
+                .execute(Credential::new(Email(email), Password(password)))
+                .await;
+        }
+
+        result.into()
+    }
+
+    pub async fn restore_session(&self) -> RestoreSessionOutcome {
+        match self.restore_session_use_case.execute().await {
+            RestoreSessionResult::Restored => RestoreSessionOutcome::Restored,
+            RestoreSessionResult::NoStoredCredentials
+            | RestoreSessionResult::CredentialsRejected
+            | RestoreSessionResult::UnableToPerformOperation => RestoreSessionOutcome::NotAvailable,
+        }
     }
 
     pub async fn retrieve_all_available_students(&self) -> RetrieveAllAvailableStudentsOutcome {
@@ -106,6 +146,11 @@ pub enum LoginResult {
     Successful,
     InvalidEmailOrPassword,
     UnableToPerformAuthorization,
+}
+
+pub enum RestoreSessionOutcome {
+    Restored,
+    NotAvailable,
 }
 
 impl From<Result<(), LoginUseCaseError>> for LoginResult {

@@ -21,7 +21,10 @@ Future<void> main() async {
 
   final AuthPresenter authPresenter = AuthPresenter(
     loginUseCase: application.login,
+    restoreSessionUseCase: application.restoreSession,
   );
+
+  await authPresenter.restoreSession();
 
   final StudentsPresenter studentsPresenter = StudentsPresenter(
     retrieveStudents: application.retrieveAllAvailableStudents,

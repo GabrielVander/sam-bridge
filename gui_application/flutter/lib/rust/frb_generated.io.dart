@@ -89,6 +89,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RangeDto dco_decode_range_dto(dynamic raw);
 
   @protected
+  RestoreSessionOutcome dco_decode_restore_session_outcome(dynamic raw);
+
+  @protected
   RetrieveAllAvailableStudentsOutcome
   dco_decode_retrieve_all_available_students_outcome(dynamic raw);
 
@@ -181,6 +184,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RangeDto sse_decode_range_dto(SseDeserializer deserializer);
+
+  @protected
+  RestoreSessionOutcome sse_decode_restore_session_outcome(
+    SseDeserializer deserializer,
+  );
 
   @protected
   RetrieveAllAvailableStudentsOutcome
@@ -306,6 +314,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_range_dto(RangeDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_restore_session_outcome(
+    RestoreSessionOutcome self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_retrieve_all_available_students_outcome(

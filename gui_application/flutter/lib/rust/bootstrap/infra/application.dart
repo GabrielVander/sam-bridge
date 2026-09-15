@@ -15,6 +15,8 @@ import 'roster_view.dart';
 abstract class ApplicationFacade implements RustOpaqueInterface {
   Future<LoginResult> login({required String email, required String password});
 
+  Future<RestoreSessionOutcome> restoreSession();
+
   Future<RetrieveAllAvailableStudentsOutcome> retrieveAllAvailableStudents();
 
   Future<RetrieveStudentLessonsOutcome> retrieveStudentLessons({
@@ -27,3 +29,5 @@ enum LoginResult {
   invalidEmailOrPassword,
   unableToPerformAuthorization,
 }
+
+enum RestoreSessionOutcome { restored, notAvailable }

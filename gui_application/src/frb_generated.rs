@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0-beta.2";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 203230829;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -2093873562;
 
 // Section: executor
 
@@ -111,6 +111,30 @@ fn wire__crate__bootstrap__infra__application__ApplicationFacade_login_impl(
             }
         },
     )
+}
+fn wire__crate__bootstrap__infra__application__ApplicationFacade_restore_session_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "ApplicationFacade_restore_session", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, ()>((move || async move {
+                        let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_async_ref().await),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::bootstrap::infra::application::ApplicationFacade::restore_session(&*api_that_guard).await)?;   Ok(output_ok)
+                    })().await)
+                } })
 }
 fn wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_all_available_students_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
@@ -380,6 +404,18 @@ impl SseDecode for crate::bootstrap::infra::lessons_view::RangeDto {
     }
 }
 
+impl SseDecode for crate::bootstrap::infra::application::RestoreSessionOutcome {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::bootstrap::infra::application::RestoreSessionOutcome::Restored,
+            1 => crate::bootstrap::infra::application::RestoreSessionOutcome::NotAvailable,
+            _ => unreachable!("Invalid variant for RestoreSessionOutcome: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -547,9 +583,10 @@ fn pde_ffi_dispatcher_primary_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
                         1 => wire__crate__bootstrap__infra__application__ApplicationFacade_login_impl(port, ptr, rust_vec_len, data_len),
-2 => wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_all_available_students_impl(port, ptr, rust_vec_len, data_len),
-3 => wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_student_lessons_impl(port, ptr, rust_vec_len, data_len),
-4 => wire__crate__api__build_main_application_impl(port, ptr, rust_vec_len, data_len),
+2 => wire__crate__bootstrap__infra__application__ApplicationFacade_restore_session_impl(port, ptr, rust_vec_len, data_len),
+3 => wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_all_available_students_impl(port, ptr, rust_vec_len, data_len),
+4 => wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_student_lessons_impl(port, ptr, rust_vec_len, data_len),
+5 => wire__crate__api__build_main_application_impl(port, ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -673,6 +710,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::lessons_view::Ra
     for crate::bootstrap::infra::lessons_view::RangeDto
 {
     fn into_into_dart(self) -> crate::bootstrap::infra::lessons_view::RangeDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::application::RestoreSessionOutcome {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Restored => 0.into_dart(),
+            Self::NotAvailable => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::application::RestoreSessionOutcome
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::application::RestoreSessionOutcome>
+    for crate::bootstrap::infra::application::RestoreSessionOutcome
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::application::RestoreSessionOutcome {
         self
     }
 }
@@ -973,6 +1031,22 @@ impl SseEncode for crate::bootstrap::infra::lessons_view::RangeDto {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.from, serializer);
         <String>::sse_encode(self.to, serializer);
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::application::RestoreSessionOutcome {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::bootstrap::infra::application::RestoreSessionOutcome::Restored => 0,
+                crate::bootstrap::infra::application::RestoreSessionOutcome::NotAvailable => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 

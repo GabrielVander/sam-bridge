@@ -67,7 +67,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => 203230829;
+  int get rustContentHash => -2093873562;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -83,6 +83,11 @@ abstract class RustLibApi extends BaseApi {
     required ApplicationFacade that,
     required String email,
     required String password,
+  });
+
+  Future<RestoreSessionOutcome>
+  crateBootstrapInfraApplicationApplicationFacadeRestoreSession({
+    required ApplicationFacade that,
   });
 
   Future<RetrieveAllAvailableStudentsOutcome>
@@ -159,6 +164,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<RestoreSessionOutcome>
+  crateBootstrapInfraApplicationApplicationFacadeRestoreSession({
+    required ApplicationFacade that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_restore_session_outcome,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateBootstrapInfraApplicationApplicationFacadeRestoreSessionConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateBootstrapInfraApplicationApplicationFacadeRestoreSessionConstMeta =>
+      const TaskConstMeta(
+        debugName: "ApplicationFacade_restore_session",
+        argNames: ["that"],
+      );
+
+  @override
   Future<RetrieveAllAvailableStudentsOutcome>
   crateBootstrapInfraApplicationApplicationFacadeRetrieveAllAvailableStudents({
     required ApplicationFacade that,
@@ -174,7 +218,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 3,
             port: port_,
           );
         },
@@ -215,7 +259,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 4,
             port: port_,
           );
         },
@@ -247,7 +291,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 5,
             port: port_,
           );
         },
@@ -408,6 +452,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       from: dco_decode_String(arr[0]),
       to: dco_decode_String(arr[1]),
     );
+  }
+
+  @protected
+  RestoreSessionOutcome dco_decode_restore_session_outcome(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return RestoreSessionOutcome.values[raw as int];
   }
 
   @protected
@@ -704,6 +754,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_from = sse_decode_String(deserializer);
     var var_to = sse_decode_String(deserializer);
     return RangeDto(from: var_from, to: var_to);
+  }
+
+  @protected
+  RestoreSessionOutcome sse_decode_restore_session_outcome(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return RestoreSessionOutcome.values[inner];
   }
 
   @protected
@@ -1016,6 +1075,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_restore_session_outcome(
+    RestoreSessionOutcome self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_retrieve_all_available_students_outcome(
     RetrieveAllAvailableStudentsOutcome self,
     SseSerializer serializer,
@@ -1161,6 +1229,11 @@ class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
         that: this,
         email: email,
         password: password,
+      );
+
+  Future<RestoreSessionOutcome> restoreSession() => RustLib.instance.api
+      .crateBootstrapInfraApplicationApplicationFacadeRestoreSession(
+        that: this,
       );
 
   Future<RetrieveAllAvailableStudentsOutcome>
