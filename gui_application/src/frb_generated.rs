@@ -22,18 +22,12 @@
     clippy::borrow_deref_ref,
     clippy::uninlined_format_args,
     clippy::needless_borrow,
-    clippy::pedantic,
-    clippy::nursery,
-    clippy::unreachable,
-    clippy::unwrap_used,
-    clippy::as_conversions,
-    clippy::unimplemented,
     mismatched_lifetime_syntaxes
 )]
 
 // Section: imports
 
-use crate::bootstrap::infra::*;
+use crate::bootstrap::infra::application::*;
 use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
 use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
 use flutter_rust_bridge::{Handler, IntoIntoDart};
@@ -46,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0-beta.2";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1488496129;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1062663734;
 
 // Section: executor
 
@@ -103,7 +97,7 @@ fn wire__crate__bootstrap__infra__application__ApplicationFacade_login_impl(
                         }
                         let api_that_guard = api_that_guard.unwrap();
                         let output_ok = Result::<_, ()>::Ok(
-                            crate::bootstrap::infra::ApplicationFacade::login(
+                            crate::bootstrap::infra::application::ApplicationFacade::login(
                                 &*api_that_guard,
                                 api_email,
                                 api_password,
@@ -117,6 +111,30 @@ fn wire__crate__bootstrap__infra__application__ApplicationFacade_login_impl(
             }
         },
     )
+}
+fn wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_all_available_students_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "ApplicationFacade_retrieve_all_available_students", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, ()>((move || async move {
+                        let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_async_ref().await),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::bootstrap::infra::application::ApplicationFacade::retrieve_all_available_students(&*api_that_guard).await)?;   Ok(output_ok)
+                    })().await)
+                } })
 }
 fn wire__crate__api__build_main_application_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
@@ -206,15 +224,123 @@ impl SseDecode for Vec<u8> {
     }
 }
 
-impl SseDecode for crate::bootstrap::infra::LoginResult {
+impl SseDecode for Vec<crate::bootstrap::infra::roster_view::StudentSummaryDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(
+                <crate::bootstrap::infra::roster_view::StudentSummaryDto>::sse_decode(deserializer),
+            );
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::application::LoginResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
-            0 => crate::bootstrap::infra::LoginResult::Successful,
-            1 => crate::bootstrap::infra::LoginResult::InvalidEmailOrPassword,
-            2 => crate::bootstrap::infra::LoginResult::UnableToPerformAuthorization,
+            0 => crate::bootstrap::infra::application::LoginResult::Successful,
+            1 => crate::bootstrap::infra::application::LoginResult::InvalidEmailOrPassword,
+            2 => crate::bootstrap::infra::application::LoginResult::UnableToPerformAuthorization,
             _ => unreachable!("Invalid variant for LoginResult: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 =
+                    <Vec<crate::bootstrap::infra::roster_view::StudentSummaryDto>>::sse_decode(
+                        deserializer,
+                    );
+                return crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome::Success(var_field0);
+            }
+            1 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome::Failure(var_field0);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::roster_view::StudentPositionDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::Candidate;
+            }
+            1 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::Practice;
+            }
+            2 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::YouthService;
+            }
+            3 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::OfficialService;
+            }
+            4 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::Officialized;
+            }
+            5 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::HalfHour;
+            }
+            6 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceHalfHour;
+            }
+            7 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServicePractice;
+            }
+            8 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceOfficialService;
+            }
+            9 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceOfficialized;
+            }
+            10 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::GemSecretary;
+            }
+            11 => {
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::MusicSecretary;
+            }
+            12 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::bootstrap::infra::roster_view::StudentPositionDto::Invalid(
+                    var_field0,
+                );
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::roster_view::StudentSummaryDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <String>::sse_decode(deserializer);
+        let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_position =
+            <crate::bootstrap::infra::roster_view::StudentPositionDto>::sse_decode(deserializer);
+        let mut var_location = <String>::sse_decode(deserializer);
+        return crate::bootstrap::infra::roster_view::StudentSummaryDto {
+            id: var_id,
+            name: var_name,
+            position: var_position,
+            location: var_location,
         };
     }
 }
@@ -254,15 +380,11 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__bootstrap__infra__application__ApplicationFacade_login_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        2 => wire__crate__api__build_main_application_impl(port, ptr, rust_vec_len, data_len),
-        _ => unreachable!(),
-    }
+                        1 => wire__crate__bootstrap__infra__application__ApplicationFacade_login_impl(port, ptr, rust_vec_len, data_len),
+2 => wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_all_available_students_impl(port, ptr, rust_vec_len, data_len),
+3 => wire__crate__api__build_main_application_impl(port, ptr, rust_vec_len, data_len),
+                        _ => unreachable!(),
+                    }
 }
 
 fn pde_ffi_dispatcher_sync_impl(
@@ -295,7 +417,7 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<ApplicationFacade>> for Applic
 }
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::LoginResult {
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::application::LoginResult {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
             Self::Successful => 0.into_dart(),
@@ -306,13 +428,100 @@ impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::LoginResult {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::bootstrap::infra::LoginResult
+    for crate::bootstrap::infra::application::LoginResult
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::LoginResult>
-    for crate::bootstrap::infra::LoginResult
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::application::LoginResult>
+    for crate::bootstrap::infra::application::LoginResult
 {
-    fn into_into_dart(self) -> crate::bootstrap::infra::LoginResult {
+    fn into_into_dart(self) -> crate::bootstrap::infra::application::LoginResult {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome::Success(
+                field0,
+            ) => [0.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome::Failure(
+                field0,
+            ) => [1.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome,
+    > for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome
+{
+    fn into_into_dart(
+        self,
+    ) -> crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::roster_view::StudentPositionDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {crate::bootstrap::infra::roster_view::StudentPositionDto::Candidate => { [0.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::Practice => { [1.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthService => { [2.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::OfficialService => { [3.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::Officialized => { [4.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::HalfHour => { [5.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceHalfHour => { [6.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServicePractice => { [7.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceOfficialService => { [8.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceOfficialized => { [9.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::GemSecretary => { [10.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::MusicSecretary => { [11.into_dart()].into_dart() }
+crate::bootstrap::infra::roster_view::StudentPositionDto::Invalid(field0) => { [12.into_dart(),
+field0.into_into_dart().into_dart()].into_dart() }
+ _ => { unimplemented!(""); }}
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::roster_view::StudentPositionDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::roster_view::StudentPositionDto>
+    for crate::bootstrap::infra::roster_view::StudentPositionDto
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::roster_view::StudentPositionDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::roster_view::StudentSummaryDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.name.into_into_dart().into_dart(),
+            self.position.into_into_dart().into_dart(),
+            self.location.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::roster_view::StudentSummaryDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::roster_view::StudentSummaryDto>
+    for crate::bootstrap::infra::roster_view::StudentSummaryDto
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::roster_view::StudentSummaryDto {
         self
     }
 }
@@ -359,20 +568,91 @@ impl SseEncode for Vec<u8> {
     }
 }
 
-impl SseEncode for crate::bootstrap::infra::LoginResult {
+impl SseEncode for Vec<crate::bootstrap::infra::roster_view::StudentSummaryDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::bootstrap::infra::roster_view::StudentSummaryDto>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::application::LoginResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(
             match self {
-                crate::bootstrap::infra::LoginResult::Successful => 0,
-                crate::bootstrap::infra::LoginResult::InvalidEmailOrPassword => 1,
-                crate::bootstrap::infra::LoginResult::UnableToPerformAuthorization => 2,
+                crate::bootstrap::infra::application::LoginResult::Successful => 0,
+                crate::bootstrap::infra::application::LoginResult::InvalidEmailOrPassword => 1,
+                crate::bootstrap::infra::application::LoginResult::UnableToPerformAuthorization => {
+                    2
+                }
                 _ => {
                     unimplemented!("");
                 }
             },
             serializer,
         );
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome::Success(
+                field0,
+            ) => {
+                <i32>::sse_encode(0, serializer);
+                <Vec<crate::bootstrap::infra::roster_view::StudentSummaryDto>>::sse_encode(
+                    field0, serializer,
+                );
+            }
+            crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome::Failure(
+                field0,
+            ) => {
+                <i32>::sse_encode(1, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::roster_view::StudentPositionDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {crate::bootstrap::infra::roster_view::StudentPositionDto::Candidate => { <i32>::sse_encode(0, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::Practice => { <i32>::sse_encode(1, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthService => { <i32>::sse_encode(2, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::OfficialService => { <i32>::sse_encode(3, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::Officialized => { <i32>::sse_encode(4, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::HalfHour => { <i32>::sse_encode(5, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceHalfHour => { <i32>::sse_encode(6, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServicePractice => { <i32>::sse_encode(7, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceOfficialService => { <i32>::sse_encode(8, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::YouthServiceOfficialized => { <i32>::sse_encode(9, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::GemSecretary => { <i32>::sse_encode(10, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::MusicSecretary => { <i32>::sse_encode(11, serializer);  }
+crate::bootstrap::infra::roster_view::StudentPositionDto::Invalid(field0) => { <i32>::sse_encode(12, serializer); <String>::sse_encode(field0, serializer);
+ }
+ _ => { unimplemented!(""); }}
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::roster_view::StudentSummaryDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.name, serializer);
+        <crate::bootstrap::infra::roster_view::StudentPositionDto>::sse_encode(
+            self.position,
+            serializer,
+        );
+        <String>::sse_encode(self.location, serializer);
     }
 }
 
@@ -413,7 +693,7 @@ mod io {
     // Section: imports
 
     use super::*;
-    use crate::bootstrap::infra::*;
+    use crate::bootstrap::infra::application::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };

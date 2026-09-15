@@ -5,6 +5,7 @@
 
 import 'api.dart';
 import 'bootstrap/infra/application.dart';
+import 'bootstrap/infra/roster_view.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -65,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => -1488496129;
+  int get rustContentHash => -1062663734;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -81,6 +82,11 @@ abstract class RustLibApi extends BaseApi {
     required ApplicationFacade that,
     required String email,
     required String password,
+  });
+
+  Future<RetrieveAllAvailableStudentsOutcome>
+  crateBootstrapInfraApplicationApplicationFacadeRetrieveAllAvailableStudents({
+    required ApplicationFacade that,
   });
 
   Future<ApplicationFacade> crateApiBuildMainApplication();
@@ -146,6 +152,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<RetrieveAllAvailableStudentsOutcome>
+  crateBootstrapInfraApplicationApplicationFacadeRetrieveAllAvailableStudents({
+    required ApplicationFacade that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_retrieve_all_available_students_outcome,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateBootstrapInfraApplicationApplicationFacadeRetrieveAllAvailableStudentsConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateBootstrapInfraApplicationApplicationFacadeRetrieveAllAvailableStudentsConstMeta =>
+      const TaskConstMeta(
+        debugName: "ApplicationFacade_retrieve_all_available_students",
+        argNames: ["that"],
+      );
+
+  @override
   Future<ApplicationFacade> crateApiBuildMainApplication() {
     return handler.executeNormal(
       NormalTask(
@@ -154,7 +199,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 3,
             port: port_,
           );
         },
@@ -227,9 +272,82 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<StudentSummaryDto> dco_decode_list_student_summary_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_student_summary_dto).toList();
+  }
+
+  @protected
   LoginResult dco_decode_login_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return LoginResult.values[raw as int];
+  }
+
+  @protected
+  RetrieveAllAvailableStudentsOutcome
+  dco_decode_retrieve_all_available_students_outcome(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return RetrieveAllAvailableStudentsOutcome_Success(
+          dco_decode_list_student_summary_dto(raw[1]),
+        );
+      case 1:
+        return RetrieveAllAvailableStudentsOutcome_Failure(
+          dco_decode_String(raw[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  StudentPositionDto dco_decode_student_position_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return StudentPositionDto_Candidate();
+      case 1:
+        return StudentPositionDto_Practice();
+      case 2:
+        return StudentPositionDto_YouthService();
+      case 3:
+        return StudentPositionDto_OfficialService();
+      case 4:
+        return StudentPositionDto_Officialized();
+      case 5:
+        return StudentPositionDto_HalfHour();
+      case 6:
+        return StudentPositionDto_YouthServiceHalfHour();
+      case 7:
+        return StudentPositionDto_YouthServicePractice();
+      case 8:
+        return StudentPositionDto_YouthServiceOfficialService();
+      case 9:
+        return StudentPositionDto_YouthServiceOfficialized();
+      case 10:
+        return StudentPositionDto_GemSecretary();
+      case 11:
+        return StudentPositionDto_MusicSecretary();
+      case 12:
+        return StudentPositionDto_Invalid(dco_decode_String(raw[1]));
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  StudentSummaryDto dco_decode_student_summary_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return StudentSummaryDto(
+      id: dco_decode_String(arr[0]),
+      name: dco_decode_String(arr[1]),
+      position: dco_decode_student_position_dto(arr[2]),
+      location: dco_decode_String(arr[3]),
+    );
   }
 
   @protected
@@ -307,10 +425,101 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<StudentSummaryDto> sse_decode_list_student_summary_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <StudentSummaryDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_student_summary_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   LoginResult sse_decode_login_result(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return LoginResult.values[inner];
+  }
+
+  @protected
+  RetrieveAllAvailableStudentsOutcome
+  sse_decode_retrieve_all_available_students_outcome(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_list_student_summary_dto(deserializer);
+        return RetrieveAllAvailableStudentsOutcome_Success(var_field0);
+      case 1:
+        var var_field0 = sse_decode_String(deserializer);
+        return RetrieveAllAvailableStudentsOutcome_Failure(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  StudentPositionDto sse_decode_student_position_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        return StudentPositionDto_Candidate();
+      case 1:
+        return StudentPositionDto_Practice();
+      case 2:
+        return StudentPositionDto_YouthService();
+      case 3:
+        return StudentPositionDto_OfficialService();
+      case 4:
+        return StudentPositionDto_Officialized();
+      case 5:
+        return StudentPositionDto_HalfHour();
+      case 6:
+        return StudentPositionDto_YouthServiceHalfHour();
+      case 7:
+        return StudentPositionDto_YouthServicePractice();
+      case 8:
+        return StudentPositionDto_YouthServiceOfficialService();
+      case 9:
+        return StudentPositionDto_YouthServiceOfficialized();
+      case 10:
+        return StudentPositionDto_GemSecretary();
+      case 11:
+        return StudentPositionDto_MusicSecretary();
+      case 12:
+        var var_field0 = sse_decode_String(deserializer);
+        return StudentPositionDto_Invalid(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  StudentSummaryDto sse_decode_student_summary_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_position = sse_decode_student_position_dto(deserializer);
+    var var_location = sse_decode_String(deserializer);
+    return StudentSummaryDto(
+      id: var_id,
+      name: var_name,
+      position: var_position,
+      location: var_location,
+    );
   }
 
   @protected
@@ -398,9 +607,86 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_student_summary_dto(
+    List<StudentSummaryDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_student_summary_dto(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_login_result(LoginResult self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_retrieve_all_available_students_outcome(
+    RetrieveAllAvailableStudentsOutcome self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case RetrieveAllAvailableStudentsOutcome_Success(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_list_student_summary_dto(field0, serializer);
+      case RetrieveAllAvailableStudentsOutcome_Failure(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_String(field0, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_student_position_dto(
+    StudentPositionDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case StudentPositionDto_Candidate():
+        sse_encode_i_32(0, serializer);
+      case StudentPositionDto_Practice():
+        sse_encode_i_32(1, serializer);
+      case StudentPositionDto_YouthService():
+        sse_encode_i_32(2, serializer);
+      case StudentPositionDto_OfficialService():
+        sse_encode_i_32(3, serializer);
+      case StudentPositionDto_Officialized():
+        sse_encode_i_32(4, serializer);
+      case StudentPositionDto_HalfHour():
+        sse_encode_i_32(5, serializer);
+      case StudentPositionDto_YouthServiceHalfHour():
+        sse_encode_i_32(6, serializer);
+      case StudentPositionDto_YouthServicePractice():
+        sse_encode_i_32(7, serializer);
+      case StudentPositionDto_YouthServiceOfficialService():
+        sse_encode_i_32(8, serializer);
+      case StudentPositionDto_YouthServiceOfficialized():
+        sse_encode_i_32(9, serializer);
+      case StudentPositionDto_GemSecretary():
+        sse_encode_i_32(10, serializer);
+      case StudentPositionDto_MusicSecretary():
+        sse_encode_i_32(11, serializer);
+      case StudentPositionDto_Invalid(field0: final field0):
+        sse_encode_i_32(12, serializer);
+        sse_encode_String(field0, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_student_summary_dto(
+    StudentSummaryDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_student_position_dto(self.position, serializer);
+    sse_encode_String(self.location, serializer);
   }
 
   @protected
@@ -458,5 +744,11 @@ class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
         that: this,
         email: email,
         password: password,
+      );
+
+  Future<RetrieveAllAvailableStudentsOutcome>
+  retrieveAllAvailableStudents() => RustLib.instance.api
+      .crateBootstrapInfraApplicationApplicationFacadeRetrieveAllAvailableStudents(
+        that: this,
       );
 }

@@ -9,6 +9,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 authentication = { path = "../authentication" }
 sam = { path = "../sam" }
+student = { path = "../student" }
 flutter_rust_bridge = "=2.13.0-beta.2"
 anyhow = { workspace = true }
 async-trait = { workspace = true }

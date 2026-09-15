@@ -2,6 +2,7 @@ import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/router.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/rust/api.dart';
 import 'package:flutter_application/rust/bootstrap/infra/application.dart';
 import 'package:flutter_application/rust/frb_generated.dart';
@@ -21,19 +22,29 @@ Future<void> main() async {
     loginUseCase: application.login,
   );
 
+  final StudentsPresenter studentsPresenter = StudentsPresenter(
+    retrieveStudents: application.retrieveAllAvailableStudents,
+  );
+
   runApp(
-    SamSiteApp(versionDisplay: versionDisplay, authPresenter: authPresenter),
+    SamSiteApp(
+      versionDisplay: versionDisplay,
+      authPresenter: authPresenter,
+      studentsPresenter: studentsPresenter,
+    ),
   );
 }
 
 class SamSiteApp extends StatelessWidget {
   final String versionDisplay;
   final AuthPresenter authPresenter;
+  final StudentsPresenter studentsPresenter;
 
   const SamSiteApp({
     super.key,
     required this.versionDisplay,
     required this.authPresenter,
+    required this.studentsPresenter,
   });
 
   @override
@@ -41,6 +52,7 @@ class SamSiteApp extends StatelessWidget {
     return MultiBlocSignalProvider(
       providers: [
         BlocSignalProvider<AuthPresenter>.value(value: authPresenter),
+        BlocSignalProvider<StudentsPresenter>.value(value: studentsPresenter),
       ],
       child: Builder(
         builder: (context) {

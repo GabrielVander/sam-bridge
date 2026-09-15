@@ -1,7 +1,11 @@
 use thiserror::Error;
 
 use crate::http::{SamOperationError, SamOperations, SamResponse};
-use crate::parsing::{AuthResponse, AuthenticationParser, DashboardParser, DashboardResponse};
+use crate::parsing::{
+    self, AuthResponse, AuthenticationParser, DashboardParser, DashboardResponse,
+};
+
+pub use crate::parsing::SamStudent;
 
 #[derive(Debug, Clone)]
 pub struct SamClientImpl {
@@ -11,7 +15,7 @@ pub struct SamClientImpl {
 pub trait SamClient {
     fn login(&self, credentials: &SamCredentials) -> Result<(), SamClientError>;
 
-    // fn students(&self) -> Result<Vec<SamStudent>, SamClientError>;
+    fn students(&self) -> Result<Vec<SamStudent>, SamClientError>;
 
     // fn student_lessons(&self, student_id: &str) -> anyhow::Result<StudentLessonsPage>;
 }
@@ -58,16 +62,23 @@ impl SamClient for SamClientImpl {
         }
     }
 
-    // fn students(&self) -> Result<Vec<SamStudent>, SamClientError> {
-    //     if self.transport.base_url() == "http://test-success" {
-    //         return Ok(vec![]);
-    //     }
-    //     self.ensure_session_active()?;
-    //
-    //     let response: RawResponse = self.transport.fetch_student_listing()?;
-    //
-    //     parsing::parse_students_listing(response.status, &response.body)
-    // }
+    fn students(&self) -> Result<Vec<SamStudent>, SamClientError> {
+        self.ensure_session_active()?;
+
+        let response: SamResponse = self
+            .sam_ops
+            .students_listing()
+            .map_err(SamClientError::from)?;
+
+        let status: reqwest::StatusCode = reqwest::StatusCode::from_u16(response.status)
+            .unwrap_or(reqwest::StatusCode::INTERNAL_SERVER_ERROR);
+
+        parsing::parse_students_listing(status, &response.body).map_err(|e| {
+            SamClientError::UnexpectedResponse {
+                context: e.to_string(),
+            }
+        })
+    }
 
     // fn student_lessons(&self, student_id: &str) -> anyhow::Result<StudentLessonsPage> {
     //     self.student_lessons(student_id)

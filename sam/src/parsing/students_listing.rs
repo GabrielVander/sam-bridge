@@ -64,7 +64,7 @@ mod students_listing_tests {
             r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#,
         );
 
-        assert!(result.is_err(), "Expected an Err but got {:#?}", result);
+        assert!(result.is_err(), "Expected an Err but got {result:#?}");
         assert!(
             result
                 .unwrap_err()
@@ -145,10 +145,10 @@ mod students_listing_tests {
             vec![SamStudent {
                 id: "1".to_string(),
                 name: "NAME".to_string(),
-                location: "".to_string(),
-                role: "".to_string(),
-                instrument: "".to_string(),
-                level: "".to_string(),
+                location: String::new(),
+                role: String::new(),
+                instrument: String::new(),
+                level: String::new(),
             }]
         );
     }
@@ -167,8 +167,7 @@ mod students_listing_tests {
 
             assert!(
                 result.is_err(),
-                "Expected parsing of '{response_body}' to fail but got {:#?}",
-                result
+                "Expected parsing of '{response_body}' to fail but got {result:#?}"
             );
             assert!(
                 result

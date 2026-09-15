@@ -22,9 +22,9 @@ final class _StudentsScreenState extends State<StudentsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final state = context.read<StudentsCubitSignal>().stateValue;
+      final state = context.read<StudentsPresenter>().stateValue;
       if (state is StudentsIdle) {
-        context.read<StudentsCubitSignal>().load();
+        context.read<StudentsPresenter>().load();
       } else if (state is StudentsLoaded) {
         _searchController.text = state.nameQuery;
       }
@@ -42,7 +42,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 250), () {
       if (!mounted) return;
-      context.read<StudentsCubitSignal>().filter(nameQuery: value);
+      context.read<StudentsPresenter>().filter(nameQuery: value);
     });
   }
 
@@ -99,13 +99,13 @@ final class _StudentsScreenState extends State<StudentsScreen> {
       ),
     );
     if (result != null && mounted) {
-      context.read<StudentsCubitSignal>().filter(selectedLocations: result);
+      context.read<StudentsPresenter>().filter(selectedLocations: result);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocSignalBuilder<StudentsCubitSignal, StudentsState>(
+    return BlocSignalBuilder<StudentsPresenter, StudentsState>(
       builder: (context, state) => switch (state) {
         StudentsLoading() => const Center(child: CircularProgressIndicator()),
         StudentsLoaded(
@@ -132,7 +132,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                             icon: const Icon(Icons.clear),
                             onPressed: () {
                               _searchController.clear();
-                              context.read<StudentsCubitSignal>().filter(
+                              context.read<StudentsPresenter>().filter(
                                 nameQuery: '',
                               );
                             },
@@ -166,7 +166,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                       TextButton(
                         onPressed: () {
                           _searchController.clear();
-                          context.read<StudentsCubitSignal>().clearFilters();
+                          context.read<StudentsPresenter>().clearFilters();
                         },
                         child: const Text('Limpar'),
                       ),
@@ -187,7 +187,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                           onDeleted: () {
                             final next = Set<String>.from(selectedLocations)
                               ..remove(loc);
-                            context.read<StudentsCubitSignal>().filter(
+                            context.read<StudentsPresenter>().filter(
                               selectedLocations: next,
                             );
                           },
@@ -222,7 +222,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
               ),
               const SizedBox(height: 16),
               FilledButton.tonal(
-                onPressed: () => context.read<StudentsCubitSignal>().load(),
+                onPressed: () => context.read<StudentsPresenter>().load(),
                 child: const Text('Tentar novamente'),
               ),
             ],
@@ -281,7 +281,7 @@ final class _StudentsListContent extends StatelessWidget {
                 const SizedBox(height: 16),
                 FilledButton.tonal(
                   onPressed: () =>
-                      context.read<StudentsCubitSignal>().clearFilters(),
+                      context.read<StudentsPresenter>().clearFilters(),
                   child: const Text('Limpar filtros'),
                 ),
               ],

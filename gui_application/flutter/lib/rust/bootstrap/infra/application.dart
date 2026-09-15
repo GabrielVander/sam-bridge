@@ -5,6 +5,7 @@
 
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'roster_view.dart';
 
 // These functions are ignored because they are not marked as `pub`: `new`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`
@@ -12,6 +13,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>
 abstract class ApplicationFacade implements RustOpaqueInterface {
   Future<LoginResult> login({required String email, required String password});
+
+  Future<RetrieveAllAvailableStudentsOutcome> retrieveAllAvailableStudents();
 }
 
 enum LoginResult {

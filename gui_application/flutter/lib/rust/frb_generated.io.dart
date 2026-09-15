@@ -5,6 +5,7 @@
 
 import 'api.dart';
 import 'bootstrap/infra/application.dart';
+import 'bootstrap/infra/roster_view.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;
@@ -51,7 +52,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<StudentSummaryDto> dco_decode_list_student_summary_dto(dynamic raw);
+
+  @protected
   LoginResult dco_decode_login_result(dynamic raw);
+
+  @protected
+  RetrieveAllAvailableStudentsOutcome
+  dco_decode_retrieve_all_available_students_outcome(dynamic raw);
+
+  @protected
+  StudentPositionDto dco_decode_student_position_dto(dynamic raw);
+
+  @protected
+  StudentSummaryDto dco_decode_student_summary_dto(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -90,7 +104,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<StudentSummaryDto> sse_decode_list_student_summary_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LoginResult sse_decode_login_result(SseDeserializer deserializer);
+
+  @protected
+  RetrieveAllAvailableStudentsOutcome
+  sse_decode_retrieve_all_available_students_outcome(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  StudentPositionDto sse_decode_student_position_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  StudentSummaryDto sse_decode_student_summary_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -138,7 +173,31 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_student_summary_dto(
+    List<StudentSummaryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_login_result(LoginResult self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_retrieve_all_available_students_outcome(
+    RetrieveAllAvailableStudentsOutcome self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_student_position_dto(
+    StudentPositionDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_student_summary_dto(
+    StudentSummaryDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);

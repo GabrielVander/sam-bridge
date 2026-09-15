@@ -5,6 +5,7 @@ pub struct SamOperations {
     client: reqwest::blocking::Client,
     authentication_url: String,
     dashboard_url: String,
+    students_listing_url: String,
 }
 
 impl SamOperations {
@@ -14,16 +15,20 @@ impl SamOperations {
         base_url: &str,
         authentication_endpoint: &str,
         dashboard_endpoint: &str,
+        students_listing_endpoint: &str,
     ) -> Self {
         let normalized_base_url: &str = base_url.trim_end_matches('/');
 
         let authentication_url: String = format!("{normalized_base_url}/{authentication_endpoint}");
         let dashboard_url: String = format!("{normalized_base_url}/{dashboard_endpoint}");
+        let students_listing_url: String =
+            format!("{normalized_base_url}/{students_listing_endpoint}");
 
         Self {
             client,
             authentication_url,
             dashboard_url,
+            students_listing_url,
         }
     }
 
@@ -60,6 +65,22 @@ impl SamOperations {
                 SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
                     source: e,
                     operation: "dashboard".to_string(),
+                })
+            })
+    }
+
+    pub(crate) fn students_listing(&self) -> Result<SamResponse, SamOperationError> {
+        self.client
+            .get(self.students_listing_url.clone())
+            .send()
+            .map_err(|e| SamOperationError::RequestError {
+                source: e,
+                operation: "students_listing".to_string(),
+            })
+            .and_then(|r| {
+                SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
+                    source: e,
+                    operation: "students_listing".to_string(),
                 })
             })
     }

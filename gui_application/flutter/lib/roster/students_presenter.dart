@@ -1,6 +1,9 @@
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/roster/application/use_cases/retrieve_students_use_case.dart';
+import 'package:flutter_application/roster/roster_mapper.dart';
+import 'package:flutter_application/rust/bootstrap/infra/roster_view.dart';
 import 'package:fuzzy/fuzzy.dart';
 
 sealed class StudentsState {
@@ -35,21 +38,24 @@ final class StudentsFailure extends StudentsState {
   const StudentsFailure(this.message);
 }
 
-class StudentsCubitSignal extends CubitSignal<StudentsState> {
+class StudentsPresenter extends CubitSignal<StudentsState> {
+  final RetrieveStudentsUseCase _retrieveStudents;
   List<StudentListItem> _all = [];
   String _nameQuery = '';
   Set<String> _selectedLocations = {};
 
-  StudentsCubitSignal() : super(initialState: const StudentsIdle());
+  StudentsPresenter({required this._retrieveStudents})
+    : super(initialState: const StudentsIdle());
 
   Future<void> load() async {
     emit(const StudentsLoading());
-    try {
-      // final dtos = await _portal.retrieveStudents();
-      // _all = RosterMapper.toViewModels(dtos);
-      emit(_filteredState());
-    } catch (e) {
-      emit(StudentsFailure(e.toString()));
+    final outcome = await _retrieveStudents();
+    switch (outcome) {
+      case RetrieveAllAvailableStudentsOutcome_Success(:final field0):
+        _all = RosterMapper.toViewModels(field0);
+        emit(_filteredState());
+      case RetrieveAllAvailableStudentsOutcome_Failure(:final field0):
+        emit(StudentsFailure(field0));
     }
   }
 

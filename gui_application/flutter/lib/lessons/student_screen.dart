@@ -54,7 +54,7 @@ final class _StudentScreenState extends State<StudentScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      final studentsState = context.read<StudentsCubitSignal>().stateValue;
+      final studentsState = context.read<StudentsPresenter>().stateValue;
       String assignedLevel = '__UNKNOWN__';
       bool found = false;
       if (studentsState is StudentsLoaded) {

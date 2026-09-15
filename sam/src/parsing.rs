@@ -2,13 +2,14 @@
 // mod method_lessons;
 // mod msa_lessons;
 // mod session;
-// mod students_listing;
 
 mod authentication_parser;
 mod dashboard_parser;
+mod students_listing;
 
 pub use authentication_parser::*;
 pub use dashboard_parser::*;
+pub use students_listing::*;
 
 // pub fn parse_student_lessons_page(
 //     response_status: reqwest::StatusCode,
