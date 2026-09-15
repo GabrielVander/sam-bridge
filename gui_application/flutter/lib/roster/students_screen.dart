@@ -118,14 +118,12 @@ final class _StudentsScreenState extends State<StudentsScreen> {
           Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
                     hintText: 'Buscar por nome…',
-                    border: const OutlineInputBorder(),
-                    isDense: true,
                     suffixIcon: nameQuery.isEmpty
                         ? null
                         : IconButton(
@@ -143,7 +141,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
                     Expanded(
@@ -176,10 +174,10 @@ final class _StudentsScreenState extends State<StudentsScreen> {
               ),
               if (selectedLocations.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                   child: Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       for (final loc in selectedLocations)
                         InputChip(
@@ -195,6 +193,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                     ],
                   ),
                 ),
+              const SizedBox(height: 12),
               const Divider(height: 1),
               Expanded(
                 child: _StudentsListContent(
@@ -307,21 +306,97 @@ final class _StudentsList extends StatelessWidget {
     }
 
     return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       itemCount: students.length,
-      separatorBuilder: (_, _) => const Divider(height: 1),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final student = students[index];
         final hasId = student.id.isNotEmpty;
-        return ListTile(
-          title: Text(student.name),
-          subtitle: Text(
-            '${student.position}\n${student.location}',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+        final initial = student.name.isEmpty
+            ? '?'
+            : student.name.substring(0, 1).toUpperCase();
+
+        return Card(
+          margin: EdgeInsets.zero,
+          child: InkWell(
+            onTap: hasId ? () => context.go('/students/${student.id}') : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer,
+                    child: Text(
+                      initial,
+                      style: TextStyle(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          student.name,
+                          style: Theme.of(context).textTheme.titleMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          student.position,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.place_outlined,
+                              size: 14,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                student.location,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (hasId) ...[
+                    const SizedBox(width: 8),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ],
+              ),
+            ),
           ),
-          isThreeLine: true,
-          trailing: hasId ? const Icon(Icons.chevron_right) : null,
-          onTap: hasId ? () => context.go('/students/${student.id}') : null,
         );
       },
     );

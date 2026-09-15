@@ -74,17 +74,49 @@ class SamSiteApp extends StatelessWidget {
               appVersion: versionDisplay,
               authPresenter: authPresenter,
             ),
-            debugShowCheckedModeBanner: true,
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.cyan,
-                brightness: Brightness.dark,
-              ),
-              useMaterial3: true,
-            ),
+            debugShowCheckedModeBanner: false,
+            theme: _buildTheme(),
           );
         },
       ),
     );
   }
+}
+
+ThemeData _buildTheme() {
+  final colorScheme = ColorScheme.fromSeed(
+    seedColor: Colors.cyan,
+    brightness: Brightness.dark,
+  );
+
+  return ThemeData(
+    colorScheme: colorScheme,
+    useMaterial3: true,
+    scaffoldBackgroundColor: colorScheme.surface,
+    appBarTheme: const AppBarTheme(elevation: 0, scrolledUnderElevation: 1),
+    cardTheme: CardThemeData(
+      elevation: 0,
+      color: colorScheme.surfaceContainerHigh,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      clipBehavior: Clip.antiAlias,
+    ),
+    listTileTheme: const ListTileThemeData(
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 14,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+    ),
+    dividerTheme: DividerThemeData(
+      color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+    ),
+  );
 }

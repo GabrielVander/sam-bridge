@@ -86,11 +86,14 @@ class MainScreen extends StatelessWidget {
       ),
       bottomNavigationBar: Container(
         width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 4),
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: Text(
           versionDisplay,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
       ),
       body: child,

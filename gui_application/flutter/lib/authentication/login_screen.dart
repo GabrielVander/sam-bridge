@@ -46,6 +46,7 @@ final class _LoginFormCard extends StatefulWidget {
 final class _LoginFormCardState extends State<_LoginFormCard> {
   final TextEditingController _username = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -67,46 +68,81 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
           child: Card(
-            elevation: 4,
+            elevation: 2,
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.fromLTRB(32, 40, 32, 32),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.lock_person, size: 48, color: Colors.cyan),
-                  const SizedBox(height: 16),
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer,
+                    child: Icon(
+                      Icons.lock_person,
+                      size: 32,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Text(
                     'Entre com seu usuário SAM',
+                    textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   if (widget.errorMessage != null) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      widget.errorMessage!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
                       ),
-                      textAlign: TextAlign.center,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        widget.errorMessage!,
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onErrorContainer,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ],
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
                   TextField(
                     controller: _username,
                     decoration: const InputDecoration(
                       labelText: 'Email',
                       prefixIcon: Icon(Icons.person),
-                      border: OutlineInputBorder(),
                     ),
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _password,
-                    obscureText: true,
-                    decoration: const InputDecoration(
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
                       labelText: 'Senha',
-                      prefixIcon: Icon(Icons.key),
-                      border: OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.key),
+                      suffixIcon: IconButton(
+                        tooltip: _obscurePassword
+                            ? 'Mostrar senha'
+                            : 'Ocultar senha',
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                      ),
                     ),
                     textInputAction: TextInputAction.done,
                     onSubmitted: (_) => _submit(context),
@@ -116,6 +152,11 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                     width: double.infinity,
                     height: 48,
                     child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       onPressed: () => _submit(context),
                       child: const Text('Entrar'),
                     ),

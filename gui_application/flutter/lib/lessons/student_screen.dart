@@ -30,6 +30,7 @@ final class _StudentScreenState extends State<StudentScreen> {
       body: Column(
         children: [
           const BackBar(),
+          const Divider(height: 1),
           Expanded(
             child: BlocSignalBuilder<LessonsCubitSignal, LessonsState>(
               builder: (context, state) => switch (state) {
