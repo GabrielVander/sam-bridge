@@ -1,5 +1,8 @@
 import 'package:bloc_signals/bloc_signals.dart';
+import 'package:flutter_application/lessons/application/use_cases/retrieve_student_lessons_use_case.dart';
+import 'package:flutter_application/lessons/lessons_mapper.dart';
 import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/rust/bootstrap/infra/lessons_view.dart';
 
 sealed class LessonsState {
   const LessonsState();
@@ -24,13 +27,21 @@ final class LessonsFailure extends LessonsState {
 }
 
 class LessonsCubitSignal extends CubitSignal<LessonsState> {
-  LessonsCubitSignal() : super(initialState: const LessonsIdle());
+  final RetrieveStudentLessonsUseCase retrieveStudentLessons;
+
+  LessonsCubitSignal({required this.retrieveStudentLessons})
+    : super(initialState: const LessonsIdle());
 
   Future<void> load(String studentId) async {
     emit(const LessonsLoading());
     try {
-      // final dto = await _portal.retrieveStudentLessons(studentId: studentId);
-      // emit(LessonsLoaded(LessonsMapper.toViewModel(dto)));
+      final outcome = await retrieveStudentLessons(studentId: studentId);
+      switch (outcome) {
+        case RetrieveStudentLessonsOutcome_Success(:final field0):
+          emit(LessonsLoaded(LessonsMapper.toViewModel(field0)));
+        case RetrieveStudentLessonsOutcome_Failure(:final field0):
+          emit(LessonsFailure(field0));
+      }
     } catch (e) {
       emit(LessonsFailure(e.toString()));
     }

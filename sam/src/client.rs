@@ -1,3 +1,6 @@
 mod sam_client;
 
-pub use sam_client::{SamClient, SamClientError, SamClientImpl, SamCredentials, SamStudent};
+pub use sam_client::{
+    MsaLesson, MtdLesson, SamClient, SamClientError, SamClientImpl, SamCredentials, SamStudent,
+    StudentLessonsPage,
+};

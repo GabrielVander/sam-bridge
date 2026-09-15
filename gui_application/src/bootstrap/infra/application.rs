@@ -3,18 +3,22 @@ use std::sync::Arc;
 use authentication::application::use_cases::{LoginCommand, LoginUseCase, LoginUseCaseError};
 use sam::{
     authentication::adapters::gateways::CredentialGatewaySamImpl, client::SamClientImpl,
-    http::SamOperations, roster::adapters::gateways::StudentGatewaySamImpl,
+    http::SamOperations, lessons::adapters::gateways::StudentLessonsGatewaySamImpl,
+    roster::adapters::gateways::StudentGatewaySamImpl,
 };
 use student::application::use_cases::{
     RetrieveAllAvailableStudentsError, RetrieveAllAvailableStudentsResult,
-    RetrieveAllAvailableStudentsUseCase,
+    RetrieveAllAvailableStudentsUseCase, RetrieveStudentLessonsUseCase,
 };
 
-use crate::infra::{Config, RetrieveAllAvailableStudentsOutcome, StudentSummaryDto};
+use crate::infra::{
+    Config, RetrieveAllAvailableStudentsOutcome, RetrieveStudentLessonsOutcome, StudentSummaryDto,
+};
 
 pub struct ApplicationFacade {
     login_use_case: LoginUseCase,
     retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase,
+    sam_student_lessons_gateway: Arc<StudentLessonsGatewaySamImpl>,
 }
 
 impl ApplicationFacade {
@@ -31,6 +35,7 @@ impl ApplicationFacade {
             &config.sam_auth_endpoint,
             &config.sam_dashboard_endpoint,
             &config.sam_students_listing_endpoint,
+            &config.sam_student_lessons_endpoint,
         );
 
         let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
@@ -41,14 +46,18 @@ impl ApplicationFacade {
         let login_use_case: LoginUseCase = LoginUseCase::new(sam_credential_gateway);
 
         let sam_student_gateway: Arc<StudentGatewaySamImpl> =
-            Arc::new(StudentGatewaySamImpl::new(sam_client));
+            Arc::new(StudentGatewaySamImpl::new(sam_client.clone()));
 
         let retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase =
             RetrieveAllAvailableStudentsUseCase::new(sam_student_gateway);
 
+        let sam_student_lessons_gateway: Arc<StudentLessonsGatewaySamImpl> =
+            Arc::new(StudentLessonsGatewaySamImpl::new(sam_client));
+
         Ok(Self {
             login_use_case,
             retrieve_all_available_students_use_case,
+            sam_student_lessons_gateway,
         })
     }
 
@@ -73,6 +82,22 @@ impl ApplicationFacade {
             RetrieveAllAvailableStudentsResult::Failure(
                 RetrieveAllAvailableStudentsError::GatewayError { context },
             ) => RetrieveAllAvailableStudentsOutcome::Failure(context),
+        }
+    }
+
+    pub async fn retrieve_student_lessons(
+        &self,
+        student_id: String,
+    ) -> RetrieveStudentLessonsOutcome {
+        let use_case =
+            RetrieveStudentLessonsUseCase::new(self.sam_student_lessons_gateway.as_ref());
+
+        match use_case.execute(&student_id).await {
+            Ok(lessons) => {
+                let dto: student::application::dto::StudentLessonsDto = lessons.into();
+                RetrieveStudentLessonsOutcome::Success(dto.into())
+            }
+            Err(err) => RetrieveStudentLessonsOutcome::Failure(err.to_string()),
         }
     }
 }

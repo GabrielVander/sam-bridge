@@ -5,6 +5,7 @@
 
 import 'api.dart';
 import 'bootstrap/infra/application.dart';
+import 'bootstrap/infra/lessons_view.dart';
 import 'bootstrap/infra/roster_view.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -66,7 +67,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => -1062663734;
+  int get rustContentHash => 203230829;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -87,6 +88,12 @@ abstract class RustLibApi extends BaseApi {
   Future<RetrieveAllAvailableStudentsOutcome>
   crateBootstrapInfraApplicationApplicationFacadeRetrieveAllAvailableStudents({
     required ApplicationFacade that,
+  });
+
+  Future<RetrieveStudentLessonsOutcome>
+  crateBootstrapInfraApplicationApplicationFacadeRetrieveStudentLessons({
+    required ApplicationFacade that,
+    required String studentId,
   });
 
   Future<ApplicationFacade> crateApiBuildMainApplication();
@@ -191,6 +198,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<RetrieveStudentLessonsOutcome>
+  crateBootstrapInfraApplicationApplicationFacadeRetrieveStudentLessons({
+    required ApplicationFacade that,
+    required String studentId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
+            that,
+            serializer,
+          );
+          sse_encode_String(studentId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_retrieve_student_lessons_outcome,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateBootstrapInfraApplicationApplicationFacadeRetrieveStudentLessonsConstMeta,
+        argValues: [that, studentId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateBootstrapInfraApplicationApplicationFacadeRetrieveStudentLessonsConstMeta =>
+      const TaskConstMeta(
+        debugName: "ApplicationFacade_retrieve_student_lessons",
+        argNames: ["that", "studentId"],
+      );
+
+  @override
   Future<ApplicationFacade> crateApiBuildMainApplication() {
     return handler.executeNormal(
       NormalTask(
@@ -199,7 +247,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 4,
             port: port_,
           );
         },
@@ -260,9 +308,58 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ClefDto dco_decode_box_autoadd_clef_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_clef_dto(raw);
+  }
+
+  @protected
+  RangeDto dco_decode_box_autoadd_range_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_range_dto(raw);
+  }
+
+  @protected
+  StudentLessonsDto dco_decode_box_autoadd_student_lessons_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_student_lessons_dto(raw);
+  }
+
+  @protected
+  ClefDto dco_decode_clef_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ClefDto.values[raw as int];
+  }
+
+  @protected
   int dco_decode_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
+  }
+
+  @protected
+  LessonDto dco_decode_lesson_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return LessonDto(
+      id: dco_decode_opt_String(arr[0]),
+      date: dco_decode_opt_String(arr[1]),
+      phase: dco_decode_opt_box_autoadd_range_dto(arr[2]),
+      page: dco_decode_opt_box_autoadd_range_dto(arr[3]),
+      lesson: dco_decode_opt_box_autoadd_range_dto(arr[4]),
+      clef: dco_decode_opt_box_autoadd_clef_dto(arr[5]),
+      description: dco_decode_opt_String(arr[6]),
+      instructor: dco_decode_opt_String(arr[7]),
+      method: dco_decode_opt_String(arr[8]),
+    );
+  }
+
+  @protected
+  List<LessonDto> dco_decode_list_lesson_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_lesson_dto).toList();
   }
 
   @protected
@@ -284,6 +381,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  ClefDto? dco_decode_opt_box_autoadd_clef_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_clef_dto(raw);
+  }
+
+  @protected
+  RangeDto? dco_decode_opt_box_autoadd_range_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_range_dto(raw);
+  }
+
+  @protected
+  RangeDto dco_decode_range_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return RangeDto(
+      from: dco_decode_String(arr[0]),
+      to: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
   RetrieveAllAvailableStudentsOutcome
   dco_decode_retrieve_all_available_students_outcome(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -299,6 +426,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw Exception("unreachable");
     }
+  }
+
+  @protected
+  RetrieveStudentLessonsOutcome dco_decode_retrieve_student_lessons_outcome(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return RetrieveStudentLessonsOutcome_Success(
+          dco_decode_box_autoadd_student_lessons_dto(raw[1]),
+        );
+      case 1:
+        return RetrieveStudentLessonsOutcome_Failure(dco_decode_String(raw[1]));
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  StudentLessonsDto dco_decode_student_lessons_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return StudentLessonsDto(
+      approved: dco_decode_list_lesson_dto(arr[0]),
+      method: dco_decode_list_lesson_dto(arr[1]),
+    );
   }
 
   @protected
@@ -412,9 +568,73 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ClefDto sse_decode_box_autoadd_clef_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_clef_dto(deserializer));
+  }
+
+  @protected
+  RangeDto sse_decode_box_autoadd_range_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_range_dto(deserializer));
+  }
+
+  @protected
+  StudentLessonsDto sse_decode_box_autoadd_student_lessons_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_student_lessons_dto(deserializer));
+  }
+
+  @protected
+  ClefDto sse_decode_clef_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ClefDto.values[inner];
+  }
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  LessonDto sse_decode_lesson_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_opt_String(deserializer);
+    var var_date = sse_decode_opt_String(deserializer);
+    var var_phase = sse_decode_opt_box_autoadd_range_dto(deserializer);
+    var var_page = sse_decode_opt_box_autoadd_range_dto(deserializer);
+    var var_lesson = sse_decode_opt_box_autoadd_range_dto(deserializer);
+    var var_clef = sse_decode_opt_box_autoadd_clef_dto(deserializer);
+    var var_description = sse_decode_opt_String(deserializer);
+    var var_instructor = sse_decode_opt_String(deserializer);
+    var var_method = sse_decode_opt_String(deserializer);
+    return LessonDto(
+      id: var_id,
+      date: var_date,
+      phase: var_phase,
+      page: var_page,
+      lesson: var_lesson,
+      clef: var_clef,
+      description: var_description,
+      instructor: var_instructor,
+      method: var_method,
+    );
+  }
+
+  @protected
+  List<LessonDto> sse_decode_list_lesson_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <LessonDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_lesson_dto(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -446,6 +666,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ClefDto? sse_decode_opt_box_autoadd_clef_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_clef_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  RangeDto? sse_decode_opt_box_autoadd_range_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_range_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  RangeDto sse_decode_range_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_from = sse_decode_String(deserializer);
+    var var_to = sse_decode_String(deserializer);
+    return RangeDto(from: var_from, to: var_to);
+  }
+
+  @protected
   RetrieveAllAvailableStudentsOutcome
   sse_decode_retrieve_all_available_students_outcome(
     SseDeserializer deserializer,
@@ -463,6 +724,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw UnimplementedError('');
     }
+  }
+
+  @protected
+  RetrieveStudentLessonsOutcome sse_decode_retrieve_student_lessons_outcome(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_box_autoadd_student_lessons_dto(
+          deserializer,
+        );
+        return RetrieveStudentLessonsOutcome_Success(var_field0);
+      case 1:
+        var var_field0 = sse_decode_String(deserializer);
+        return RetrieveStudentLessonsOutcome_Failure(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  StudentLessonsDto sse_decode_student_lessons_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_approved = sse_decode_list_lesson_dto(deserializer);
+    var var_method = sse_decode_list_lesson_dto(deserializer);
+    return StudentLessonsDto(approved: var_approved, method: var_method);
   }
 
   @protected
@@ -591,9 +883,65 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_clef_dto(ClefDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_clef_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_range_dto(
+    RangeDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_range_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_student_lessons_dto(
+    StudentLessonsDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_student_lessons_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_clef_dto(ClefDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_lesson_dto(LessonDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.id, serializer);
+    sse_encode_opt_String(self.date, serializer);
+    sse_encode_opt_box_autoadd_range_dto(self.phase, serializer);
+    sse_encode_opt_box_autoadd_range_dto(self.page, serializer);
+    sse_encode_opt_box_autoadd_range_dto(self.lesson, serializer);
+    sse_encode_opt_box_autoadd_clef_dto(self.clef, serializer);
+    sse_encode_opt_String(self.description, serializer);
+    sse_encode_opt_String(self.instructor, serializer);
+    sse_encode_opt_String(self.method, serializer);
+  }
+
+  @protected
+  void sse_encode_list_lesson_dto(
+    List<LessonDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_lesson_dto(item, serializer);
+    }
   }
 
   @protected
@@ -625,6 +973,49 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_clef_dto(
+    ClefDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_clef_dto(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_range_dto(
+    RangeDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_range_dto(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_range_dto(RangeDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.from, serializer);
+    sse_encode_String(self.to, serializer);
+  }
+
+  @protected
   void sse_encode_retrieve_all_available_students_outcome(
     RetrieveAllAvailableStudentsOutcome self,
     SseSerializer serializer,
@@ -638,6 +1029,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(1, serializer);
         sse_encode_String(field0, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_retrieve_student_lessons_outcome(
+    RetrieveStudentLessonsOutcome self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case RetrieveStudentLessonsOutcome_Success(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_box_autoadd_student_lessons_dto(field0, serializer);
+      case RetrieveStudentLessonsOutcome_Failure(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_String(field0, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_student_lessons_dto(
+    StudentLessonsDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_lesson_dto(self.approved, serializer);
+    sse_encode_list_lesson_dto(self.method, serializer);
   }
 
   @protected
@@ -750,5 +1167,13 @@ class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
   retrieveAllAvailableStudents() => RustLib.instance.api
       .crateBootstrapInfraApplicationApplicationFacadeRetrieveAllAvailableStudents(
         that: this,
+      );
+
+  Future<RetrieveStudentLessonsOutcome> retrieveStudentLessons({
+    required String studentId,
+  }) => RustLib.instance.api
+      .crateBootstrapInfraApplicationApplicationFacadeRetrieveStudentLessons(
+        that: this,
+        studentId: studentId,
       );
 }

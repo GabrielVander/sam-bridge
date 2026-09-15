@@ -3,4 +3,5 @@ pub struct Config {
     pub sam_auth_endpoint: String,
     pub sam_dashboard_endpoint: String,
     pub sam_students_listing_endpoint: String,
+    pub sam_student_lessons_endpoint: String,
 }

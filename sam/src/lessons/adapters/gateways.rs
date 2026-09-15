@@ -1,0 +1,3 @@
+mod student_lessons_gateway_sam_impl;
+
+pub use student_lessons_gateway_sam_impl::StudentLessonsGatewaySamImpl;

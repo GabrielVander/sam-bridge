@@ -20,6 +20,7 @@ fn build_gateway(mock_server: &MockServer) -> Result<StudentGatewaySamImpl, reqw
         "autenticar",
         "painel",
         "alunos/listagem",
+        "licoes/index",
     );
 
     let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));

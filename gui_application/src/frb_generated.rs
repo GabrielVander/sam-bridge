@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0-beta.2";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1062663734;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 203230829;
 
 // Section: executor
 
@@ -136,6 +136,31 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
                     })().await)
                 } })
 }
+fn wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_student_lessons_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "ApplicationFacade_retrieve_student_lessons", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || {
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>>::sse_decode(&mut deserializer);
+let api_student_id = <String>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, ()>((move || async move {
+                        let mut api_that_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_that_guard = Some(api_that.lockable_decode_async_ref().await),
+                _ => unreachable!(),
+            }
+        }
+        let api_that_guard = api_that_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok(crate::bootstrap::infra::application::ApplicationFacade::retrieve_student_lessons(&*api_that_guard, api_student_id).await)?;   Ok(output_ok)
+                    })().await)
+                } })
+}
 fn wire__crate__api__build_main_application_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -205,10 +230,65 @@ impl SseDecode for String {
     }
 }
 
+impl SseDecode for crate::bootstrap::infra::lessons_view::ClefDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::bootstrap::infra::lessons_view::ClefDto::G,
+            1 => crate::bootstrap::infra::lessons_view::ClefDto::C,
+            2 => crate::bootstrap::infra::lessons_view::ClefDto::F,
+            _ => unreachable!("Invalid variant for ClefDto: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         deserializer.cursor.read_i32::<NativeEndian>().unwrap()
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::lessons_view::LessonDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <Option<String>>::sse_decode(deserializer);
+        let mut var_date = <Option<String>>::sse_decode(deserializer);
+        let mut var_phase =
+            <Option<crate::bootstrap::infra::lessons_view::RangeDto>>::sse_decode(deserializer);
+        let mut var_page =
+            <Option<crate::bootstrap::infra::lessons_view::RangeDto>>::sse_decode(deserializer);
+        let mut var_lesson =
+            <Option<crate::bootstrap::infra::lessons_view::RangeDto>>::sse_decode(deserializer);
+        let mut var_clef =
+            <Option<crate::bootstrap::infra::lessons_view::ClefDto>>::sse_decode(deserializer);
+        let mut var_description = <Option<String>>::sse_decode(deserializer);
+        let mut var_instructor = <Option<String>>::sse_decode(deserializer);
+        let mut var_method = <Option<String>>::sse_decode(deserializer);
+        return crate::bootstrap::infra::lessons_view::LessonDto {
+            id: var_id,
+            date: var_date,
+            phase: var_phase,
+            page: var_page,
+            lesson: var_lesson,
+            clef: var_clef,
+            description: var_description,
+            instructor: var_instructor,
+            method: var_method,
+        };
+    }
+}
+
+impl SseDecode for Vec<crate::bootstrap::infra::lessons_view::LessonDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::bootstrap::infra::lessons_view::LessonDto>::sse_decode(deserializer));
+        }
+        return ans_;
     }
 }
 
@@ -251,6 +331,55 @@ impl SseDecode for crate::bootstrap::infra::application::LoginResult {
     }
 }
 
+impl SseDecode for Option<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<String>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::bootstrap::infra::lessons_view::ClefDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::bootstrap::infra::lessons_view::ClefDto>::sse_decode(deserializer),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::bootstrap::infra::lessons_view::RangeDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::bootstrap::infra::lessons_view::RangeDto>::sse_decode(deserializer),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::lessons_view::RangeDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_from = <String>::sse_decode(deserializer);
+        let mut var_to = <String>::sse_decode(deserializer);
+        return crate::bootstrap::infra::lessons_view::RangeDto {
+            from: var_from,
+            to: var_to,
+        };
+    }
+}
+
 impl SseDecode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -271,6 +400,43 @@ impl SseDecode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStu
                 unimplemented!("");
             }
         }
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 =
+                    <crate::bootstrap::infra::lessons_view::StudentLessonsDto>::sse_decode(
+                        deserializer,
+                    );
+                return crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome::Success(var_field0);
+            }
+            1 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome::Failure(var_field0);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::lessons_view::StudentLessonsDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_approved =
+            <Vec<crate::bootstrap::infra::lessons_view::LessonDto>>::sse_decode(deserializer);
+        let mut var_method =
+            <Vec<crate::bootstrap::infra::lessons_view::LessonDto>>::sse_decode(deserializer);
+        return crate::bootstrap::infra::lessons_view::StudentLessonsDto {
+            approved: var_approved,
+            method: var_method,
+        };
     }
 }
 
@@ -382,7 +548,8 @@ fn pde_ffi_dispatcher_primary_impl(
     match func_id {
                         1 => wire__crate__bootstrap__infra__application__ApplicationFacade_login_impl(port, ptr, rust_vec_len, data_len),
 2 => wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_all_available_students_impl(port, ptr, rust_vec_len, data_len),
-3 => wire__crate__api__build_main_application_impl(port, ptr, rust_vec_len, data_len),
+3 => wire__crate__bootstrap__infra__application__ApplicationFacade_retrieve_student_lessons_impl(port, ptr, rust_vec_len, data_len),
+4 => wire__crate__api__build_main_application_impl(port, ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -417,6 +584,56 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<ApplicationFacade>> for Applic
 }
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::lessons_view::ClefDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::G => 0.into_dart(),
+            Self::C => 1.into_dart(),
+            Self::F => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::lessons_view::ClefDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::lessons_view::ClefDto>
+    for crate::bootstrap::infra::lessons_view::ClefDto
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::lessons_view::ClefDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::lessons_view::LessonDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.date.into_into_dart().into_dart(),
+            self.phase.into_into_dart().into_dart(),
+            self.page.into_into_dart().into_dart(),
+            self.lesson.into_into_dart().into_dart(),
+            self.clef.into_into_dart().into_dart(),
+            self.description.into_into_dart().into_dart(),
+            self.instructor.into_into_dart().into_dart(),
+            self.method.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::lessons_view::LessonDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::lessons_view::LessonDto>
+    for crate::bootstrap::infra::lessons_view::LessonDto
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::lessons_view::LessonDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::application::LoginResult {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
@@ -435,6 +652,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::application::Log
     for crate::bootstrap::infra::application::LoginResult
 {
     fn into_into_dart(self) -> crate::bootstrap::infra::application::LoginResult {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::lessons_view::RangeDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.from.into_into_dart().into_dart(),
+            self.to.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::lessons_view::RangeDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::lessons_view::RangeDto>
+    for crate::bootstrap::infra::lessons_view::RangeDto
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::lessons_view::RangeDto {
         self
     }
 }
@@ -468,6 +706,60 @@ impl
     fn into_into_dart(
         self,
     ) -> crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome::Success(
+                field0,
+            ) => [0.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome::Failure(
+                field0,
+            ) => [1.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome,
+    > for crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome
+{
+    fn into_into_dart(
+        self,
+    ) -> crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::lessons_view::StudentLessonsDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.approved.into_into_dart().into_dart(),
+            self.method.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::lessons_view::StudentLessonsDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::lessons_view::StudentLessonsDto>
+    for crate::bootstrap::infra::lessons_view::StudentLessonsDto
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::lessons_view::StudentLessonsDto {
         self
     }
 }
@@ -551,10 +843,59 @@ impl SseEncode for String {
     }
 }
 
+impl SseEncode for crate::bootstrap::infra::lessons_view::ClefDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::bootstrap::infra::lessons_view::ClefDto::G => 0,
+                crate::bootstrap::infra::lessons_view::ClefDto::C => 1,
+                crate::bootstrap::infra::lessons_view::ClefDto::F => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::lessons_view::LessonDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<String>>::sse_encode(self.id, serializer);
+        <Option<String>>::sse_encode(self.date, serializer);
+        <Option<crate::bootstrap::infra::lessons_view::RangeDto>>::sse_encode(
+            self.phase, serializer,
+        );
+        <Option<crate::bootstrap::infra::lessons_view::RangeDto>>::sse_encode(
+            self.page, serializer,
+        );
+        <Option<crate::bootstrap::infra::lessons_view::RangeDto>>::sse_encode(
+            self.lesson,
+            serializer,
+        );
+        <Option<crate::bootstrap::infra::lessons_view::ClefDto>>::sse_encode(self.clef, serializer);
+        <Option<String>>::sse_encode(self.description, serializer);
+        <Option<String>>::sse_encode(self.instructor, serializer);
+        <Option<String>>::sse_encode(self.method, serializer);
+    }
+}
+
+impl SseEncode for Vec<crate::bootstrap::infra::lessons_view::LessonDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::bootstrap::infra::lessons_view::LessonDto>::sse_encode(item, serializer);
+        }
     }
 }
 
@@ -597,6 +938,44 @@ impl SseEncode for crate::bootstrap::infra::application::LoginResult {
     }
 }
 
+impl SseEncode for Option<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <String>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::bootstrap::infra::lessons_view::ClefDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::bootstrap::infra::lessons_view::ClefDto>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::bootstrap::infra::lessons_view::RangeDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::bootstrap::infra::lessons_view::RangeDto>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::lessons_view::RangeDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.from, serializer);
+        <String>::sse_encode(self.to, serializer);
+    }
+}
+
 impl SseEncode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -619,6 +998,45 @@ impl SseEncode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStu
                 unimplemented!("");
             }
         }
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome::Success(
+                field0,
+            ) => {
+                <i32>::sse_encode(0, serializer);
+                <crate::bootstrap::infra::lessons_view::StudentLessonsDto>::sse_encode(
+                    field0, serializer,
+                );
+            }
+            crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome::Failure(
+                field0,
+            ) => {
+                <i32>::sse_encode(1, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::lessons_view::StudentLessonsDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<crate::bootstrap::infra::lessons_view::LessonDto>>::sse_encode(
+            self.approved,
+            serializer,
+        );
+        <Vec<crate::bootstrap::infra::lessons_view::LessonDto>>::sse_encode(
+            self.method,
+            serializer,
+        );
     }
 }
 

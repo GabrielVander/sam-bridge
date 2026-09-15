@@ -5,7 +5,7 @@ use crate::parsing::{
     self, AuthResponse, AuthenticationParser, DashboardParser, DashboardResponse,
 };
 
-pub use crate::parsing::SamStudent;
+pub use crate::parsing::{MsaLesson, MtdLesson, SamStudent, StudentLessonsPage};
 
 #[derive(Debug, Clone)]
 pub struct SamClientImpl {
@@ -17,7 +17,7 @@ pub trait SamClient {
 
     fn students(&self) -> Result<Vec<SamStudent>, SamClientError>;
 
-    // fn student_lessons(&self, student_id: &str) -> anyhow::Result<StudentLessonsPage>;
+    fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage, SamClientError>;
 }
 
 impl SamClientImpl {
@@ -25,16 +25,6 @@ impl SamClientImpl {
     pub const fn new(sam_ops: SamOperations) -> Self {
         Self { sam_ops }
     }
-
-    // pub fn student_lessons(&self, student_id: &str) -> anyhow::Result<StudentLessonsPage> {
-    //     if self.transport.base_url() == "http://test-success" {
-    //         return Ok(StudentLessonsPage::default());
-    //     }
-    //
-    //     let response: RawResponse = self.transport.fetch_student_lessons(student_id)?;
-    //
-    //     parsing::parse_student_lessons_page(response.status, &response.body)
-    // }
 
     fn ensure_session_active(&self) -> Result<(), SamClientError> {
         let response: SamResponse = self.sam_ops.dashboard().map_err(SamClientError::from)?;
@@ -80,9 +70,21 @@ impl SamClient for SamClientImpl {
         })
     }
 
-    // fn student_lessons(&self, student_id: &str) -> anyhow::Result<StudentLessonsPage> {
-    //     self.student_lessons(student_id)
-    // }
+    fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage, SamClientError> {
+        let response: SamResponse = self
+            .sam_ops
+            .student_lessons(student_id)
+            .map_err(SamClientError::from)?;
+
+        let status: reqwest::StatusCode = reqwest::StatusCode::from_u16(response.status)
+            .unwrap_or(reqwest::StatusCode::INTERNAL_SERVER_ERROR);
+
+        parsing::parse_student_lessons_page(status, &response.body).map_err(|e| {
+            SamClientError::UnexpectedResponse {
+                context: e.to_string(),
+            }
+        })
+    }
 }
 
 #[derive(Error, Debug)]

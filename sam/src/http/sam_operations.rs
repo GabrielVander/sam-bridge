@@ -6,6 +6,7 @@ pub struct SamOperations {
     authentication_url: String,
     dashboard_url: String,
     students_listing_url: String,
+    student_lessons_base_url: String,
 }
 
 impl SamOperations {
@@ -16,6 +17,7 @@ impl SamOperations {
         authentication_endpoint: &str,
         dashboard_endpoint: &str,
         students_listing_endpoint: &str,
+        student_lessons_endpoint: &str,
     ) -> Self {
         let normalized_base_url: &str = base_url.trim_end_matches('/');
 
@@ -23,12 +25,15 @@ impl SamOperations {
         let dashboard_url: String = format!("{normalized_base_url}/{dashboard_endpoint}");
         let students_listing_url: String =
             format!("{normalized_base_url}/{students_listing_endpoint}");
+        let student_lessons_base_url: String =
+            format!("{normalized_base_url}/{student_lessons_endpoint}");
 
         Self {
             client,
             authentication_url,
             dashboard_url,
             students_listing_url,
+            student_lessons_base_url,
         }
     }
 
@@ -81,6 +86,25 @@ impl SamOperations {
                 SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
                     source: e,
                     operation: "students_listing".to_string(),
+                })
+            })
+    }
+
+    pub(crate) fn student_lessons(
+        &self,
+        student_id: &str,
+    ) -> Result<SamResponse, SamOperationError> {
+        self.client
+            .get(format!("{}/{student_id}", self.student_lessons_base_url))
+            .send()
+            .map_err(|e| SamOperationError::RequestError {
+                source: e,
+                operation: "student_lessons".to_string(),
+            })
+            .and_then(|r| {
+                SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
+                    source: e,
+                    operation: "student_lessons".to_string(),
                 })
             })
     }

@@ -16,7 +16,9 @@ pub fn parse_method_lessons_body(body: &str) -> Vec<MtdLesson> {
     }
 
     let document: scraper::Html = scraper::Html::parse_document(body);
-    let selectors: &Selectors = selectors();
+    let Some(selectors): Option<&Selectors> = selectors() else {
+        return Vec::new();
+    };
 
     let Some(mtd_table): Option<scraper::ElementRef> = document.select(&selectors.mtd_table).next()
     else {
@@ -35,16 +37,23 @@ struct Selectors {
     cell: scraper::Selector,
 }
 
-fn selectors() -> &'static Selectors {
-    static SELECTORS: std::sync::OnceLock<Selectors> = std::sync::OnceLock::new();
+/// These selectors are fixed string literals covered by this module's own
+/// tests, so parsing them can never actually fail — but `Selector::parse` is
+/// fallible by API shape. Rather than unwrap/expect (denied workspace-wide),
+/// fall through to "no lessons found" like every other unexpected-shape case
+/// in this parser.
+fn selectors() -> Option<&'static Selectors> {
+    static SELECTORS: std::sync::OnceLock<Option<Selectors>> = std::sync::OnceLock::new();
 
-    SELECTORS.get_or_init(|| Selectors {
-        mtd_table: scraper::Selector::parse("table#datatable3")
-            .expect("The MTD lessons table selector must be valid"),
-        body_row: scraper::Selector::parse("tbody tr")
-            .expect("The body row selector must be valid"),
-        cell: scraper::Selector::parse("td").expect("The cell selector must be valid"),
-    })
+    SELECTORS
+        .get_or_init(|| {
+            Some(Selectors {
+                mtd_table: scraper::Selector::parse("table#datatable3").ok()?,
+                body_row: scraper::Selector::parse("tbody tr").ok()?,
+                cell: scraper::Selector::parse("td").ok()?,
+            })
+        })
+        .as_ref()
 }
 
 fn parse_row(row: scraper::ElementRef, cell_selector: &scraper::Selector) -> MtdLesson {

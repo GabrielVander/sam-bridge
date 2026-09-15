@@ -14,6 +14,7 @@ pub mod application {
     }
 
     pub mod use_cases {
+        pub use crate::lessons::application::use_cases::*;
         pub use crate::roster::application::use_cases::*;
     }
 }

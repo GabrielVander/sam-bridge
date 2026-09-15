@@ -5,6 +5,7 @@
 
 import 'api.dart';
 import 'bootstrap/infra/application.dart';
+import 'bootstrap/infra/lessons_view.dart';
 import 'bootstrap/infra/roster_view.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -46,7 +47,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  ClefDto dco_decode_box_autoadd_clef_dto(dynamic raw);
+
+  @protected
+  RangeDto dco_decode_box_autoadd_range_dto(dynamic raw);
+
+  @protected
+  StudentLessonsDto dco_decode_box_autoadd_student_lessons_dto(dynamic raw);
+
+  @protected
+  ClefDto dco_decode_clef_dto(dynamic raw);
+
+  @protected
   int dco_decode_i_32(dynamic raw);
+
+  @protected
+  LessonDto dco_decode_lesson_dto(dynamic raw);
+
+  @protected
+  List<LessonDto> dco_decode_list_lesson_dto(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
@@ -58,8 +77,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LoginResult dco_decode_login_result(dynamic raw);
 
   @protected
+  String? dco_decode_opt_String(dynamic raw);
+
+  @protected
+  ClefDto? dco_decode_opt_box_autoadd_clef_dto(dynamic raw);
+
+  @protected
+  RangeDto? dco_decode_opt_box_autoadd_range_dto(dynamic raw);
+
+  @protected
+  RangeDto dco_decode_range_dto(dynamic raw);
+
+  @protected
   RetrieveAllAvailableStudentsOutcome
   dco_decode_retrieve_all_available_students_outcome(dynamic raw);
+
+  @protected
+  RetrieveStudentLessonsOutcome dco_decode_retrieve_student_lessons_outcome(
+    dynamic raw,
+  );
+
+  @protected
+  StudentLessonsDto dco_decode_student_lessons_dto(dynamic raw);
 
   @protected
   StudentPositionDto dco_decode_student_position_dto(dynamic raw);
@@ -98,7 +137,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  ClefDto sse_decode_box_autoadd_clef_dto(SseDeserializer deserializer);
+
+  @protected
+  RangeDto sse_decode_box_autoadd_range_dto(SseDeserializer deserializer);
+
+  @protected
+  StudentLessonsDto sse_decode_box_autoadd_student_lessons_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ClefDto sse_decode_clef_dto(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
+  LessonDto sse_decode_lesson_dto(SseDeserializer deserializer);
+
+  @protected
+  List<LessonDto> sse_decode_list_lesson_dto(SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
@@ -112,8 +171,30 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LoginResult sse_decode_login_result(SseDeserializer deserializer);
 
   @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
+  ClefDto? sse_decode_opt_box_autoadd_clef_dto(SseDeserializer deserializer);
+
+  @protected
+  RangeDto? sse_decode_opt_box_autoadd_range_dto(SseDeserializer deserializer);
+
+  @protected
+  RangeDto sse_decode_range_dto(SseDeserializer deserializer);
+
+  @protected
   RetrieveAllAvailableStudentsOutcome
   sse_decode_retrieve_all_available_students_outcome(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RetrieveStudentLessonsOutcome sse_decode_retrieve_student_lessons_outcome(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  StudentLessonsDto sse_decode_student_lessons_dto(
     SseDeserializer deserializer,
   );
 
@@ -164,7 +245,34 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_clef_dto(ClefDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_range_dto(
+    RangeDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_student_lessons_dto(
+    StudentLessonsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_clef_dto(ClefDto self, SseSerializer serializer);
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_lesson_dto(LessonDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_lesson_dto(
+    List<LessonDto> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_prim_u_8_strict(
@@ -182,8 +290,38 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_login_result(LoginResult self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_clef_dto(
+    ClefDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_range_dto(
+    RangeDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_range_dto(RangeDto self, SseSerializer serializer);
+
+  @protected
   void sse_encode_retrieve_all_available_students_outcome(
     RetrieveAllAvailableStudentsOutcome self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_retrieve_student_lessons_outcome(
+    RetrieveStudentLessonsOutcome self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_student_lessons_dto(
+    StudentLessonsDto self,
     SseSerializer serializer,
   );
 

@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import 'lessons_view.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'roster_view.dart';
 
@@ -15,6 +16,10 @@ abstract class ApplicationFacade implements RustOpaqueInterface {
   Future<LoginResult> login({required String email, required String password});
 
   Future<RetrieveAllAvailableStudentsOutcome> retrieveAllAvailableStudents();
+
+  Future<RetrieveStudentLessonsOutcome> retrieveStudentLessons({
+    required String studentId,
+  });
 }
 
 enum LoginResult {
