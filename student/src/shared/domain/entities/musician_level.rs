@@ -1,0 +1,102 @@
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum MusicianLevel {
+    Candidate,
+    Practice,
+    YouthService,
+    OfficialService,
+    Officialized,
+    Unknown(String),
+}
+
+impl MusicianLevel {
+    #[must_use]
+    pub fn name(&self) -> String {
+        match self {
+            Self::Candidate => "Candidate".to_owned(),
+            Self::Practice => "Practice".to_owned(),
+            Self::YouthService => "YouthService".to_owned(),
+            Self::OfficialService => "OfficialService".to_owned(),
+            Self::Officialized => "Officialized".to_owned(),
+            Self::Unknown(raw) => raw.clone(),
+        }
+    }
+
+    #[must_use]
+    pub fn parse_named(raw: &str) -> Self {
+        match raw {
+            "Candidate" => Self::Candidate,
+            "Practice" => Self::Practice,
+            "YouthService" => Self::YouthService,
+            "OfficialService" => Self::OfficialService,
+            "Officialized" => Self::Officialized,
+            other => Self::Unknown(other.to_owned()),
+        }
+    }
+
+    #[must_use]
+    pub const fn is_unknown(&self) -> bool {
+        matches!(self, Self::Unknown(_))
+    }
+
+    #[must_use]
+    pub fn unknown_raw(&self) -> Option<&str> {
+        if let Self::Unknown(raw) = self {
+            Some(raw)
+        } else {
+            None
+        }
+    }
+
+    #[must_use]
+    pub const fn rank(&self) -> u8 {
+        match self {
+            Self::Candidate => 0,
+            Self::Practice => 1,
+            Self::YouthService => 2,
+            Self::OfficialService => 3,
+            Self::Officialized => 4,
+            Self::Unknown(_) => u8::MAX,
+        }
+    }
+
+    #[must_use]
+    pub const fn rank_opt(&self) -> Option<u8> {
+        match self {
+            Self::Unknown(_) => None,
+            _ => Some(self.rank()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MusicianLevel;
+
+    #[test]
+    fn musician_level_name_and_parse() {
+        assert_eq!(MusicianLevel::Candidate.name(), "Candidate");
+        assert_eq!(
+            MusicianLevel::parse_named("Candidate"),
+            MusicianLevel::Candidate
+        );
+        assert_eq!(
+            MusicianLevel::parse_named("UnknownX"),
+            MusicianLevel::Unknown("UnknownX".to_owned())
+        );
+        assert!(MusicianLevel::Unknown("x".to_owned()).is_unknown());
+        assert_eq!(MusicianLevel::Candidate.unknown_raw(), None);
+        assert_eq!(
+            MusicianLevel::Unknown("raw".to_owned()).unknown_raw(),
+            Some("raw")
+        );
+    }
+
+    #[test]
+    fn musician_level_rank() {
+        assert_eq!(MusicianLevel::Candidate.rank(), 0);
+        assert_eq!(MusicianLevel::Officialized.rank(), 4);
+        assert_eq!(MusicianLevel::Unknown("x".to_owned()).rank(), u8::MAX);
+        assert_eq!(MusicianLevel::Unknown("x".to_owned()).rank_opt(), None);
+        assert_eq!(MusicianLevel::Candidate.rank_opt(), Some(0));
+    }
+}

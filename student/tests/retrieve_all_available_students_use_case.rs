@@ -3,10 +3,11 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use student::{
     application::{
+        dto::{StudentPositionDto, StudentSummaryDto},
         gateways::StudentGateway,
         use_cases::{
             RetrieveAllAvailableStudentsError, RetrieveAllAvailableStudentsResult,
-            RetrieveAllAvailableStudentsUseCase, StudentPositionDto, StudentSummaryDto,
+            RetrieveAllAvailableStudentsUseCase,
         },
     },
     domain::entities::{
