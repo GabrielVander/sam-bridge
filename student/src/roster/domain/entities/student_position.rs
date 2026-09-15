@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum StudentPosition {
     Musician { level: MusicianLevel },
     Organist { level: OrganistLevel },
@@ -6,7 +6,7 @@ pub enum StudentPosition {
     Unknown(String),
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum MusicianLevel {
     Candidate,
     Practice,
@@ -17,6 +17,7 @@ pub enum MusicianLevel {
 }
 
 impl MusicianLevel {
+    #[must_use]
     pub fn name(&self) -> String {
         match self {
             Self::Candidate => "Candidate".to_owned(),
@@ -28,6 +29,7 @@ impl MusicianLevel {
         }
     }
 
+    #[must_use]
     pub fn parse_named(raw: &str) -> Self {
         match raw {
             "Candidate" => Self::Candidate,
@@ -39,10 +41,12 @@ impl MusicianLevel {
         }
     }
 
-    pub fn is_unknown(&self) -> bool {
+    #[must_use]
+    pub const fn is_unknown(&self) -> bool {
         matches!(self, Self::Unknown(_))
     }
 
+    #[must_use]
     pub fn unknown_raw(&self) -> Option<&str> {
         if let Self::Unknown(raw) = self {
             Some(raw)
@@ -51,7 +55,8 @@ impl MusicianLevel {
         }
     }
 
-    pub fn rank(&self) -> u8 {
+    #[must_use]
+    pub const fn rank(&self) -> u8 {
         match self {
             Self::Candidate => 0,
             Self::Practice => 1,
@@ -62,7 +67,8 @@ impl MusicianLevel {
         }
     }
 
-    pub fn rank_opt(&self) -> Option<u8> {
+    #[must_use]
+    pub const fn rank_opt(&self) -> Option<u8> {
         match self {
             Self::Unknown(_) => None,
             _ => Some(self.rank()),
@@ -70,7 +76,7 @@ impl MusicianLevel {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum OrganistLevel {
     Candidate,
     Practice,
@@ -84,7 +90,7 @@ pub enum OrganistLevel {
     Unknown(String),
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SecretaryType {
     Gem,
     Music,

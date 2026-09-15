@@ -13,7 +13,7 @@ pub struct RetrieveAllAvailableStudentsUseCase {
 impl RetrieveAllAvailableStudentsUseCase {
     pub fn new(gateway: Arc<dyn StudentGateway + Send + Sync>) -> Self {
         Self {
-            student_gateway: gateway.clone(),
+            student_gateway: gateway,
         }
     }
 
@@ -34,18 +34,18 @@ impl RetrieveAllAvailableStudentsUseCase {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RetrieveAllAvailableStudentsResult {
     Success(Vec<StudentSummaryDto>),
     Failure(RetrieveAllAvailableStudentsError),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RetrieveAllAvailableStudentsError {
     GatewayError { context: String },
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StudentSummaryDto {
     pub id: String,
     pub name: String,
@@ -53,7 +53,7 @@ pub struct StudentSummaryDto {
     pub location: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StudentPositionDto {
     Candidate,
     Practice,
@@ -158,7 +158,7 @@ mod tests {
 
         let actual: [StudentSummaryDto; 11] = input.map(StudentSummaryDto::from);
 
-        assert_eq!(actual, expected)
+        assert_eq!(actual, expected);
     }
 
     #[test]

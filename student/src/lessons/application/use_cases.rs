@@ -7,7 +7,7 @@ pub struct RetrieveStudentLessonsUseCase<'a, T: StudentLessonsGateway> {
 }
 
 impl<'a, T: StudentLessonsGateway> RetrieveStudentLessonsUseCase<'a, T> {
-    pub fn new(gateway: &'a T) -> Self {
+    pub const fn new(gateway: &'a T) -> Self {
         Self { gateway }
     }
 

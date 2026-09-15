@@ -1,6 +1,6 @@
 use crate::roster::domain::entities::{region::Region, student_position::StudentPosition};
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Student {
     pub id: String,
     pub name: String,

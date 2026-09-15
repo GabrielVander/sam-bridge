@@ -1,6 +1,6 @@
 use crate::lessons::domain::entities::{Clef, Range};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LessonDto {
     pub id: Option<String>,
     pub date: Option<chrono::NaiveDate>,
@@ -13,7 +13,7 @@ pub struct LessonDto {
     pub method: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StudentLessonsDto {
     pub approved: Vec<LessonDto>,
     pub method: Vec<LessonDto>,

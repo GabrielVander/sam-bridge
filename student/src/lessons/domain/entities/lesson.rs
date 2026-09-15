@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Clone, Default)]
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct Lesson {
     pub id: Option<String>,
     pub date: Option<chrono::NaiveDate>,
@@ -11,20 +11,20 @@ pub struct Lesson {
     pub method: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Clone, Default)]
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct StudentLessons {
     pub approved: Vec<Lesson>,
     pub method: Vec<Lesson>,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Range<T = String> {
     pub from: T,
     pub to: T,
 }
 
 impl<T> Range<T> {
-    pub fn new(from: T, to: T) -> Self {
+    pub const fn new(from: T, to: T) -> Self {
         Self { from, to }
     }
     pub fn single(value: T) -> Self
@@ -63,7 +63,7 @@ where
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Clef {
     G,
     C,
@@ -112,8 +112,8 @@ mod tests {
         let l = Lesson::default();
         assert!(l.id.is_none());
         let sl = StudentLessons::default();
-        assert!(sl.approved.is_empty());
-        assert_eq!(l.clone(), Lesson::default());
+        assert_eq!(sl.approved, Vec::new());
+        assert_eq!(l, Lesson::default());
         assert_eq!(Clef::G.clone(), Clef::G);
     }
 }

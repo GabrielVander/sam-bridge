@@ -8,7 +8,7 @@ use thiserror::Error;
 #[error("UnknownLevel")]
 pub struct UnknownLevel(pub String);
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Instrument {
     Violin,
 }
@@ -41,7 +41,7 @@ pub const LEVEL_PATH: &[LevelDefinition] = &[
     },
 ];
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MethodProfile {
     pub instrument: Instrument,
     pub method_name: &'static str,
@@ -54,7 +54,8 @@ pub struct MethodProfile {
 }
 
 impl MethodProfile {
-    pub fn violin_schmoll() -> Self {
+    #[must_use]
+    pub const fn violin_schmoll() -> Self {
         Self {
             instrument: Instrument::Violin,
             method_name: "MÉTODO CCB - SCHIMOLL",
@@ -68,13 +69,18 @@ impl MethodProfile {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RequirementStatus {
+    pub msa_met: bool,
+    pub method_met: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckpointStatus {
     pub level: MusicianLevel,
     pub achieved: bool,
     pub ready_to_advance: bool,
-    pub msa_requirement_met: bool,
-    pub method_requirement_met: bool,
+    pub requirement: RequirementStatus,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -86,6 +92,23 @@ pub struct ProgressAssessment {
     pub combinedPercent: f64,
     pub overallCheckpointPercent: f64,
     pub nextLevel: Option<MusicianLevel>,
+}
+
+// `.get(idx)` on `LEVEL_PATH` never actually misses: every index used against it
+// is derived from `checkpoints`, which is built as a 1:1 map over `LEVEL_PATH`
+// and so always has the same length. This fallback exists only because the
+// panic-free indexing style below needs a concrete value for the type checker.
+const FALLBACK_LEVEL_DEFINITION: &LevelDefinition = &LevelDefinition {
+    level: MusicianLevel::Candidate,
+    msa_phase: None,
+};
+
+fn level_definition_at(idx: usize) -> &'static LevelDefinition {
+    LEVEL_PATH.get(idx).unwrap_or(FALLBACK_LEVEL_DEFINITION)
+}
+
+fn as_f64(count: usize) -> f64 {
+    f64::from(u32::try_from(count).unwrap_or(u32::MAX))
 }
 
 pub fn assess(
@@ -102,13 +125,59 @@ pub fn assess(
     let highest_method_page = max_field(method.iter().map(|l| &l.page));
     let highest_method_lesson = max_field(method.iter().map(|l| &l.lesson));
 
-    let checkpoints: Vec<CheckpointStatus> = LEVEL_PATH
+    let checkpoints = build_checkpoints(
+        assigned_level,
+        highest_msa_phase,
+        highest_method_page,
+        highest_method_lesson,
+        profile,
+    );
+
+    let (prev_idx, target_idx) = locate_target(&checkpoints, profile);
+    let (msa_relative, method_relative, combined) = compute_relative_percentages(
+        prev_idx,
+        target_idx,
+        highest_msa_phase,
+        highest_method_page,
+        highest_method_lesson,
+        profile,
+    );
+
+    let achieved_count = checkpoints.iter().filter(|c| c.achieved).count();
+    let all_achieved = checkpoints.iter().all(|c| c.achieved);
+
+    let overall_checkpoint = if all_achieved {
+        100.0
+    } else {
+        (as_f64(achieved_count) + combined / 100.0) / as_f64(checkpoints.len()) * 100.0
+    };
+    let next_level = if all_achieved {
+        None
+    } else {
+        Some(level_definition_at(target_idx).level.clone())
+    };
+
+    Ok(ProgressAssessment {
+        checkpoints,
+        msaRelativePercent: msa_relative,
+        methodRelativePercent: method_relative,
+        combinedPercent: combined,
+        overallCheckpointPercent: overall_checkpoint,
+        nextLevel: next_level,
+    })
+}
+
+fn build_checkpoints(
+    assigned_level: &MusicianLevel,
+    highest_msa_phase: f64,
+    highest_method_page: f64,
+    highest_method_lesson: f64,
+    profile: &MethodProfile,
+) -> Vec<CheckpointStatus> {
+    LEVEL_PATH
         .iter()
         .map(|def| {
-            let assigned_rank = assigned_level.rank();
-            let checkpoint_rank = def.level.rank();
-            let achieved = assigned_rank >= checkpoint_rank;
-
+            let achieved = assigned_level.rank() >= def.level.rank();
             let msa_met = def.msa_phase.is_none_or(|min| highest_msa_phase >= min);
             let method_met = method_req_met(
                 &def.level,
@@ -123,35 +192,52 @@ pub fn assess(
                 level: def.level.clone(),
                 achieved,
                 ready_to_advance: !achieved && has_measurable_requirement && requirement_met,
-                msa_requirement_met: msa_met,
-                method_requirement_met: method_met,
+                requirement: RequirementStatus {
+                    msa_met,
+                    method_met,
+                },
             }
         })
-        .collect();
+        .collect()
+}
 
-    let achieved_count = checkpoints.iter().filter(|c| c.achieved).count();
+fn locate_target(checkpoints: &[CheckpointStatus], profile: &MethodProfile) -> (usize, usize) {
     let next_idx = checkpoints
         .iter()
-        .enumerate()
-        .find(|(_, c)| !c.achieved)
-        .map(|(i, _)| i)
-        .unwrap_or(checkpoints.len() - 1);
-    let next_measurable_idx = (next_idx..checkpoints.len())
+        .position(|c| !c.achieved)
+        .unwrap_or_else(|| checkpoints.len().saturating_sub(1));
+
+    let target_idx = (next_idx..checkpoints.len())
         .find(|&i| {
-            LEVEL_PATH[i].msa_phase.is_some()
-                || method_threshold_for_level(&LEVEL_PATH[i].level, profile) != (0, 0)
+            LEVEL_PATH.get(i).is_some_and(|def| {
+                def.msa_phase.is_some() || method_threshold_for_level(&def.level, profile) != (0, 0)
+            })
         })
         .unwrap_or(next_idx);
-    let target_idx = next_measurable_idx;
-    let prev_idx = target_idx.saturating_sub(1);
+
     // Ensure prev is the last achieved before target, or 0
-    let prev_idx = if checkpoints[prev_idx].achieved {
+    let prev_idx = target_idx.saturating_sub(1);
+    let prev_idx = if checkpoints.get(prev_idx).is_some_and(|c| c.achieved) {
         prev_idx
     } else {
         0
     };
-    let next_def = &LEVEL_PATH[target_idx];
-    let prev_msa = LEVEL_PATH[prev_idx].msa_phase.unwrap_or(0.0);
+
+    (prev_idx, target_idx)
+}
+
+fn compute_relative_percentages(
+    prev_idx: usize,
+    target_idx: usize,
+    highest_msa_phase: f64,
+    highest_method_page: f64,
+    highest_method_lesson: f64,
+    profile: &MethodProfile,
+) -> (f64, f64, f64) {
+    let prev_def = level_definition_at(prev_idx);
+    let next_def = level_definition_at(target_idx);
+
+    let prev_msa = prev_def.msa_phase.unwrap_or(0.0);
     let next_msa = next_def.msa_phase.unwrap_or(prev_msa);
     let delta_msa = (next_msa - prev_msa).max(0.0);
     let msa_relative = if delta_msa == 0.0 {
@@ -160,15 +246,15 @@ pub fn assess(
         pct((highest_msa_phase - prev_msa).max(0.0), delta_msa)
     };
 
-    let (prev_page, prev_lesson) = method_threshold_for_level(&LEVEL_PATH[prev_idx].level, profile);
+    let (prev_page, prev_lesson) = method_threshold_for_level(&prev_def.level, profile);
     let (next_page, next_lesson) = method_threshold_for_level(&next_def.level, profile);
-    let delta_page = next_page.saturating_sub(prev_page) as f64;
-    let delta_lesson = next_lesson.saturating_sub(prev_lesson) as f64;
+    let delta_page = f64::from(next_page.saturating_sub(prev_page));
+    let delta_lesson = f64::from(next_lesson.saturating_sub(prev_lesson));
     let page_relative = if delta_page == 0.0 {
         0.0
     } else {
         pct(
-            (highest_method_page - prev_page as f64).max(0.0),
+            (highest_method_page - f64::from(prev_page)).max(0.0),
             delta_page,
         )
     };
@@ -176,67 +262,36 @@ pub fn assess(
         0.0
     } else {
         pct(
-            (highest_method_lesson - prev_lesson as f64).max(0.0),
+            (highest_method_lesson - f64::from(prev_lesson)).max(0.0),
             delta_lesson,
         )
     };
-    let method_relative = (page_relative + lesson_relative) / 2.0;
+    let method_relative = page_relative.midpoint(lesson_relative);
     let all_zero_delta = delta_msa == 0.0 && delta_page == 0.0 && delta_lesson == 0.0;
     let combined = if all_zero_delta {
         0.0
     } else if delta_msa == 0.0 {
         method_relative
     } else {
-        (msa_relative + method_relative) / 2.0
-    };
-    let overall_checkpoint = if checkpoints.iter().all(|c| c.achieved) {
-        100.0
-    } else {
-        (achieved_count as f64 + combined / 100.0) / checkpoints.len() as f64 * 100.0
-    };
-    let next_level = if checkpoints.iter().all(|c| c.achieved) {
-        None
-    } else {
-        Some(next_def.level.clone())
+        msa_relative.midpoint(method_relative)
     };
 
-    Ok(ProgressAssessment {
-        checkpoints,
-        msaRelativePercent: msa_relative,
-        methodRelativePercent: method_relative,
-        combinedPercent: combined,
-        overallCheckpointPercent: overall_checkpoint,
-        nextLevel: next_level,
-    })
+    (msa_relative, method_relative, combined)
 }
 
 fn method_req_met(level: &MusicianLevel, profile: &MethodProfile, page: f64, lesson: f64) -> bool {
-    match level {
-        MusicianLevel::Candidate | MusicianLevel::Practice => true,
-        MusicianLevel::YouthService => {
-            page >= profile.youth_service_page as f64
-                && lesson >= profile.youth_service_lesson as f64
-        }
-        MusicianLevel::OfficialService => {
-            page >= profile.culto_oficial_page as f64
-                && lesson >= profile.culto_oficial_lesson as f64
-        }
-        MusicianLevel::Officialized => {
-            page >= profile.total_pages as f64 && lesson >= profile.total_lessons as f64
-        }
-        MusicianLevel::Unknown(_) => unreachable!("assess early-returned for Unknown"),
-    }
+    let (required_page, required_lesson) = method_threshold_for_level(level, profile);
+    page >= f64::from(required_page) && lesson >= f64::from(required_lesson)
 }
 
-fn method_threshold_for_level(level: &MusicianLevel, profile: &MethodProfile) -> (u32, u32) {
+const fn method_threshold_for_level(level: &MusicianLevel, profile: &MethodProfile) -> (u32, u32) {
     match level {
-        MusicianLevel::Candidate | MusicianLevel::Practice => (0, 0),
+        MusicianLevel::Candidate | MusicianLevel::Practice | MusicianLevel::Unknown(_) => (0, 0),
         MusicianLevel::YouthService => (profile.youth_service_page, profile.youth_service_lesson),
         MusicianLevel::OfficialService => {
             (profile.culto_oficial_page, profile.culto_oficial_lesson)
         }
         MusicianLevel::Officialized => (profile.total_pages, profile.total_lessons),
-        MusicianLevel::Unknown(_) => (0, 0),
     }
 }
 
@@ -294,7 +349,7 @@ mod tests {
         )
         .unwrap();
 
-        assert!(!report.checkpoints.is_empty());
+        assert_ne!(report.checkpoints, Vec::new());
         assert!(report.checkpoints[0].achieved);
         assert!(!report.meets_any_above());
         assert!((report.overallCheckpointPercent - 20.0).abs() < 0.1);
