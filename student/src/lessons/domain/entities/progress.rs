@@ -215,7 +215,6 @@ fn locate_target(checkpoints: &[CheckpointStatus], profile: &MethodProfile) -> (
         })
         .unwrap_or(next_idx);
 
-    // Ensure prev is the last achieved before target, or 0
     let prev_idx = target_idx.saturating_sub(1);
     let prev_idx = if checkpoints.get(prev_idx).is_some_and(|c| c.achieved) {
         prev_idx

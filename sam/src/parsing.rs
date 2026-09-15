@@ -1,6 +1,3 @@
-// mod authentication;
-// mod session;
-
 mod authentication_parser;
 mod dashboard_parser;
 mod method_lessons;
