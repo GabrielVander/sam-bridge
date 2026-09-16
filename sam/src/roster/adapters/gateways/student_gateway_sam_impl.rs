@@ -3,7 +3,9 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use student::{
     application::gateways::{StudentGateway, StudentGatewayError},
-    domain::entities::{MusicianLevel, Region, Student, StudentPosition},
+    domain::entities::{
+        Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
+    },
 };
 
 use crate::client::{SamClient, SamStudent};
@@ -32,7 +34,11 @@ impl StudentGateway for StudentGatewaySamImpl {
 
 impl From<SamStudent> for Student {
     fn from(sam_student: SamStudent) -> Self {
-        let position: StudentPosition = parse_position(&sam_student.role, &sam_student.level);
+        let position: StudentPosition = parse_position(
+            &sam_student.role,
+            &sam_student.level,
+            &sam_student.instrument,
+        );
         let region: Region = parse_region(&sam_student.location);
         let location: String = clean_location(&sam_student.location);
 
@@ -68,15 +74,24 @@ fn clean_location(raw: &str) -> String {
         .join(" ")
 }
 
-/// SAM's raw `role`/`level` vocabulary is only partially confirmed against
-/// the real portal today (see `sam/src/parsing/students_listing.rs`'s test
-/// fixtures and `sam/tests/sam_http_capabilities_and_behaviour.rs`).
-/// Unrecognized raw values intentionally fall through to `Unknown` rather
-/// than guessing — extend these as more of SAM's vocabulary is confirmed.
-fn parse_position(role: &str, level: &str) -> StudentPosition {
+/// SAM's raw `role`/`level`/`instrument` vocabulary below is confirmed
+/// against the live students listing (704 records, see the exploratory test
+/// `discovers_role_level_and_instrument_vocabulary_from_the_real_students_listing`
+/// in `sam/tests/sam_http_capabilities_and_behaviour.rs`, run against the
+/// real SAM site). Unrecognized raw values intentionally fall through to
+/// `Unknown` rather than guessing — extend these as more of SAM's vocabulary
+/// is confirmed.
+fn parse_position(role: &str, level: &str, instrument: &str) -> StudentPosition {
     match role {
         "MÚSICO" => StudentPosition::Musician {
             level: parse_musician_level(level),
+            instrument: parse_instrument(instrument),
+        },
+        "ORGANISTA" => StudentPosition::Organist {
+            level: parse_organist_level(level),
+        },
+        "SECRETÁRIO DO GEM" => StudentPosition::Secretary {
+            r#type: SecretaryType::Gem,
         },
         other => StudentPosition::Unknown(other.to_owned()),
     }
@@ -85,7 +100,59 @@ fn parse_position(role: &str, level: &str) -> StudentPosition {
 fn parse_musician_level(level: &str) -> MusicianLevel {
     match level {
         "CANDIDATO(A)" => MusicianLevel::Candidate,
+        "ENSAIO" => MusicianLevel::Practice,
+        "RJM" => MusicianLevel::YouthService,
+        "CULTO OFICIAL" => MusicianLevel::OfficialService,
+        // "RJM / ENSAIO" is also seen for musicians in the live data, but its
+        // meaning isn't confirmed (no existing `MusicianLevel` variant models
+        // a youth-service/practice combination the way `OrganistLevel` does),
+        // so it intentionally falls through to `Unknown` rather than guessing.
         other => MusicianLevel::Unknown(other.to_owned()),
+    }
+}
+
+/// "CANDIDATO(A)"/"ENSAIO"/"RJM"/"CULTO OFICIAL" are the same generic status
+/// tokens confirmed for `MusicianLevel` above (SAM reuses this vocabulary
+/// across roles); "RJM / MEIA HORA" is an organist-specific compound
+/// confirmed directly against the live data.
+fn parse_organist_level(level: &str) -> OrganistLevel {
+    match level {
+        "CANDIDATO(A)" => OrganistLevel::Candidate,
+        "ENSAIO" => OrganistLevel::Practice,
+        "RJM" => OrganistLevel::YouthService,
+        "CULTO OFICIAL" => OrganistLevel::OfficialService,
+        "RJM / MEIA HORA" => OrganistLevel::YouthServiceHalfHour,
+        other => OrganistLevel::Unknown(other.to_owned()),
+    }
+}
+
+fn parse_instrument(instrument: &str) -> Option<Instrument> {
+    match instrument {
+        "A DEFINIR" => None,
+        "VIOLINO" => Some(Instrument::Violin),
+        "VIOLA" => Some(Instrument::Viola),
+        "VIOLONCELO" => Some(Instrument::Cello),
+        "FLAUTA" => Some(Instrument::Flute),
+        "OBOÉ" => Some(Instrument::Oboe),
+        "FAGOTE" => Some(Instrument::Bassoon),
+        "CLARINETE" => Some(Instrument::Clarinet),
+        "CLARINETE ALTO" => Some(Instrument::AltoClarinet),
+        "CLARINETE BAIXO" => Some(Instrument::BassClarinet),
+        // SAM splits saxophones into four physical sub-types; Formulário M09
+        // only publishes one generic "Saxofone" requirement, so all four map
+        // to the same catalog entry.
+        "SAXOFONE ALTO" | "SAXOFONE SOPRANO CUR" | "SAXOFONE SOPRANO RET" | "SAXOFONE TENOR" => {
+            Some(Instrument::Saxophone)
+        }
+        // Confirmed aliases per Formulário M09's own *(1) note.
+        "TROMPETE" | "CORNET" | "FLUGELHORN" => Some(Instrument::Trumpet),
+        "TROMPA" => Some(Instrument::FrenchHorn),
+        "TROMBONE" => Some(Instrument::Trombone),
+        "EUPHONIUM" => Some(Instrument::Euphonium),
+        "TUBA" => Some(Instrument::Tuba),
+        "CORNE INGLÊS" => Some(Instrument::EnglishHorn),
+        "VIOLINO CONTRALTO" => Some(Instrument::ContraltoViolin),
+        other => Some(Instrument::Unknown(other.to_owned())),
     }
 }
 
@@ -103,16 +170,53 @@ fn parse_region(location: &str) -> Region {
 
 #[cfg(test)]
 mod tests {
-    use student::domain::entities::{MusicianLevel, Region, StudentPosition};
+    use student::domain::entities::{
+        Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, StudentPosition,
+    };
 
-    use super::{clean_location, parse_musician_level, parse_position, parse_region};
+    use super::{
+        clean_location, parse_instrument, parse_musician_level, parse_organist_level,
+        parse_position, parse_region,
+    };
 
     #[test]
     fn known_musician_candidate_is_recognized() {
         assert_eq!(
-            parse_position("MÚSICO", "CANDIDATO(A)"),
+            parse_position("MÚSICO", "CANDIDATO(A)", "A DEFINIR"),
             StudentPosition::Musician {
-                level: MusicianLevel::Candidate
+                level: MusicianLevel::Candidate,
+                instrument: None,
+            }
+        );
+    }
+
+    #[test]
+    fn musician_with_a_confirmed_instrument_is_recognized() {
+        assert_eq!(
+            parse_position("MÚSICO", "RJM", "VIOLINO"),
+            StudentPosition::Musician {
+                level: MusicianLevel::YouthService,
+                instrument: Some(Instrument::Violin),
+            }
+        );
+    }
+
+    #[test]
+    fn organist_role_is_recognized() {
+        assert_eq!(
+            parse_position("ORGANISTA", "RJM / MEIA HORA", "A DEFINIR"),
+            StudentPosition::Organist {
+                level: OrganistLevel::YouthServiceHalfHour,
+            }
+        );
+    }
+
+    #[test]
+    fn gem_secretary_role_is_recognized() {
+        assert_eq!(
+            parse_position("SECRETÁRIO DO GEM", "RJM", "A DEFINIR"),
+            StudentPosition::Secretary {
+                r#type: SecretaryType::Gem,
             }
         );
     }
@@ -120,8 +224,8 @@ mod tests {
     #[test]
     fn unknown_role_falls_through_to_unknown() {
         assert_eq!(
-            parse_position("ORGANISTA", "CANDIDATO(A)"),
-            StudentPosition::Unknown("ORGANISTA".to_owned())
+            parse_position("BATERISTA", "CANDIDATO(A)", "A DEFINIR"),
+            StudentPosition::Unknown("BATERISTA".to_owned())
         );
     }
 
@@ -130,6 +234,66 @@ mod tests {
         assert_eq!(
             parse_musician_level("PRÁTICO(A)"),
             MusicianLevel::Unknown("PRÁTICO(A)".to_owned())
+        );
+    }
+
+    #[test]
+    fn compound_musician_level_of_unconfirmed_meaning_falls_through_to_unknown() {
+        assert_eq!(
+            parse_musician_level("RJM / ENSAIO"),
+            MusicianLevel::Unknown("RJM / ENSAIO".to_owned())
+        );
+    }
+
+    #[test]
+    fn unknown_organist_level_falls_through_to_unknown() {
+        assert_eq!(
+            parse_organist_level("ALGO NOVO"),
+            OrganistLevel::Unknown("ALGO NOVO".to_owned())
+        );
+    }
+
+    #[test]
+    fn unassigned_instrument_is_none() {
+        assert_eq!(parse_instrument("A DEFINIR"), None);
+    }
+
+    #[test]
+    fn saxophone_subtypes_all_map_to_the_generic_saxophone_requirement() {
+        for raw in [
+            "SAXOFONE ALTO",
+            "SAXOFONE SOPRANO CUR",
+            "SAXOFONE SOPRANO RET",
+            "SAXOFONE TENOR",
+        ] {
+            assert_eq!(parse_instrument(raw), Some(Instrument::Saxophone));
+        }
+    }
+
+    #[test]
+    fn trumpet_aliases_map_to_trumpet() {
+        for raw in ["TROMPETE", "CORNET", "FLUGELHORN"] {
+            assert_eq!(parse_instrument(raw), Some(Instrument::Trumpet));
+        }
+    }
+
+    #[test]
+    fn unpublished_but_real_instrument_categories_are_recognized() {
+        assert_eq!(
+            parse_instrument("CORNE INGLÊS"),
+            Some(Instrument::EnglishHorn)
+        );
+        assert_eq!(
+            parse_instrument("VIOLINO CONTRALTO"),
+            Some(Instrument::ContraltoViolin)
+        );
+    }
+
+    #[test]
+    fn unrecognized_instrument_falls_through_to_unknown() {
+        assert_eq!(
+            parse_instrument("BANDOLIM"),
+            Some(Instrument::Unknown("BANDOLIM".to_owned()))
         );
     }
 

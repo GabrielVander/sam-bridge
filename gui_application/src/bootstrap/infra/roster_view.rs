@@ -13,6 +13,7 @@ pub struct StudentSummaryDto {
     pub name: String,
     pub position: StudentPositionDto,
     pub location: String,
+    pub instrument: Option<String>,
 }
 
 pub enum RetrieveAllAvailableStudentsOutcome {
@@ -43,6 +44,7 @@ impl From<student_dto::StudentSummaryDto> for StudentSummaryDto {
             name: dto.name,
             position: dto.position.into(),
             location: dto.location,
+            instrument: dto.instrument,
         }
     }
 }

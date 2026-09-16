@@ -6,6 +6,7 @@
 import '../../frb_generated.dart';
 import 'lessons_view.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'progress_view.dart';
 import 'roster_view.dart';
 
 // These functions are ignored because they are not marked as `pub`: `new`
@@ -13,6 +14,16 @@ import 'roster_view.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>
 abstract class ApplicationFacade implements RustOpaqueInterface {
+  /// `level_name` and `instrument_name` are expected to be
+  /// `MusicianLevel::name()`/`Instrument::name()` values (e.g. as carried
+  /// through the roster listing) - the caller already has these from
+  /// selecting the student, so there's no second roster lookup here.
+  Future<AssessStudentProgressOutcome> assessStudentProgress({
+    required String studentId,
+    required String levelName,
+    String? instrumentName,
+  });
+
   Future<LoginResult> login({required String email, required String password});
 
   Future<RestoreSessionOutcome> restoreSession();

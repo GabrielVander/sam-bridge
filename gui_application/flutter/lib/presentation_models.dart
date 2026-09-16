@@ -5,12 +5,18 @@ class StudentListItem {
   final String position;
   final String rawLevel;
 
+  /// `Instrument::name()` (e.g. "Violino"), when SAM has one assigned to
+  /// this student. Round-trips through `Instrument::parse_named` when
+  /// requesting their progress assessment.
+  final String? rawInstrument;
+
   const StudentListItem({
     required this.id,
     required this.name,
     required this.location,
     required this.position,
     required this.rawLevel,
+    this.rawInstrument,
   });
 
   @override
@@ -19,7 +25,8 @@ class StudentListItem {
       name.hashCode ^
       location.hashCode ^
       position.hashCode ^
-      rawLevel.hashCode;
+      rawLevel.hashCode ^
+      rawInstrument.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -30,7 +37,8 @@ class StudentListItem {
           name == other.name &&
           location == other.location &&
           position == other.position &&
-          rawLevel == other.rawLevel;
+          rawLevel == other.rawLevel &&
+          rawInstrument == other.rawInstrument;
 }
 
 enum LessonKind { msa, method }
@@ -109,4 +117,82 @@ class StudentLessonsView {
           runtimeType == other.runtimeType &&
           msa == other.msa &&
           method == other.method;
+}
+
+class CheckpointView {
+  final String levelKey;
+  final String label;
+  final bool achieved;
+  final bool readyToAdvance;
+  final bool msaMet;
+  final bool methodMet;
+
+  const CheckpointView({
+    required this.levelKey,
+    required this.label,
+    required this.achieved,
+    required this.readyToAdvance,
+    required this.msaMet,
+    required this.methodMet,
+  });
+
+  @override
+  int get hashCode =>
+      levelKey.hashCode ^
+      label.hashCode ^
+      achieved.hashCode ^
+      readyToAdvance.hashCode ^
+      msaMet.hashCode ^
+      methodMet.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CheckpointView &&
+          runtimeType == other.runtimeType &&
+          levelKey == other.levelKey &&
+          label == other.label &&
+          achieved == other.achieved &&
+          readyToAdvance == other.readyToAdvance &&
+          msaMet == other.msaMet &&
+          methodMet == other.methodMet;
+}
+
+class ProgressView {
+  final List<CheckpointView> checkpoints;
+  final double msaRelativePercent;
+  final double methodRelativePercent;
+  final double combinedPercent;
+  final double overallCheckpointPercent;
+  final String? nextLevelLabel;
+
+  const ProgressView({
+    required this.checkpoints,
+    required this.msaRelativePercent,
+    required this.methodRelativePercent,
+    required this.combinedPercent,
+    required this.overallCheckpointPercent,
+    this.nextLevelLabel,
+  });
+
+  @override
+  int get hashCode =>
+      checkpoints.hashCode ^
+      msaRelativePercent.hashCode ^
+      methodRelativePercent.hashCode ^
+      combinedPercent.hashCode ^
+      overallCheckpointPercent.hashCode ^
+      nextLevelLabel.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProgressView &&
+          runtimeType == other.runtimeType &&
+          checkpoints == other.checkpoints &&
+          msaRelativePercent == other.msaRelativePercent &&
+          methodRelativePercent == other.methodRelativePercent &&
+          combinedPercent == other.combinedPercent &&
+          overallCheckpointPercent == other.overallCheckpointPercent &&
+          nextLevelLabel == other.nextLevelLabel;
 }

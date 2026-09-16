@@ -55,6 +55,33 @@ void main() {
       expect(viewModel.rawLevel, 'ALGO DESCONHECIDO');
     });
 
+    test('carries the assigned instrument through as rawInstrument', () {
+      const dto = StudentSummaryDto(
+        id: '4',
+        name: 'Maria',
+        position: StudentPositionDto.youthService(),
+        location: 'L',
+        instrument: 'Violino',
+      );
+
+      final viewModel = RosterMapper.toViewModel(dto);
+
+      expect(viewModel.rawInstrument, 'Violino');
+    });
+
+    test('a musician with no assigned instrument has none in the view', () {
+      const dto = StudentSummaryDto(
+        id: '5',
+        name: 'Pedro',
+        position: StudentPositionDto.candidate(),
+        location: 'L',
+      );
+
+      final viewModel = RosterMapper.toViewModel(dto);
+
+      expect(viewModel.rawInstrument, isNull);
+    });
+
     test('maps a list of dtos preserving order', () {
       const dtos = [
         StudentSummaryDto(

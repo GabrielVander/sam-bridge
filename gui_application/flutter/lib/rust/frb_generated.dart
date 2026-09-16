@@ -6,6 +6,7 @@
 import 'api.dart';
 import 'bootstrap/infra/application.dart';
 import 'bootstrap/infra/lessons_view.dart';
+import 'bootstrap/infra/progress_view.dart';
 import 'bootstrap/infra/roster_view.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -67,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0-beta.2';
 
   @override
-  int get rustContentHash => -2093873562;
+  int get rustContentHash => -1973232432;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,6 +80,14 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<AssessStudentProgressOutcome>
+  crateBootstrapInfraApplicationApplicationFacadeAssessStudentProgress({
+    required ApplicationFacade that,
+    required String studentId,
+    required String levelName,
+    String? instrumentName,
+  });
+
   Future<LoginResult> crateBootstrapInfraApplicationApplicationFacadeLogin({
     required ApplicationFacade that,
     required String email,
@@ -122,6 +131,51 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<AssessStudentProgressOutcome>
+  crateBootstrapInfraApplicationApplicationFacadeAssessStudentProgress({
+    required ApplicationFacade that,
+    required String studentId,
+    required String levelName,
+    String? instrumentName,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
+            that,
+            serializer,
+          );
+          sse_encode_String(studentId, serializer);
+          sse_encode_String(levelName, serializer);
+          sse_encode_opt_String(instrumentName, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_assess_student_progress_outcome,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateBootstrapInfraApplicationApplicationFacadeAssessStudentProgressConstMeta,
+        argValues: [that, studentId, levelName, instrumentName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateBootstrapInfraApplicationApplicationFacadeAssessStudentProgressConstMeta =>
+      const TaskConstMeta(
+        debugName: "ApplicationFacade_assess_student_progress",
+        argNames: ["that", "studentId", "levelName", "instrumentName"],
+      );
+
+  @override
   Future<LoginResult> crateBootstrapInfraApplicationApplicationFacadeLogin({
     required ApplicationFacade that,
     required String email,
@@ -140,7 +194,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 1,
+            funcId: 2,
             port: port_,
           );
         },
@@ -179,7 +233,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 3,
             port: port_,
           );
         },
@@ -218,7 +272,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 4,
             port: port_,
           );
         },
@@ -259,7 +313,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 5,
             port: port_,
           );
         },
@@ -291,7 +345,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 6,
             port: port_,
           );
         },
@@ -352,9 +406,46 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AssessStudentProgressOutcome dco_decode_assess_student_progress_outcome(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return AssessStudentProgressOutcome_Success(
+          dco_decode_box_autoadd_progress_assessment_dto(raw[1]),
+        );
+      case 1:
+        return AssessStudentProgressOutcome_NoInstrumentAssigned();
+      case 2:
+        return AssessStudentProgressOutcome_UnknownLevel(
+          dco_decode_String(raw[1]),
+        );
+      case 3:
+        return AssessStudentProgressOutcome_Failure(dco_decode_String(raw[1]));
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
   ClefDto dco_decode_box_autoadd_clef_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_clef_dto(raw);
+  }
+
+  @protected
+  ProgressAssessmentDto dco_decode_box_autoadd_progress_assessment_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_progress_assessment_dto(raw);
   }
 
   @protected
@@ -370,9 +461,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CheckpointStatusDto dco_decode_checkpoint_status_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return CheckpointStatusDto(
+      level: dco_decode_String(arr[0]),
+      achieved: dco_decode_bool(arr[1]),
+      readyToAdvance: dco_decode_bool(arr[2]),
+      requirement: dco_decode_requirement_status_dto(arr[3]),
+    );
+  }
+
+  @protected
   ClefDto dco_decode_clef_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ClefDto.values[raw as int];
+  }
+
+  @protected
+  double dco_decode_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
   }
 
   @protected
@@ -398,6 +509,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       instructor: dco_decode_opt_String(arr[7]),
       method: dco_decode_opt_String(arr[8]),
     );
+  }
+
+  @protected
+  List<CheckpointStatusDto> dco_decode_list_checkpoint_status_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_checkpoint_status_dto)
+        .toList();
   }
 
   @protected
@@ -443,6 +562,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ProgressAssessmentDto dco_decode_progress_assessment_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return ProgressAssessmentDto(
+      checkpoints: dco_decode_list_checkpoint_status_dto(arr[0]),
+      msaRelativePercent: dco_decode_f_64(arr[1]),
+      methodRelativePercent: dco_decode_f_64(arr[2]),
+      combinedPercent: dco_decode_f_64(arr[3]),
+      overallCheckpointPercent: dco_decode_f_64(arr[4]),
+      nextLevel: dco_decode_opt_String(arr[5]),
+    );
+  }
+
+  @protected
   RangeDto dco_decode_range_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -451,6 +586,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return RangeDto(
       from: dco_decode_String(arr[0]),
       to: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  RequirementStatusDto dco_decode_requirement_status_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return RequirementStatusDto(
+      msaMet: dco_decode_bool(arr[0]),
+      methodMet: dco_decode_bool(arr[1]),
     );
   }
 
@@ -546,13 +693,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   StudentSummaryDto dco_decode_student_summary_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return StudentSummaryDto(
       id: dco_decode_String(arr[0]),
       name: dco_decode_String(arr[1]),
       position: dco_decode_student_position_dto(arr[2]),
       location: dco_decode_String(arr[3]),
+      instrument: dco_decode_opt_String(arr[4]),
     );
   }
 
@@ -618,9 +766,49 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AssessStudentProgressOutcome sse_decode_assess_student_progress_outcome(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_box_autoadd_progress_assessment_dto(
+          deserializer,
+        );
+        return AssessStudentProgressOutcome_Success(var_field0);
+      case 1:
+        return AssessStudentProgressOutcome_NoInstrumentAssigned();
+      case 2:
+        var var_field0 = sse_decode_String(deserializer);
+        return AssessStudentProgressOutcome_UnknownLevel(var_field0);
+      case 3:
+        var var_field0 = sse_decode_String(deserializer);
+        return AssessStudentProgressOutcome_Failure(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
   ClefDto sse_decode_box_autoadd_clef_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_clef_dto(deserializer));
+  }
+
+  @protected
+  ProgressAssessmentDto sse_decode_box_autoadd_progress_assessment_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_progress_assessment_dto(deserializer));
   }
 
   @protected
@@ -638,10 +826,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CheckpointStatusDto sse_decode_checkpoint_status_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_level = sse_decode_String(deserializer);
+    var var_achieved = sse_decode_bool(deserializer);
+    var var_readyToAdvance = sse_decode_bool(deserializer);
+    var var_requirement = sse_decode_requirement_status_dto(deserializer);
+    return CheckpointStatusDto(
+      level: var_level,
+      achieved: var_achieved,
+      readyToAdvance: var_readyToAdvance,
+      requirement: var_requirement,
+    );
+  }
+
+  @protected
   ClefDto sse_decode_clef_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return ClefDto.values[inner];
+  }
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat64();
   }
 
   @protected
@@ -673,6 +884,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       instructor: var_instructor,
       method: var_method,
     );
+  }
+
+  @protected
+  List<CheckpointStatusDto> sse_decode_list_checkpoint_status_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <CheckpointStatusDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_checkpoint_status_dto(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -749,11 +974,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ProgressAssessmentDto sse_decode_progress_assessment_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_checkpoints = sse_decode_list_checkpoint_status_dto(deserializer);
+    var var_msaRelativePercent = sse_decode_f_64(deserializer);
+    var var_methodRelativePercent = sse_decode_f_64(deserializer);
+    var var_combinedPercent = sse_decode_f_64(deserializer);
+    var var_overallCheckpointPercent = sse_decode_f_64(deserializer);
+    var var_nextLevel = sse_decode_opt_String(deserializer);
+    return ProgressAssessmentDto(
+      checkpoints: var_checkpoints,
+      msaRelativePercent: var_msaRelativePercent,
+      methodRelativePercent: var_methodRelativePercent,
+      combinedPercent: var_combinedPercent,
+      overallCheckpointPercent: var_overallCheckpointPercent,
+      nextLevel: var_nextLevel,
+    );
+  }
+
+  @protected
   RangeDto sse_decode_range_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_from = sse_decode_String(deserializer);
     var var_to = sse_decode_String(deserializer);
     return RangeDto(from: var_from, to: var_to);
+  }
+
+  @protected
+  RequirementStatusDto sse_decode_requirement_status_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_msaMet = sse_decode_bool(deserializer);
+    var var_methodMet = sse_decode_bool(deserializer);
+    return RequirementStatusDto(msaMet: var_msaMet, methodMet: var_methodMet);
   }
 
   @protected
@@ -865,11 +1121,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_name = sse_decode_String(deserializer);
     var var_position = sse_decode_student_position_dto(deserializer);
     var var_location = sse_decode_String(deserializer);
+    var var_instrument = sse_decode_opt_String(deserializer);
     return StudentSummaryDto(
       id: var_id,
       name: var_name,
       position: var_position,
       location: var_location,
+      instrument: var_instrument,
     );
   }
 
@@ -888,12 +1146,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BigInt sse_decode_usize(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getBigUint64();
-  }
-
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
   }
 
   @protected
@@ -942,9 +1194,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_assess_student_progress_outcome(
+    AssessStudentProgressOutcome self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case AssessStudentProgressOutcome_Success(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_box_autoadd_progress_assessment_dto(field0, serializer);
+      case AssessStudentProgressOutcome_NoInstrumentAssigned():
+        sse_encode_i_32(1, serializer);
+      case AssessStudentProgressOutcome_UnknownLevel(field0: final field0):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(field0, serializer);
+      case AssessStudentProgressOutcome_Failure(field0: final field0):
+        sse_encode_i_32(3, serializer);
+        sse_encode_String(field0, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
   void sse_encode_box_autoadd_clef_dto(ClefDto self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_clef_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_progress_assessment_dto(
+    ProgressAssessmentDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_progress_assessment_dto(self, serializer);
   }
 
   @protected
@@ -966,9 +1254,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_checkpoint_status_dto(
+    CheckpointStatusDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.level, serializer);
+    sse_encode_bool(self.achieved, serializer);
+    sse_encode_bool(self.readyToAdvance, serializer);
+    sse_encode_requirement_status_dto(self.requirement, serializer);
+  }
+
+  @protected
   void sse_encode_clef_dto(ClefDto self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat64(self);
   }
 
   @protected
@@ -989,6 +1295,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.description, serializer);
     sse_encode_opt_String(self.instructor, serializer);
     sse_encode_opt_String(self.method, serializer);
+  }
+
+  @protected
+  void sse_encode_list_checkpoint_status_dto(
+    List<CheckpointStatusDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_checkpoint_status_dto(item, serializer);
+    }
   }
 
   @protected
@@ -1068,10 +1386,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_progress_assessment_dto(
+    ProgressAssessmentDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_checkpoint_status_dto(self.checkpoints, serializer);
+    sse_encode_f_64(self.msaRelativePercent, serializer);
+    sse_encode_f_64(self.methodRelativePercent, serializer);
+    sse_encode_f_64(self.combinedPercent, serializer);
+    sse_encode_f_64(self.overallCheckpointPercent, serializer);
+    sse_encode_opt_String(self.nextLevel, serializer);
+  }
+
+  @protected
   void sse_encode_range_dto(RangeDto self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.from, serializer);
     sse_encode_String(self.to, serializer);
+  }
+
+  @protected
+  void sse_encode_requirement_status_dto(
+    RequirementStatusDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self.msaMet, serializer);
+    sse_encode_bool(self.methodMet, serializer);
   }
 
   @protected
@@ -1172,6 +1514,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.name, serializer);
     sse_encode_student_position_dto(self.position, serializer);
     sse_encode_String(self.location, serializer);
+    sse_encode_opt_String(self.instrument, serializer);
   }
 
   @protected
@@ -1189,12 +1532,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_usize(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
-  }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
   }
 }
 
@@ -1220,6 +1557,22 @@ class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
         .api
         .rust_arc_decrement_strong_count_ApplicationFacadePtr,
   );
+
+  /// `level_name` and `instrument_name` are expected to be
+  /// `MusicianLevel::name()`/`Instrument::name()` values (e.g. as carried
+  /// through the roster listing) - the caller already has these from
+  /// selecting the student, so there's no second roster lookup here.
+  Future<AssessStudentProgressOutcome> assessStudentProgress({
+    required String studentId,
+    required String levelName,
+    String? instrumentName,
+  }) => RustLib.instance.api
+      .crateBootstrapInfraApplicationApplicationFacadeAssessStudentProgress(
+        that: this,
+        studentId: studentId,
+        levelName: levelName,
+        instrumentName: instrumentName,
+      );
 
   Future<LoginResult> login({
     required String email,

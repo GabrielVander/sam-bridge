@@ -32,6 +32,7 @@ Future<void> main() async {
 
   final LessonsCubitSignal lessonsCubitSignal = LessonsCubitSignal(
     retrieveStudentLessons: application.retrieveStudentLessons,
+    assessStudentProgress: application.assessStudentProgress,
   );
 
   runApp(
@@ -106,10 +107,7 @@ ThemeData _buildTheme() {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 14,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,

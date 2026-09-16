@@ -13,6 +13,7 @@ class RosterMapper {
       location: dto.location,
       position: label,
       rawLevel: label,
+      rawInstrument: dto.instrument,
     );
   }
 

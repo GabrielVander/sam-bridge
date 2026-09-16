@@ -1,5 +1,5 @@
 use crate::{
-    domain::entities::{MusicianLevel, OrganistLevel, SecretaryType, StudentPosition},
+    domain::entities::{Instrument, MusicianLevel, OrganistLevel, SecretaryType, StudentPosition},
     roster::domain::entities::Student,
 };
 
@@ -9,6 +9,9 @@ pub struct StudentSummaryDto {
     pub name: String,
     pub position: StudentPositionDto,
     pub location: String,
+    /// `Instrument::name()`, only present for musicians with an assigned
+    /// instrument. Round-trips through `Instrument::parse_named`.
+    pub instrument: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -30,11 +33,19 @@ pub enum StudentPositionDto {
 
 impl From<Student> for StudentSummaryDto {
     fn from(student: Student) -> Self {
+        let instrument = match &student.position {
+            StudentPosition::Musician { instrument, .. } => {
+                instrument.as_ref().map(Instrument::name)
+            }
+            _ => None,
+        };
+
         Self {
             id: student.id,
             name: student.name,
             position: StudentPositionDto::from(student.position),
             location: student.location,
+            instrument,
         }
     }
 }
@@ -42,7 +53,7 @@ impl From<Student> for StudentSummaryDto {
 impl From<StudentPosition> for StudentPositionDto {
     fn from(position: StudentPosition) -> Self {
         match position {
-            StudentPosition::Musician { level } => level.into(),
+            StudentPosition::Musician { level, .. } => level.into(),
             StudentPosition::Organist { level } => level.into(),
             StudentPosition::Secretary { r#type } => r#type.into(),
             StudentPosition::Unknown(value) => Self::Invalid(value),
@@ -92,7 +103,7 @@ impl From<SecretaryType> for StudentPositionDto {
 #[cfg(test)]
 mod tests {
     use crate::domain::entities::{
-        MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
+        Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
     };
 
     use super::{StudentPositionDto, StudentSummaryDto};
@@ -145,42 +156,49 @@ mod tests {
                 "Musician - Candidate",
                 StudentPosition::Musician {
                     level: MusicianLevel::Candidate,
+                    instrument: None,
                 },
             ),
             student(
                 "Musician - Practice",
                 StudentPosition::Musician {
                     level: MusicianLevel::Practice,
+                    instrument: None,
                 },
             ),
             student(
                 "Musician - Youth",
                 StudentPosition::Musician {
                     level: MusicianLevel::YouthService,
+                    instrument: None,
                 },
             ),
             student(
                 "Musician - Official",
                 StudentPosition::Musician {
                     level: MusicianLevel::OfficialService,
+                    instrument: None,
                 },
             ),
             student(
                 "Musician - Officialized",
                 StudentPosition::Musician {
                     level: MusicianLevel::Officialized,
+                    instrument: None,
                 },
             ),
             student(
                 "Musician - Unknown 1",
                 StudentPosition::Musician {
                     level: MusicianLevel::Unknown("Strawberry".to_string()),
+                    instrument: None,
                 },
             ),
             student(
                 "Musician - Unknown 2",
                 StudentPosition::Musician {
                     level: MusicianLevel::Unknown("Banana".to_string()),
+                    instrument: None,
                 },
             ),
         ]
@@ -366,6 +384,51 @@ mod tests {
             name: format!("Student {id}"),
             position,
             location: "Location".to_owned(),
+            instrument: None,
         }
+    }
+
+    #[test]
+    fn musician_with_an_assigned_instrument_carries_its_name() {
+        let input = student(
+            "Musician - Violin",
+            StudentPosition::Musician {
+                level: MusicianLevel::YouthService,
+                instrument: Some(Instrument::Violin),
+            },
+        );
+
+        let actual = StudentSummaryDto::from(input);
+
+        assert_eq!(actual.instrument, Some("Violino".to_owned()));
+    }
+
+    #[test]
+    fn musician_without_an_assigned_instrument_has_no_instrument() {
+        let input = student(
+            "Musician - Unassigned",
+            StudentPosition::Musician {
+                level: MusicianLevel::Candidate,
+                instrument: None,
+            },
+        );
+
+        let actual = StudentSummaryDto::from(input);
+
+        assert_eq!(actual.instrument, None);
+    }
+
+    #[test]
+    fn non_musicians_have_no_instrument() {
+        let input = student(
+            "Organist",
+            StudentPosition::Organist {
+                level: OrganistLevel::YouthService,
+            },
+        );
+
+        let actual = StudentSummaryDto::from(input);
+
+        assert_eq!(actual.instrument, None);
     }
 }

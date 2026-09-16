@@ -9,6 +9,7 @@
 import 'api.dart';
 import 'bootstrap/infra/application.dart';
 import 'bootstrap/infra/lessons_view.dart';
+import 'bootstrap/infra/progress_view.dart';
 import 'bootstrap/infra/roster_view.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -49,7 +50,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  AssessStudentProgressOutcome dco_decode_assess_student_progress_outcome(
+    dynamic raw,
+  );
+
+  @protected
+  bool dco_decode_bool(dynamic raw);
+
+  @protected
   ClefDto dco_decode_box_autoadd_clef_dto(dynamic raw);
+
+  @protected
+  ProgressAssessmentDto dco_decode_box_autoadd_progress_assessment_dto(
+    dynamic raw,
+  );
 
   @protected
   RangeDto dco_decode_box_autoadd_range_dto(dynamic raw);
@@ -58,13 +72,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   StudentLessonsDto dco_decode_box_autoadd_student_lessons_dto(dynamic raw);
 
   @protected
+  CheckpointStatusDto dco_decode_checkpoint_status_dto(dynamic raw);
+
+  @protected
   ClefDto dco_decode_clef_dto(dynamic raw);
+
+  @protected
+  double dco_decode_f_64(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
 
   @protected
   LessonDto dco_decode_lesson_dto(dynamic raw);
+
+  @protected
+  List<CheckpointStatusDto> dco_decode_list_checkpoint_status_dto(dynamic raw);
 
   @protected
   List<LessonDto> dco_decode_list_lesson_dto(dynamic raw);
@@ -88,7 +111,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RangeDto? dco_decode_opt_box_autoadd_range_dto(dynamic raw);
 
   @protected
+  ProgressAssessmentDto dco_decode_progress_assessment_dto(dynamic raw);
+
+  @protected
   RangeDto dco_decode_range_dto(dynamic raw);
+
+  @protected
+  RequirementStatusDto dco_decode_requirement_status_dto(dynamic raw);
 
   @protected
   RestoreSessionOutcome dco_decode_restore_session_outcome(dynamic raw);
@@ -142,7 +171,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  AssessStudentProgressOutcome sse_decode_assess_student_progress_outcome(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
   ClefDto sse_decode_box_autoadd_clef_dto(SseDeserializer deserializer);
+
+  @protected
+  ProgressAssessmentDto sse_decode_box_autoadd_progress_assessment_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   RangeDto sse_decode_box_autoadd_range_dto(SseDeserializer deserializer);
@@ -153,13 +195,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  CheckpointStatusDto sse_decode_checkpoint_status_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ClefDto sse_decode_clef_dto(SseDeserializer deserializer);
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
   LessonDto sse_decode_lesson_dto(SseDeserializer deserializer);
+
+  @protected
+  List<CheckpointStatusDto> sse_decode_list_checkpoint_status_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<LessonDto> sse_decode_list_lesson_dto(SseDeserializer deserializer);
@@ -185,7 +240,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RangeDto? sse_decode_opt_box_autoadd_range_dto(SseDeserializer deserializer);
 
   @protected
+  ProgressAssessmentDto sse_decode_progress_assessment_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   RangeDto sse_decode_range_dto(SseDeserializer deserializer);
+
+  @protected
+  RequirementStatusDto sse_decode_requirement_status_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   RestoreSessionOutcome sse_decode_restore_session_outcome(
@@ -228,9 +293,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
-
-  @protected
   void
   sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
     ApplicationFacade self,
@@ -255,7 +317,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
+  void sse_encode_assess_student_progress_outcome(
+    AssessStudentProgressOutcome self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_clef_dto(ClefDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_progress_assessment_dto(
+    ProgressAssessmentDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_range_dto(
@@ -270,13 +347,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_checkpoint_status_dto(
+    CheckpointStatusDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_clef_dto(ClefDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_lesson_dto(LessonDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_checkpoint_status_dto(
+    List<CheckpointStatusDto> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_lesson_dto(
@@ -315,7 +407,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_progress_assessment_dto(
+    ProgressAssessmentDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_range_dto(RangeDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_requirement_status_dto(
+    RequirementStatusDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_restore_session_outcome(
@@ -361,9 +465,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
 }
 
 // Section: wire_class

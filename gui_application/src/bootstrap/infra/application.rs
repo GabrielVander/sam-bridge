@@ -11,12 +11,14 @@ use sam::{
     roster::adapters::gateways::StudentGatewaySamImpl,
 };
 use student::application::use_cases::{
-    RetrieveAllAvailableStudentsResult, RetrieveAllAvailableStudentsUseCase,
-    RetrieveStudentLessonsUseCase,
+    AssessStudentProgressError, AssessStudentProgressUseCase, RetrieveAllAvailableStudentsResult,
+    RetrieveAllAvailableStudentsUseCase, RetrieveStudentLessonsUseCase,
 };
+use student::domain::entities::{AssessError, Instrument, MusicianLevel};
 
 use crate::infra::{
-    Config, RetrieveAllAvailableStudentsOutcome, RetrieveStudentLessonsOutcome, StudentSummaryDto,
+    AssessStudentProgressOutcome, Config, ProgressAssessmentDto,
+    RetrieveAllAvailableStudentsOutcome, RetrieveStudentLessonsOutcome, StudentSummaryDto,
 };
 
 pub struct ApplicationFacade {
@@ -122,6 +124,39 @@ impl ApplicationFacade {
                 RetrieveStudentLessonsOutcome::Success(dto.into())
             }
             Err(err) => RetrieveStudentLessonsOutcome::Failure(err.to_string()),
+        }
+    }
+
+    /// `level_name` and `instrument_name` are expected to be
+    /// `MusicianLevel::name()`/`Instrument::name()` values (e.g. as carried
+    /// through the roster listing) - the caller already has these from
+    /// selecting the student, so there's no second roster lookup here.
+    pub async fn assess_student_progress(
+        &self,
+        student_id: String,
+        level_name: String,
+        instrument_name: Option<String>,
+    ) -> AssessStudentProgressOutcome {
+        let Some(instrument_name) = instrument_name else {
+            return AssessStudentProgressOutcome::NoInstrumentAssigned;
+        };
+
+        let assigned_level = MusicianLevel::parse_named(&level_name);
+        let instrument = Instrument::parse_named(&instrument_name);
+
+        let use_case = AssessStudentProgressUseCase::new(self.sam_student_lessons_gateway.as_ref());
+
+        match use_case
+            .execute(&student_id, &assigned_level, instrument)
+            .await
+        {
+            Ok(assessment) => {
+                AssessStudentProgressOutcome::Success(ProgressAssessmentDto::from(assessment))
+            }
+            Err(AssessStudentProgressError::Assessment(AssessError::UnknownLevel(raw))) => {
+                AssessStudentProgressOutcome::UnknownLevel(raw)
+            }
+            Err(err) => AssessStudentProgressOutcome::Failure(err.to_string()),
         }
     }
 }

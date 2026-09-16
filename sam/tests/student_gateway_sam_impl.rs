@@ -4,7 +4,7 @@ use sam::client::SamClientImpl;
 use sam::http::SamOperations;
 use sam::roster::adapters::gateways::StudentGatewaySamImpl;
 use student::application::gateways::{StudentGateway, StudentGatewayError};
-use student::domain::entities::{MusicianLevel, Student, StudentPosition};
+use student::domain::entities::{Instrument, MusicianLevel, Student, StudentPosition};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -68,7 +68,8 @@ fn given_accessible_dashboard_students_should_be_retrieved_and_mapped() {
         assert_eq!(
             students[0].position,
             StudentPosition::Musician {
-                level: MusicianLevel::Candidate
+                level: MusicianLevel::Candidate,
+                instrument: Some(Instrument::Violin),
             }
         );
 

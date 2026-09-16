@@ -1,3 +1,7 @@
+use std::collections::{BTreeMap, BTreeSet};
+
+const MAX_STUDENTS_PER_INSTRUMENT: usize = 15;
+
 struct SamSiteConfig {
     base_url: String,
     username: String,
@@ -564,6 +568,232 @@ fn student_lessons_contains_instrument_lessons() {
     println!("{response_content:#?}");
 
     assert!(response_content.contains("<tr id=\"mtd_214020\">\n            <td>00</td>\n            <td>00</td>\n            <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>\n            <td>04/12/2023</td>\n            <td>MURILO FAGNER CARDOSO</td>\n            <td>04/12/2023 21:17:17</td>\n            <td>Postura do violino </td>\n            <td>\n                                <button type=\"button\" class=\"btn btn-danger btn-sm\" data-toggle=\"tooltip\" title=\"Excluir\"\n                    onclick=\"delete_lancamento_mtd(214020)\">\n                    <i class=\"fa fa-trash\"></i> Apagar\n                </button>\n                            </td>\n        </tr>"));
+}
+
+/// Exploratory: pure HTTP + raw JSON against the real site, nothing from
+/// this workspace's own crates (no `sam::client`, no parsing helpers). Not
+/// asserting exact vocabulary (we don't control SAM's data entry), just
+/// surfacing what raw `role`/`level`/`instrument` strings actually occur
+/// today. Prints only the distinct raw values, never individual student
+/// names or ids.
+#[test]
+fn discovers_role_level_and_instrument_vocabulary_from_the_real_students_listing() {
+    let site: SamSiteConfig = require_sam_site();
+    if site.base_url.is_empty() {
+        return;
+    }
+
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
+
+    // The listing endpoint 500s unless the dashboard was visited first in
+    // this session (see `students_listing_fails_even_if_previously_logged_in`
+    // above).
+    client
+        .get(build_sam_dashboard_url(&site))
+        .header(reqwest::header::COOKIE, &session_cookie)
+        .send()
+        .unwrap();
+
+    let response: reqwest::blocking::Response = client
+        .get(build_sam_students_listing_url(&site))
+        .header(reqwest::header::COOKIE, session_cookie)
+        .send()
+        .unwrap();
+
+    assert_eq!(response.status(), reqwest::StatusCode::OK);
+
+    let response_content: String = response.text().unwrap();
+    let parsed: serde_json::Value =
+        serde_json::from_str(&response_content).expect("listing response should be valid JSON");
+    let rows: &Vec<serde_json::Value> = parsed["data"]
+        .as_array()
+        .expect("listing response should have a data array");
+
+    assert!(
+        !rows.is_empty(),
+        "expected at least one student record in the real roster"
+    );
+
+    let distinct_roles: BTreeSet<String> = rows.iter().map(|r| column(r, 3)).collect();
+    let distinct_levels: BTreeSet<String> = rows.iter().map(|r| column(r, 5)).collect();
+    let distinct_instruments: BTreeSet<String> = rows.iter().map(|r| column(r, 4)).collect();
+
+    println!("total students: {}", rows.len());
+    println!(
+        "distinct roles ({}): {distinct_roles:#?}",
+        distinct_roles.len()
+    );
+    println!(
+        "distinct levels ({}): {distinct_levels:#?}",
+        distinct_levels.len()
+    );
+    println!(
+        "distinct instruments ({}): {distinct_instruments:#?}",
+        distinct_instruments.len()
+    );
+
+    for role in &distinct_roles {
+        let levels_for_role: BTreeSet<String> = rows
+            .iter()
+            .filter(|r| &column(r, 3) == role)
+            .map(|r| column(r, 5))
+            .collect();
+        println!("levels for role {role:?}: {levels_for_role:#?}");
+    }
+
+    let mut instrument_counts: BTreeMap<String, usize> = BTreeMap::new();
+    for row in rows {
+        if column(row, 3) == "MÚSICO" {
+            *instrument_counts.entry(column(row, 4)).or_insert(0) += 1;
+        }
+    }
+    println!("instrument counts for role MÚSICO: {instrument_counts:#?}");
+}
+
+/// Exploratory: pure HTTP + `scraper` (a third-party HTML parser, not this
+/// workspace's own parsing code), nothing from `sam::client`/`sam::parsing`.
+/// Samples a handful of students per instrument (not all ~700 - this hits
+/// the real production site) and reads their real method-lesson rows, to see
+/// what "Método" values SAM actually records per instrument. An instrument
+/// can have students on more than one method book at once, so this collects
+/// every distinct value seen, not just one.
+#[test]
+fn discovers_method_names_actually_used_per_instrument() {
+    let site: SamSiteConfig = require_sam_site();
+    if site.base_url.is_empty() {
+        return;
+    }
+
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let authorized_session_id: String = {
+        client
+            .post(build_sam_authentication_url(&site))
+            .form(&[
+                ("login", site.username.as_str()),
+                ("password", site.password.as_str()),
+            ])
+            .send()
+            .unwrap()
+            .cookies()
+            .find(|i| i.name() == "PHPSESSID")
+            .unwrap()
+            .value()
+            .to_string()
+    };
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
+
+    client
+        .get(build_sam_dashboard_url(&site))
+        .header(reqwest::header::COOKIE, &session_cookie)
+        .send()
+        .unwrap();
+
+    let listing_response: reqwest::blocking::Response = client
+        .get(build_sam_students_listing_url(&site))
+        .header(reqwest::header::COOKIE, session_cookie.clone())
+        .send()
+        .unwrap();
+    let listing_body: String = listing_response.text().unwrap();
+    let listing: serde_json::Value =
+        serde_json::from_str(&listing_body).expect("listing response should be valid JSON");
+    let rows: &Vec<serde_json::Value> = listing["data"]
+        .as_array()
+        .expect("listing response should have a data array");
+
+    let mut sampled_student_ids_by_instrument: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for row in rows {
+        if column(row, 3) != "MÚSICO" {
+            continue;
+        }
+        let instrument: String = column(row, 4);
+        if instrument == "A DEFINIR" {
+            continue;
+        }
+        let ids: &mut Vec<String> = sampled_student_ids_by_instrument
+            .entry(instrument)
+            .or_default();
+        if ids.len() < MAX_STUDENTS_PER_INSTRUMENT {
+            ids.push(column(row, 0));
+        }
+    }
+
+    // Table id and column position observed directly on the live lesson
+    // page: the "Método" column is the 3rd `<td>` in each `datatable3` row.
+    let mtd_row_selector: scraper::Selector =
+        scraper::Selector::parse("table#datatable3 tbody tr").unwrap();
+    let cell_selector: scraper::Selector = scraper::Selector::parse("td").unwrap();
+
+    let mut methods_by_instrument: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+
+    for (instrument, student_ids) in &sampled_student_ids_by_instrument {
+        let mut methods: BTreeSet<String> = BTreeSet::new();
+
+        for student_id in student_ids {
+            let response: reqwest::blocking::Response = client
+                .get(build_sam_student_lessons_url(&site, student_id))
+                .header(reqwest::header::COOKIE, session_cookie.clone())
+                .send()
+                .unwrap();
+            let body: String = response.text().unwrap();
+
+            let document: scraper::Html = scraper::Html::parse_document(&body);
+            for row in document.select(&mtd_row_selector) {
+                if let Some(method_cell) = row.select(&cell_selector).nth(2) {
+                    let method_name: String = method_cell
+                        .text()
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                        .trim()
+                        .to_owned();
+                    if !method_name.is_empty() {
+                        methods.insert(method_name);
+                    }
+                }
+            }
+        }
+
+        methods_by_instrument.insert(instrument.clone(), methods);
+    }
+
+    println!("methods actually used per instrument (sampled): {methods_by_instrument:#?}");
+
+    assert!(
+        !methods_by_instrument.is_empty(),
+        "expected at least one sampled instrument"
+    );
+}
+
+/// Raw `DataTables` row column order per the live response:
+/// [id, name, location, role, instrument, level, ...].
+fn column(row: &serde_json::Value, index: usize) -> String {
+    row.get(index)
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or_default()
+        .to_owned()
 }
 
 fn build_sam_authentication_url(site: &SamSiteConfig) -> String {

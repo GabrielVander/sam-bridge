@@ -1,8 +1,11 @@
 import 'package:bloc_signals/bloc_signals.dart';
+import 'package:flutter_application/lessons/application/use_cases/assess_student_progress_use_case.dart';
 import 'package:flutter_application/lessons/application/use_cases/retrieve_student_lessons_use_case.dart';
 import 'package:flutter_application/lessons/lessons_mapper.dart';
+import 'package:flutter_application/lessons/progress_mapper.dart';
 import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/rust/bootstrap/infra/lessons_view.dart';
+import 'package:flutter_application/rust/bootstrap/infra/progress_view.dart';
 
 sealed class LessonsState {
   const LessonsState();
@@ -18,7 +21,8 @@ final class LessonsLoading extends LessonsState {
 
 final class LessonsLoaded extends LessonsState {
   final StudentLessonsView view;
-  const LessonsLoaded(this.view);
+  final ProgressStatus progress;
+  const LessonsLoaded(this.view, this.progress);
 }
 
 final class LessonsFailure extends LessonsState {
@@ -26,19 +30,66 @@ final class LessonsFailure extends LessonsState {
   const LessonsFailure(this.message);
 }
 
+/// Progress is assessed alongside the lessons but can independently succeed,
+/// be inapplicable, or fail without that being a failure of the whole
+/// screen - the lesson history is still worth showing either way.
+sealed class ProgressStatus {
+  const ProgressStatus();
+}
+
+final class ProgressAvailable extends ProgressStatus {
+  final ProgressView view;
+  const ProgressAvailable(this.view);
+}
+
+final class ProgressNoInstrumentAssigned extends ProgressStatus {
+  const ProgressNoInstrumentAssigned();
+}
+
+final class ProgressUnknownLevel extends ProgressStatus {
+  final String raw;
+  const ProgressUnknownLevel(this.raw);
+}
+
+final class ProgressUnavailable extends ProgressStatus {
+  final String message;
+  const ProgressUnavailable(this.message);
+}
+
 class LessonsCubitSignal extends CubitSignal<LessonsState> {
   final RetrieveStudentLessonsUseCase retrieveStudentLessons;
+  final AssessStudentProgressUseCase assessStudentProgress;
 
-  LessonsCubitSignal({required this.retrieveStudentLessons})
-    : super(initialState: const LessonsIdle());
+  LessonsCubitSignal({
+    required this.retrieveStudentLessons,
+    required this.assessStudentProgress,
+  }) : super(initialState: const LessonsIdle());
 
-  Future<void> load(String studentId) async {
+  Future<void> load(
+    String studentId, {
+    required String rawLevel,
+    String? rawInstrument,
+  }) async {
     emit(const LessonsLoading());
     try {
-      final outcome = await retrieveStudentLessons(studentId: studentId);
-      switch (outcome) {
+      final lessonsFuture = retrieveStudentLessons(studentId: studentId);
+      final progressFuture = assessStudentProgress(
+        studentId: studentId,
+        levelName: rawLevel,
+        instrumentName: rawInstrument,
+      );
+
+      final lessonsOutcome = await lessonsFuture;
+      final progressOutcome = await progressFuture;
+
+      switch (lessonsOutcome) {
         case RetrieveStudentLessonsOutcome_Success(:final field0):
-          emit(LessonsLoaded(LessonsMapper.toViewModel(field0)));
+          emit(
+            LessonsLoaded(
+              LessonsMapper.toViewModel(field0),
+              _toProgressStatus(progressOutcome),
+            ),
+          );
         case RetrieveStudentLessonsOutcome_Failure(:final field0):
           emit(LessonsFailure(field0));
       }
@@ -46,4 +97,16 @@ class LessonsCubitSignal extends CubitSignal<LessonsState> {
       emit(LessonsFailure(e.toString()));
     }
   }
+
+  ProgressStatus _toProgressStatus(AssessStudentProgressOutcome outcome) =>
+      switch (outcome) {
+        AssessStudentProgressOutcome_Success(:final field0) =>
+          ProgressAvailable(ProgressMapper.toViewModel(field0)),
+        AssessStudentProgressOutcome_NoInstrumentAssigned() =>
+          const ProgressNoInstrumentAssigned(),
+        AssessStudentProgressOutcome_UnknownLevel(:final field0) =>
+          ProgressUnknownLevel(field0),
+        AssessStudentProgressOutcome_Failure(:final field0) =>
+          ProgressUnavailable(field0),
+      };
 }

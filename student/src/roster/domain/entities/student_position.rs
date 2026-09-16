@@ -1,10 +1,19 @@
-use crate::shared::domain::entities::MusicianLevel;
+use crate::shared::domain::entities::{Instrument, MusicianLevel};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum StudentPosition {
-    Musician { level: MusicianLevel },
-    Organist { level: OrganistLevel },
-    Secretary { r#type: SecretaryType },
+    Musician {
+        level: MusicianLevel,
+        /// `None` when SAM has the student marked "A DEFINIR" (instrument
+        /// not yet assigned).
+        instrument: Option<Instrument>,
+    },
+    Organist {
+        level: OrganistLevel,
+    },
+    Secretary {
+        r#type: SecretaryType,
+    },
     Unknown(String),
 }
 

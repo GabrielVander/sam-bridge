@@ -23,6 +23,7 @@ fn assert_students_map() {
                 name: "Student A".to_string(),
                 position: StudentPosition::Musician {
                     level: MusicianLevel::Candidate,
+                    instrument: None,
                 },
                 location: "Location A".to_string(),
                 region: Region::AraraquaraSaoCarlos,
@@ -55,18 +56,21 @@ fn assert_students_map() {
                         name: "Student A".to_string(),
                         position: StudentPositionDto::Candidate,
                         location: "Location A".to_string(),
+                        instrument: None,
                     },
                     StudentSummaryDto {
                         id: "2".to_string(),
                         name: "Student B".to_string(),
                         position: StudentPositionDto::MusicSecretary,
                         location: "Location B".to_owned(),
+                        instrument: None,
                     },
                     StudentSummaryDto {
                         id: "3".to_string(),
                         name: "Student C".to_string(),
                         position: StudentPositionDto::YouthServiceHalfHour,
                         location: "Location A".to_string(),
+                        instrument: None,
                     },
                 ]
                 .to_vec(),
