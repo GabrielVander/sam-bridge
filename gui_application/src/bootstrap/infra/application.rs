@@ -1,11 +1,8 @@
 use std::sync::Arc;
 
-use authentication::{
-    application::use_cases::{
-        LoginCommand, LoginUseCase, LoginUseCaseError, RememberCredentialsUseCase,
-        RestoreSessionResult, RestoreSessionUseCase,
-    },
-    domain::entities::{Credential, Email, Password},
+use authentication::application::use_cases::{
+    LoginAndRememberCredentialsUseCase, LoginUseCaseError, RestoreSessionResult,
+    RestoreSessionUseCase,
 };
 use credential_store::FileCredentialStore;
 use sam::{
@@ -14,8 +11,8 @@ use sam::{
     roster::adapters::gateways::StudentGatewaySamImpl,
 };
 use student::application::use_cases::{
-    RetrieveAllAvailableStudentsError, RetrieveAllAvailableStudentsResult,
-    RetrieveAllAvailableStudentsUseCase, RetrieveStudentLessonsUseCase,
+    RetrieveAllAvailableStudentsResult, RetrieveAllAvailableStudentsUseCase,
+    RetrieveStudentLessonsUseCase,
 };
 
 use crate::infra::{
@@ -23,8 +20,7 @@ use crate::infra::{
 };
 
 pub struct ApplicationFacade {
-    login_use_case: LoginUseCase,
-    remember_credentials_use_case: RememberCredentialsUseCase,
+    login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase,
     restore_session_use_case: RestoreSessionUseCase,
     retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase,
     sam_student_lessons_gateway: Arc<StudentLessonsGatewaySamImpl>,
@@ -52,12 +48,13 @@ impl ApplicationFacade {
         let sam_credential_gateway: Arc<CredentialGatewaySamImpl> =
             Arc::new(CredentialGatewaySamImpl::new(sam_client.clone()));
 
-        let login_use_case: LoginUseCase = LoginUseCase::new(sam_credential_gateway.clone());
-
         let file_credential_store: Arc<FileCredentialStore> = Arc::new(FileCredentialStore::new());
 
-        let remember_credentials_use_case: RememberCredentialsUseCase =
-            RememberCredentialsUseCase::new(file_credential_store.clone());
+        let login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase =
+            LoginAndRememberCredentialsUseCase::new(
+                sam_credential_gateway.clone(),
+                file_credential_store.clone(),
+            );
 
         let restore_session_use_case: RestoreSessionUseCase =
             RestoreSessionUseCase::new(file_credential_store, sam_credential_gateway);
@@ -72,8 +69,7 @@ impl ApplicationFacade {
             Arc::new(StudentLessonsGatewaySamImpl::new(sam_client));
 
         Ok(Self {
-            login_use_case,
-            remember_credentials_use_case,
+            login_and_remember_credentials_use_case,
             restore_session_use_case,
             retrieve_all_available_students_use_case,
             sam_student_lessons_gateway,
@@ -81,22 +77,10 @@ impl ApplicationFacade {
     }
 
     pub async fn login(&self, email: String, password: String) -> LoginResult {
-        let result: Result<(), LoginUseCaseError> = self
-            .login_use_case
-            .execute(LoginCommand::new(email.clone(), password.clone()))
-            .await;
-
-        if result.is_ok() {
-            // Remembering credentials is a best-effort side effect: a failed
-            // save must never turn an otherwise-successful login into a
-            // failure for the user.
-            let _ = self
-                .remember_credentials_use_case
-                .execute(Credential::new(Email(email), Password(password)))
-                .await;
-        }
-
-        result.into()
+        self.login_and_remember_credentials_use_case
+            .execute(email, password)
+            .await
+            .into()
     }
 
     pub async fn restore_session(&self) -> RestoreSessionOutcome {
@@ -119,9 +103,9 @@ impl ApplicationFacade {
                     students.into_iter().map(StudentSummaryDto::from).collect(),
                 )
             }
-            RetrieveAllAvailableStudentsResult::Failure(
-                RetrieveAllAvailableStudentsError::GatewayError { context },
-            ) => RetrieveAllAvailableStudentsOutcome::Failure(context),
+            RetrieveAllAvailableStudentsResult::Failure(gateway_error) => {
+                RetrieveAllAvailableStudentsOutcome::Failure(gateway_error.to_string())
+            }
         }
     }
 
