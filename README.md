@@ -18,17 +18,34 @@ about HTTP or HTML.
 @startuml
 title SAM Bridge Component Diagram
 
-component "gui_application::flutter" as ui <<Infrastructure>>
-component gui_application <<Main>>
-component authentication <<Domain>>
+component "gui_application::flutter" as ui <<Main + Infrastructure>>
+component gui_application <<Adapter>>
+component authentication <<Domain + Application>>
+component student <<Domain + Application>>
 component sam <<Adapter + Infrastructure>>
+component credential_store <<Adapter + Infrastructure>>
 
 ui --> gui_application
+
 gui_application --> authentication
+gui_application --> student
 gui_application --> sam
+gui_application --> credential_store
+
 sam --> authentication
+sam --> student
+
+credential_store --> authentication
 @enduml
 ```
+
+`ui` is the true composition root (`main.dart` calls `RustLib.init()`, builds the
+facade, and wires the widget tree), so it owns `<<Main>>`; `gui_application`
+exposes an `ApplicationFacade` that translates use cases into FRB-friendly
+DTOs, making it an `<<Adapter>>` for the delivery mechanism rather than the
+outermost layer. `sam` and `credential_store` implement gateway/store ports
+declared by `authentication` and `student` (dependency inversion), which is
+why the arrows point from adapter to domain and never the reverse.
 
 ## Development
 
