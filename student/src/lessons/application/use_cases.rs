@@ -1,5 +1,6 @@
 use crate::lessons::{
-    application::gateways::StudentLessonsGateway, domain::entities::StudentLessons,
+    application::gateways::{StudentLessonsGateway, StudentLessonsGatewayError},
+    domain::entities::StudentLessons,
 };
 
 pub struct RetrieveStudentLessonsUseCase<'a, T: StudentLessonsGateway> {
@@ -11,7 +12,10 @@ impl<'a, T: StudentLessonsGateway> RetrieveStudentLessonsUseCase<'a, T> {
         Self { gateway }
     }
 
-    pub async fn execute(&self, student_id: &str) -> anyhow::Result<StudentLessons> {
+    pub async fn execute(
+        &self,
+        student_id: &str,
+    ) -> Result<StudentLessons, StudentLessonsGatewayError> {
         self.gateway.get_all_for_student_with_id(student_id).await
     }
 }
@@ -34,9 +38,9 @@ mod tests {
         async fn get_all_for_student_with_id(
             &self,
             _student_id: &str,
-        ) -> anyhow::Result<StudentLessons> {
+        ) -> Result<StudentLessons, StudentLessonsGatewayError> {
             if self.fail {
-                anyhow::bail!("Student lessons request failed");
+                return Err(StudentLessonsGatewayError::UnableToPerformOperation);
             }
             Ok(self.bundle.clone())
         }
@@ -89,8 +93,10 @@ mod tests {
 
             let result = use_case.execute("500132").await;
 
-            assert!(result.is_err());
-            assert!(result.unwrap_err().to_string().contains("Student lessons"));
+            assert_eq!(
+                result,
+                Err(StudentLessonsGatewayError::UnableToPerformOperation)
+            );
         });
     }
 }

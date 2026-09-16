@@ -3,7 +3,7 @@ use std::sync::Arc;
 use sam::client::SamClientImpl;
 use sam::http::SamOperations;
 use sam::roster::adapters::gateways::StudentGatewaySamImpl;
-use student::application::gateways::StudentGateway;
+use student::application::gateways::{StudentGateway, StudentGatewayError};
 use student::domain::entities::{MusicianLevel, Student, StudentPosition};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -54,7 +54,8 @@ fn given_accessible_dashboard_students_should_be_retrieved_and_mapped() {
         let gateway: StudentGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: anyhow::Result<Vec<Student>> = gateway.get_available_records().await;
+        let result: Result<Vec<Student>, StudentGatewayError> =
+            gateway.get_available_records().await;
 
         let students: Vec<Student> = result.expect("students retrieval should succeed");
         assert_eq!(students.len(), 1);
@@ -104,7 +105,8 @@ fn given_inaccessible_dashboard_students_retrieval_should_fail() {
         let gateway: StudentGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: anyhow::Result<Vec<Student>> = gateway.get_available_records().await;
+        let result: Result<Vec<Student>, StudentGatewayError> =
+            gateway.get_available_records().await;
 
         assert!(
             result.is_err(),
@@ -133,7 +135,8 @@ fn given_unexpected_listing_status_students_retrieval_should_fail() {
         let gateway: StudentGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: anyhow::Result<Vec<Student>> = gateway.get_available_records().await;
+        let result: Result<Vec<Student>, StudentGatewayError> =
+            gateway.get_available_records().await;
 
         assert!(
             result.is_err(),

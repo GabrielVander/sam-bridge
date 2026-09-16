@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
-use anyhow::Context;
 use async_trait::async_trait;
-use student::application::gateways::StudentLessonsGateway;
+use student::application::gateways::{StudentLessonsGateway, StudentLessonsGatewayError};
 use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
 
 use crate::client::{MsaLesson, MtdLesson, SamClient, StudentLessonsPage};
@@ -19,11 +18,14 @@ impl StudentLessonsGatewaySamImpl {
 
 #[async_trait]
 impl StudentLessonsGateway for StudentLessonsGatewaySamImpl {
-    async fn get_all_for_student_with_id(&self, id: &str) -> anyhow::Result<StudentLessons> {
+    async fn get_all_for_student_with_id(
+        &self,
+        id: &str,
+    ) -> Result<StudentLessons, StudentLessonsGatewayError> {
         let page: StudentLessonsPage = self
             .client
             .student_lessons(id)
-            .context("Unable to retrieve lessons from SAM")?;
+            .map_err(|_| StudentLessonsGatewayError::UnableToPerformOperation)?;
 
         Ok(StudentLessons {
             approved: page.msa.into_iter().map(Lesson::from).collect(),

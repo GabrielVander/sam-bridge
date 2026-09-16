@@ -1,9 +1,8 @@
 use std::sync::Arc;
 
-use anyhow::Context;
 use async_trait::async_trait;
 use student::{
-    application::gateways::StudentGateway,
+    application::gateways::{StudentGateway, StudentGatewayError},
     domain::entities::{MusicianLevel, Region, Student, StudentPosition},
 };
 
@@ -21,11 +20,11 @@ impl StudentGatewaySamImpl {
 
 #[async_trait]
 impl StudentGateway for StudentGatewaySamImpl {
-    async fn get_available_records(&self) -> anyhow::Result<Vec<Student>> {
+    async fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
         let sam_students: Vec<SamStudent> = self
             .client
             .students()
-            .context("Unable to retrieve students from SAM")?;
+            .map_err(|_| StudentGatewayError::UnableToPerformOperation)?;
 
         Ok(sam_students.into_iter().map(Student::from).collect())
     }

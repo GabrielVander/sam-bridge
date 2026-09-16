@@ -4,11 +4,8 @@ use async_trait::async_trait;
 use student::{
     application::{
         dto::{StudentPositionDto, StudentSummaryDto},
-        gateways::StudentGateway,
-        use_cases::{
-            RetrieveAllAvailableStudentsError, RetrieveAllAvailableStudentsResult,
-            RetrieveAllAvailableStudentsUseCase,
-        },
+        gateways::{StudentGateway, StudentGatewayError},
+        use_cases::{RetrieveAllAvailableStudentsResult, RetrieveAllAvailableStudentsUseCase},
     },
     domain::entities::{
         MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
@@ -91,11 +88,7 @@ fn assert_students_map() {
 #[test]
 fn propagates_gateway_errors() {
     smol::block_on(async {
-        let message: &str = "Some error";
-
-        let gateway: FakeFailureGateway = FakeFailureGateway {
-            message: message.to_string(),
-        };
+        let gateway: FakeFailureGateway = FakeFailureGateway;
 
         let use_case: RetrieveAllAvailableStudentsUseCase =
             RetrieveAllAvailableStudentsUseCase::new(Arc::new(gateway));
@@ -105,9 +98,7 @@ fn propagates_gateway_errors() {
         assert_eq!(
             result,
             RetrieveAllAvailableStudentsResult::Failure(
-                RetrieveAllAvailableStudentsError::GatewayError {
-                    context: message.to_string()
-                }
+                StudentGatewayError::UnableToPerformOperation
             )
         );
     });
@@ -119,18 +110,16 @@ struct FakeSuccessGateway {
 
 #[async_trait]
 impl StudentGateway for FakeSuccessGateway {
-    async fn get_available_records(&self) -> anyhow::Result<Vec<Student>> {
+    async fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
         Ok(self.students.clone())
     }
 }
 
-struct FakeFailureGateway {
-    message: String,
-}
+struct FakeFailureGateway;
 
 #[async_trait]
 impl StudentGateway for FakeFailureGateway {
-    async fn get_available_records(&self) -> anyhow::Result<Vec<Student>> {
-        anyhow::bail!(self.message.clone());
+    async fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
+        Err(StudentGatewayError::UnableToPerformOperation)
     }
 }
