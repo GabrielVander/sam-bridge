@@ -1,54 +1,23 @@
-//! Test-eligibility requirements per instrument and level, as published by the
-//! music commission (Comissão Musical, Formulário M09 - Março/2023). This is
-//! reference data: which methods (and how far into them) a student must have
-//! completed, together with the shared MSA/theory, metric-reading and hymnal
-//! requirements, before they may sit a given level's test.
 use crate::shared::domain::entities::{Instrument, MusicianLevel};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MethodMilestone {
     Page(u32),
     Lesson(u32),
-    PageAndLesson {
-        page: u32,
-        lesson: u32,
-    },
+    PageAndLesson { page: u32, lesson: u32 },
     Phase(u32),
     Module(u32),
-    ExerciseRange {
-        from: u32,
-        to: u32,
-    },
+    ExerciseRange { from: u32, to: u32 },
     Complete,
-    /// Escape hatch for milestones that don't fit a clean numeric shape
-    /// (e.g. "até pág. 24 e da pág. 44 a 53"), kept verbatim from the sheet.
     Described(&'static str),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MethodComponent {
-    /// A human-readable label sourced from Formulário M09, kept short and
-    /// scoped to one instrument on purpose.
-    ///
-    /// It is *not* meant to be matched against SAM's own free-text `método`
-    /// field on a recorded lesson: a wide exploratory sample (~200 real
-    /// lesson records across every instrument, see
-    /// `discovers_method_names_actually_used_per_instrument` in
-    /// `sam/tests/sam_http_capabilities_and_behaviour.rs`) showed that field
-    /// is one shared, unscoped dropdown - the same generic entries (and even
-    /// a music-theory book) turned up recorded under unrelated instruments
-    /// far too often to be occasional instrument-switch history. `assess`
-    /// deliberately never reads `Lesson.method`; this field exists purely
-    /// for display.
     pub method_name: &'static str,
     pub milestone: MethodMilestone,
 }
 
-/// One acceptable path to satisfy a level's method requirement.
-///
-/// All of its components must be completed together (they are joined by "+"
-/// on the sheet); different alternatives for the same requirement are joined
-/// by "OU" and any single one suffices.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MethodAlternative {
     pub components: Vec<MethodComponent>,
@@ -63,21 +32,16 @@ pub struct TheoryRequirement {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TestRequirement {
     pub level: MusicianLevel,
-    /// Any one of these alternatives satisfies the instrument-method part of
-    /// the requirement.
     pub method_alternatives: Vec<MethodAlternative>,
     pub theory: TheoryRequirement,
     pub metric_reading: &'static str,
     pub hymnal: &'static str,
-    /// Free-form observation from the sheet (e.g. clef/voice notes).
     pub observation: Option<&'static str>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InstrumentRequirements {
     pub instrument: Instrument,
-    /// One entry per testable level (`YouthService`, `OfficialService`,
-    /// `Officialized`). Candidate/Practice have no test to sit.
     pub tests: Vec<TestRequirement>,
 }
 
@@ -87,19 +51,6 @@ impl InstrumentRequirements {
         self.tests.iter().find(|t| &t.level == level)
     }
 
-    /// Looks up the published requirements for an instrument. Returns `None`
-    /// when the commission has not yet published requirements for it (e.g.
-    /// Alto Clarinet, English Horn or Contralto Violin, as of Formulário
-    /// M09).
-    ///
-    /// Note for whoever revisits `EnglishHorn`: a real SAM method-lesson
-    /// sample showed Oboe's own method book listed as "GIAMPIERI - OBOÉ,
-    /// OBOÉ D'AMORE, CORNE INGLES", i.e. it's also used to teach English
-    /// Horn in practice. That's a fact about which *book* is shared, not
-    /// about *test eligibility* - Formulário M09 has no footnote extending
-    /// Oboe's testing track to English Horn the way it explicitly does for
-    /// Trumpet/Cornet/Flugelhorn, so this intentionally still returns `None`
-    /// pending an actual policy confirmation from the music commission.
     #[must_use]
     pub fn for_instrument(instrument: &Instrument) -> Option<Self> {
         match instrument {

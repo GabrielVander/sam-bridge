@@ -1,7 +1,3 @@
-// See roster_view.rs for why these mirror `student::application::dto` types
-// field-for-field instead of being re-exported directly: FRB only generates
-// plain Dart classes for types defined in this crate's own scanned source.
-
 use student::application::dto as student_dto;
 use student::domain::entities::Clef;
 

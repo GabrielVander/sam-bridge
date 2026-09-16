@@ -56,23 +56,17 @@ class StudentSummaryDto {
   final String name;
   final StudentPositionDto position;
   final String location;
-  final String? instrument;
 
   const StudentSummaryDto({
     required this.id,
     required this.name,
     required this.position,
     required this.location,
-    this.instrument,
   });
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      position.hashCode ^
-      location.hashCode ^
-      instrument.hashCode;
+      id.hashCode ^ name.hashCode ^ position.hashCode ^ location.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -82,6 +76,5 @@ class StudentSummaryDto {
           id == other.id &&
           name == other.name &&
           position == other.position &&
-          location == other.location &&
-          instrument == other.instrument;
+          location == other.location;
 }

@@ -30,9 +30,6 @@ final class LessonsFailure extends LessonsState {
   const LessonsFailure(this.message);
 }
 
-/// Progress is assessed alongside the lessons but can independently succeed,
-/// be inapplicable, or fail without that being a failure of the whole
-/// screen - the lesson history is still worth showing either way.
 sealed class ProgressStatus {
   const ProgressStatus();
 }
@@ -65,19 +62,11 @@ class LessonsCubitSignal extends CubitSignal<LessonsState> {
     required this.assessStudentProgress,
   }) : super(initialState: const LessonsIdle());
 
-  Future<void> load(
-    String studentId, {
-    required String rawLevel,
-    String? rawInstrument,
-  }) async {
+  Future<void> load(String studentId) async {
     emit(const LessonsLoading());
     try {
       final lessonsFuture = retrieveStudentLessons(studentId: studentId);
-      final progressFuture = assessStudentProgress(
-        studentId: studentId,
-        levelName: rawLevel,
-        instrumentName: rawInstrument,
-      );
+      final progressFuture = assessStudentProgress(studentId: studentId);
 
       final lessonsOutcome = await lessonsFuture;
       final progressOutcome = await progressFuture;

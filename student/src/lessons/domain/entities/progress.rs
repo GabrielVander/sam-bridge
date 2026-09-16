@@ -45,17 +45,6 @@ const LEVELS: [MusicianLevel; 5] = [
     MusicianLevel::Officialized,
 ];
 
-/// Progress recorded against a method's raw, measurable units. Instrument
-/// methods track different units (pages, lessons, MSA-style phases); values
-/// that aren't tracked at all stay at zero and simply never satisfy a
-/// milestone expressed in that unit.
-///
-/// This deliberately doesn't look at `Lesson.method` (the free-text name of
-/// the book a lesson was recorded against) to decide which alternative a
-/// student is on. That field turned out to be unreliable for that purpose:
-/// see the doc comment on `MethodComponent::method_name` for the real-data
-/// evidence. Instead every alternative is scored against the same recorded
-/// numbers and the best-explaining one wins (`assess_method` below).
 struct RecordedProgress {
     page: f64,
     lesson: f64,
@@ -70,9 +59,6 @@ fn recorded_progress(lessons: &[Lesson]) -> RecordedProgress {
     }
 }
 
-/// Percent complete towards a single milestone, or `None` when the milestone
-/// isn't expressed in a unit we can measure from recorded lessons (e.g. a
-/// method "module", an exercise range, or a plain "completo" mark).
 fn milestone_percent(milestone: &MethodMilestone, recorded: &RecordedProgress) -> Option<f64> {
     match *milestone {
         MethodMilestone::Page(target) => Some(pct(recorded.page, f64::from(target))),
@@ -103,11 +89,6 @@ fn milestone_met(milestone: &MethodMilestone, recorded: &RecordedProgress) -> Op
     }
 }
 
-/// Assesses one acceptable path (all of its components are required
-/// together). Percent is the average of whatever components are measurable;
-/// `met` only ever turns true when every component is both measurable and
-/// individually satisfied, since we don't want to tell a student they're
-/// eligible on a requirement we can't actually verify from recorded lessons.
 fn assess_alternative(alternative: &MethodAlternative, recorded: &RecordedProgress) -> (f64, bool) {
     let mut measured_percents = Vec::new();
     let mut all_met = true;
@@ -131,13 +112,6 @@ fn assess_alternative(alternative: &MethodAlternative, recorded: &RecordedProgre
     (percent, all_met)
 }
 
-/// A student only needs to satisfy one alternative, so we report the
-/// best-explaining one: the highest completion percent reached on any single
-/// alternative, and whether any alternative is fully (verifiably) satisfied.
-///
-/// These are computed independently, since a met alternative and the
-/// highest-percent one are not necessarily the same object once percentages
-/// tie at 100.
 fn assess_method(requirement: &TestRequirement, recorded: &RecordedProgress) -> (f64, bool) {
     let assessments: Vec<(f64, bool)> = requirement
         .method_alternatives
@@ -161,7 +135,6 @@ fn build_checkpoint(
     let achieved = assigned_level.rank() >= level.rank();
 
     let Some(requirement) = catalog.requirement_for(level) else {
-        // No test to sit at this level (Candidate/Practice): nothing blocks it.
         return CheckpointStatus {
             level: level.clone(),
             achieved,
@@ -367,10 +340,6 @@ mod tests {
 
     #[test]
     fn best_alternative_is_picked_even_when_it_is_not_the_first_listed() {
-        // No page progress (rules out the Laourex-only and Facilitado
-        // alternatives), but the H. Sitt supplement of the CCB alternative
-        // (the second one listed) is fully met - that alternative should
-        // still be surfaced as the closest to completion.
         let method = vec![method_lesson("0", "6")];
 
         let report = assess(&MusicianLevel::Candidate, Instrument::Violin, &[], &method).unwrap();
@@ -396,10 +365,6 @@ mod tests {
 
     #[test]
     fn officialization_is_unverifiable_from_data_alone() {
-        // The sheet only says "completo" for officialization, which we can't
-        // measure numerically, so it can never show ready_to_advance from
-        // recorded lessons - only the supreme rule (assigned_level) marks it
-        // achieved.
         let approved = vec![msa_lesson("16", "16")];
         let method = vec![method_lesson("999", "999")];
 
@@ -506,7 +471,6 @@ mod tests {
 
     #[test]
     fn phase_based_method_milestone_is_measurable() {
-        // Flute's "Método Prático" alternative is phase-based, not page/lesson.
         let method = vec![method_phase_lesson("10")];
         let report = assess(&MusicianLevel::Candidate, Instrument::Flute, &[], &method).unwrap();
 

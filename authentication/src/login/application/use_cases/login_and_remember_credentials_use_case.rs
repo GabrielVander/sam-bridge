@@ -31,9 +31,6 @@ impl LoginAndRememberCredentialsUseCase {
 
         match self.credential_gateway.authorize(&credential).await {
             Ok(AuthorizationResult::Authorized) => {
-                // Remembering credentials is a best-effort side effect: a
-                // failed save must never turn an otherwise-successful login
-                // into a failure for the user.
                 let _ = self.credential_store.save(&credential).await;
                 Ok(())
             }

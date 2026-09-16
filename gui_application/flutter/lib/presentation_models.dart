@@ -3,30 +3,17 @@ class StudentListItem {
   final String name;
   final String location;
   final String position;
-  final String rawLevel;
-
-  /// `Instrument::name()` (e.g. "Violino"), when SAM has one assigned to
-  /// this student. Round-trips through `Instrument::parse_named` when
-  /// requesting their progress assessment.
-  final String? rawInstrument;
 
   const StudentListItem({
     required this.id,
     required this.name,
     required this.location,
     required this.position,
-    required this.rawLevel,
-    this.rawInstrument,
   });
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      location.hashCode ^
-      position.hashCode ^
-      rawLevel.hashCode ^
-      rawInstrument.hashCode;
+      id.hashCode ^ name.hashCode ^ location.hashCode ^ position.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -36,9 +23,7 @@ class StudentListItem {
           id == other.id &&
           name == other.name &&
           location == other.location &&
-          position == other.position &&
-          rawLevel == other.rawLevel &&
-          rawInstrument == other.rawInstrument;
+          position == other.position;
 }
 
 enum LessonKind { msa, method }

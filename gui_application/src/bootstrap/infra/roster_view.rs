@@ -1,11 +1,3 @@
-// FRB only generates plain, field-accessible Dart classes for types defined
-// in this crate's own scanned source (`rust_input: crate`); types from other
-// crates come through as opaque handles. Rather than adding a
-// `flutter_rust_bridge` dependency to `student` (an application/domain-layer
-// crate that must stay ignorant of any specific UI framework), these mirror
-// `student::application::dto::{StudentSummaryDto, StudentPositionDto}`
-// field-for-field so FRB can expose them to Dart directly.
-
 use student::application::dto as student_dto;
 
 pub struct StudentSummaryDto {
@@ -13,7 +5,6 @@ pub struct StudentSummaryDto {
     pub name: String,
     pub position: StudentPositionDto,
     pub location: String,
-    pub instrument: Option<String>,
 }
 
 pub enum RetrieveAllAvailableStudentsOutcome {
@@ -44,7 +35,6 @@ impl From<student_dto::StudentSummaryDto> for StudentSummaryDto {
             name: dto.name,
             position: dto.position.into(),
             location: dto.location,
-            instrument: dto.instrument,
         }
     }
 }

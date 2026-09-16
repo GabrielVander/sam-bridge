@@ -30,11 +30,6 @@ impl RestoreSessionUseCase {
         match self.credential_gateway.authorize(&credential).await {
             Ok(AuthorizationResult::Authorized) => RestoreSessionResult::Restored,
             Ok(AuthorizationResult::Unauthorized) => {
-                // The stored credentials are genuinely no longer valid — self-heal
-                // rather than keep retrying them on every future launch. A plain
-                // transport/network failure (below) is deliberately NOT treated
-                // this way: it would otherwise forget a valid saved login on a
-                // transient blip.
                 let _ = self.credential_store.clear().await;
                 RestoreSessionResult::CredentialsRejected
             }

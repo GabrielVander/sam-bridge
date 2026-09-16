@@ -319,12 +319,9 @@ final class _StudentsList extends StatelessWidget {
         return Card(
           margin: EdgeInsets.zero,
           child: InkWell(
-            onTap: hasId ? () => context.go(_studentDetailUri(student)) : null,
+            onTap: hasId ? () => context.go('/students/${student.id}') : null,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   CircleAvatar(
@@ -335,9 +332,7 @@ final class _StudentsList extends StatelessWidget {
                     child: Text(
                       initial,
                       style: TextStyle(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onPrimaryContainer,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -401,14 +396,4 @@ final class _StudentsList extends StatelessWidget {
       },
     );
   }
-}
-
-String _studentDetailUri(StudentListItem student) {
-  final params = <String, String>{'level': student.rawLevel};
-  final instrument = student.rawInstrument;
-  if (instrument != null) params['instrument'] = instrument;
-  return Uri(
-    path: '/students/${student.id}',
-    queryParameters: params,
-  ).toString();
 }

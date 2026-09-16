@@ -84,8 +84,6 @@ abstract class RustLibApi extends BaseApi {
   crateBootstrapInfraApplicationApplicationFacadeAssessStudentProgress({
     required ApplicationFacade that,
     required String studentId,
-    required String levelName,
-    String? instrumentName,
   });
 
   Future<LoginResult> crateBootstrapInfraApplicationApplicationFacadeLogin({
@@ -135,8 +133,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   crateBootstrapInfraApplicationApplicationFacadeAssessStudentProgress({
     required ApplicationFacade that,
     required String studentId,
-    required String levelName,
-    String? instrumentName,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -147,8 +143,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_String(studentId, serializer);
-          sse_encode_String(levelName, serializer);
-          sse_encode_opt_String(instrumentName, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -162,7 +156,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         ),
         constMeta:
             kCrateBootstrapInfraApplicationApplicationFacadeAssessStudentProgressConstMeta,
-        argValues: [that, studentId, levelName, instrumentName],
+        argValues: [that, studentId],
         apiImpl: this,
       ),
     );
@@ -172,7 +166,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   get kCrateBootstrapInfraApplicationApplicationFacadeAssessStudentProgressConstMeta =>
       const TaskConstMeta(
         debugName: "ApplicationFacade_assess_student_progress",
-        argNames: ["that", "studentId", "levelName", "instrumentName"],
+        argNames: ["that", "studentId"],
       );
 
   @override
@@ -693,14 +687,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   StudentSummaryDto dco_decode_student_summary_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return StudentSummaryDto(
       id: dco_decode_String(arr[0]),
       name: dco_decode_String(arr[1]),
       position: dco_decode_student_position_dto(arr[2]),
       location: dco_decode_String(arr[3]),
-      instrument: dco_decode_opt_String(arr[4]),
     );
   }
 
@@ -1121,13 +1114,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_name = sse_decode_String(deserializer);
     var var_position = sse_decode_student_position_dto(deserializer);
     var var_location = sse_decode_String(deserializer);
-    var var_instrument = sse_decode_opt_String(deserializer);
     return StudentSummaryDto(
       id: var_id,
       name: var_name,
       position: var_position,
       location: var_location,
-      instrument: var_instrument,
     );
   }
 
@@ -1514,7 +1505,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.name, serializer);
     sse_encode_student_position_dto(self.position, serializer);
     sse_encode_String(self.location, serializer);
-    sse_encode_opt_String(self.instrument, serializer);
   }
 
   @protected
@@ -1558,20 +1548,12 @@ class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
         .rust_arc_decrement_strong_count_ApplicationFacadePtr,
   );
 
-  /// `level_name` and `instrument_name` are expected to be
-  /// `MusicianLevel::name()`/`Instrument::name()` values (e.g. as carried
-  /// through the roster listing) - the caller already has these from
-  /// selecting the student, so there's no second roster lookup here.
   Future<AssessStudentProgressOutcome> assessStudentProgress({
     required String studentId,
-    required String levelName,
-    String? instrumentName,
   }) => RustLib.instance.api
       .crateBootstrapInfraApplicationApplicationFacadeAssessStudentProgress(
         that: this,
         studentId: studentId,
-        levelName: levelName,
-        instrumentName: instrumentName,
       );
 
   Future<LoginResult> login({

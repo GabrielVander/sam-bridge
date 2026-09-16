@@ -22,26 +22,11 @@ void main() {
           name: 'Jane Doe',
           location: 'Some Location',
           position: 'YouthService',
-          rawLevel: 'YouthService',
         ),
       );
     });
 
-    test('uses the same raw variant name for position and rawLevel', () {
-      const dto = StudentSummaryDto(
-        id: '3',
-        name: 'Carlos',
-        position: StudentPositionDto.gemSecretary(),
-        location: 'L',
-      );
-
-      final viewModel = RosterMapper.toViewModel(dto);
-
-      expect(viewModel.position, viewModel.rawLevel);
-      expect(viewModel.position, 'GemSecretary');
-    });
-
-    test('maps an invalid position to its raw SAM string for both fields', () {
+    test('maps an invalid position to its raw SAM string', () {
       const dto = StudentSummaryDto(
         id: '2',
         name: 'John Doe',
@@ -52,34 +37,6 @@ void main() {
       final viewModel = RosterMapper.toViewModel(dto);
 
       expect(viewModel.position, 'ALGO DESCONHECIDO');
-      expect(viewModel.rawLevel, 'ALGO DESCONHECIDO');
-    });
-
-    test('carries the assigned instrument through as rawInstrument', () {
-      const dto = StudentSummaryDto(
-        id: '4',
-        name: 'Maria',
-        position: StudentPositionDto.youthService(),
-        location: 'L',
-        instrument: 'Violino',
-      );
-
-      final viewModel = RosterMapper.toViewModel(dto);
-
-      expect(viewModel.rawInstrument, 'Violino');
-    });
-
-    test('a musician with no assigned instrument has none in the view', () {
-      const dto = StudentSummaryDto(
-        id: '5',
-        name: 'Pedro',
-        position: StudentPositionDto.candidate(),
-        location: 'L',
-      );
-
-      final viewModel = RosterMapper.toViewModel(dto);
-
-      expect(viewModel.rawInstrument, isNull);
     });
 
     test('maps a list of dtos preserving order', () {

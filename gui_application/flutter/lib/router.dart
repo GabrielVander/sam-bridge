@@ -56,8 +56,6 @@ GoRouter buildRouter({
                 path: ':studentId',
                 builder: (BuildContext _, GoRouterState state) => StudentScreen(
                   studentId: state.pathParameters['studentId']!,
-                  rawLevel: state.uri.queryParameters['level'] ?? '',
-                  rawInstrument: state.uri.queryParameters['instrument'],
                 ),
               ),
             ],

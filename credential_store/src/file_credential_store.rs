@@ -7,11 +7,6 @@ use authentication::{
 };
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
-// `Zeroize`/`ZeroizeOnDrop` (rather than a hand-rolled `Drop` writing zeros
-// into the buffer) matter here: a plain "write zeros then drop" loop is a
-// dead store from the optimizer's point of view — nothing observable reads
-// the buffer afterward — so LLVM is free to elide it in a release build.
-// The `zeroize` crate uses a volatile write specifically to defeat that.
 #[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Zeroize, ZeroizeOnDrop)]
 struct StoredCredential {
     email: String,
@@ -140,9 +135,6 @@ impl FileCredentialStore {
     }
 
     fn save_sync(&self, credential: &StoredCredential) -> anyhow::Result<()> {
-        // The JSON encoding is itself a transient plaintext copy of the
-        // credential (distinct from `StoredCredential`'s own zeroized
-        // buffers), so it gets the same treatment.
         let json: Zeroizing<Vec<u8>> = Zeroizing::new(serde_json::to_vec(credential)?);
         let ciphertext: Vec<u8> = self.encrypt(&json)?;
         Self::atomic_write(&self.credential_path, &ciphertext)

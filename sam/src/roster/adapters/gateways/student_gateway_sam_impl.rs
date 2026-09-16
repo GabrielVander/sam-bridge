@@ -52,9 +52,6 @@ impl From<SamStudent> for Student {
     }
 }
 
-/// SAM embeds presentational markup directly in the location string (e.g.
-/// `<span class='m-r-10'></span>` separators) — strip it so only plain text
-/// ever reaches the UI.
 fn clean_location(raw: &str) -> String {
     let mut without_tags: String = String::with_capacity(raw.len());
     let mut inside_tag: bool = false;
@@ -74,13 +71,6 @@ fn clean_location(raw: &str) -> String {
         .join(" ")
 }
 
-/// SAM's raw `role`/`level`/`instrument` vocabulary below is confirmed
-/// against the live students listing (704 records, see the exploratory test
-/// `discovers_role_level_and_instrument_vocabulary_from_the_real_students_listing`
-/// in `sam/tests/sam_http_capabilities_and_behaviour.rs`, run against the
-/// real SAM site). Unrecognized raw values intentionally fall through to
-/// `Unknown` rather than guessing — extend these as more of SAM's vocabulary
-/// is confirmed.
 fn parse_position(role: &str, level: &str, instrument: &str) -> StudentPosition {
     match role {
         "MÚSICO" => StudentPosition::Musician {
@@ -103,18 +93,10 @@ fn parse_musician_level(level: &str) -> MusicianLevel {
         "ENSAIO" => MusicianLevel::Practice,
         "RJM" => MusicianLevel::YouthService,
         "CULTO OFICIAL" => MusicianLevel::OfficialService,
-        // "RJM / ENSAIO" is also seen for musicians in the live data, but its
-        // meaning isn't confirmed (no existing `MusicianLevel` variant models
-        // a youth-service/practice combination the way `OrganistLevel` does),
-        // so it intentionally falls through to `Unknown` rather than guessing.
         other => MusicianLevel::Unknown(other.to_owned()),
     }
 }
 
-/// "CANDIDATO(A)"/"ENSAIO"/"RJM"/"CULTO OFICIAL" are the same generic status
-/// tokens confirmed for `MusicianLevel` above (SAM reuses this vocabulary
-/// across roles); "RJM / MEIA HORA" is an organist-specific compound
-/// confirmed directly against the live data.
 fn parse_organist_level(level: &str) -> OrganistLevel {
     match level {
         "CANDIDATO(A)" => OrganistLevel::Candidate,
@@ -138,13 +120,9 @@ fn parse_instrument(instrument: &str) -> Option<Instrument> {
         "CLARINETE" => Some(Instrument::Clarinet),
         "CLARINETE ALTO" => Some(Instrument::AltoClarinet),
         "CLARINETE BAIXO" => Some(Instrument::BassClarinet),
-        // SAM splits saxophones into four physical sub-types; Formulário M09
-        // only publishes one generic "Saxofone" requirement, so all four map
-        // to the same catalog entry.
         "SAXOFONE ALTO" | "SAXOFONE SOPRANO CUR" | "SAXOFONE SOPRANO RET" | "SAXOFONE TENOR" => {
             Some(Instrument::Saxophone)
         }
-        // Confirmed aliases per Formulário M09's own *(1) note.
         "TROMPETE" | "CORNET" | "FLUGELHORN" => Some(Instrument::Trumpet),
         "TROMPA" => Some(Instrument::FrenchHorn),
         "TROMBONE" => Some(Instrument::Trombone),
@@ -156,8 +134,6 @@ fn parse_instrument(instrument: &str) -> Option<Instrument> {
     }
 }
 
-/// `Student.region` is currently unused by `StudentSummaryDto`'s mapping, so
-/// imprecision here doesn't affect what's displayed today.
 fn parse_region(location: &str) -> Region {
     if location.contains("ARARAQUARA-SÃO CARLOS") {
         Region::AraraquaraSaoCarlos

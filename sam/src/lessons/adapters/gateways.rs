@@ -1,3 +1,5 @@
+mod musician_profile_gateway_sam_impl;
 mod student_lessons_gateway_sam_impl;
 
+pub use musician_profile_gateway_sam_impl::MusicianProfileGatewaySamImpl;
 pub use student_lessons_gateway_sam_impl::StudentLessonsGatewaySamImpl;

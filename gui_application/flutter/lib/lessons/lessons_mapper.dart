@@ -27,9 +27,6 @@ class LessonsMapper {
     return '${range.from} - ${range.to}';
   }
 
-  // SAM's own clef vocabulary ("Sol"/"Dó"/"Fá") is shown back to the user
-  // rather than the Rust enum's raw variant names, since this is a
-  // display-only field with no downstream round-trip requirement.
   static String _formatClef(ClefDto? clef) => switch (clef) {
     ClefDto.g => 'Sol',
     ClefDto.c => 'Dó',

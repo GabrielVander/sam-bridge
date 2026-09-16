@@ -5,7 +5,10 @@ import 'package:flutter_application/rust/bootstrap/infra/application.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 AuthPresenter buildPresenter({
-  Future<LoginResult> Function({required String email, required String password})?
+  Future<LoginResult> Function({
+    required String email,
+    required String password,
+  })?
   loginUseCase,
   Future<RestoreSessionOutcome> Function()? restoreSessionUseCase,
 }) {
@@ -59,20 +62,23 @@ void main() {
       },
     );
 
-    test('submitLogin() reports missing fields without calling the use case', () async {
-      var called = false;
-      final presenter = buildPresenter(
-        loginUseCase: ({required email, required password}) async {
-          called = true;
-          return LoginResult.successful;
-        },
-      );
+    test(
+      'submitLogin() reports missing fields without calling the use case',
+      () async {
+        var called = false;
+        final presenter = buildPresenter(
+          loginUseCase: ({required email, required password}) async {
+            called = true;
+            return LoginResult.successful;
+          },
+        );
 
-      await presenter.submitLogin('', '');
+        await presenter.submitLogin('', '');
 
-      expect(presenter.stateValue, isA<AuthMissingFields>());
-      expect(called, isFalse);
-    });
+        expect(presenter.stateValue, isA<AuthMissingFields>());
+        expect(called, isFalse);
+      },
+    );
 
     test('submitLogin() transitions to Success on successful login', () async {
       final presenter = buildPresenter(

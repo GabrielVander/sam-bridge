@@ -34,10 +34,7 @@ void main() {
       expect(item.page, '38');
       expect(item.lesson, '7 - 8');
       expect(item.clef, 'Sol');
-      expect(
-        item.description,
-        'Passou lições 7 e 8, estudar próximas lições.',
-      );
+      expect(item.description, 'Passou lições 7 e 8, estudar próximas lições.');
       expect(item.instructor, 'MARCOS ROGÉRIO COSME');
       expect(item.method, '');
     });

@@ -17,9 +17,7 @@ void main() {
 
     test('load() transitions Idle -> Loading -> Loaded on success', () async {
       final completer = Completer<RetrieveAllAvailableStudentsOutcome>();
-      final cubit = StudentsPresenter(
-        retrieveStudents: () => completer.future,
-      );
+      final cubit = StudentsPresenter(retrieveStudents: () => completer.future);
 
       final loadFuture = cubit.load();
       expect(cubit.stateValue, isA<StudentsLoading>());

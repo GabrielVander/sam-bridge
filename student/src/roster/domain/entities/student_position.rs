@@ -4,8 +4,6 @@ use crate::shared::domain::entities::{Instrument, MusicianLevel};
 pub enum StudentPosition {
     Musician {
         level: MusicianLevel,
-        /// `None` when SAM has the student marked "A DEFINIR" (instrument
-        /// not yet assigned).
         instrument: Option<Instrument>,
     },
     Organist {

@@ -1,8 +1,3 @@
-// See roster_view.rs for why these mirror `student::domain::entities`
-// types field-for-field instead of being re-exported directly: FRB only
-// generates plain Dart classes for types defined in this crate's own
-// scanned source.
-
 use student::domain::entities as student_entities;
 
 pub struct RequirementStatusDto {
@@ -11,7 +6,6 @@ pub struct RequirementStatusDto {
 }
 
 pub struct CheckpointStatusDto {
-    /// `MusicianLevel::name()`, round-trips through `parse_named`.
     pub level: String,
     pub achieved: bool,
     pub ready_to_advance: bool,
@@ -24,17 +18,12 @@ pub struct ProgressAssessmentDto {
     pub method_relative_percent: f64,
     pub combined_percent: f64,
     pub overall_checkpoint_percent: f64,
-    /// `MusicianLevel::name()` of the next unmet checkpoint, or `None` when
-    /// every checkpoint is already achieved.
     pub next_level: Option<String>,
 }
 
 pub enum AssessStudentProgressOutcome {
     Success(ProgressAssessmentDto),
-    /// The student is a musician but SAM has them marked "A DEFINIR"
-    /// (instrument not yet assigned) - there's nothing to assess against.
     NoInstrumentAssigned,
-    /// SAM's raw level string didn't parse into a known `MusicianLevel`.
     UnknownLevel(String),
     Failure(String),
 }

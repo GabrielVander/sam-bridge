@@ -23,8 +23,7 @@ LessonsCubitSignal _buildCubit({
       ({required studentId}) async => _emptyLessonsSuccess,
   assessStudentProgress:
       assessStudentProgress ??
-      ({required studentId, required levelName, instrumentName}) async =>
-          _noInstrumentProgress,
+      ({required studentId}) async => _noInstrumentProgress,
 );
 
 void main() {
@@ -41,14 +40,17 @@ void main() {
         retrieveStudentLessons: ({required studentId}) => completer.future,
       );
 
-      final loadFuture = cubit.load('500132', rawLevel: 'YouthService');
+      final loadFuture = cubit.load('500132');
       expect(cubit.stateValue, isA<LessonsLoading>());
 
       completer.complete(
         const RetrieveStudentLessonsOutcome.success(
           StudentLessonsDto(
             approved: [LessonDto(id: '1')],
-            method: [LessonDto(id: '2'), LessonDto(id: '3')],
+            method: [
+              LessonDto(id: '2'),
+              LessonDto(id: '3'),
+            ],
           ),
         ),
       );
@@ -69,7 +71,7 @@ void main() {
               const RetrieveStudentLessonsOutcome.failure('boom'),
         );
 
-        await cubit.load('500132', rawLevel: 'YouthService');
+        await cubit.load('500132');
 
         final state = cubit.stateValue;
         expect(state, isA<LessonsFailure>());
@@ -85,65 +87,34 @@ void main() {
           receivedLessonsId = studentId;
           return _emptyLessonsSuccess;
         },
-        assessStudentProgress:
-            ({required studentId, required levelName, instrumentName}) async {
-              receivedProgressId = studentId;
-              return _noInstrumentProgress;
-            },
+        assessStudentProgress: ({required studentId}) async {
+          receivedProgressId = studentId;
+          return _noInstrumentProgress;
+        },
       );
 
-      await cubit.load('999999', rawLevel: 'YouthService');
+      await cubit.load('999999');
 
       expect(receivedLessonsId, '999999');
       expect(receivedProgressId, '999999');
     });
 
-    test(
-      'load() passes rawLevel and rawInstrument through to the progress use case',
-      () async {
-        String? receivedLevel;
-        String? receivedInstrument;
-        final cubit = _buildCubit(
-          assessStudentProgress:
-              ({
-                required studentId,
-                required levelName,
-                instrumentName,
-              }) async {
-                receivedLevel = levelName;
-                receivedInstrument = instrumentName;
-                return _noInstrumentProgress;
-              },
-        );
-
-        await cubit.load(
-          '500132',
-          rawLevel: 'YouthService',
-          rawInstrument: 'Violino',
-        );
-
-        expect(receivedLevel, 'YouthService');
-        expect(receivedInstrument, 'Violino');
-      },
-    );
-
     test('a successful progress outcome maps to ProgressAvailable', () async {
       final cubit = _buildCubit(
-        assessStudentProgress:
-            ({required studentId, required levelName, instrumentName}) async =>
-                const AssessStudentProgressOutcome.success(
-                  ProgressAssessmentDto(
-                    checkpoints: [],
-                    msaRelativePercent: 50,
-                    methodRelativePercent: 25,
-                    combinedPercent: 37.5,
-                    overallCheckpointPercent: 60,
-                    nextLevel: 'OfficialService',
-                  ),
-                ),
+        assessStudentProgress: ({required studentId}) async =>
+            const AssessStudentProgressOutcome.success(
+              ProgressAssessmentDto(
+                checkpoints: [],
+                msaRelativePercent: 50,
+                methodRelativePercent: 25,
+                combinedPercent: 37.5,
+                overallCheckpointPercent: 60,
+                nextLevel: 'OfficialService',
+              ),
+            ),
       );
 
-      await cubit.load('500132', rawLevel: 'YouthService');
+      await cubit.load('500132');
 
       final loaded = cubit.stateValue as LessonsLoaded;
       expect(loaded.progress, isA<ProgressAvailable>());
@@ -156,17 +127,11 @@ void main() {
       'an unknown-level progress outcome maps to ProgressUnknownLevel without failing the whole screen',
       () async {
         final cubit = _buildCubit(
-          assessStudentProgress:
-              ({
-                required studentId,
-                required levelName,
-                instrumentName,
-              }) async => const AssessStudentProgressOutcome.unknownLevel(
-                'EXÓTICO',
-              ),
+          assessStudentProgress: ({required studentId}) async =>
+              const AssessStudentProgressOutcome.unknownLevel('EXÓTICO'),
         );
 
-        await cubit.load('500132', rawLevel: 'EXÓTICO');
+        await cubit.load('500132');
 
         final state = cubit.stateValue;
         expect(state, isA<LessonsLoaded>());
@@ -180,15 +145,11 @@ void main() {
       'a progress failure maps to ProgressUnavailable without failing the whole screen',
       () async {
         final cubit = _buildCubit(
-          assessStudentProgress:
-              ({
-                required studentId,
-                required levelName,
-                instrumentName,
-              }) async => const AssessStudentProgressOutcome.failure('boom'),
+          assessStudentProgress: ({required studentId}) async =>
+              const AssessStudentProgressOutcome.failure('boom'),
         );
 
-        await cubit.load('500132', rawLevel: 'YouthService');
+        await cubit.load('500132');
 
         final loaded = cubit.stateValue as LessonsLoaded;
         expect(loaded.progress, isA<ProgressUnavailable>());

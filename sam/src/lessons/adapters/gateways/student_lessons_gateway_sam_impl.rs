@@ -66,12 +66,10 @@ impl From<MtdLesson> for Lesson {
     }
 }
 
-/// SAM renders dates as `dd/MM/yyyy`; anything else is left absent rather than guessed.
 fn parse_date(raw: &str) -> Option<chrono::NaiveDate> {
     chrono::NaiveDate::parse_from_str(raw, "%d/%m/%Y").ok()
 }
 
-/// SAM renders a range as `"from - to"`, or a bare value when there is only one endpoint.
 fn parse_range(raw: &str) -> Option<Range> {
     let trimmed: &str = raw.trim();
     if trimmed.is_empty() {
@@ -84,9 +82,6 @@ fn parse_range(raw: &str) -> Option<Range> {
     )
 }
 
-/// SAM's raw clef vocabulary is only partially confirmed against the real portal
-/// today. Unrecognized raw values intentionally fall through to `None` rather
-/// than guessing — extend these as more of SAM's vocabulary is confirmed.
 fn parse_clef(raw: &str) -> Option<Clef> {
     match raw.trim() {
         "Sol" => Some(Clef::G),

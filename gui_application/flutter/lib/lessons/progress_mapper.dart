@@ -21,11 +21,6 @@ class ProgressMapper {
         methodMet: dto.requirement.methodMet,
       );
 
-  // Confirmed against the real SAM roster (see
-  // discovers_role_level_and_instrument_vocabulary_from_the_real_students_listing
-  // in sam/tests/sam_http_capabilities_and_behaviour.rs), not invented
-  // translations. Falls back to the raw round-trip key for anything the
-  // domain model reports as `Unknown`.
   static String levelLabel(String rawLevel) => switch (rawLevel) {
     'Candidate' => 'Candidato(a)',
     'Practice' => 'Ensaio',

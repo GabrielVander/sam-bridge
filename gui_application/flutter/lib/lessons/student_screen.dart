@@ -9,15 +9,8 @@ import 'package:flutter_application/presentation_models.dart';
 
 class StudentScreen extends StatefulWidget {
   final String studentId;
-  final String rawLevel;
-  final String? rawInstrument;
 
-  const StudentScreen({
-    super.key,
-    required this.studentId,
-    required this.rawLevel,
-    this.rawInstrument,
-  });
+  const StudentScreen({super.key, required this.studentId});
 
   @override
   State<StudentScreen> createState() => _StudentScreenState();
@@ -29,11 +22,7 @@ final class _StudentScreenState extends State<StudentScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<LessonsCubitSignal>().load(
-        widget.studentId,
-        rawLevel: widget.rawLevel,
-        rawInstrument: widget.rawInstrument,
-      );
+      context.read<LessonsCubitSignal>().load(widget.studentId);
     });
   }
 

@@ -18,9 +18,7 @@ final class LessonCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.secondaryContainer,
+              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
               child: Icon(
                 lesson.kind == LessonKind.msa
                     ? Icons.menu_book

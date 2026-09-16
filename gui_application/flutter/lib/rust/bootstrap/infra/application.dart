@@ -14,14 +14,8 @@ import 'roster_view.dart';
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>
 abstract class ApplicationFacade implements RustOpaqueInterface {
-  /// `level_name` and `instrument_name` are expected to be
-  /// `MusicianLevel::name()`/`Instrument::name()` values (e.g. as carried
-  /// through the roster listing) - the caller already has these from
-  /// selecting the student, so there's no second roster lookup here.
   Future<AssessStudentProgressOutcome> assessStudentProgress({
     required String studentId,
-    required String levelName,
-    String? instrumentName,
   });
 
   Future<LoginResult> login({required String email, required String password});

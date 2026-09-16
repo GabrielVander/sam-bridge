@@ -6,15 +6,17 @@ use authentication::application::use_cases::{
 };
 use credential_store::FileCredentialStore;
 use sam::{
-    authentication::adapters::gateways::CredentialGatewaySamImpl, client::SamClientImpl,
-    http::SamOperations, lessons::adapters::gateways::StudentLessonsGatewaySamImpl,
+    authentication::adapters::gateways::CredentialGatewaySamImpl,
+    client::SamClientImpl,
+    http::SamOperations,
+    lessons::adapters::gateways::{MusicianProfileGatewaySamImpl, StudentLessonsGatewaySamImpl},
     roster::adapters::gateways::StudentGatewaySamImpl,
 };
 use student::application::use_cases::{
     AssessStudentProgressError, AssessStudentProgressUseCase, RetrieveAllAvailableStudentsResult,
     RetrieveAllAvailableStudentsUseCase, RetrieveStudentLessonsUseCase,
 };
-use student::domain::entities::{AssessError, Instrument, MusicianLevel};
+use student::domain::entities::AssessError;
 
 use crate::infra::{
     AssessStudentProgressOutcome, Config, ProgressAssessmentDto,
@@ -26,6 +28,7 @@ pub struct ApplicationFacade {
     restore_session_use_case: RestoreSessionUseCase,
     retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase,
     sam_student_lessons_gateway: Arc<StudentLessonsGatewaySamImpl>,
+    sam_musician_profile_gateway: Arc<MusicianProfileGatewaySamImpl>,
 }
 
 impl ApplicationFacade {
@@ -68,13 +71,17 @@ impl ApplicationFacade {
             RetrieveAllAvailableStudentsUseCase::new(sam_student_gateway);
 
         let sam_student_lessons_gateway: Arc<StudentLessonsGatewaySamImpl> =
-            Arc::new(StudentLessonsGatewaySamImpl::new(sam_client));
+            Arc::new(StudentLessonsGatewaySamImpl::new(sam_client.clone()));
+
+        let sam_musician_profile_gateway: Arc<MusicianProfileGatewaySamImpl> =
+            Arc::new(MusicianProfileGatewaySamImpl::new(sam_client));
 
         Ok(Self {
             login_and_remember_credentials_use_case,
             restore_session_use_case,
             retrieve_all_available_students_use_case,
             sam_student_lessons_gateway,
+            sam_musician_profile_gateway,
         })
     }
 
@@ -127,31 +134,21 @@ impl ApplicationFacade {
         }
     }
 
-    /// `level_name` and `instrument_name` are expected to be
-    /// `MusicianLevel::name()`/`Instrument::name()` values (e.g. as carried
-    /// through the roster listing) - the caller already has these from
-    /// selecting the student, so there's no second roster lookup here.
     pub async fn assess_student_progress(
         &self,
         student_id: String,
-        level_name: String,
-        instrument_name: Option<String>,
     ) -> AssessStudentProgressOutcome {
-        let Some(instrument_name) = instrument_name else {
-            return AssessStudentProgressOutcome::NoInstrumentAssigned;
-        };
+        let use_case = AssessStudentProgressUseCase::new(
+            self.sam_musician_profile_gateway.as_ref(),
+            self.sam_student_lessons_gateway.as_ref(),
+        );
 
-        let assigned_level = MusicianLevel::parse_named(&level_name);
-        let instrument = Instrument::parse_named(&instrument_name);
-
-        let use_case = AssessStudentProgressUseCase::new(self.sam_student_lessons_gateway.as_ref());
-
-        match use_case
-            .execute(&student_id, &assigned_level, instrument)
-            .await
-        {
+        match use_case.execute(&student_id).await {
             Ok(assessment) => {
                 AssessStudentProgressOutcome::Success(ProgressAssessmentDto::from(assessment))
+            }
+            Err(AssessStudentProgressError::NoInstrumentAssigned) => {
+                AssessStudentProgressOutcome::NoInstrumentAssigned
             }
             Err(AssessStudentProgressError::Assessment(AssessError::UnknownLevel(raw))) => {
                 AssessStudentProgressOutcome::UnknownLevel(raw)

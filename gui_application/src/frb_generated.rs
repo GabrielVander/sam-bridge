@@ -58,9 +58,7 @@ fn wire__crate__bootstrap__infra__application__ApplicationFacade_assess_student_
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>>::sse_decode(&mut deserializer);
-let api_student_id = <String>::sse_decode(&mut deserializer);
-let api_level_name = <String>::sse_decode(&mut deserializer);
-let api_instrument_name = <Option<String>>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+let api_student_id = <String>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
                     transform_result_sse::<_, ()>((move || async move {
                         let mut api_that_guard = None;
 let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_that, 0, false)]);
@@ -71,7 +69,7 @@ let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decod
             }
         }
         let api_that_guard = api_that_guard.unwrap();
- let output_ok = Result::<_,()>::Ok(crate::bootstrap::infra::application::ApplicationFacade::assess_student_progress(&*api_that_guard, api_student_id, api_level_name, api_instrument_name).await)?;   Ok(output_ok)
+ let output_ok = Result::<_,()>::Ok(crate::bootstrap::infra::application::ApplicationFacade::assess_student_progress(&*api_that_guard, api_student_id).await)?;   Ok(output_ok)
                     })().await)
                 } })
 }
@@ -679,13 +677,11 @@ impl SseDecode for crate::bootstrap::infra::roster_view::StudentSummaryDto {
         let mut var_position =
             <crate::bootstrap::infra::roster_view::StudentPositionDto>::sse_decode(deserializer);
         let mut var_location = <String>::sse_decode(deserializer);
-        let mut var_instrument = <Option<String>>::sse_decode(deserializer);
         return crate::bootstrap::infra::roster_view::StudentSummaryDto {
             id: var_id,
             name: var_name,
             position: var_position,
             location: var_location,
-            instrument: var_instrument,
         };
     }
 }
@@ -1101,7 +1097,6 @@ impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::roster_view::Stu
             self.name.into_into_dart().into_dart(),
             self.position.into_into_dart().into_dart(),
             self.location.into_into_dart().into_dart(),
-            self.instrument.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -1463,7 +1458,6 @@ impl SseEncode for crate::bootstrap::infra::roster_view::StudentSummaryDto {
             serializer,
         );
         <String>::sse_encode(self.location, serializer);
-        <Option<String>>::sse_encode(self.instrument, serializer);
     }
 }
 

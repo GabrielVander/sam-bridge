@@ -44,8 +44,10 @@ class AuthPresenter extends CubitSignal<AuthState> {
   final LoginUseCase loginUseCase;
   final RestoreSessionUseCase restoreSessionUseCase;
 
-  AuthPresenter({required this.loginUseCase, required this.restoreSessionUseCase})
-    : super(initialState: const AuthIdle());
+  AuthPresenter({
+    required this.loginUseCase,
+    required this.restoreSessionUseCase,
+  }) : super(initialState: const AuthIdle());
 
   Future<void> restoreSession() async {
     emit(const AuthLoading());

@@ -106,9 +106,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                       child: Text(
                         widget.errorMessage!,
                         style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onErrorContainer,
+                          color: Theme.of(context).colorScheme.onErrorContainer,
                         ),
                         textAlign: TextAlign.center,
                       ),

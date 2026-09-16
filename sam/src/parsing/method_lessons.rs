@@ -37,11 +37,6 @@ struct Selectors {
     cell: scraper::Selector,
 }
 
-/// These selectors are fixed string literals covered by this module's own
-/// tests, so parsing them can never actually fail — but `Selector::parse` is
-/// fallible by API shape. Rather than unwrap/expect (denied workspace-wide),
-/// fall through to "no lessons found" like every other unexpected-shape case
-/// in this parser.
 fn selectors() -> Option<&'static Selectors> {
     static SELECTORS: std::sync::OnceLock<Option<Selectors>> = std::sync::OnceLock::new();
 
