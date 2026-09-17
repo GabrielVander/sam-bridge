@@ -64,7 +64,7 @@ final class _Timeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         for (var i = 0; i < checkpoints.length; i++) ...[
           if (i > 0)
