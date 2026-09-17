@@ -80,7 +80,7 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SamSite Portal'),
+        title: const Text('SAM Bridge'),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       ),
