@@ -1,5 +1,6 @@
 use student::application::dto as student_dto;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StudentSummaryDto {
     pub id: String,
     pub name: String,
@@ -7,11 +8,13 @@ pub struct StudentSummaryDto {
     pub location: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RetrieveAllAvailableStudentsOutcome {
     Success(Vec<StudentSummaryDto>),
     Failure(String),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StudentPositionDto {
     Candidate,
     Practice,
@@ -60,5 +63,94 @@ impl From<student_dto::StudentPositionDto> for StudentPositionDto {
             student_dto::StudentPositionDto::MusicSecretary => Self::MusicSecretary,
             student_dto::StudentPositionDto::Invalid(value) => Self::Invalid(value),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{student_dto, StudentPositionDto, StudentSummaryDto};
+
+    #[test]
+    fn every_student_position_variant_is_mapped() {
+        let cases = [
+            (
+                student_dto::StudentPositionDto::Candidate,
+                StudentPositionDto::Candidate,
+            ),
+            (
+                student_dto::StudentPositionDto::Practice,
+                StudentPositionDto::Practice,
+            ),
+            (
+                student_dto::StudentPositionDto::YouthService,
+                StudentPositionDto::YouthService,
+            ),
+            (
+                student_dto::StudentPositionDto::OfficialService,
+                StudentPositionDto::OfficialService,
+            ),
+            (
+                student_dto::StudentPositionDto::Officialized,
+                StudentPositionDto::Officialized,
+            ),
+            (
+                student_dto::StudentPositionDto::HalfHour,
+                StudentPositionDto::HalfHour,
+            ),
+            (
+                student_dto::StudentPositionDto::YouthServiceHalfHour,
+                StudentPositionDto::YouthServiceHalfHour,
+            ),
+            (
+                student_dto::StudentPositionDto::YouthServicePractice,
+                StudentPositionDto::YouthServicePractice,
+            ),
+            (
+                student_dto::StudentPositionDto::YouthServiceOfficialService,
+                StudentPositionDto::YouthServiceOfficialService,
+            ),
+            (
+                student_dto::StudentPositionDto::YouthServiceOfficialized,
+                StudentPositionDto::YouthServiceOfficialized,
+            ),
+            (
+                student_dto::StudentPositionDto::GemSecretary,
+                StudentPositionDto::GemSecretary,
+            ),
+            (
+                student_dto::StudentPositionDto::MusicSecretary,
+                StudentPositionDto::MusicSecretary,
+            ),
+            (
+                student_dto::StudentPositionDto::Invalid("odd".to_owned()),
+                StudentPositionDto::Invalid("odd".to_owned()),
+            ),
+        ];
+
+        for (input, expected) in cases {
+            assert_eq!(StudentPositionDto::from(input), expected);
+        }
+    }
+
+    #[test]
+    fn student_summary_fields_are_mapped() {
+        let dto = student_dto::StudentSummaryDto {
+            id: "1".to_owned(),
+            name: "Someone".to_owned(),
+            position: student_dto::StudentPositionDto::YouthService,
+            location: "Somewhere".to_owned(),
+        };
+
+        let mapped = StudentSummaryDto::from(dto);
+
+        assert_eq!(
+            mapped,
+            StudentSummaryDto {
+                id: "1".to_owned(),
+                name: "Someone".to_owned(),
+                position: StudentPositionDto::YouthService,
+                location: "Somewhere".to_owned(),
+            }
+        );
     }
 }

@@ -284,6 +284,14 @@ mod tests {
     }
 
     #[test]
+    fn confirmed_second_region_is_recognized() {
+        assert_eq!(
+            parse_region("JARDIM SÃO PAULO | BR-SP-ARARAQUARA-ITIRAPINA"),
+            Region::AraraquaraItirapina
+        );
+    }
+
+    #[test]
     fn unrecognized_region_falls_through_to_other() {
         assert_eq!(
             parse_region("SOME OTHER LOCATION"),

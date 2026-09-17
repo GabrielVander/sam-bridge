@@ -19,12 +19,16 @@ pub enum AssessStudentProgressError {
     Assessment(#[from] AssessError),
 }
 
-pub struct AssessStudentProgressUseCase<'a, P: MusicianProfileGateway, L: StudentLessonsGateway> {
+pub struct AssessStudentProgressUseCase<
+    'a,
+    P: MusicianProfileGateway + ?Sized,
+    L: StudentLessonsGateway + ?Sized,
+> {
     profile_gateway: &'a P,
     lessons_gateway: &'a L,
 }
 
-impl<'a, P: MusicianProfileGateway, L: StudentLessonsGateway>
+impl<'a, P: MusicianProfileGateway + ?Sized, L: StudentLessonsGateway + ?Sized>
     AssessStudentProgressUseCase<'a, P, L>
 {
     pub const fn new(profile_gateway: &'a P, lessons_gateway: &'a L) -> Self {

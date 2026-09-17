@@ -11,3 +11,25 @@ pub fn build_main_application() -> Result<ApplicationFacade, String> {
 
     ApplicationFacade::new(&config)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::build_main_application;
+
+    #[test]
+    fn builds_successfully_with_the_default_configuration() {
+        let base = tempfile::tempdir().expect("tempdir");
+
+        unsafe {
+            std::env::set_var("XDG_DATA_HOME", base.path());
+        }
+
+        let result = build_main_application();
+
+        unsafe {
+            std::env::remove_var("XDG_DATA_HOME");
+        }
+
+        assert!(result.is_ok());
+    }
+}

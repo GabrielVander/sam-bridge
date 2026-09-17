@@ -16,42 +16,33 @@ pub fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
     }
 
     let document: scraper::Html = scraper::Html::parse_document(body);
-    let Some(selectors): Option<&Selectors> = selectors() else {
-        return Vec::new();
-    };
+    let root: scraper::ElementRef = document.root_element();
 
-    let Some(msa_table): Option<scraper::ElementRef> = document.select(&selectors.msa_table).next()
+    let Some(msa_section): Option<scraper::ElementRef> =
+        super::dom::find_descendant_with_id(root, "div", "msa")
     else {
         return Vec::new();
     };
 
-    msa_table
-        .select(&selectors.body_row)
-        .map(|row| parse_row(row, &selectors.cell))
+    let Some(msa_table): Option<scraper::ElementRef> =
+        super::dom::find_descendant(msa_section, "table")
+    else {
+        return Vec::new();
+    };
+
+    let Some(body_element): Option<scraper::ElementRef> =
+        super::dom::find_descendant(msa_table, "tbody")
+    else {
+        return Vec::new();
+    };
+
+    super::dom::descendants_with_tag(body_element, "tr")
+        .into_iter()
+        .map(parse_row)
         .collect()
 }
 
-struct Selectors {
-    msa_table: scraper::Selector,
-    body_row: scraper::Selector,
-    cell: scraper::Selector,
-}
-
-fn selectors() -> Option<&'static Selectors> {
-    static SELECTORS: std::sync::OnceLock<Option<Selectors>> = std::sync::OnceLock::new();
-
-    SELECTORS
-        .get_or_init(|| {
-            Some(Selectors {
-                msa_table: scraper::Selector::parse("div#msa table").ok()?,
-                body_row: scraper::Selector::parse("tbody tr").ok()?,
-                cell: scraper::Selector::parse("td").ok()?,
-            })
-        })
-        .as_ref()
-}
-
-fn parse_row(row: scraper::ElementRef, cell_selector: &scraper::Selector) -> MsaLesson {
+fn parse_row(row: scraper::ElementRef) -> MsaLesson {
     let id = row
         .value()
         .attr("id")
@@ -59,7 +50,7 @@ fn parse_row(row: scraper::ElementRef, cell_selector: &scraper::Selector) -> Msa
         .filter(|value| !value.is_empty())
         .map(str::to_owned);
 
-    let mut cells: scraper::element_ref::Select = row.select(cell_selector);
+    let mut cells = super::dom::descendants_with_tag(row, "td").into_iter();
 
     MsaLesson {
         id,
@@ -73,20 +64,11 @@ fn parse_row(row: scraper::ElementRef, cell_selector: &scraper::Selector) -> Msa
     }
 }
 
-fn optional_cell(cells: &mut scraper::element_ref::Select) -> Option<String> {
+fn optional_cell<'a>(cells: &mut impl Iterator<Item = scraper::ElementRef<'a>>) -> Option<String> {
     cells
         .next()
-        .map(extract_cell_text)
+        .map(super::dom::text_content)
         .filter(|text| !text.is_empty())
-}
-
-fn extract_cell_text(element: scraper::ElementRef) -> String {
-    element
-        .text()
-        .collect::<Vec<&str>>()
-        .join(" ")
-        .trim()
-        .to_owned()
 }
 
 #[cfg(test)]
@@ -193,6 +175,26 @@ mod msa_lessons_tests {
     fn given_html_without_msa_table_should_return_empty_list_not_error() {
         let result =
             parse_msa_lessons_body("<html><body><h1>Informação não encontrada</h1></body></html>");
+
+        assert_eq!(result, vec![]);
+    }
+
+    #[test]
+    fn given_msa_section_without_a_table_should_return_no_lessons() {
+        let result = parse_msa_lessons_body(
+            "<html><body><div id=\"msa\">Nenhum registro encontrado</div></body></html>",
+        );
+
+        assert_eq!(result, vec![]);
+    }
+
+    #[test]
+    fn given_msa_table_without_a_tbody_should_return_no_lessons() {
+        let result = parse_msa_lessons_body(
+            r#"<html><body><div id="msa"><table id="datatable1">
+                <thead><tr><th>Data da Lição</th></tr></thead>
+            </table></div></body></html>"#,
+        );
 
         assert_eq!(result, vec![]);
     }

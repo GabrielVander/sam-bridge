@@ -88,6 +88,33 @@ fn a_failure_to_remember_the_credential_does_not_fail_the_login() {
     assert_eq!(result, Ok(()));
 }
 
+#[test]
+fn gateway_failure_is_reported_as_unable_to_perform_authorization() {
+    let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Err(
+        CredentialGatewayError::UnableToPerformOperation,
+    )));
+    let credential_store: Arc<SpyCredentialStore> = Arc::new(SpyCredentialStore::new());
+
+    let use_case: LoginAndRememberCredentialsUseCase =
+        LoginAndRememberCredentialsUseCase::new(credential_gateway, credential_store.clone());
+
+    let result = smol::block_on(async {
+        use_case
+            .execute("Some email".to_string(), "secretpassword123".to_string())
+            .await
+    });
+
+    assert_eq!(result, Err(LoginUseCaseError::UnableToPerformAuthorization));
+    assert!(
+        credential_store
+            .saved_credential
+            .lock()
+            .expect("mutex is not poisoned")
+            .is_none(),
+        "a failed authorization attempt must never be remembered"
+    );
+}
+
 struct FakeCredentialGateway {
     result: Result<AuthorizationResult, CredentialGatewayError>,
 }

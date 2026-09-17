@@ -173,11 +173,7 @@ fn max_field<'a>(ranges: impl Iterator<Item = &'a Option<Range>>) -> f64 {
 }
 
 fn pct(current: f64, max: f64) -> f64 {
-    if max > 0.0 {
-        (current / max * 100.0).min(100.0)
-    } else {
-        0.0
-    }
+    (current / max * 100.0).min(100.0)
 }
 
 pub fn assess(

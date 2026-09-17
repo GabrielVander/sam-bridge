@@ -3,11 +3,11 @@ use crate::lessons::{
     domain::entities::StudentLessons,
 };
 
-pub struct RetrieveStudentLessonsUseCase<'a, T: StudentLessonsGateway> {
+pub struct RetrieveStudentLessonsUseCase<'a, T: StudentLessonsGateway + ?Sized> {
     gateway: &'a T,
 }
 
-impl<'a, T: StudentLessonsGateway> RetrieveStudentLessonsUseCase<'a, T> {
+impl<'a, T: StudentLessonsGateway + ?Sized> RetrieveStudentLessonsUseCase<'a, T> {
     pub const fn new(gateway: &'a T) -> Self {
         Self { gateway }
     }

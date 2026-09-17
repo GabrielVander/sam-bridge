@@ -189,6 +189,47 @@ fn given_unexpected_status_for_lessons_should_fail() {
 }
 
 #[test]
+fn given_a_truncated_response_should_fail_to_decode() {
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+
+    let listener: TcpListener = TcpListener::bind("127.0.0.1:0").expect("should bind");
+    let addr: std::net::SocketAddr = listener.local_addr().expect("should have a local address");
+
+    let server: std::thread::JoinHandle<()> = std::thread::spawn(move || {
+        if let Ok((mut stream, _)) = listener.accept() {
+            let mut buf: [u8; 1024] = [0; 1024];
+            let _ = stream.read(&mut buf);
+            let _ = stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 1000\r\n\r\nShort");
+        }
+    });
+
+    let http_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .expect("HTTP client should be built");
+
+    let sam_operations: SamOperations = SamOperations::new(
+        http_client,
+        &format!("http://{addr}"),
+        "autenticar",
+        "painel",
+        "alunos/listagem",
+        "licoes/index",
+    );
+    let client: SamClientImpl = SamClientImpl::new(sam_operations);
+
+    let result: Result<StudentLessonsPage, _> = client.student_lessons("500132");
+
+    assert!(
+        result.is_err(),
+        "Expected a decode failure from a truncated body but got {result:#?}"
+    );
+
+    server.join().expect("server thread should not panic");
+}
+
+#[test]
 fn given_connection_refused_should_fail() {
     let http_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())

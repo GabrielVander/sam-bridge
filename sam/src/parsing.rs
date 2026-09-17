@@ -1,5 +1,6 @@
 mod authentication_parser;
 mod dashboard_parser;
+mod dom;
 mod method_lessons;
 mod msa_lessons;
 mod students_listing;

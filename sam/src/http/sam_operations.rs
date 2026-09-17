@@ -42,69 +42,50 @@ impl SamOperations {
         login: &str,
         password: &str,
     ) -> Result<SamResponse, SamOperationError> {
-        self.client
-            .post(self.authentication_url.clone())
-            .form(&[("login", login), ("password", password)])
-            .send()
-            .map_err(|e| SamOperationError::RequestError {
-                source: e,
-                operation: "authentication".to_string(),
-            })
-            .and_then(|r| {
-                SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
-                    source: e,
-                    operation: "authentication".to_string(),
-                })
-            })
+        Self::execute(
+            self.client
+                .post(self.authentication_url.clone())
+                .form(&[("login", login), ("password", password)]),
+            "authentication",
+        )
     }
 
     pub(crate) fn dashboard(&self) -> Result<SamResponse, SamOperationError> {
-        self.client
-            .get(self.dashboard_url.clone())
-            .send()
-            .map_err(|e| SamOperationError::RequestError {
-                source: e,
-                operation: "dashboard".to_string(),
-            })
-            .and_then(|r| {
-                SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
-                    source: e,
-                    operation: "dashboard".to_string(),
-                })
-            })
+        Self::execute(self.client.get(self.dashboard_url.clone()), "dashboard")
     }
 
     pub(crate) fn students_listing(&self) -> Result<SamResponse, SamOperationError> {
-        self.client
-            .get(self.students_listing_url.clone())
-            .send()
-            .map_err(|e| SamOperationError::RequestError {
-                source: e,
-                operation: "students_listing".to_string(),
-            })
-            .and_then(|r| {
-                SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
-                    source: e,
-                    operation: "students_listing".to_string(),
-                })
-            })
+        Self::execute(
+            self.client.get(self.students_listing_url.clone()),
+            "students_listing",
+        )
     }
 
     pub(crate) fn student_lessons(
         &self,
         student_id: &str,
     ) -> Result<SamResponse, SamOperationError> {
-        self.client
-            .get(format!("{}/{student_id}", self.student_lessons_base_url))
+        Self::execute(
+            self.client
+                .get(format!("{}/{student_id}", self.student_lessons_base_url)),
+            "student_lessons",
+        )
+    }
+
+    fn execute(
+        request: reqwest::blocking::RequestBuilder,
+        operation: &str,
+    ) -> Result<SamResponse, SamOperationError> {
+        request
             .send()
             .map_err(|e| SamOperationError::RequestError {
                 source: e,
-                operation: "student_lessons".to_string(),
+                operation: operation.to_string(),
             })
             .and_then(|r| {
                 SamResponse::from_reqwest_response(r).map_err(|e| SamOperationError::DecodeError {
                     source: e,
-                    operation: "student_lessons".to_string(),
+                    operation: operation.to_string(),
                 })
             })
     }

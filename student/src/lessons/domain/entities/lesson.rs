@@ -36,31 +36,6 @@ impl<T> Range<T> {
             to: value,
         }
     }
-    pub fn try_new(from: T, to: T) -> Result<Self, String>
-    where
-        T: PartialOrd + std::fmt::Display,
-    {
-        if from <= to {
-            Ok(Self { from, to })
-        } else {
-            Err(format!("inverted range {from} > {to}"))
-        }
-    }
-}
-
-impl<T> Range<T>
-where
-    T: std::str::FromStr + PartialOrd + std::fmt::Display,
-    T::Err: std::fmt::Display,
-{
-    pub fn try_from_str(from: &str, to: &str) -> Result<Self, String>
-    where
-        T: Clone,
-    {
-        let f: T = from.parse().map_err(|e| format!("{e}"))?;
-        let t: T = to.parse().map_err(|e| format!("{e}"))?;
-        Self::try_new(f, t)
-    }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -84,27 +59,6 @@ mod tests {
         assert_eq!(s.to, "x");
         let n = Range::new(3, 5);
         assert_eq!(n.from, 3);
-    }
-
-    #[test]
-    fn range_try_new_inverted() {
-        assert!(Range::try_new(1, 2).is_ok());
-        assert_eq!(Range::try_new(5, 3).unwrap_err(), "inverted range 5 > 3");
-        assert_eq!(
-            Range::try_new("b".to_owned(), "a".to_owned()).unwrap_err(),
-            "inverted range b > a"
-        );
-    }
-
-    #[test]
-    fn range_try_from_str() {
-        let r: Range<i32> = Range::try_from_str("3", "5").unwrap();
-        assert_eq!(r.from, 3);
-        assert_eq!(r.to, 5);
-        let r2: Range<i32> = Range::try_from_str("7", "7").unwrap();
-        assert_eq!(r2.from, 7);
-        assert!(Range::<i32>::try_from_str("a", "b").is_err());
-        assert!(Range::<i32>::try_from_str("5", "3").is_err());
     }
 
     #[test]

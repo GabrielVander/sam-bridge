@@ -1138,11 +1138,14 @@ dependencies = [
  "anyhow",
  "async-trait",
  "authentication",
+ "chrono",
  "credential_store",
  "flutter_rust_bridge",
  "reqwest",
  "sam",
+ "smol",
  "student",
+ "tempfile",
 ]
 
 [[package]]

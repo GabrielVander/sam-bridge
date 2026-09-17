@@ -16,42 +16,27 @@ pub fn parse_method_lessons_body(body: &str) -> Vec<MtdLesson> {
     }
 
     let document: scraper::Html = scraper::Html::parse_document(body);
-    let Some(selectors): Option<&Selectors> = selectors() else {
-        return Vec::new();
-    };
+    let root: scraper::ElementRef = document.root_element();
 
-    let Some(mtd_table): Option<scraper::ElementRef> = document.select(&selectors.mtd_table).next()
+    let Some(mtd_table): Option<scraper::ElementRef> =
+        super::dom::find_descendant_with_id(root, "table", "datatable3")
     else {
         return Vec::new();
     };
 
-    mtd_table
-        .select(&selectors.body_row)
-        .map(|row| parse_row(row, &selectors.cell))
+    let Some(body_element): Option<scraper::ElementRef> =
+        super::dom::find_descendant(mtd_table, "tbody")
+    else {
+        return Vec::new();
+    };
+
+    super::dom::descendants_with_tag(body_element, "tr")
+        .into_iter()
+        .map(parse_row)
         .collect()
 }
 
-struct Selectors {
-    mtd_table: scraper::Selector,
-    body_row: scraper::Selector,
-    cell: scraper::Selector,
-}
-
-fn selectors() -> Option<&'static Selectors> {
-    static SELECTORS: std::sync::OnceLock<Option<Selectors>> = std::sync::OnceLock::new();
-
-    SELECTORS
-        .get_or_init(|| {
-            Some(Selectors {
-                mtd_table: scraper::Selector::parse("table#datatable3").ok()?,
-                body_row: scraper::Selector::parse("tbody tr").ok()?,
-                cell: scraper::Selector::parse("td").ok()?,
-            })
-        })
-        .as_ref()
-}
-
-fn parse_row(row: scraper::ElementRef, cell_selector: &scraper::Selector) -> MtdLesson {
+fn parse_row(row: scraper::ElementRef) -> MtdLesson {
     let id = row
         .value()
         .attr("id")
@@ -59,7 +44,7 @@ fn parse_row(row: scraper::ElementRef, cell_selector: &scraper::Selector) -> Mtd
         .filter(|value| !value.is_empty())
         .map(str::to_owned);
 
-    let mut cells: scraper::element_ref::Select = row.select(cell_selector);
+    let mut cells = super::dom::descendants_with_tag(row, "td").into_iter();
 
     MtdLesson {
         id,
@@ -73,20 +58,11 @@ fn parse_row(row: scraper::ElementRef, cell_selector: &scraper::Selector) -> Mtd
     }
 }
 
-fn optional_cell(cells: &mut scraper::element_ref::Select) -> Option<String> {
+fn optional_cell<'a>(cells: &mut impl Iterator<Item = scraper::ElementRef<'a>>) -> Option<String> {
     cells
         .next()
-        .map(extract_cell_text)
+        .map(super::dom::text_content)
         .filter(|text| !text.is_empty())
-}
-
-fn extract_cell_text(element: scraper::ElementRef) -> String {
-    element
-        .text()
-        .collect::<Vec<&str>>()
-        .join(" ")
-        .trim()
-        .to_owned()
 }
 
 #[cfg(test)]
@@ -183,6 +159,17 @@ mod method_lessons_tests {
     fn given_html_without_mtd_table_should_return_empty_list_not_error() {
         let result = parse_method_lessons_body(
             "<html><body><h1>Informação não encontrada</h1></body></html>",
+        );
+
+        assert_eq!(result, vec![]);
+    }
+
+    #[test]
+    fn given_mtd_table_without_a_tbody_should_return_no_lessons() {
+        let result = parse_method_lessons_body(
+            r#"<html><body><table id="datatable3">
+                <thead><tr><th>Páginas</th></tr></thead>
+            </table></body></html>"#,
         );
 
         assert_eq!(result, vec![]);

@@ -23,18 +23,14 @@ impl std::fmt::Debug for StoredCredential {
 }
 
 pub struct FileCredentialStore {
+    dir: PathBuf,
     credential_path: PathBuf,
     key_path: PathBuf,
 }
 
-impl Default for FileCredentialStore {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl FileCredentialStore {
     #[must_use]
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let data_dir = dirs::data_local_dir()
             .unwrap_or_else(|| PathBuf::from("."))
@@ -52,10 +48,11 @@ impl FileCredentialStore {
 
     #[must_use]
     pub fn with_dir(dir: &str) -> Self {
-        let dir = Path::new(dir);
+        let dir = Path::new(dir).to_path_buf();
         Self {
             credential_path: dir.join("session.enc"),
             key_path: dir.join("key.bin"),
+            dir,
         }
     }
 
@@ -72,9 +69,8 @@ impl FileCredentialStore {
         getrandom::getrandom(&mut key)
             .map_err(|e| anyhow::anyhow!("Failed to generate encryption key: {e}"))?;
 
-        let dir = self.key_path.parent().unwrap_or_else(|| Path::new("."));
-        let _ = std::fs::create_dir_all(dir);
-        let tmp = dir.join(".key.bin.tmp");
+        let _ = std::fs::create_dir_all(&self.dir);
+        let tmp = self.dir.join(".key.bin.tmp");
         std::fs::write(&tmp, key)?;
         #[cfg(unix)]
         {
@@ -112,24 +108,22 @@ impl FileCredentialStore {
         cocoon.unwrap(ciphertext).ok()
     }
 
-    fn atomic_write(path: &Path, data: &[u8]) -> anyhow::Result<()> {
-        let dir = path.parent().unwrap_or_else(|| Path::new("."));
-        let _ = std::fs::create_dir_all(dir);
-        let tmp = dir.join(format!(
-            ".{}.tmp",
-            path.file_name().unwrap_or_default().to_string_lossy()
-        ));
+    fn atomic_write(&self, data: &[u8]) -> anyhow::Result<()> {
+        let _ = std::fs::create_dir_all(&self.dir);
+        let tmp = self.dir.join(".session.enc.tmp");
         std::fs::write(&tmp, data)?;
         #[cfg(unix)]
         {
             let _ =
                 std::fs::set_permissions(&tmp, std::os::unix::fs::PermissionsExt::from_mode(0o600));
         }
-        std::fs::rename(&tmp, path)?;
+        std::fs::rename(&tmp, &self.credential_path)?;
         #[cfg(unix)]
         {
-            let _ =
-                std::fs::set_permissions(path, std::os::unix::fs::PermissionsExt::from_mode(0o600));
+            let _ = std::fs::set_permissions(
+                &self.credential_path,
+                std::os::unix::fs::PermissionsExt::from_mode(0o600),
+            );
         }
         Ok(())
     }
@@ -137,7 +131,7 @@ impl FileCredentialStore {
     fn save_sync(&self, credential: &StoredCredential) -> anyhow::Result<()> {
         let json: Zeroizing<Vec<u8>> = Zeroizing::new(serde_json::to_vec(credential)?);
         let ciphertext: Vec<u8> = self.encrypt(&json)?;
-        Self::atomic_write(&self.credential_path, &ciphertext)
+        self.atomic_write(&ciphertext)
     }
 
     fn load_sync(&self) -> Option<StoredCredential> {
@@ -175,5 +169,23 @@ impl CredentialStore for FileCredentialStore {
     async fn clear(&self) -> Result<(), CredentialStoreError> {
         self.clear_sync();
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::StoredCredential;
+
+    #[test]
+    fn debug_formatting_redacts_the_password() {
+        let stored = StoredCredential {
+            email: "someone@example.com".to_owned(),
+            password: "super-secret".to_owned(),
+        };
+
+        let formatted = format!("{stored:?}");
+
+        assert!(formatted.contains("someone@example.com"));
+        assert!(!formatted.contains("super-secret"));
     }
 }

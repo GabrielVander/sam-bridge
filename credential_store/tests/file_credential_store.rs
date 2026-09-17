@@ -129,6 +129,169 @@ fn decrypt_with_wrong_key_returns_none() {
     });
 }
 
+#[test]
+fn saving_twice_reuses_the_existing_encryption_key() {
+    let (store, dir) = temp_store().expect("tempdir");
+
+    smol::block_on(async {
+        store.save(&credential()).await.expect("first save");
+    });
+    let key_after_first_save =
+        std::fs::read(dir.path().join("key.bin")).expect("key after first save");
+
+    smol::block_on(async {
+        store.save(&credential()).await.expect("second save");
+    });
+    let key_after_second_save =
+        std::fs::read(dir.path().join("key.bin")).expect("key after second save");
+
+    assert_eq!(
+        key_after_first_save, key_after_second_save,
+        "the encryption key must be reused across saves, not regenerated"
+    );
+}
+
+#[test]
+fn a_corrupted_key_file_causes_load_to_return_none() {
+    let (store, dir) = temp_store().expect("tempdir");
+
+    smol::block_on(async {
+        store.save(&credential()).await.expect("save");
+    });
+
+    std::fs::write(dir.path().join("key.bin"), [0u8; 10]).expect("corrupt the key file");
+
+    smol::block_on(async {
+        assert!(store.load().await.is_none());
+    });
+}
+
+#[test]
+fn a_missing_key_file_causes_load_to_return_none() {
+    let (store, dir) = temp_store().expect("tempdir");
+
+    smol::block_on(async {
+        store.save(&credential()).await.expect("save");
+    });
+
+    std::fs::remove_file(dir.path().join("key.bin")).expect("remove the key file");
+
+    smol::block_on(async {
+        assert!(store.load().await.is_none());
+    });
+}
+
+#[cfg(unix)]
+#[test]
+fn save_fails_when_the_key_file_path_is_a_directory() {
+    let (store, dir) = temp_store().expect("tempdir");
+    std::fs::create_dir(dir.path().join("key.bin")).expect("occupy the key path with a directory");
+
+    let result = smol::block_on(async { store.save(&credential()).await });
+
+    assert!(
+        result.is_err(),
+        "a key file path occupied by a directory must fail rather than silently succeed"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn save_fails_when_the_credential_file_path_is_a_directory() {
+    let (store, dir) = temp_store().expect("tempdir");
+    smol::block_on(async {
+        store
+            .save(&credential())
+            .await
+            .expect("first save creates the key");
+    });
+    std::fs::remove_file(dir.path().join("session.enc")).expect("remove the credential file");
+    std::fs::create_dir(dir.path().join("session.enc"))
+        .expect("occupy the credential path with a directory");
+
+    let result = smol::block_on(async { store.save(&credential()).await });
+
+    assert!(
+        result.is_err(),
+        "a credential file path occupied by a directory must fail rather than silently succeed"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn save_fails_when_the_directory_is_not_writable_during_key_creation() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let (store, dir) = temp_store().expect("tempdir");
+    std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o500))
+        .expect("make the directory read-only");
+
+    let result = smol::block_on(async { store.save(&credential()).await });
+
+    std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o700))
+        .expect("restore permissions so the tempdir can be cleaned up");
+
+    assert!(
+        result.is_err(),
+        "creating the encryption key in a read-only directory must fail rather than silently succeed"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn save_fails_when_the_directory_is_not_writable_for_the_credential_file() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let (store, dir) = temp_store().expect("tempdir");
+    smol::block_on(async {
+        store
+            .save(&credential())
+            .await
+            .expect("first save creates the key while the directory is still writable");
+    });
+
+    std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o500))
+        .expect("make the directory read-only");
+
+    let result = smol::block_on(async { store.save(&credential()).await });
+
+    std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o700))
+        .expect("restore permissions so the tempdir can be cleaned up");
+
+    assert!(
+        result.is_err(),
+        "writing the credential file into a read-only directory must fail rather than silently succeed"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn new_creates_the_platform_data_directory_with_restricted_permissions() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let base = tempfile::tempdir().expect("tempdir");
+
+    unsafe {
+        std::env::set_var("XDG_DATA_HOME", base.path());
+    }
+
+    let _store = credential_store::FileCredentialStore::new();
+
+    unsafe {
+        std::env::remove_var("XDG_DATA_HOME");
+    }
+
+    let created_dir = base.path().join("sam_bridge");
+    assert!(created_dir.is_dir(), "the data directory should be created");
+
+    let mode = std::fs::metadata(&created_dir)
+        .expect("metadata")
+        .permissions()
+        .mode()
+        & 0o777;
+    assert_eq!(mode, 0o700);
+}
+
 #[cfg(unix)]
 #[test]
 fn files_have_restricted_permissions() {
