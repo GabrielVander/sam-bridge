@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('RosterMapper', () {
-    test('maps a known position to its raw variant name', () {
+    test('maps a known position to its Portuguese label', () {
       const dto = StudentSummaryDto(
         id: '1',
         name: 'Jane Doe',
@@ -21,7 +21,7 @@ void main() {
           id: '1',
           name: 'Jane Doe',
           location: 'Some Location',
-          position: 'YouthService',
+          position: 'Reunião de Jovens e Menores',
         ),
       );
     });
@@ -58,8 +58,8 @@ void main() {
       final result = RosterMapper.toViewModels(dtos);
 
       expect(result.map((s) => s.id).toList(), ['1', '2']);
-      expect(result[0].position, 'Candidate');
-      expect(result[1].position, 'GemSecretary');
+      expect(result[0].position, 'Candidato(a)');
+      expect(result[1].position, 'Secretário(a) do GEM');
     });
   });
 }

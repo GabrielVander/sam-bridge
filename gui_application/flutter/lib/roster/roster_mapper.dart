@@ -9,25 +9,27 @@ class RosterMapper {
     id: dto.id,
     name: dto.name,
     location: dto.location,
-    position: _rawVariantName(dto.position),
+    position: _positionLabel(dto.position),
   );
 
-  static String _rawVariantName(StudentPositionDto position) =>
+  static String _positionLabel(StudentPositionDto position) =>
       switch (position) {
-        StudentPositionDto_Candidate() => 'Candidate',
-        StudentPositionDto_Practice() => 'Practice',
-        StudentPositionDto_YouthService() => 'YouthService',
-        StudentPositionDto_OfficialService() => 'OfficialService',
-        StudentPositionDto_Officialized() => 'Officialized',
-        StudentPositionDto_HalfHour() => 'HalfHour',
-        StudentPositionDto_YouthServiceHalfHour() => 'YouthServiceHalfHour',
-        StudentPositionDto_YouthServicePractice() => 'YouthServicePractice',
+        StudentPositionDto_Candidate() => 'Candidato(a)',
+        StudentPositionDto_Practice() => 'Ensaio',
+        StudentPositionDto_YouthService() => 'Reunião de Jovens e Menores',
+        StudentPositionDto_OfficialService() => 'Culto Oficial',
+        StudentPositionDto_Officialized() => 'Oficialização',
+        StudentPositionDto_HalfHour() => 'Meia Hora',
+        StudentPositionDto_YouthServiceHalfHour() =>
+          'Reunião de Jovens e Menores / Meia Hora',
+        StudentPositionDto_YouthServicePractice() =>
+          'Reunião de Jovens e Menores / Ensaio',
         StudentPositionDto_YouthServiceOfficialService() =>
-          'YouthServiceOfficialService',
+          'Reunião de Jovens e Menores / Culto Oficial',
         StudentPositionDto_YouthServiceOfficialized() =>
-          'YouthServiceOfficialized',
-        StudentPositionDto_GemSecretary() => 'GemSecretary',
-        StudentPositionDto_MusicSecretary() => 'MusicSecretary',
+          'Reunião de Jovens e Menores / Oficialização',
+        StudentPositionDto_GemSecretary() => 'Secretário(a) do GEM',
+        StudentPositionDto_MusicSecretary() => 'Secretário(a) de Música',
         StudentPositionDto_Invalid(:final field0) => field0,
       };
 }
