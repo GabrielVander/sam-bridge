@@ -1,10 +1,8 @@
-use std::sync::Arc;
-
-use async_trait::async_trait;
 use authentication::{
     application::gateways::{AuthorizationResult, CredentialGateway, CredentialGatewayError},
     domain::entities::Credential,
 };
+use std::sync::Arc;
 
 use crate::client::{SamClient, SamClientError, SamCredentials};
 
@@ -17,10 +15,8 @@ impl CredentialGatewaySamImpl {
         Self { client }
     }
 }
-
-#[async_trait]
 impl CredentialGateway for CredentialGatewaySamImpl {
-    async fn authorize(
+    fn authorize(
         &self,
         credential: &Credential,
     ) -> Result<AuthorizationResult, CredentialGatewayError> {

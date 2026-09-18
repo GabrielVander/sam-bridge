@@ -26,12 +26,12 @@ impl LoginAndRememberCredentialsUseCase {
         }
     }
 
-    pub async fn execute(&self, email: String, password: String) -> Result<(), LoginUseCaseError> {
+    pub fn execute(&self, email: String, password: String) -> Result<(), LoginUseCaseError> {
         let credential: Credential = Credential::new(Email(email), Password(password));
 
-        match self.credential_gateway.authorize(&credential).await {
+        match self.credential_gateway.authorize(&credential) {
             Ok(AuthorizationResult::Authorized) => {
-                let _ = self.credential_store.save(&credential).await;
+                let _ = self.credential_store.save(&credential);
                 Ok(())
             }
             Ok(AuthorizationResult::Unauthorized) => Err(LoginUseCaseError::InvalidEmailOrPassword),

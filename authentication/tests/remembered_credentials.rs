@@ -1,7 +1,3 @@
-use std::sync::Arc;
-use std::sync::Mutex;
-
-use async_trait::async_trait;
 use authentication::application::gateways::{
     AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
     CredentialStoreError,
@@ -12,6 +8,8 @@ use authentication::application::use_cases::{
 };
 use authentication::domain::entities::{Credential, Email, Password};
 use pretty_assertions::assert_eq;
+use std::sync::Arc;
+use std::sync::Mutex;
 
 #[test]
 fn remember_credentials_persists_via_the_store() {
@@ -20,14 +18,10 @@ fn remember_credentials_persists_via_the_store() {
     let use_case: RememberCredentialsUseCase =
         RememberCredentialsUseCase::new(credential_store.clone());
 
-    let result = smol::block_on(async {
-        use_case
-            .execute(Credential::new(
-                Email("Some email".to_string()),
-                Password("secretpassword123".to_string()),
-            ))
-            .await
-    });
+    let result = use_case.execute(&Credential::new(
+        Email("Some email".to_string()),
+        Password("secretpassword123".to_string()),
+    ));
 
     assert_eq!(result, Ok(()));
 
@@ -50,14 +44,10 @@ fn remember_credentials_surfaces_store_failures() {
 
     let use_case: RememberCredentialsUseCase = RememberCredentialsUseCase::new(credential_store);
 
-    let result = smol::block_on(async {
-        use_case
-            .execute(Credential::new(
-                Email("Some email".to_string()),
-                Password("secretpassword123".to_string()),
-            ))
-            .await
-    });
+    let result = use_case.execute(&Credential::new(
+        Email("Some email".to_string()),
+        Password("secretpassword123".to_string()),
+    ));
 
     assert_eq!(result, Err(RememberCredentialsError::UnableToPersist));
 }
@@ -72,7 +62,7 @@ fn restore_session_without_stored_credentials_reports_no_stored_credentials() {
     let use_case: RestoreSessionUseCase =
         RestoreSessionUseCase::new(credential_store, credential_gateway);
 
-    let result = smol::block_on(async { use_case.execute().await });
+    let result = use_case.execute();
 
     assert_eq!(result, RestoreSessionResult::NoStoredCredentials);
 }
@@ -90,7 +80,7 @@ fn restore_session_with_valid_stored_credentials_is_restored() {
     let use_case: RestoreSessionUseCase =
         RestoreSessionUseCase::new(credential_store, credential_gateway);
 
-    let result = smol::block_on(async { use_case.execute().await });
+    let result = use_case.execute();
 
     assert_eq!(result, RestoreSessionResult::Restored);
 }
@@ -108,7 +98,7 @@ fn restore_session_with_rejected_credentials_clears_the_store_and_reports_reject
     let use_case: RestoreSessionUseCase =
         RestoreSessionUseCase::new(credential_store.clone(), credential_gateway);
 
-    let result = smol::block_on(async { use_case.execute().await });
+    let result = use_case.execute();
 
     assert_eq!(result, RestoreSessionResult::CredentialsRejected);
     assert!(
@@ -133,7 +123,7 @@ fn restore_session_when_gateway_is_unavailable_leaves_the_store_untouched() {
     let use_case: RestoreSessionUseCase =
         RestoreSessionUseCase::new(credential_store.clone(), credential_gateway);
 
-    let result = smol::block_on(async { use_case.execute().await });
+    let result = use_case.execute();
 
     assert_eq!(result, RestoreSessionResult::UnableToPerformOperation);
     assert!(
@@ -154,13 +144,8 @@ impl FakeCredentialGateway {
         Self { result }
     }
 }
-
-#[async_trait]
 impl CredentialGateway for FakeCredentialGateway {
-    async fn authorize(
-        &self,
-        _: &Credential,
-    ) -> Result<AuthorizationResult, CredentialGatewayError> {
+    fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, CredentialGatewayError> {
         self.result.clone()
     }
 }
@@ -178,20 +163,18 @@ impl StubCredentialStore {
         }
     }
 }
-
-#[async_trait]
 impl CredentialStore for StubCredentialStore {
-    async fn save(&self, _: &Credential) -> Result<(), CredentialStoreError> {
+    fn save(&self, _: &Credential) -> Result<(), CredentialStoreError> {
         Ok(())
     }
 
-    async fn load(&self) -> Option<Credential> {
+    fn load(&self) -> Option<Credential> {
         self.load_result
             .clone()
             .map(|(email, password)| Credential::new(Email(email), Password(password)))
     }
 
-    async fn clear(&self) -> Result<(), CredentialStoreError> {
+    fn clear(&self) -> Result<(), CredentialStoreError> {
         if let Ok(mut called) = self.clear_called.lock() {
             *called = true;
         }
@@ -210,38 +193,34 @@ impl SpyCredentialStore {
         }
     }
 }
-
-#[async_trait]
 impl CredentialStore for SpyCredentialStore {
-    async fn save(&self, credential: &Credential) -> Result<(), CredentialStoreError> {
+    fn save(&self, credential: &Credential) -> Result<(), CredentialStoreError> {
         if let Ok(mut saved) = self.saved_credential.lock() {
             *saved = Some((credential.email.0.clone(), credential.password.0.clone()));
         }
         Ok(())
     }
 
-    async fn load(&self) -> Option<Credential> {
+    fn load(&self) -> Option<Credential> {
         None
     }
 
-    async fn clear(&self) -> Result<(), CredentialStoreError> {
+    fn clear(&self) -> Result<(), CredentialStoreError> {
         Ok(())
     }
 }
 
 struct FailingCredentialStore;
-
-#[async_trait]
 impl CredentialStore for FailingCredentialStore {
-    async fn save(&self, _: &Credential) -> Result<(), CredentialStoreError> {
+    fn save(&self, _: &Credential) -> Result<(), CredentialStoreError> {
         Err(CredentialStoreError::UnableToPerformOperation)
     }
 
-    async fn load(&self) -> Option<Credential> {
+    fn load(&self) -> Option<Credential> {
         None
     }
 
-    async fn clear(&self) -> Result<(), CredentialStoreError> {
+    fn clear(&self) -> Result<(), CredentialStoreError> {
         Ok(())
     }
 }

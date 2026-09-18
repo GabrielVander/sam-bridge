@@ -9,7 +9,6 @@ student = { path = "../student" }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 reqwest = { workspace = true }
-async-trait = { workspace = true }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 scraper = "0.27.0"

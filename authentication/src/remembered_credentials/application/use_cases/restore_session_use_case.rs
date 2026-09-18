@@ -22,15 +22,16 @@ impl RestoreSessionUseCase {
         }
     }
 
-    pub async fn execute(&self) -> RestoreSessionResult {
-        let Some(credential) = self.credential_store.load().await else {
+    #[must_use]
+    pub fn execute(&self) -> RestoreSessionResult {
+        let Some(credential) = self.credential_store.load() else {
             return RestoreSessionResult::NoStoredCredentials;
         };
 
-        match self.credential_gateway.authorize(&credential).await {
+        match self.credential_gateway.authorize(&credential) {
             Ok(AuthorizationResult::Authorized) => RestoreSessionResult::Restored,
             Ok(AuthorizationResult::Unauthorized) => {
-                let _ = self.credential_store.clear().await;
+                let _ = self.credential_store.clear();
                 RestoreSessionResult::CredentialsRejected
             }
             Err(CredentialGatewayError::UnableToPerformOperation) => {

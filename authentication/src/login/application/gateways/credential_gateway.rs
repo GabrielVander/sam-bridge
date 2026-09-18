@@ -1,11 +1,8 @@
-use async_trait::async_trait;
 use thiserror::Error;
 
 use crate::shared::domain::entities::Credential;
-
-#[async_trait]
 pub trait CredentialGateway {
-    async fn authorize(
+    fn authorize(
         &self,
         credential: &Credential,
     ) -> Result<AuthorizationResult, CredentialGatewayError>;

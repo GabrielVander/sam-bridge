@@ -77,7 +77,6 @@ fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
 
         let result: StudentLessons = gateway
             .get_all_for_student_with_id("500132")
-            .await
             .expect("Lessons retrieval should succeed");
 
         assert_eq!(
@@ -145,7 +144,6 @@ fn given_page_with_no_lessons_should_return_empty_bundle() {
 
         let result: StudentLessons = gateway
             .get_all_for_student_with_id("999999")
-            .await
             .expect("Lessons retrieval should succeed");
 
         assert_eq!(result, StudentLessons::default());
@@ -166,7 +164,7 @@ fn given_request_failure_should_propagate_error() {
         let gateway: StudentLessonsGatewaySamImpl =
             build_gateway(&mock_server).expect("gateway should be built");
 
-        let result = gateway.get_all_for_student_with_id("500132").await;
+        let result = gateway.get_all_for_student_with_id("500132");
 
         assert!(result.is_err(), "Expected an Err but got {result:#?}");
     });

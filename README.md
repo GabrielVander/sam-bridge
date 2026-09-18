@@ -7,8 +7,8 @@ while the Flutter side stays a thin presentation layer.
 
 ## Architecture
 
-The project follows Clean Architecture, Vertical Slices, and Domain-Driven
-Design.
+The project follows Test-Driven Development and applies concepts of Clean
+Architecture (organized as Vertical Slices) and Domain-Driven Design.
 
 Dependencies point inward: presentation → application → domain.
 Infrastructure implements core-defined gateway ports; the core never knows

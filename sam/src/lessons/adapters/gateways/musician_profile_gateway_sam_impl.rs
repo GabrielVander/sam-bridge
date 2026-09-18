@@ -1,6 +1,4 @@
 use std::sync::Arc;
-
-use async_trait::async_trait;
 use student::application::gateways::{MusicianProfileGateway, MusicianProfileGatewayError};
 use student::domain::entities::{MusicianProfile, Student, StudentPosition};
 
@@ -15,10 +13,8 @@ impl MusicianProfileGatewaySamImpl {
         Self { client }
     }
 }
-
-#[async_trait]
 impl MusicianProfileGateway for MusicianProfileGatewaySamImpl {
-    async fn get_by_id(&self, id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+    fn get_by_id(&self, id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
         let sam_students: Vec<SamStudent> = self
             .client
             .students()
@@ -32,9 +28,7 @@ impl MusicianProfileGateway for MusicianProfileGatewaySamImpl {
         match Student::from(sam_student).position {
             StudentPosition::Musician {
                 level, instrument, ..
-            } => {
-                Ok(MusicianProfile { level, instrument })
-            }
+            } => Ok(MusicianProfile { level, instrument }),
             StudentPosition::Organist { .. }
             | StudentPosition::Secretary { .. }
             | StudentPosition::Unknown(_) => Err(MusicianProfileGatewayError::NotAMusician),

@@ -63,7 +63,7 @@ fn returns_the_musicians_level_and_instrument() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let profile: MusicianProfile = gateway.get_by_id("1").await.expect("should succeed");
+        let profile: MusicianProfile = gateway.get_by_id("1").expect("should succeed");
 
         assert_eq!(profile.level, MusicianLevel::YouthService);
         assert_eq!(profile.instrument, Some(Instrument::Violin));
@@ -83,7 +83,7 @@ fn student_without_an_assigned_instrument_has_none() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let profile: MusicianProfile = gateway.get_by_id("1").await.expect("should succeed");
+        let profile: MusicianProfile = gateway.get_by_id("1").expect("should succeed");
 
         assert_eq!(profile.instrument, None);
     });
@@ -102,7 +102,7 @@ fn student_with_a_blank_instrument_column_has_none() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let profile: MusicianProfile = gateway.get_by_id("1").await.expect("should succeed");
+        let profile: MusicianProfile = gateway.get_by_id("1").expect("should succeed");
 
         assert_eq!(profile.instrument, None);
     });
@@ -122,7 +122,7 @@ fn unknown_id_is_not_found() {
             build_gateway(&mock_server).expect("client should be built");
 
         let result: Result<MusicianProfile, MusicianProfileGatewayError> =
-            gateway.get_by_id("does-not-exist").await;
+            gateway.get_by_id("does-not-exist");
 
         assert_eq!(result, Err(MusicianProfileGatewayError::NotFound));
     });
@@ -141,8 +141,7 @@ fn non_musician_is_reported_as_not_a_musician() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<MusicianProfile, MusicianProfileGatewayError> =
-            gateway.get_by_id("1").await;
+        let result: Result<MusicianProfile, MusicianProfileGatewayError> = gateway.get_by_id("1");
 
         assert_eq!(result, Err(MusicianProfileGatewayError::NotAMusician));
     });
@@ -162,8 +161,7 @@ fn client_failure_is_reported_as_unable_to_perform_operation() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<MusicianProfile, MusicianProfileGatewayError> =
-            gateway.get_by_id("1").await;
+        let result: Result<MusicianProfile, MusicianProfileGatewayError> = gateway.get_by_id("1");
 
         assert_eq!(
             result,

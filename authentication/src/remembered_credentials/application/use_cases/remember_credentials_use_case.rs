@@ -17,10 +17,9 @@ impl RememberCredentialsUseCase {
         Self { credential_store }
     }
 
-    pub async fn execute(&self, credential: Credential) -> Result<(), RememberCredentialsError> {
+    pub fn execute(&self, credential: &Credential) -> Result<(), RememberCredentialsError> {
         self.credential_store
-            .save(&credential)
-            .await
+            .save(credential)
             .map_err(|_| RememberCredentialsError::UnableToPersist)
     }
 }

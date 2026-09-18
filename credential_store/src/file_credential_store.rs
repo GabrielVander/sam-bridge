@@ -1,10 +1,8 @@
-use std::path::{Path, PathBuf};
-
-use async_trait::async_trait;
 use authentication::{
     application::gateways::{CredentialStore, CredentialStoreError},
     domain::entities::{Credential, Email, Password},
 };
+use std::path::{Path, PathBuf};
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
 #[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Zeroize, ZeroizeOnDrop)]
@@ -144,10 +142,8 @@ impl FileCredentialStore {
         let _ = std::fs::remove_file(&self.credential_path);
     }
 }
-
-#[async_trait]
 impl CredentialStore for FileCredentialStore {
-    async fn save(&self, credential: &Credential) -> Result<(), CredentialStoreError> {
+    fn save(&self, credential: &Credential) -> Result<(), CredentialStoreError> {
         let stored = StoredCredential {
             email: credential.email.0.clone(),
             password: credential.password.0.clone(),
@@ -157,7 +153,7 @@ impl CredentialStore for FileCredentialStore {
             .map_err(|_| CredentialStoreError::UnableToPerformOperation)
     }
 
-    async fn load(&self) -> Option<Credential> {
+    fn load(&self) -> Option<Credential> {
         self.load_sync().map(|stored| {
             Credential::new(
                 Email(stored.email.clone()),
@@ -166,7 +162,7 @@ impl CredentialStore for FileCredentialStore {
         })
     }
 
-    async fn clear(&self) -> Result<(), CredentialStoreError> {
+    fn clear(&self) -> Result<(), CredentialStoreError> {
         self.clear_sync();
         Ok(())
     }

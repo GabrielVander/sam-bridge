@@ -19,25 +19,18 @@ fn credential() -> Credential {
 fn round_trip_preserves_credential() {
     let (store, _dir) = temp_store().expect("tempdir");
 
-    smol::block_on(async {
-        store
-            .save(&credential())
-            .await
-            .expect("save should succeed");
-        let loaded = store.load().await.expect("load should return Some");
+    store.save(&credential()).expect("save should succeed");
+    let loaded = store.load().expect("load should return Some");
 
-        assert_eq!(loaded.email.0, "test_user@example.com");
-        assert_eq!(loaded.password.0, "test_pass");
-    });
+    assert_eq!(loaded.email.0, "test_user@example.com");
+    assert_eq!(loaded.password.0, "test_pass");
 }
 
 #[test]
 fn saved_file_is_encrypted_not_plaintext() {
     let (store, dir) = temp_store().expect("tempdir");
 
-    smol::block_on(async {
-        store.save(&credential()).await.expect("save");
-    });
+    store.save(&credential()).expect("save");
 
     let raw = std::fs::read(dir.path().join("session.enc")).expect("read enc file");
     let raw_str = String::from_utf8_lossy(&raw);
@@ -51,22 +44,18 @@ fn saved_file_is_encrypted_not_plaintext() {
 fn missing_file_loads_as_none() {
     let (store, _dir) = temp_store().expect("tempdir");
 
-    smol::block_on(async {
-        assert!(store.load().await.is_none());
-    });
+    assert!(store.load().is_none());
 }
 
 #[test]
 fn clear_removes_the_credential() {
     let (store, dir) = temp_store().expect("tempdir");
 
-    smol::block_on(async {
-        store.save(&credential()).await.expect("save");
+    store.save(&credential()).expect("save");
 
-        store.clear().await.expect("clear should succeed");
+    store.clear().expect("clear should succeed");
 
-        assert!(store.load().await.is_none());
-    });
+    assert!(store.load().is_none());
     assert!(!dir.path().join("session.enc").exists());
 }
 
@@ -75,9 +64,7 @@ fn tamper_detection_returns_none() {
     let (store, dir) = temp_store().expect("tempdir");
     let credential_path = dir.path().join("session.enc");
 
-    smol::block_on(async {
-        store.save(&credential()).await.expect("save");
-    });
+    store.save(&credential()).expect("save");
 
     let mut data = std::fs::read(&credential_path).expect("read");
     if !data.is_empty() {
@@ -85,9 +72,7 @@ fn tamper_detection_returns_none() {
         std::fs::write(&credential_path, &data).expect("tamper");
     }
 
-    smol::block_on(async {
-        assert!(store.load().await.is_none());
-    });
+    assert!(store.load().is_none());
 }
 
 #[test]
@@ -96,14 +81,12 @@ fn a_second_store_pointed_at_the_same_dir_reads_what_the_first_wrote() {
     let store1 = FileCredentialStore::with_dir(&dir.path().to_string_lossy());
     let store2 = FileCredentialStore::with_dir(&dir.path().to_string_lossy());
 
-    smol::block_on(async {
-        store1.save(&credential()).await.expect("save via store1");
+    store1.save(&credential()).expect("save via store1");
 
-        let loaded = store2.load().await.expect("load via store2");
+    let loaded = store2.load().expect("load via store2");
 
-        assert_eq!(loaded.email.0, "test_user@example.com");
-        assert_eq!(loaded.password.0, "test_pass");
-    });
+    assert_eq!(loaded.email.0, "test_user@example.com");
+    assert_eq!(loaded.password.0, "test_pass");
 }
 
 #[test]
@@ -113,35 +96,26 @@ fn decrypt_with_wrong_key_returns_none() {
     let dir2 = tempfile::tempdir().expect("dir2");
     let store2 = FileCredentialStore::with_dir(&dir2.path().to_string_lossy());
 
-    smol::block_on(async {
-        store1.save(&credential()).await.expect("save1");
-        store2
-            .save(&credential())
-            .await
-            .expect("save2 to create a different key");
-    });
+    store1.save(&credential()).expect("save1");
+    store2
+        .save(&credential())
+        .expect("save2 to create a different key");
 
     let data = std::fs::read(dir1.path().join("session.enc")).expect("data");
     std::fs::write(dir2.path().join("session.enc"), &data).expect("copy data with wrong key");
 
-    smol::block_on(async {
-        assert!(store2.load().await.is_none());
-    });
+    assert!(store2.load().is_none());
 }
 
 #[test]
 fn saving_twice_reuses_the_existing_encryption_key() {
     let (store, dir) = temp_store().expect("tempdir");
 
-    smol::block_on(async {
-        store.save(&credential()).await.expect("first save");
-    });
+    store.save(&credential()).expect("first save");
     let key_after_first_save =
         std::fs::read(dir.path().join("key.bin")).expect("key after first save");
 
-    smol::block_on(async {
-        store.save(&credential()).await.expect("second save");
-    });
+    store.save(&credential()).expect("second save");
     let key_after_second_save =
         std::fs::read(dir.path().join("key.bin")).expect("key after second save");
 
@@ -155,30 +129,22 @@ fn saving_twice_reuses_the_existing_encryption_key() {
 fn a_corrupted_key_file_causes_load_to_return_none() {
     let (store, dir) = temp_store().expect("tempdir");
 
-    smol::block_on(async {
-        store.save(&credential()).await.expect("save");
-    });
+    store.save(&credential()).expect("save");
 
     std::fs::write(dir.path().join("key.bin"), [0u8; 10]).expect("corrupt the key file");
 
-    smol::block_on(async {
-        assert!(store.load().await.is_none());
-    });
+    assert!(store.load().is_none());
 }
 
 #[test]
 fn a_missing_key_file_causes_load_to_return_none() {
     let (store, dir) = temp_store().expect("tempdir");
 
-    smol::block_on(async {
-        store.save(&credential()).await.expect("save");
-    });
+    store.save(&credential()).expect("save");
 
     std::fs::remove_file(dir.path().join("key.bin")).expect("remove the key file");
 
-    smol::block_on(async {
-        assert!(store.load().await.is_none());
-    });
+    assert!(store.load().is_none());
 }
 
 #[cfg(unix)]
@@ -187,7 +153,7 @@ fn save_fails_when_the_key_file_path_is_a_directory() {
     let (store, dir) = temp_store().expect("tempdir");
     std::fs::create_dir(dir.path().join("key.bin")).expect("occupy the key path with a directory");
 
-    let result = smol::block_on(async { store.save(&credential()).await });
+    let result = store.save(&credential());
 
     assert!(
         result.is_err(),
@@ -199,17 +165,14 @@ fn save_fails_when_the_key_file_path_is_a_directory() {
 #[test]
 fn save_fails_when_the_credential_file_path_is_a_directory() {
     let (store, dir) = temp_store().expect("tempdir");
-    smol::block_on(async {
-        store
-            .save(&credential())
-            .await
-            .expect("first save creates the key");
-    });
+    store
+        .save(&credential())
+        .expect("first save creates the key");
     std::fs::remove_file(dir.path().join("session.enc")).expect("remove the credential file");
     std::fs::create_dir(dir.path().join("session.enc"))
         .expect("occupy the credential path with a directory");
 
-    let result = smol::block_on(async { store.save(&credential()).await });
+    let result = store.save(&credential());
 
     assert!(
         result.is_err(),
@@ -226,7 +189,7 @@ fn save_fails_when_the_directory_is_not_writable_during_key_creation() {
     std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o500))
         .expect("make the directory read-only");
 
-    let result = smol::block_on(async { store.save(&credential()).await });
+    let result = store.save(&credential());
 
     std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o700))
         .expect("restore permissions so the tempdir can be cleaned up");
@@ -243,17 +206,14 @@ fn save_fails_when_the_directory_is_not_writable_for_the_credential_file() {
     use std::os::unix::fs::PermissionsExt;
 
     let (store, dir) = temp_store().expect("tempdir");
-    smol::block_on(async {
-        store
-            .save(&credential())
-            .await
-            .expect("first save creates the key while the directory is still writable");
-    });
+    store
+        .save(&credential())
+        .expect("first save creates the key while the directory is still writable");
 
     std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o500))
         .expect("make the directory read-only");
 
-    let result = smol::block_on(async { store.save(&credential()).await });
+    let result = store.save(&credential());
 
     std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o700))
         .expect("restore permissions so the tempdir can be cleaned up");
@@ -299,9 +259,7 @@ fn files_have_restricted_permissions() {
 
     let (store, dir) = temp_store().expect("tempdir");
 
-    smol::block_on(async {
-        store.save(&credential()).await.expect("save");
-    });
+    store.save(&credential()).expect("save");
 
     let meta = std::fs::metadata(dir.path().join("session.enc")).expect("meta");
     assert_eq!(meta.permissions().mode() & 0o777, 0o600);

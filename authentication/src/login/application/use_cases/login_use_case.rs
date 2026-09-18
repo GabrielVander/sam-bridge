@@ -15,9 +15,9 @@ impl LoginUseCase {
         Self { credential_gateway }
     }
 
-    pub async fn execute(&self, command: LoginCommand) -> Result<(), LoginUseCaseError> {
+    pub fn execute(&self, command: LoginCommand) -> Result<(), LoginUseCaseError> {
         let result: Result<AuthorizationResult, CredentialGatewayError> =
-            self.credential_gateway.authorize(&command.into()).await;
+            self.credential_gateway.authorize(&command.into());
 
         match result {
             Ok(auth_result) => match auth_result {

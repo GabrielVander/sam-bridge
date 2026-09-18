@@ -1,12 +1,10 @@
-use std::sync::{Arc, Mutex};
-
-use async_trait::async_trait;
 use authentication::application::gateways::{
     AuthorizationResult, CredentialGateway, CredentialGatewayError,
 };
 use authentication::application::use_cases::{LoginCommand, LoginUseCase, LoginUseCaseError};
 use authentication::domain::entities::Credential;
 use pretty_assertions::assert_eq;
+use std::sync::{Arc, Mutex};
 
 #[test]
 fn login_successful() {
@@ -16,16 +14,12 @@ fn login_successful() {
 
     let use_case: LoginUseCase = LoginUseCase::new(credential_gateway);
 
-    smol::block_on(async {
-        let result = use_case
-            .execute(LoginCommand::new(
-                "Some email".to_string(),
-                "secretpassword123".to_string(),
-            ))
-            .await;
+    let result = use_case.execute(LoginCommand::new(
+        "Some email".to_string(),
+        "secretpassword123".to_string(),
+    ));
 
-        assert_eq!(result, Ok(()));
-    });
+    assert_eq!(result, Ok(()));
 }
 
 #[test]
@@ -36,16 +30,12 @@ fn login_unsuccessful() {
 
     let use_case: LoginUseCase = LoginUseCase::new(credential_gateway);
 
-    smol::block_on(async {
-        let result = use_case
-            .execute(LoginCommand::new(
-                "Some email".to_string(),
-                "secretpassword123".to_string(),
-            ))
-            .await;
+    let result = use_case.execute(LoginCommand::new(
+        "Some email".to_string(),
+        "secretpassword123".to_string(),
+    ));
 
-        assert_eq!(result, Err(LoginUseCaseError::InvalidEmailOrPassword));
-    });
+    assert_eq!(result, Err(LoginUseCaseError::InvalidEmailOrPassword));
 }
 
 #[test]
@@ -56,16 +46,12 @@ fn login_failure() {
 
     let use_case: LoginUseCase = LoginUseCase::new(credential_gateway);
 
-    smol::block_on(async {
-        let result = use_case
-            .execute(LoginCommand::new(
-                "Some email".to_string(),
-                "secretpassword123".to_string(),
-            ))
-            .await;
+    let result = use_case.execute(LoginCommand::new(
+        "Some email".to_string(),
+        "secretpassword123".to_string(),
+    ));
 
-        assert_eq!(result, Err(LoginUseCaseError::UnableToPerformAuthorization));
-    });
+    assert_eq!(result, Err(LoginUseCaseError::UnableToPerformAuthorization));
 }
 
 #[test]
@@ -74,15 +60,12 @@ fn login_forwards_email_and_password_to_the_credential_gateway() {
 
     let use_case: LoginUseCase = LoginUseCase::new(credential_gateway.clone());
 
-    smol::block_on(async {
-        use_case
-            .execute(LoginCommand::new(
-                "Some email".to_string(),
-                "secretpassword123".to_string(),
-            ))
-            .await
-    })
-    .expect("gateway is stubbed to authorize");
+    use_case
+        .execute(LoginCommand::new(
+            "Some email".to_string(),
+            "secretpassword123".to_string(),
+        ))
+        .expect("gateway is stubbed to authorize");
 
     let received_credential: (String, String) = credential_gateway
         .received_credential
@@ -106,13 +89,8 @@ impl FakeCredentialGateway {
         Self { result }
     }
 }
-
-#[async_trait]
 impl CredentialGateway for FakeCredentialGateway {
-    async fn authorize(
-        &self,
-        _: &Credential,
-    ) -> Result<AuthorizationResult, CredentialGatewayError> {
+    fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, CredentialGatewayError> {
         self.result.clone()
     }
 }
@@ -128,10 +106,8 @@ impl SpyCredentialGateway {
         }
     }
 }
-
-#[async_trait]
 impl CredentialGateway for SpyCredentialGateway {
-    async fn authorize(
+    fn authorize(
         &self,
         credential: &Credential,
     ) -> Result<AuthorizationResult, CredentialGatewayError> {

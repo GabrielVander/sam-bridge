@@ -1,6 +1,4 @@
 use std::sync::Arc;
-
-use async_trait::async_trait;
 use student::{
     application::gateways::{StudentGateway, StudentGatewayError},
     domain::entities::{
@@ -19,10 +17,8 @@ impl StudentGatewaySamImpl {
         Self { client }
     }
 }
-
-#[async_trait]
 impl StudentGateway for StudentGatewaySamImpl {
-    async fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
+    fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
         let sam_students: Vec<SamStudent> = self
             .client
             .students()

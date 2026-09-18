@@ -49,10 +49,7 @@ fn given_a_303_response_authorization_succeeds() {
         let gateway: CredentialGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: AuthorizationResult = gateway
-            .authorize(&credential())
-            .await
-            .expect("should succeed");
+        let result: AuthorizationResult = gateway.authorize(&credential()).expect("should succeed");
 
         assert_eq!(result, AuthorizationResult::Authorized);
     });
@@ -75,10 +72,7 @@ fn given_the_invalid_credentials_marker_authorization_is_unauthorized() {
         let gateway: CredentialGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: AuthorizationResult = gateway
-            .authorize(&credential())
-            .await
-            .expect("should succeed");
+        let result: AuthorizationResult = gateway.authorize(&credential()).expect("should succeed");
 
         assert_eq!(result, AuthorizationResult::Unauthorized);
     });
@@ -98,7 +92,7 @@ fn given_an_unexpected_response_authorization_fails() {
         let gateway: CredentialGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<AuthorizationResult, _> = gateway.authorize(&credential()).await;
+        let result: Result<AuthorizationResult, _> = gateway.authorize(&credential());
 
         assert!(result.is_err());
     });
@@ -123,7 +117,7 @@ fn given_a_connection_failure_authorization_fails() {
         let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
         let gateway: CredentialGatewaySamImpl = CredentialGatewaySamImpl::new(sam_client);
 
-        let result: Result<AuthorizationResult, _> = gateway.authorize(&credential()).await;
+        let result: Result<AuthorizationResult, _> = gateway.authorize(&credential());
 
         assert!(result.is_err());
     });

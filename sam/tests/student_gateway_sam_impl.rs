@@ -54,8 +54,7 @@ fn given_accessible_dashboard_students_should_be_retrieved_and_mapped() {
         let gateway: StudentGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<Vec<Student>, StudentGatewayError> =
-            gateway.get_available_records().await;
+        let result: Result<Vec<Student>, StudentGatewayError> = gateway.get_available_records();
 
         let students: Vec<Student> = result.expect("students retrieval should succeed");
         assert_eq!(students.len(), 1);
@@ -121,7 +120,6 @@ fn given_musicians_without_a_real_instrument_no_instrument_name_is_carried() {
 
         let students: Vec<Student> = gateway
             .get_available_records()
-            .await
             .expect("students retrieval should succeed");
 
         let names: Vec<Option<&str>> = students
@@ -151,8 +149,7 @@ fn given_inaccessible_dashboard_students_retrieval_should_fail() {
         let gateway: StudentGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<Vec<Student>, StudentGatewayError> =
-            gateway.get_available_records().await;
+        let result: Result<Vec<Student>, StudentGatewayError> = gateway.get_available_records();
 
         assert!(
             result.is_err(),
@@ -181,8 +178,7 @@ fn given_unexpected_listing_status_students_retrieval_should_fail() {
         let gateway: StudentGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<Vec<Student>, StudentGatewayError> =
-            gateway.get_available_records().await;
+        let result: Result<Vec<Student>, StudentGatewayError> = gateway.get_available_records();
 
         assert!(
             result.is_err(),

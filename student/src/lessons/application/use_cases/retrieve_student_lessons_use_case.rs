@@ -12,11 +12,8 @@ impl<'a, T: StudentLessonsGateway + ?Sized> RetrieveStudentLessonsUseCase<'a, T>
         Self { gateway }
     }
 
-    pub async fn execute(
-        &self,
-        student_id: &str,
-    ) -> Result<StudentLessons, StudentLessonsGatewayError> {
-        self.gateway.get_all_for_student_with_id(student_id).await
+    pub fn execute(&self, student_id: &str) -> Result<StudentLessons, StudentLessonsGatewayError> {
+        self.gateway.get_all_for_student_with_id(student_id)
     }
 }
 
@@ -25,17 +22,14 @@ mod tests {
     use crate::lessons::domain::entities::{Clef, Lesson, Range};
 
     use super::*;
-    use async_trait::async_trait;
     use chrono::NaiveDate;
 
     struct FakeStudentLessonsGateway {
         bundle: StudentLessons,
         fail: bool,
     }
-
-    #[async_trait]
     impl StudentLessonsGateway for FakeStudentLessonsGateway {
-        async fn get_all_for_student_with_id(
+        fn get_all_for_student_with_id(
             &self,
             _student_id: &str,
         ) -> Result<StudentLessons, StudentLessonsGatewayError> {
@@ -68,35 +62,31 @@ mod tests {
 
     #[test]
     fn returns_the_bundle_from_the_gateway() {
-        smol::block_on(async {
-            let bundle = fixture_bundle();
-            let gateway = FakeStudentLessonsGateway {
-                bundle: bundle.clone(),
-                fail: false,
-            };
-            let use_case = RetrieveStudentLessonsUseCase::new(&gateway);
+        let bundle = fixture_bundle();
+        let gateway = FakeStudentLessonsGateway {
+            bundle: bundle.clone(),
+            fail: false,
+        };
+        let use_case = RetrieveStudentLessonsUseCase::new(&gateway);
 
-            let result = use_case.execute("500132").await.expect("should succeed");
+        let result = use_case.execute("500132").expect("should succeed");
 
-            assert_eq!(result, bundle);
-        });
+        assert_eq!(result, bundle);
     }
 
     #[test]
     fn propagates_gateway_errors() {
-        smol::block_on(async {
-            let gateway = FakeStudentLessonsGateway {
-                bundle: StudentLessons::default(),
-                fail: true,
-            };
-            let use_case = RetrieveStudentLessonsUseCase::new(&gateway);
+        let gateway = FakeStudentLessonsGateway {
+            bundle: StudentLessons::default(),
+            fail: true,
+        };
+        let use_case = RetrieveStudentLessonsUseCase::new(&gateway);
 
-            let result = use_case.execute("500132").await;
+        let result = use_case.execute("500132");
 
-            assert_eq!(
-                result,
-                Err(StudentLessonsGatewayError::UnableToPerformOperation)
-            );
-        });
+        assert_eq!(
+            result,
+            Err(StudentLessonsGatewayError::UnableToPerformOperation)
+        );
     }
 }

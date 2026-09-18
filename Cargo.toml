@@ -3,7 +3,6 @@ members = ["student", "sam", "gui_application", "authentication", "credential_st
 resolver = "3"
 
 [workspace.dependencies]
-async-trait = "0.1.89"
 anyhow = "1.0.103"
 thiserror = "2.0.18"
 chrono = "0.4.45"

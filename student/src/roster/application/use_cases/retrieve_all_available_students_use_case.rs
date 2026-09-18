@@ -20,9 +20,9 @@ impl RetrieveAllAvailableStudentsUseCase {
         }
     }
 
-    pub async fn execute(&self) -> RetrieveAllAvailableStudentsResult {
+    pub fn execute(&self) -> RetrieveAllAvailableStudentsResult {
         let students_result: Result<Vec<Student>, StudentGatewayError> =
-            self.student_gateway.get_available_records().await;
+            self.student_gateway.get_available_records();
 
         match students_result {
             Ok(students) => RetrieveAllAvailableStudentsResult::Success(

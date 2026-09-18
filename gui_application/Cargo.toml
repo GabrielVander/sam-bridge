@@ -13,11 +13,9 @@ sam = { path = "../sam" }
 student = { path = "../student" }
 flutter_rust_bridge = "=2.13.0-beta.2"
 anyhow = { workspace = true }
-async-trait = { workspace = true }
 reqwest = { workspace = true }
 
 [dev-dependencies]
-smol = { workspace = true }
 chrono = { workspace = true }
 tempfile = "3"
 

@@ -38,19 +38,18 @@ impl<'a, P: MusicianProfileGateway + ?Sized, L: StudentLessonsGateway + ?Sized>
         }
     }
 
-    pub async fn execute(
+    pub fn execute(
         &self,
         student_id: &str,
     ) -> Result<ProgressAssessment, AssessStudentProgressError> {
-        let profile = self.profile_gateway.get_by_id(student_id).await?;
+        let profile = self.profile_gateway.get_by_id(student_id)?;
         let Some(instrument) = profile.instrument else {
             return Err(AssessStudentProgressError::NoInstrumentAssigned);
         };
 
         let lessons = self
             .lessons_gateway
-            .get_all_for_student_with_id(student_id)
-            .await?;
+            .get_all_for_student_with_id(student_id)?;
 
         Ok(assess(
             &profile.level,
@@ -66,18 +65,12 @@ mod tests {
     use super::*;
     use crate::lessons::domain::entities::{Lesson, MusicianProfile, Range, StudentLessons};
     use crate::shared::domain::entities::{Instrument, MusicianLevel};
-    use async_trait::async_trait;
 
     struct FakeMusicianProfileGateway {
         profile: Result<MusicianProfile, MusicianProfileGatewayError>,
     }
-
-    #[async_trait]
     impl MusicianProfileGateway for FakeMusicianProfileGateway {
-        async fn get_by_id(
-            &self,
-            _id: &str,
-        ) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+        fn get_by_id(&self, _id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
             self.profile.clone()
         }
     }
@@ -86,10 +79,8 @@ mod tests {
         bundle: StudentLessons,
         fail: bool,
     }
-
-    #[async_trait]
     impl StudentLessonsGateway for FakeStudentLessonsGateway {
-        async fn get_all_for_student_with_id(
+        fn get_all_for_student_with_id(
             &self,
             _student_id: &str,
         ) -> Result<StudentLessons, StudentLessonsGatewayError> {
@@ -125,131 +116,118 @@ mod tests {
 
     #[test]
     fn assesses_progress_from_the_gateways_profile_and_lessons() {
-        smol::block_on(async {
-            let profiles = profile_gateway(MusicianLevel::Candidate, Some(Instrument::Violin));
-            let lessons = FakeStudentLessonsGateway {
-                bundle: ready_to_advance_bundle(),
-                fail: false,
-            };
-            let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let profiles = profile_gateway(MusicianLevel::Candidate, Some(Instrument::Violin));
+        let lessons = FakeStudentLessonsGateway {
+            bundle: ready_to_advance_bundle(),
+            fail: false,
+        };
+        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
 
-            let report = use_case.execute("500132").await.expect("should succeed");
+        let report = use_case.execute("500132").expect("should succeed");
 
-            let youth_service = report
-                .checkpoints
-                .iter()
-                .find(|c| c.level == MusicianLevel::YouthService)
-                .expect("youth service checkpoint exists");
-            assert!(youth_service.ready_to_advance);
-        });
+        let youth_service = report
+            .checkpoints
+            .iter()
+            .find(|c| c.level == MusicianLevel::YouthService)
+            .expect("youth service checkpoint exists");
+        assert!(youth_service.ready_to_advance);
     }
 
     #[test]
     fn propagates_profile_gateway_errors() {
-        smol::block_on(async {
-            let profiles = FakeMusicianProfileGateway {
-                profile: Err(MusicianProfileGatewayError::NotFound),
-            };
-            let lessons = FakeStudentLessonsGateway {
-                bundle: StudentLessons::default(),
-                fail: false,
-            };
-            let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let profiles = FakeMusicianProfileGateway {
+            profile: Err(MusicianProfileGatewayError::NotFound),
+        };
+        let lessons = FakeStudentLessonsGateway {
+            bundle: StudentLessons::default(),
+            fail: false,
+        };
+        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
 
-            let result = use_case.execute("500132").await;
+        let result = use_case.execute("500132");
 
-            assert_eq!(
-                result,
-                Err(AssessStudentProgressError::Profile(
-                    MusicianProfileGatewayError::NotFound
-                ))
-            );
-        });
+        assert_eq!(
+            result,
+            Err(AssessStudentProgressError::Profile(
+                MusicianProfileGatewayError::NotFound
+            ))
+        );
     }
 
     #[test]
     fn student_with_no_instrument_assigned_is_reported_without_fetching_lessons() {
-        smol::block_on(async {
-            let profiles = profile_gateway(MusicianLevel::Candidate, None);
-            let lessons = FakeStudentLessonsGateway {
-                bundle: StudentLessons::default(),
-                fail: true,
-            };
-            let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let profiles = profile_gateway(MusicianLevel::Candidate, None);
+        let lessons = FakeStudentLessonsGateway {
+            bundle: StudentLessons::default(),
+            fail: true,
+        };
+        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
 
-            let result = use_case.execute("500132").await;
+        let result = use_case.execute("500132");
 
-            assert_eq!(
-                result,
-                Err(AssessStudentProgressError::NoInstrumentAssigned)
-            );
-        });
+        assert_eq!(
+            result,
+            Err(AssessStudentProgressError::NoInstrumentAssigned)
+        );
     }
 
     #[test]
     fn propagates_lessons_gateway_errors() {
-        smol::block_on(async {
-            let profiles = profile_gateway(MusicianLevel::Candidate, Some(Instrument::Violin));
-            let lessons = FakeStudentLessonsGateway {
-                bundle: StudentLessons::default(),
-                fail: true,
-            };
-            let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let profiles = profile_gateway(MusicianLevel::Candidate, Some(Instrument::Violin));
+        let lessons = FakeStudentLessonsGateway {
+            bundle: StudentLessons::default(),
+            fail: true,
+        };
+        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
 
-            let result = use_case.execute("500132").await;
+        let result = use_case.execute("500132");
 
-            assert_eq!(
-                result,
-                Err(AssessStudentProgressError::Lessons(
-                    StudentLessonsGatewayError::UnableToPerformOperation
-                ))
-            );
-        });
+        assert_eq!(
+            result,
+            Err(AssessStudentProgressError::Lessons(
+                StudentLessonsGatewayError::UnableToPerformOperation
+            ))
+        );
     }
 
     #[test]
     fn propagates_unknown_level_assessment_errors() {
-        smol::block_on(async {
-            let profiles = profile_gateway(
-                MusicianLevel::Unknown("EXÓTICO".to_owned()),
-                Some(Instrument::Violin),
-            );
-            let lessons = FakeStudentLessonsGateway {
-                bundle: StudentLessons::default(),
-                fail: false,
-            };
-            let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let profiles = profile_gateway(
+            MusicianLevel::Unknown("EXÓTICO".to_owned()),
+            Some(Instrument::Violin),
+        );
+        let lessons = FakeStudentLessonsGateway {
+            bundle: StudentLessons::default(),
+            fail: false,
+        };
+        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
 
-            let result = use_case.execute("500132").await;
+        let result = use_case.execute("500132");
 
-            assert_eq!(
-                result,
-                Err(AssessStudentProgressError::Assessment(
-                    AssessError::UnknownLevel("EXÓTICO".to_owned())
-                ))
-            );
-        });
+        assert_eq!(
+            result,
+            Err(AssessStudentProgressError::Assessment(
+                AssessError::UnknownLevel("EXÓTICO".to_owned())
+            ))
+        );
     }
 
     #[test]
     fn propagates_unpublished_requirements_assessment_errors() {
-        smol::block_on(async {
-            let profiles =
-                profile_gateway(MusicianLevel::Candidate, Some(Instrument::AltoClarinet));
-            let lessons = FakeStudentLessonsGateway {
-                bundle: StudentLessons::default(),
-                fail: false,
-            };
-            let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let profiles = profile_gateway(MusicianLevel::Candidate, Some(Instrument::AltoClarinet));
+        let lessons = FakeStudentLessonsGateway {
+            bundle: StudentLessons::default(),
+            fail: false,
+        };
+        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
 
-            let result = use_case.execute("500132").await;
+        let result = use_case.execute("500132");
 
-            assert_eq!(
-                result,
-                Err(AssessStudentProgressError::Assessment(
-                    AssessError::UnpublishedRequirements(Instrument::AltoClarinet)
-                ))
-            );
-        });
+        assert_eq!(
+            result,
+            Err(AssessStudentProgressError::Assessment(
+                AssessError::UnpublishedRequirements(Instrument::AltoClarinet)
+            ))
+        );
     }
 }

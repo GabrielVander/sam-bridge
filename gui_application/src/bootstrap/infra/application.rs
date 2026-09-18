@@ -86,15 +86,16 @@ impl ApplicationFacade {
         })
     }
 
-    pub async fn login(&self, email: String, password: String) -> LoginResult {
+    #[must_use]
+    pub fn login(&self, email: String, password: String) -> LoginResult {
         self.login_and_remember_credentials_use_case
             .execute(email, password)
-            .await
             .into()
     }
 
-    pub async fn restore_session(&self) -> RestoreSessionOutcome {
-        match self.restore_session_use_case.execute().await {
+    #[must_use]
+    pub fn restore_session(&self) -> RestoreSessionOutcome {
+        match self.restore_session_use_case.execute() {
             RestoreSessionResult::Restored => RestoreSessionOutcome::Restored,
             RestoreSessionResult::NoStoredCredentials
             | RestoreSessionResult::CredentialsRejected
@@ -102,12 +103,9 @@ impl ApplicationFacade {
         }
     }
 
-    pub async fn retrieve_all_available_students(&self) -> RetrieveAllAvailableStudentsOutcome {
-        match self
-            .retrieve_all_available_students_use_case
-            .execute()
-            .await
-        {
+    #[must_use]
+    pub fn retrieve_all_available_students(&self) -> RetrieveAllAvailableStudentsOutcome {
+        match self.retrieve_all_available_students_use_case.execute() {
             RetrieveAllAvailableStudentsResult::Success(students) => {
                 RetrieveAllAvailableStudentsOutcome::Success(
                     students.into_iter().map(StudentSummaryDto::from).collect(),
@@ -119,14 +117,14 @@ impl ApplicationFacade {
         }
     }
 
-    pub async fn retrieve_student_lessons(
-        &self,
-        student_id: String,
-    ) -> RetrieveStudentLessonsOutcome {
+    #[must_use]
+    // FRB bridges owned values, so the id cannot be taken as `&str`.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn retrieve_student_lessons(&self, student_id: String) -> RetrieveStudentLessonsOutcome {
         let use_case =
             RetrieveStudentLessonsUseCase::new(self.sam_student_lessons_gateway.as_ref());
 
-        match use_case.execute(&student_id).await {
+        match use_case.execute(&student_id) {
             Ok(lessons) => {
                 let dto: student::application::dto::StudentLessonsDto = lessons.into();
                 RetrieveStudentLessonsOutcome::Success(dto.into())
@@ -135,16 +133,16 @@ impl ApplicationFacade {
         }
     }
 
-    pub async fn assess_student_progress(
-        &self,
-        student_id: String,
-    ) -> AssessStudentProgressOutcome {
+    #[must_use]
+    // FRB bridges owned values, so the id cannot be taken as `&str`.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn assess_student_progress(&self, student_id: String) -> AssessStudentProgressOutcome {
         let use_case = AssessStudentProgressUseCase::new(
             self.sam_musician_profile_gateway.as_ref(),
             self.sam_student_lessons_gateway.as_ref(),
         );
 
-        match use_case.execute(&student_id).await {
+        match use_case.execute(&student_id) {
             Ok(assessment) => {
                 AssessStudentProgressOutcome::Success(ProgressAssessmentDto::from(assessment))
             }
@@ -194,7 +192,6 @@ impl From<LoginUseCaseError> for LoginResult {
 mod tests {
     use super::*;
     use crate::infra::{StudentLessonsDto, StudentPositionDto};
-    use async_trait::async_trait;
     use authentication::application::gateways::{
         AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
     };
@@ -212,13 +209,8 @@ mod tests {
     struct FakeCredentialGateway {
         result: Result<AuthorizationResult, CredentialGatewayError>,
     }
-
-    #[async_trait]
     impl CredentialGateway for FakeCredentialGateway {
-        async fn authorize(
-            &self,
-            _: &Credential,
-        ) -> Result<AuthorizationResult, CredentialGatewayError> {
+        fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, CredentialGatewayError> {
             self.result.clone()
         }
     }
@@ -226,10 +218,8 @@ mod tests {
     struct FakeStudentGateway {
         result: Result<Vec<Student>, StudentGatewayError>,
     }
-
-    #[async_trait]
     impl StudentGateway for FakeStudentGateway {
-        async fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
+        fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
             self.result.clone()
         }
     }
@@ -237,13 +227,8 @@ mod tests {
     struct FakeMusicianProfileGateway {
         result: Result<MusicianProfile, MusicianProfileGatewayError>,
     }
-
-    #[async_trait]
     impl MusicianProfileGateway for FakeMusicianProfileGateway {
-        async fn get_by_id(
-            &self,
-            _id: &str,
-        ) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+        fn get_by_id(&self, _id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
             self.result.clone()
         }
     }
@@ -251,10 +236,8 @@ mod tests {
     struct FakeStudentLessonsGateway {
         result: Result<StudentLessons, StudentLessonsGatewayError>,
     }
-
-    #[async_trait]
     impl StudentLessonsGateway for FakeStudentLessonsGateway {
-        async fn get_all_for_student_with_id(
+        fn get_all_for_student_with_id(
             &self,
             _student_id: &str,
         ) -> Result<StudentLessons, StudentLessonsGatewayError> {
@@ -279,10 +262,9 @@ mod tests {
             &credential_dir.path().to_string_lossy(),
         ));
         if let Some((email, password)) = stored_credential {
-            smol::block_on(
-                credential_store.save(&Credential::new(Email(email), Password(password))),
-            )
-            .expect("seeding the credential store should succeed");
+            credential_store
+                .save(&Credential::new(Email(email), Password(password)))
+                .expect("seeding the credential store should succeed");
         }
 
         let facade = ApplicationFacade {
@@ -334,7 +316,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.login("e".to_owned(), "p".to_owned()).await });
+        let result = facade.login("e".to_owned(), "p".to_owned());
 
         assert_eq!(result, LoginResult::Successful);
     }
@@ -349,7 +331,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.login("e".to_owned(), "p".to_owned()).await });
+        let result = facade.login("e".to_owned(), "p".to_owned());
 
         assert_eq!(result, LoginResult::InvalidEmailOrPassword);
     }
@@ -364,7 +346,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.login("e".to_owned(), "p".to_owned()).await });
+        let result = facade.login("e".to_owned(), "p".to_owned());
 
         assert_eq!(result, LoginResult::UnableToPerformAuthorization);
     }
@@ -379,7 +361,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.restore_session().await });
+        let result = facade.restore_session();
 
         assert_eq!(result, RestoreSessionOutcome::Restored);
     }
@@ -394,7 +376,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.restore_session().await });
+        let result = facade.restore_session();
 
         assert_eq!(result, RestoreSessionOutcome::NotAvailable);
     }
@@ -409,7 +391,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.retrieve_all_available_students().await });
+        let result = facade.retrieve_all_available_students();
 
         assert_eq!(
             result,
@@ -433,7 +415,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.retrieve_all_available_students().await });
+        let result = facade.retrieve_all_available_students();
 
         assert!(matches!(
             result,
@@ -451,8 +433,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result =
-            smol::block_on(async { facade.retrieve_student_lessons("1".to_owned()).await });
+        let result = facade.retrieve_student_lessons("1".to_owned());
 
         assert_eq!(
             result,
@@ -473,8 +454,7 @@ mod tests {
             Err(StudentLessonsGatewayError::UnableToPerformOperation),
         );
 
-        let result =
-            smol::block_on(async { facade.retrieve_student_lessons("1".to_owned()).await });
+        let result = facade.retrieve_student_lessons("1".to_owned());
 
         assert!(matches!(result, RetrieveStudentLessonsOutcome::Failure(_)));
     }
@@ -492,7 +472,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.assess_student_progress("1".to_owned()).await });
+        let result = facade.assess_student_progress("1".to_owned());
 
         assert!(matches!(result, AssessStudentProgressOutcome::Success(_)));
     }
@@ -510,7 +490,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.assess_student_progress("1".to_owned()).await });
+        let result = facade.assess_student_progress("1".to_owned());
 
         assert_eq!(result, AssessStudentProgressOutcome::NoInstrumentAssigned);
     }
@@ -528,7 +508,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.assess_student_progress("1".to_owned()).await });
+        let result = facade.assess_student_progress("1".to_owned());
 
         assert_eq!(
             result,
@@ -546,7 +526,7 @@ mod tests {
             Ok(StudentLessons::default()),
         );
 
-        let result = smol::block_on(async { facade.assess_student_progress("1".to_owned()).await });
+        let result = facade.assess_student_progress("1".to_owned());
 
         assert!(matches!(result, AssessStudentProgressOutcome::Failure(_)));
     }

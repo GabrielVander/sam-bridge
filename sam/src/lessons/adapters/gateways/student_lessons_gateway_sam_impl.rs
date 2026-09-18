@@ -1,6 +1,4 @@
 use std::sync::Arc;
-
-use async_trait::async_trait;
 use student::application::gateways::{StudentLessonsGateway, StudentLessonsGatewayError};
 use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
 
@@ -15,10 +13,8 @@ impl StudentLessonsGatewaySamImpl {
         Self { client }
     }
 }
-
-#[async_trait]
 impl StudentLessonsGateway for StudentLessonsGatewaySamImpl {
-    async fn get_all_for_student_with_id(
+    fn get_all_for_student_with_id(
         &self,
         id: &str,
     ) -> Result<StudentLessons, StudentLessonsGatewayError> {
