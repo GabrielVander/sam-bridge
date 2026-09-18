@@ -3,17 +3,23 @@ class StudentListItem {
   final String name;
   final String location;
   final String position;
+  final String? instrument;
 
   const StudentListItem({
     required this.id,
     required this.name,
     required this.location,
     required this.position,
+    this.instrument,
   });
 
   @override
   int get hashCode =>
-      id.hashCode ^ name.hashCode ^ location.hashCode ^ position.hashCode;
+      id.hashCode ^
+      name.hashCode ^
+      location.hashCode ^
+      position.hashCode ^
+      instrument.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -23,7 +29,8 @@ class StudentListItem {
           id == other.id &&
           name == other.name &&
           location == other.location &&
-          position == other.position;
+          position == other.position &&
+          instrument == other.instrument;
 }
 
 enum LessonKind { msa, method }

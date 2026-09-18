@@ -39,6 +39,48 @@ void main() {
       expect(viewModel.position, 'ALGO DESCONHECIDO');
     });
 
+    group('instrument', () {
+      StudentListItem mapInstrument(String? instrumentName) =>
+          RosterMapper.toViewModel(
+            StudentSummaryDto(
+              id: '1',
+              name: 'Jane Doe',
+              position: const StudentPositionDto.practice(),
+              location: 'Some Location',
+              instrumentName: instrumentName,
+            ),
+          );
+
+      test('keeps the first letter uppercase and lowercases the rest', () {
+        expect(mapInstrument('SAXOFONE TENOR').instrument, 'Saxofone tenor');
+      });
+
+      test('keeps accented letters', () {
+        expect(mapInstrument('OBOÉ').instrument, 'Oboé');
+      });
+
+      test('shows instruments the app does not know', () {
+        expect(mapInstrument('BANDOLIM').instrument, 'Bandolim');
+      });
+
+      test('trims surrounding spaces', () {
+        expect(mapInstrument('  VIOLINO ').instrument, 'Violino');
+      });
+
+      test('has no instrument when SAM sent none', () {
+        expect(mapInstrument(null).instrument, isNull);
+      });
+
+      test('has no instrument when the name is blank', () {
+        expect(mapInstrument('').instrument, isNull);
+        expect(mapInstrument('   ').instrument, isNull);
+      });
+
+      test('does not change the position label', () {
+        expect(mapInstrument('VIOLINO').position, 'Ensaio');
+      });
+    });
+
     test('maps a list of dtos preserving order', () {
       const dtos = [
         StudentSummaryDto(

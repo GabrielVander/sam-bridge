@@ -8,7 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'roster_view.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `from`, `from`
 
 @freezed
 sealed class RetrieveAllAvailableStudentsOutcome
@@ -56,17 +56,23 @@ class StudentSummaryDto {
   final String name;
   final StudentPositionDto position;
   final String location;
+  final String? instrumentName;
 
   const StudentSummaryDto({
     required this.id,
     required this.name,
     required this.position,
     required this.location,
+    this.instrumentName,
   });
 
   @override
   int get hashCode =>
-      id.hashCode ^ name.hashCode ^ position.hashCode ^ location.hashCode;
+      id.hashCode ^
+      name.hashCode ^
+      position.hashCode ^
+      location.hashCode ^
+      instrumentName.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -76,5 +82,6 @@ class StudentSummaryDto {
           id == other.id &&
           name == other.name &&
           position == other.position &&
-          location == other.location;
+          location == other.location &&
+          instrumentName == other.instrumentName;
 }

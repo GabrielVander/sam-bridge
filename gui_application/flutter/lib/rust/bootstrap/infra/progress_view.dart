@@ -8,7 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'progress_view.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`
 
 @freezed
 sealed class AssessStudentProgressOutcome with _$AssessStudentProgressOutcome {
@@ -17,13 +17,8 @@ sealed class AssessStudentProgressOutcome with _$AssessStudentProgressOutcome {
   const factory AssessStudentProgressOutcome.success(
     ProgressAssessmentDto field0,
   ) = AssessStudentProgressOutcome_Success;
-
-  /// The student is a musician but SAM has them marked "A DEFINIR"
-  /// (instrument not yet assigned) - there's nothing to assess against.
   const factory AssessStudentProgressOutcome.noInstrumentAssigned() =
       AssessStudentProgressOutcome_NoInstrumentAssigned;
-
-  /// SAM's raw level string didn't parse into a known `MusicianLevel`.
   const factory AssessStudentProgressOutcome.unknownLevel(String field0) =
       AssessStudentProgressOutcome_UnknownLevel;
   const factory AssessStudentProgressOutcome.failure(String field0) =
@@ -31,7 +26,6 @@ sealed class AssessStudentProgressOutcome with _$AssessStudentProgressOutcome {
 }
 
 class CheckpointStatusDto {
-  /// `MusicianLevel::name()`, round-trips through `parse_named`.
   final String level;
   final bool achieved;
   final bool readyToAdvance;
@@ -68,9 +62,6 @@ class ProgressAssessmentDto {
   final double methodRelativePercent;
   final double combinedPercent;
   final double overallCheckpointPercent;
-
-  /// `MusicianLevel::name()` of the next unmet checkpoint, or `None` when
-  /// every checkpoint is already achieved.
   final String? nextLevel;
 
   const ProgressAssessmentDto({

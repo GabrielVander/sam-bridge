@@ -90,6 +90,25 @@ fn student_without_an_assigned_instrument_has_none() {
 }
 
 #[test]
+fn student_with_a_blank_instrument_column_has_none() {
+    smol::block_on(async {
+        let mock_server: MockServer = MockServer::start().await;
+        mount_listing(
+            &mock_server,
+            r#"["1","PEDRO ÁLVARES CABRAL","SOMEWHERE","MÚSICO","  ","CANDIDATO(A)","1","0"]"#,
+        )
+        .await;
+
+        let gateway: MusicianProfileGatewaySamImpl =
+            build_gateway(&mock_server).expect("client should be built");
+
+        let profile: MusicianProfile = gateway.get_by_id("1").await.expect("should succeed");
+
+        assert_eq!(profile.instrument, None);
+    });
+}
+
+#[test]
 fn unknown_id_is_not_found() {
     smol::block_on(async {
         let mock_server: MockServer = MockServer::start().await;

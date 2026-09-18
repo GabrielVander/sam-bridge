@@ -9,6 +9,7 @@ pub struct StudentSummaryDto {
     pub name: String,
     pub position: StudentPositionDto,
     pub location: String,
+    pub instrument_name: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -30,12 +31,26 @@ pub enum StudentPositionDto {
 
 impl From<Student> for StudentSummaryDto {
     fn from(student: Student) -> Self {
+        let instrument_name: Option<String> = instrument_name(&student.position);
+
         Self {
             id: student.id,
             name: student.name,
             position: StudentPositionDto::from(student.position),
             location: student.location,
+            instrument_name,
         }
+    }
+}
+
+fn instrument_name(position: &StudentPosition) -> Option<String> {
+    match position {
+        StudentPosition::Musician {
+            instrument_name, ..
+        } => instrument_name.clone(),
+        StudentPosition::Organist { .. }
+        | StudentPosition::Secretary { .. }
+        | StudentPosition::Unknown(_) => None,
     }
 }
 
@@ -92,12 +107,51 @@ impl From<SecretaryType> for StudentPositionDto {
 #[cfg(test)]
 mod tests {
     use crate::domain::entities::{
-        MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
+        Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
     };
 
     use super::{StudentPositionDto, StudentSummaryDto};
 
     use pretty_assertions::assert_eq;
+
+    #[test]
+    fn carries_the_instrument_name_of_musicians() {
+        let input: Student = student(
+            "Musician - Saxophone",
+            StudentPosition::Musician {
+                level: MusicianLevel::Practice,
+                instrument: Some(Instrument::Saxophone),
+                instrument_name: Some("SAXOFONE TENOR".to_owned()),
+            },
+        );
+        let expected: StudentSummaryDto = StudentSummaryDto {
+            instrument_name: Some("SAXOFONE TENOR".to_owned()),
+            ..student_summary("Musician - Saxophone", StudentPositionDto::Practice)
+        };
+
+        let actual: StudentSummaryDto = StudentSummaryDto::from(input);
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn musicians_without_an_instrument_have_no_instrument_name() {
+        let input: Student = student(
+            "Musician - Nothing assigned",
+            StudentPosition::Musician {
+                level: MusicianLevel::Candidate,
+                instrument: None,
+                instrument_name: None,
+            },
+        );
+        let expected: StudentSummaryDto =
+            student_summary("Musician - Nothing assigned", StudentPositionDto::Candidate);
+
+        let actual: StudentSummaryDto = StudentSummaryDto::from(input);
+
+        assert_eq!(actual.instrument_name, None);
+        assert_eq!(actual, expected);
+    }
 
     #[test]
     fn maps_all_musician_levels() {
@@ -146,6 +200,7 @@ mod tests {
                 StudentPosition::Musician {
                     level: MusicianLevel::Candidate,
                     instrument: None,
+                    instrument_name: None,
                 },
             ),
             student(
@@ -153,6 +208,7 @@ mod tests {
                 StudentPosition::Musician {
                     level: MusicianLevel::Practice,
                     instrument: None,
+                    instrument_name: None,
                 },
             ),
             student(
@@ -160,6 +216,7 @@ mod tests {
                 StudentPosition::Musician {
                     level: MusicianLevel::YouthService,
                     instrument: None,
+                    instrument_name: None,
                 },
             ),
             student(
@@ -167,6 +224,7 @@ mod tests {
                 StudentPosition::Musician {
                     level: MusicianLevel::OfficialService,
                     instrument: None,
+                    instrument_name: None,
                 },
             ),
             student(
@@ -174,6 +232,7 @@ mod tests {
                 StudentPosition::Musician {
                     level: MusicianLevel::Officialized,
                     instrument: None,
+                    instrument_name: None,
                 },
             ),
             student(
@@ -181,6 +240,7 @@ mod tests {
                 StudentPosition::Musician {
                     level: MusicianLevel::Unknown("Strawberry".to_string()),
                     instrument: None,
+                    instrument_name: None,
                 },
             ),
             student(
@@ -188,6 +248,7 @@ mod tests {
                 StudentPosition::Musician {
                     level: MusicianLevel::Unknown("Banana".to_string()),
                     instrument: None,
+                    instrument_name: None,
                 },
             ),
         ]
@@ -373,6 +434,7 @@ mod tests {
             name: format!("Student {id}"),
             position,
             location: "Location".to_owned(),
+            instrument_name: None,
         }
     }
 }

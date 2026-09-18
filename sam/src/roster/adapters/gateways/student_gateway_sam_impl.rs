@@ -73,10 +73,15 @@ fn clean_location(raw: &str) -> String {
 
 fn parse_position(role: &str, level: &str, instrument: &str) -> StudentPosition {
     match role {
-        "MÚSICO" => StudentPosition::Musician {
-            level: parse_musician_level(level),
-            instrument: parse_instrument(instrument),
-        },
+        "MÚSICO" => {
+            let (instrument, instrument_name) = parse_musician_instrument(instrument);
+
+            StudentPosition::Musician {
+                level: parse_musician_level(level),
+                instrument,
+                instrument_name,
+            }
+        }
         "ORGANISTA" => StudentPosition::Organist {
             level: parse_organist_level(level),
         },
@@ -108,9 +113,17 @@ fn parse_organist_level(level: &str) -> OrganistLevel {
     }
 }
 
+/// Both values come from the same trimmed text, so they are always both present or both absent.
+fn parse_musician_instrument(raw: &str) -> (Option<Instrument>, Option<String>) {
+    let instrument: Option<Instrument> = parse_instrument(raw);
+    let instrument_name: Option<String> = instrument.as_ref().map(|_| raw.trim().to_owned());
+
+    (instrument, instrument_name)
+}
+
 fn parse_instrument(instrument: &str) -> Option<Instrument> {
-    match instrument {
-        "A DEFINIR" => None,
+    match instrument.trim() {
+        "" | "A DEFINIR" => None,
         "VIOLINO" => Some(Instrument::Violin),
         "VIOLA" => Some(Instrument::Viola),
         "VIOLONCELO" => Some(Instrument::Cello),
@@ -162,6 +175,7 @@ mod tests {
             StudentPosition::Musician {
                 level: MusicianLevel::Candidate,
                 instrument: None,
+                instrument_name: None,
             }
         );
     }
@@ -173,8 +187,60 @@ mod tests {
             StudentPosition::Musician {
                 level: MusicianLevel::YouthService,
                 instrument: Some(Instrument::Violin),
+                instrument_name: Some("VIOLINO".to_owned()),
             }
         );
+    }
+
+    #[test]
+    fn musician_keeps_the_exact_site_instrument_text_as_its_name() {
+        assert_eq!(
+            parse_position("MÚSICO", "RJM", "SAXOFONE TENOR"),
+            StudentPosition::Musician {
+                level: MusicianLevel::YouthService,
+                instrument: Some(Instrument::Saxophone),
+                instrument_name: Some("SAXOFONE TENOR".to_owned()),
+            }
+        );
+    }
+
+    #[test]
+    fn musician_with_an_unrecognized_instrument_keeps_its_text_as_name() {
+        assert_eq!(
+            parse_position("MÚSICO", "ENSAIO", "BANDOLIM"),
+            StudentPosition::Musician {
+                level: MusicianLevel::Practice,
+                instrument: Some(Instrument::Unknown("BANDOLIM".to_owned())),
+                instrument_name: Some("BANDOLIM".to_owned()),
+            }
+        );
+    }
+
+    #[test]
+    fn instrument_name_is_trimmed() {
+        assert_eq!(
+            parse_position("MÚSICO", "RJM", "  OBOÉ \t"),
+            StudentPosition::Musician {
+                level: MusicianLevel::YouthService,
+                instrument: Some(Instrument::Oboe),
+                instrument_name: Some("OBOÉ".to_owned()),
+            }
+        );
+    }
+
+    #[test]
+    fn musician_without_an_assigned_instrument_has_no_instrument_and_no_name() {
+        for raw in ["A DEFINIR", " A DEFINIR ", "", "   "] {
+            assert_eq!(
+                parse_position("MÚSICO", "CANDIDATO(A)", raw),
+                StudentPosition::Musician {
+                    level: MusicianLevel::Candidate,
+                    instrument: None,
+                    instrument_name: None,
+                },
+                "instrument column {raw:?}"
+            );
+        }
     }
 
     #[test]
@@ -184,6 +250,26 @@ mod tests {
             StudentPosition::Organist {
                 level: OrganistLevel::YouthServiceHalfHour,
             }
+        );
+    }
+
+    #[test]
+    fn positions_other_than_musician_ignore_the_instrument_column() {
+        assert_eq!(
+            parse_position("ORGANISTA", "RJM", "VIOLINO"),
+            StudentPosition::Organist {
+                level: OrganistLevel::YouthService,
+            }
+        );
+        assert_eq!(
+            parse_position("SECRETÁRIO DO GEM", "RJM", "VIOLINO"),
+            StudentPosition::Secretary {
+                r#type: SecretaryType::Gem,
+            }
+        );
+        assert_eq!(
+            parse_position("BATERISTA", "RJM", "VIOLINO"),
+            StudentPosition::Unknown("BATERISTA".to_owned())
         );
     }
 
@@ -232,6 +318,12 @@ mod tests {
     #[test]
     fn unassigned_instrument_is_none() {
         assert_eq!(parse_instrument("A DEFINIR"), None);
+    }
+
+    #[test]
+    fn blank_instrument_is_none() {
+        assert_eq!(parse_instrument(""), None);
+        assert_eq!(parse_instrument("   "), None);
     }
 
     #[test]

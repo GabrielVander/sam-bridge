@@ -30,7 +30,9 @@ impl MusicianProfileGateway for MusicianProfileGatewaySamImpl {
             .ok_or(MusicianProfileGatewayError::NotFound)?;
 
         match Student::from(sam_student).position {
-            StudentPosition::Musician { level, instrument } => {
+            StudentPosition::Musician {
+                level, instrument, ..
+            } => {
                 Ok(MusicianProfile { level, instrument })
             }
             StudentPosition::Organist { .. }

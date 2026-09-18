@@ -677,11 +677,13 @@ impl SseDecode for crate::bootstrap::infra::roster_view::StudentSummaryDto {
         let mut var_position =
             <crate::bootstrap::infra::roster_view::StudentPositionDto>::sse_decode(deserializer);
         let mut var_location = <String>::sse_decode(deserializer);
+        let mut var_instrumentName = <Option<String>>::sse_decode(deserializer);
         return crate::bootstrap::infra::roster_view::StudentSummaryDto {
             id: var_id,
             name: var_name,
             position: var_position,
             location: var_location,
+            instrument_name: var_instrumentName,
         };
     }
 }
@@ -1097,6 +1099,7 @@ impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::roster_view::Stu
             self.name.into_into_dart().into_dart(),
             self.position.into_into_dart().into_dart(),
             self.location.into_into_dart().into_dart(),
+            self.instrument_name.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -1458,6 +1461,7 @@ impl SseEncode for crate::bootstrap::infra::roster_view::StudentSummaryDto {
             serializer,
         );
         <String>::sse_encode(self.location, serializer);
+        <Option<String>>::sse_encode(self.instrument_name, serializer);
     }
 }
 

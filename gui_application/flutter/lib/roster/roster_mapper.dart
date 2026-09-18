@@ -10,7 +10,15 @@ class RosterMapper {
     name: dto.name,
     location: dto.location,
     position: _positionLabel(dto.position),
+    instrument: _instrumentLabel(dto.instrumentName),
   );
+
+  static String? _instrumentLabel(String? name) {
+    final trimmed = name?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
+    return trimmed.substring(0, 1).toUpperCase() +
+        trimmed.substring(1).toLowerCase();
+  }
 
   static String _positionLabel(StudentPositionDto position) =>
       switch (position) {

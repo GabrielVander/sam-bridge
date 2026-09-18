@@ -360,31 +360,17 @@ final class _StudentsList extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        if (student.instrument case final instrument?) ...[
+                          const SizedBox(height: 2),
+                          _IconLine(
+                            icon: Icons.music_note_outlined,
+                            text: instrument,
+                          ),
+                        ],
                         const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.place_outlined,
-                              size: 14,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                student.location,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                    ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                        _IconLine(
+                          icon: Icons.place_outlined,
+                          text: student.location,
                         ),
                       ],
                     ),
@@ -399,6 +385,35 @@ final class _StudentsList extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+final class _IconLine extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _IconLine({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+
+    return Row(
+      children: [
+        ExcludeSemantics(child: Icon(icon, size: 14, color: color)),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            text,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: color),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

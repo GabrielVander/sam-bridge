@@ -193,7 +193,7 @@ impl From<LoginUseCaseError> for LoginResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::infra::StudentLessonsDto;
+    use crate::infra::{StudentLessonsDto, StudentPositionDto};
     use async_trait::async_trait;
     use authentication::application::gateways::{
         AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
@@ -317,6 +317,7 @@ mod tests {
             position: StudentPosition::Musician {
                 level: MusicianLevel::YouthService,
                 instrument: Some(Instrument::Violin),
+                instrument_name: Some("VIOLINO".to_owned()),
             },
             location: "Somewhere".to_owned(),
             region: Region::Other("Somewhere".to_owned()),
@@ -412,9 +413,13 @@ mod tests {
 
         assert_eq!(
             result,
-            RetrieveAllAvailableStudentsOutcome::Success(vec![StudentSummaryDto::from(
-                student::application::dto::StudentSummaryDto::from(student())
-            )])
+            RetrieveAllAvailableStudentsOutcome::Success(vec![StudentSummaryDto {
+                id: "1".to_owned(),
+                name: "Someone".to_owned(),
+                position: StudentPositionDto::YouthService,
+                location: "Somewhere".to_owned(),
+                instrument_name: Some("VIOLINO".to_owned()),
+            }])
         );
     }
 

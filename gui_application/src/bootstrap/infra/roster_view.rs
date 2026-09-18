@@ -6,6 +6,7 @@ pub struct StudentSummaryDto {
     pub name: String,
     pub position: StudentPositionDto,
     pub location: String,
+    pub instrument_name: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -38,6 +39,7 @@ impl From<student_dto::StudentSummaryDto> for StudentSummaryDto {
             name: dto.name,
             position: dto.position.into(),
             location: dto.location,
+            instrument_name: dto.instrument_name,
         }
     }
 }
@@ -139,6 +141,7 @@ mod tests {
             name: "Someone".to_owned(),
             position: student_dto::StudentPositionDto::YouthService,
             location: "Somewhere".to_owned(),
+            instrument_name: Some("SAXOFONE TENOR".to_owned()),
         };
 
         let mapped = StudentSummaryDto::from(dto);
@@ -150,7 +153,21 @@ mod tests {
                 name: "Someone".to_owned(),
                 position: StudentPositionDto::YouthService,
                 location: "Somewhere".to_owned(),
+                instrument_name: Some("SAXOFONE TENOR".to_owned()),
             }
         );
+    }
+
+    #[test]
+    fn missing_instrument_name_stays_missing() {
+        let dto = student_dto::StudentSummaryDto {
+            id: "2".to_owned(),
+            name: "Organist".to_owned(),
+            position: student_dto::StudentPositionDto::Practice,
+            location: "Somewhere".to_owned(),
+            instrument_name: None,
+        };
+
+        assert_eq!(StudentSummaryDto::from(dto).instrument_name, None);
     }
 }
