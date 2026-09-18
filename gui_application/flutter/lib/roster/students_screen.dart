@@ -319,7 +319,12 @@ final class _StudentsList extends StatelessWidget {
         return Card(
           margin: EdgeInsets.zero,
           child: InkWell(
-            onTap: hasId ? () => context.go('/students/${student.id}') : null,
+            onTap: hasId
+                ? () => context.go(
+                    '/students/${student.id}',
+                    extra: student.name,
+                  )
+                : null,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(

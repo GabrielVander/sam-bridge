@@ -56,6 +56,7 @@ GoRouter buildRouter({
                 path: ':studentId',
                 builder: (BuildContext _, GoRouterState state) => StudentScreen(
                   studentId: state.pathParameters['studentId']!,
+                  studentName: state.extra as String?,
                 ),
               ),
             ],

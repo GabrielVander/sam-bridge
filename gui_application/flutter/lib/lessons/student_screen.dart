@@ -9,8 +9,9 @@ import 'package:flutter_application/presentation_models.dart';
 
 class StudentScreen extends StatefulWidget {
   final String studentId;
+  final String? studentName;
 
-  const StudentScreen({super.key, required this.studentId});
+  const StudentScreen({super.key, required this.studentId, this.studentName});
 
   @override
   State<StudentScreen> createState() => _StudentScreenState();
@@ -31,7 +32,7 @@ final class _StudentScreenState extends State<StudentScreen> {
     return Scaffold(
       body: Column(
         children: [
-          const BackBar(),
+          BackBar(studentName: widget.studentName),
           const Divider(height: 1),
           Expanded(
             child: BlocSignalBuilder<LessonsCubitSignal, LessonsState>(
