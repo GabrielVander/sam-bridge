@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::time::Duration;
 
 use authentication::application::use_cases::{
     LoginAndRememberCredentialsUseCase, LoginUseCaseError, RestoreSessionResult,
@@ -7,7 +8,7 @@ use authentication::application::use_cases::{
 use credential_store::FileCredentialStore;
 use sam::{
     authentication::adapters::gateways::CredentialGatewaySamImpl,
-    client::SamClientImpl,
+    client::{CacheTtl, SamClient, SamClientCacheDecorator, SamClientImpl, SystemClock},
     http::SamOperations,
     lessons::adapters::gateways::{MusicianProfileGatewaySamImpl, StudentLessonsGatewaySamImpl},
     roster::adapters::gateways::StudentGatewaySamImpl,
@@ -24,6 +25,9 @@ use crate::infra::{
     RetrieveAllAvailableStudentsOutcome, RetrieveStudentLessonsOutcome, StudentSummaryDto,
 };
 
+const STUDENTS_CACHE_TTL: Duration = Duration::from_secs(300);
+const LESSONS_CACHE_TTL: Duration = Duration::from_secs(60);
+
 pub struct ApplicationFacade {
     login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase,
     restore_session_use_case: RestoreSessionUseCase,
@@ -34,6 +38,13 @@ pub struct ApplicationFacade {
 
 impl ApplicationFacade {
     pub(crate) fn new(config: &Config) -> Result<Self, String> {
+        Self::with_credential_store(config, Arc::new(FileCredentialStore::new()))
+    }
+
+    fn with_credential_store(
+        config: &Config,
+        file_credential_store: Arc<FileCredentialStore>,
+    ) -> Result<Self, String> {
         let reqwest_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
             .redirect(reqwest::redirect::Policy::none())
             .cookie_store(true)
@@ -49,12 +60,17 @@ impl ApplicationFacade {
             &config.sam_student_lessons_endpoint,
         );
 
-        let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
+        let sam_client: Arc<dyn SamClient + Send + Sync> = Arc::new(SamClientCacheDecorator::new(
+            Arc::new(SamClientImpl::new(sam_operations)),
+            Arc::new(SystemClock),
+            CacheTtl {
+                students: STUDENTS_CACHE_TTL,
+                lessons: LESSONS_CACHE_TTL,
+            },
+        ));
 
         let sam_credential_gateway: Arc<CredentialGatewaySamImpl> =
             Arc::new(CredentialGatewaySamImpl::new(sam_client.clone()));
-
-        let file_credential_store: Arc<FileCredentialStore> = Arc::new(FileCredentialStore::new());
 
         let login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase =
             LoginAndRememberCredentialsUseCase::new(
@@ -205,106 +221,6 @@ mod tests {
         Instrument, MusicianLevel, MusicianProfile, Region, Student, StudentLessons,
         StudentPosition,
     };
-
-    struct FakeCredentialGateway {
-        result: Result<AuthorizationResult, CredentialGatewayError>,
-    }
-    impl CredentialGateway for FakeCredentialGateway {
-        fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, CredentialGatewayError> {
-            self.result.clone()
-        }
-    }
-
-    struct FakeStudentGateway {
-        result: Result<Vec<Student>, StudentGatewayError>,
-    }
-    impl StudentGateway for FakeStudentGateway {
-        fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
-            self.result.clone()
-        }
-    }
-
-    struct FakeMusicianProfileGateway {
-        result: Result<MusicianProfile, MusicianProfileGatewayError>,
-    }
-    impl MusicianProfileGateway for FakeMusicianProfileGateway {
-        fn get_by_id(&self, _id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
-            self.result.clone()
-        }
-    }
-
-    struct FakeStudentLessonsGateway {
-        result: Result<StudentLessons, StudentLessonsGatewayError>,
-    }
-    impl StudentLessonsGateway for FakeStudentLessonsGateway {
-        fn get_all_for_student_with_id(
-            &self,
-            _student_id: &str,
-        ) -> Result<StudentLessons, StudentLessonsGatewayError> {
-            self.result.clone()
-        }
-    }
-
-    fn facade(
-        credential_gateway_result: Result<AuthorizationResult, CredentialGatewayError>,
-        stored_credential: Option<(String, String)>,
-        students_result: Result<Vec<Student>, StudentGatewayError>,
-        musician_profile_result: Result<MusicianProfile, MusicianProfileGatewayError>,
-        student_lessons_result: Result<StudentLessons, StudentLessonsGatewayError>,
-    ) -> (ApplicationFacade, tempfile::TempDir) {
-        let credential_gateway: Arc<dyn CredentialGateway + Send + Sync> =
-            Arc::new(FakeCredentialGateway {
-                result: credential_gateway_result,
-            });
-
-        let credential_dir = tempfile::tempdir().expect("tempdir");
-        let credential_store: Arc<FileCredentialStore> = Arc::new(FileCredentialStore::with_dir(
-            &credential_dir.path().to_string_lossy(),
-        ));
-        if let Some((email, password)) = stored_credential {
-            credential_store
-                .save(&Credential::new(Email(email), Password(password)))
-                .expect("seeding the credential store should succeed");
-        }
-
-        let facade = ApplicationFacade {
-            login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase::new(
-                credential_gateway.clone(),
-                credential_store.clone(),
-            ),
-            restore_session_use_case: RestoreSessionUseCase::new(
-                credential_store,
-                credential_gateway,
-            ),
-            retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase::new(
-                Arc::new(FakeStudentGateway {
-                    result: students_result,
-                }),
-            ),
-            sam_student_lessons_gateway: Arc::new(FakeStudentLessonsGateway {
-                result: student_lessons_result,
-            }),
-            sam_musician_profile_gateway: Arc::new(FakeMusicianProfileGateway {
-                result: musician_profile_result,
-            }),
-        };
-
-        (facade, credential_dir)
-    }
-
-    fn student() -> Student {
-        Student {
-            id: "1".to_owned(),
-            name: "Someone".to_owned(),
-            position: StudentPosition::Musician {
-                level: MusicianLevel::YouthService,
-                instrument: Some(Instrument::Violin),
-                instrument_name: Some("VIOLINO".to_owned()),
-            },
-            location: "Somewhere".to_owned(),
-            region: Region::Other("Somewhere".to_owned()),
-        }
-    }
 
     #[test]
     fn login_success_is_reported() {
@@ -529,5 +445,162 @@ mod tests {
         let result = facade.assess_student_progress("1".to_owned());
 
         assert!(matches!(result, AssessStudentProgressOutcome::Failure(_)));
+    }
+
+    #[test]
+    fn repeated_reads_of_the_students_listing_hit_the_site_once() {
+        use crate::infra::Config;
+        use wiremock::matchers::{method, path};
+        use wiremock::{Mock, MockServer, ResponseTemplate};
+
+        smol::block_on(async {
+            let mock_server: MockServer = MockServer::start().await;
+
+            Mock::given(method("GET"))
+                .and(path("/painel"))
+                .respond_with(ResponseTemplate::new(200))
+                .mount(&mock_server)
+                .await;
+
+            Mock::given(method("GET"))
+                .and(path("/alunos/listagem"))
+                .respond_with(
+                    ResponseTemplate::new(200)
+                        .set_body_string(
+                            r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#,
+                        )
+                        .insert_header("Content-Type", "application/json"),
+                )
+                .mount(&mock_server)
+                .await;
+
+            let config: Config = Config {
+                sam_client_base_url: mock_server.uri(),
+                sam_auth_endpoint: "autenticar".to_owned(),
+                sam_dashboard_endpoint: "painel".to_owned(),
+                sam_students_listing_endpoint: "alunos/listagem".to_owned(),
+                sam_student_lessons_endpoint: "licoes/index".to_owned(),
+            };
+            let credential_dir = tempfile::tempdir().expect("tempdir");
+            let facade: ApplicationFacade = ApplicationFacade::with_credential_store(
+                &config,
+                Arc::new(FileCredentialStore::with_dir(
+                    &credential_dir.path().to_string_lossy(),
+                )),
+            )
+            .expect("facade should be built");
+
+            let _ = facade.retrieve_all_available_students();
+            let _ = facade.retrieve_all_available_students();
+
+            let listing_requests: usize = mock_server
+                .received_requests()
+                .await
+                .expect("requests should have been recorded")
+                .iter()
+                .filter(|request| request.url.path() == "/alunos/listagem")
+                .count();
+            assert_eq!(listing_requests, 1);
+        });
+    }
+
+    struct FakeCredentialGateway {
+        result: Result<AuthorizationResult, CredentialGatewayError>,
+    }
+    impl CredentialGateway for FakeCredentialGateway {
+        fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, CredentialGatewayError> {
+            self.result.clone()
+        }
+    }
+
+    struct FakeStudentGateway {
+        result: Result<Vec<Student>, StudentGatewayError>,
+    }
+    impl StudentGateway for FakeStudentGateway {
+        fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
+            self.result.clone()
+        }
+    }
+
+    struct FakeMusicianProfileGateway {
+        result: Result<MusicianProfile, MusicianProfileGatewayError>,
+    }
+    impl MusicianProfileGateway for FakeMusicianProfileGateway {
+        fn get_by_id(&self, _id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+            self.result.clone()
+        }
+    }
+
+    struct FakeStudentLessonsGateway {
+        result: Result<StudentLessons, StudentLessonsGatewayError>,
+    }
+    impl StudentLessonsGateway for FakeStudentLessonsGateway {
+        fn get_all_for_student_with_id(
+            &self,
+            _student_id: &str,
+        ) -> Result<StudentLessons, StudentLessonsGatewayError> {
+            self.result.clone()
+        }
+    }
+
+    fn facade(
+        credential_gateway_result: Result<AuthorizationResult, CredentialGatewayError>,
+        stored_credential: Option<(String, String)>,
+        students_result: Result<Vec<Student>, StudentGatewayError>,
+        musician_profile_result: Result<MusicianProfile, MusicianProfileGatewayError>,
+        student_lessons_result: Result<StudentLessons, StudentLessonsGatewayError>,
+    ) -> (ApplicationFacade, tempfile::TempDir) {
+        let credential_gateway: Arc<dyn CredentialGateway + Send + Sync> =
+            Arc::new(FakeCredentialGateway {
+                result: credential_gateway_result,
+            });
+
+        let credential_dir = tempfile::tempdir().expect("tempdir");
+        let credential_store: Arc<FileCredentialStore> = Arc::new(FileCredentialStore::with_dir(
+            &credential_dir.path().to_string_lossy(),
+        ));
+        if let Some((email, password)) = stored_credential {
+            credential_store
+                .save(&Credential::new(Email(email), Password(password)))
+                .expect("seeding the credential store should succeed");
+        }
+
+        let facade = ApplicationFacade {
+            login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase::new(
+                credential_gateway.clone(),
+                credential_store.clone(),
+            ),
+            restore_session_use_case: RestoreSessionUseCase::new(
+                credential_store,
+                credential_gateway,
+            ),
+            retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase::new(
+                Arc::new(FakeStudentGateway {
+                    result: students_result,
+                }),
+            ),
+            sam_student_lessons_gateway: Arc::new(FakeStudentLessonsGateway {
+                result: student_lessons_result,
+            }),
+            sam_musician_profile_gateway: Arc::new(FakeMusicianProfileGateway {
+                result: musician_profile_result,
+            }),
+        };
+
+        (facade, credential_dir)
+    }
+
+    fn student() -> Student {
+        Student {
+            id: "1".to_owned(),
+            name: "Someone".to_owned(),
+            position: StudentPosition::Musician {
+                level: MusicianLevel::YouthService,
+                instrument: Some(Instrument::Violin),
+                instrument_name: Some("VIOLINO".to_owned()),
+            },
+            location: "Somewhere".to_owned(),
+            region: Region::Other("Somewhere".to_owned()),
+        }
     }
 }

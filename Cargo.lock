@@ -1127,8 +1127,10 @@ dependencies = [
  "flutter_rust_bridge",
  "reqwest",
  "sam",
+ "smol",
  "student",
  "tempfile",
+ "wiremock",
 ]
 
 [[package]]

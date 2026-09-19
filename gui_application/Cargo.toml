@@ -16,6 +16,8 @@ anyhow = { workspace = true }
 reqwest = { workspace = true }
 
 [dev-dependencies]
+smol = { workspace = true }
+wiremock = "0.6.5"
 chrono = { workspace = true }
 tempfile = "3"
 
