@@ -7,19 +7,19 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-authentication = { path = "../authentication" }
-credential_store = { path = "../credential_store" }
-sam = { path = "../sam" }
-student = { path = "../student" }
-flutter_rust_bridge = "=2.13.0-beta.2"
+authentication = { workspace = true }
+credential_store = { workspace = true }
+sam = { workspace = true }
+student = { workspace = true }
+flutter_rust_bridge = { workspace = true }
 anyhow = { workspace = true }
 reqwest = { workspace = true }
 
 [dev-dependencies]
 smol = { workspace = true }
-wiremock = "0.6.5"
+wiremock = { workspace = true }
 chrono = { workspace = true }
-tempfile = "3"
+tempfile = { workspace = true }
 
 [lints]
 workspace = true
