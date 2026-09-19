@@ -64,7 +64,7 @@ impl FileCredentialStore {
         }
 
         let mut key = [0u8; 32];
-        getrandom::getrandom(&mut key)
+        getrandom::fill(&mut key)
             .map_err(|e| anyhow::anyhow!("Failed to generate encryption key: {e}"))?;
 
         let _ = std::fs::create_dir_all(&self.dir);
