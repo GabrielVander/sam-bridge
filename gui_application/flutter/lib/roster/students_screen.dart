@@ -4,6 +4,7 @@ import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
+import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:go_router/go_router.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -205,27 +206,9 @@ final class _StudentsScreenState extends State<StudentsScreen> {
               ),
             ],
           ),
-        StudentsFailure(:final message) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Text(message, textAlign: TextAlign.center),
-              ),
-              const SizedBox(height: 16),
-              FilledButton.tonal(
-                onPressed: () => context.read<StudentsPresenter>().load(),
-                child: const Text('Tentar novamente'),
-              ),
-            ],
-          ),
+        StudentsFailure(:final report) => ErrorPanel(
+          report: report,
+          onRetry: () => context.read<StudentsPresenter>().load(),
         ),
         _ => const SizedBox.shrink(),
       },
@@ -320,10 +303,8 @@ final class _StudentsList extends StatelessWidget {
           margin: EdgeInsets.zero,
           child: InkWell(
             onTap: hasId
-                ? () => context.go(
-                    '/students/${student.id}',
-                    extra: student.name,
-                  )
+                ? () =>
+                      context.go('/students/${student.id}', extra: student.name)
                 : null,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

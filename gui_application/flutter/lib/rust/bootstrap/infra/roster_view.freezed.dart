@@ -119,7 +119,7 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<StudentSummaryDto> field0)?  success,TResult Function( String field0)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<StudentSummaryDto> field0)?  success,TResult Function( ErrorReportDto field0)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case RetrieveAllAvailableStudentsOutcome_Success() when success != null:
 return success(_that.field0);case RetrieveAllAvailableStudentsOutcome_Failure() when failure != null:
@@ -141,7 +141,7 @@ return failure(_that.field0);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<StudentSummaryDto> field0)  success,required TResult Function( String field0)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<StudentSummaryDto> field0)  success,required TResult Function( ErrorReportDto field0)  failure,}) {final _that = this;
 switch (_that) {
 case RetrieveAllAvailableStudentsOutcome_Success():
 return success(_that.field0);case RetrieveAllAvailableStudentsOutcome_Failure():
@@ -159,7 +159,7 @@ return failure(_that.field0);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<StudentSummaryDto> field0)?  success,TResult? Function( String field0)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<StudentSummaryDto> field0)?  success,TResult? Function( ErrorReportDto field0)?  failure,}) {final _that = this;
 switch (_that) {
 case RetrieveAllAvailableStudentsOutcome_Success() when success != null:
 return success(_that.field0);case RetrieveAllAvailableStudentsOutcome_Failure() when failure != null:
@@ -250,7 +250,7 @@ class RetrieveAllAvailableStudentsOutcome_Failure extends RetrieveAllAvailableSt
   const RetrieveAllAvailableStudentsOutcome_Failure(this.field0): super._();
   
 
-@override final  String field0;
+@override final  ErrorReportDto field0;
 
 /// Create a copy of RetrieveAllAvailableStudentsOutcome
 /// with the given fields replaced by the non-null parameter values.
@@ -282,7 +282,7 @@ abstract mixin class $RetrieveAllAvailableStudentsOutcome_FailureCopyWith<$Res> 
   factory $RetrieveAllAvailableStudentsOutcome_FailureCopyWith(RetrieveAllAvailableStudentsOutcome_Failure value, $Res Function(RetrieveAllAvailableStudentsOutcome_Failure) _then) = _$RetrieveAllAvailableStudentsOutcome_FailureCopyWithImpl;
 @useResult
 $Res call({
- String field0
+ ErrorReportDto field0
 });
 
 
@@ -302,7 +302,7 @@ class _$RetrieveAllAvailableStudentsOutcome_FailureCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
   return _then(RetrieveAllAvailableStudentsOutcome_Failure(
 null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
-as String,
+as ErrorReportDto,
   ));
 }
 

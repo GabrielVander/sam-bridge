@@ -1,5 +1,7 @@
 use student::domain::entities as student_entities;
 
+use crate::infra::ErrorReportDto;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RequirementStatusDto {
     pub msa_met: bool,
@@ -29,7 +31,8 @@ pub enum AssessStudentProgressOutcome {
     Success(ProgressAssessmentDto),
     NoInstrumentAssigned,
     UnknownLevel(String),
-    Failure(String),
+    NotAMusician,
+    Failure(ErrorReportDto),
 }
 
 impl From<student_entities::ProgressAssessment> for ProgressAssessmentDto {

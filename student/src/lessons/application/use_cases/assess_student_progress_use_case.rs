@@ -64,7 +64,15 @@ impl<'a, P: MusicianProfileGateway + ?Sized, L: StudentLessonsGateway + ?Sized>
 mod tests {
     use super::*;
     use crate::lessons::domain::entities::{Lesson, MusicianProfile, Range, StudentLessons};
+    use crate::shared::application::failure_kind::FailureKind;
     use crate::shared::domain::entities::{Instrument, MusicianLevel};
+
+    fn lessons_failure() -> StudentLessonsGatewayError {
+        StudentLessonsGatewayError::UnableToPerformOperation {
+            kind: FailureKind::Network,
+            details: "connection refused".to_owned(),
+        }
+    }
 
     struct FakeMusicianProfileGateway {
         profile: Result<MusicianProfile, MusicianProfileGatewayError>,
@@ -85,7 +93,7 @@ mod tests {
             _student_id: &str,
         ) -> Result<StudentLessons, StudentLessonsGatewayError> {
             if self.fail {
-                return Err(StudentLessonsGatewayError::UnableToPerformOperation);
+                return Err(lessons_failure());
             }
             Ok(self.bundle.clone())
         }
@@ -155,6 +163,26 @@ mod tests {
     }
 
     #[test]
+    fn propagates_profile_gateway_failures_with_their_kind_and_details() {
+        let failure = MusicianProfileGatewayError::UnableToPerformOperation {
+            kind: FailureKind::SessionExpired,
+            details: "Session expired".to_owned(),
+        };
+        let profiles = FakeMusicianProfileGateway {
+            profile: Err(failure.clone()),
+        };
+        let lessons = FakeStudentLessonsGateway {
+            bundle: StudentLessons::default(),
+            fail: false,
+        };
+        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+
+        let result = use_case.execute("500132");
+
+        assert_eq!(result, Err(AssessStudentProgressError::Profile(failure)));
+    }
+
+    #[test]
     fn student_with_no_instrument_assigned_is_reported_without_fetching_lessons() {
         let profiles = profile_gateway(MusicianLevel::Candidate, None);
         let lessons = FakeStudentLessonsGateway {
@@ -184,9 +212,7 @@ mod tests {
 
         assert_eq!(
             result,
-            Err(AssessStudentProgressError::Lessons(
-                StudentLessonsGatewayError::UnableToPerformOperation
-            ))
+            Err(AssessStudentProgressError::Lessons(lessons_failure()))
         );
     }
 

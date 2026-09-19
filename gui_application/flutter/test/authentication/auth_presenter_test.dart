@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/rust/bootstrap/infra/application.dart';
+import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 AuthPresenter buildPresenter({
@@ -15,7 +17,8 @@ AuthPresenter buildPresenter({
   return AuthPresenter(
     loginUseCase:
         loginUseCase ??
-        ({required email, required password}) async => LoginResult.successful,
+        ({required email, required password}) async =>
+            const LoginResult.successful(),
     restoreSessionUseCase:
         restoreSessionUseCase ?? () async => RestoreSessionOutcome.notAvailable,
   );
@@ -69,7 +72,7 @@ void main() {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async {
             called = true;
-            return LoginResult.successful;
+            return const LoginResult.successful();
           },
         );
 
@@ -83,7 +86,7 @@ void main() {
     test('submitLogin() transitions to Success on successful login', () async {
       final presenter = buildPresenter(
         loginUseCase: ({required email, required password}) async =>
-            LoginResult.successful,
+            const LoginResult.successful(),
       );
 
       await presenter.submitLogin('user@example.com', 'secret');
@@ -96,7 +99,7 @@ void main() {
       () async {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async =>
-              LoginResult.invalidEmailOrPassword,
+              const LoginResult.invalidEmailOrPassword(),
         );
 
         await presenter.submitLogin('user@example.com', 'wrong');
@@ -106,16 +109,62 @@ void main() {
     );
 
     test(
-      'submitLogin() transitions to Failure when authorization cannot be performed',
+      'submitLogin() transitions to Failure carrying the mapped error report',
       () async {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async =>
-              LoginResult.unableToPerformAuthorization,
+              const LoginResult.unableToPerformAuthorization(
+                ErrorReportDto(
+                  kind: ErrorKindDto.network,
+                  details: "Request failed for operation 'authentication'",
+                ),
+              ),
         );
 
         await presenter.submitLogin('user@example.com', 'secret');
 
-        expect(presenter.stateValue, isA<AuthFailure>());
+        final state = presenter.stateValue;
+        expect(state, isA<AuthFailure>());
+        expect(
+          (state as AuthFailure).report,
+          const ErrorReport(
+            userMessage:
+                'Não foi possível conectar ao SAM. '
+                'Verifique sua conexão com a internet e tente novamente.',
+            details: "Request failed for operation 'authentication'",
+          ),
+        );
+      },
+    );
+
+    test(
+      'submitLogin() reports a failure instead of hanging when the use case throws',
+      () async {
+        final presenter = buildPresenter(
+          loginUseCase: ({required email, required password}) async =>
+              throw StateError('bridge down'),
+        );
+
+        await presenter.submitLogin('user@example.com', 'secret');
+
+        final state = presenter.stateValue;
+        expect(state, isA<AuthFailure>());
+        final report = (state as AuthFailure).report;
+        expect(report.userMessage, 'Algo deu errado. Tente novamente.');
+        expect(report.details, contains('bridge down'));
+      },
+    );
+
+    test(
+      'restoreSession() falls back to the login form when the use case throws',
+      () async {
+        final presenter = buildPresenter(
+          restoreSessionUseCase: () async => throw StateError('bridge down'),
+        );
+
+        await presenter.restoreSession();
+
+        expect(presenter.stateValue, isA<AuthIdle>());
       },
     );
   });

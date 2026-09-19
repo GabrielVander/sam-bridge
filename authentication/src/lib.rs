@@ -11,6 +11,7 @@ pub mod application {
     pub mod gateways {
         pub use crate::login::application::gateways::*;
         pub use crate::remembered_credentials::application::gateways::*;
+        pub use crate::shared::application::failure_kind::FailureKind;
     }
 }
 

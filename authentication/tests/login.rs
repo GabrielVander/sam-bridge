@@ -1,5 +1,5 @@
 use authentication::application::gateways::{
-    AuthorizationResult, CredentialGateway, CredentialGatewayError,
+    AuthorizationResult, CredentialGateway, CredentialGatewayError, FailureKind,
 };
 use authentication::application::use_cases::{LoginCommand, LoginUseCase, LoginUseCaseError};
 use authentication::domain::entities::Credential;
@@ -39,9 +39,12 @@ fn login_unsuccessful() {
 }
 
 #[test]
-fn login_failure() {
+fn login_failure_carries_the_gateways_kind_and_details() {
     let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Err(
-        CredentialGatewayError::UnableToPerformOperation,
+        CredentialGatewayError::UnableToPerformOperation {
+            kind: FailureKind::Network,
+            details: "connection refused".to_owned(),
+        },
     )));
 
     let use_case: LoginUseCase = LoginUseCase::new(credential_gateway);
@@ -51,7 +54,13 @@ fn login_failure() {
         "secretpassword123".to_string(),
     ));
 
-    assert_eq!(result, Err(LoginUseCaseError::UnableToPerformAuthorization));
+    assert_eq!(
+        result,
+        Err(LoginUseCaseError::UnableToPerformAuthorization {
+            kind: FailureKind::Network,
+            details: "connection refused".to_owned(),
+        })
+    );
 }
 
 #[test]

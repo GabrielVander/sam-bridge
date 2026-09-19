@@ -4,12 +4,18 @@ use chrono::NaiveDate;
 use sam::client::{SamClient, SamClientImpl};
 use sam::http::SamOperations;
 use sam::lessons::adapters::gateways::StudentLessonsGatewaySamImpl;
-use student::application::gateways::StudentLessonsGateway;
+use student::application::gateways::{
+    FailureKind, StudentLessonsGateway, StudentLessonsGatewayError,
+};
 use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
+    build_gateway_for(&mock_server.uri())
+}
+
+fn build_gateway_for(base_url: &str) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
     let http_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .cookie_store(true)
@@ -17,7 +23,7 @@ fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImp
 
     let sam_operations: SamOperations = SamOperations::new(
         http_client,
-        &mock_server.uri(),
+        base_url,
         "autenticar",
         "painel",
         "alunos/listagem",
@@ -27,6 +33,17 @@ fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImp
     let client: Arc<dyn SamClient + Send + Sync> = Arc::new(SamClientImpl::new(sam_operations));
 
     Ok(StudentLessonsGatewaySamImpl::new(client))
+}
+
+fn failure_of(
+    result: Result<StudentLessons, StudentLessonsGatewayError>,
+) -> Option<(FailureKind, String)> {
+    match result {
+        Err(StudentLessonsGatewayError::UnableToPerformOperation { kind, details }) => {
+            Some((kind, details))
+        }
+        Ok(_) => None,
+    }
 }
 
 fn student_lessons_page() -> String {
@@ -151,7 +168,7 @@ fn given_page_with_no_lessons_should_return_empty_bundle() {
 }
 
 #[test]
-fn given_request_failure_should_propagate_error() {
+fn given_an_unexpected_status_the_failure_names_it() {
     smol::block_on(async {
         let mock_server: MockServer = MockServer::start().await;
 
@@ -164,8 +181,23 @@ fn given_request_failure_should_propagate_error() {
         let gateway: StudentLessonsGatewaySamImpl =
             build_gateway(&mock_server).expect("gateway should be built");
 
-        let result = gateway.get_all_for_student_with_id("500132");
+        let (kind, details) = failure_of(gateway.get_all_for_student_with_id("500132"))
+            .expect("lessons retrieval should have failed");
 
-        assert!(result.is_err(), "Expected an Err but got {result:#?}");
+        assert_eq!(kind, FailureKind::UnexpectedResponse);
+        assert!(details.contains("500"), "got: {details}");
     });
+}
+
+#[test]
+fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation() {
+    // Port 1 is reserved and nothing listens on it, so the connection is refused.
+    let gateway: StudentLessonsGatewaySamImpl =
+        build_gateway_for("http://127.0.0.1:1").expect("gateway should be built");
+
+    let (kind, details) = failure_of(gateway.get_all_for_student_with_id("500132"))
+        .expect("lessons retrieval should have failed");
+
+    assert_eq!(kind, FailureKind::Network);
+    assert!(details.contains("student_lessons"), "got: {details}");
 }

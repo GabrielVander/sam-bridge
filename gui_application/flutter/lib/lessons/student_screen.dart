@@ -6,6 +6,7 @@ import 'package:flutter_application/lessons/widgets/category_lessons_view.dart';
 import 'package:flutter_application/lessons/widgets/checkpoint_timeline.dart';
 import 'package:flutter_application/lessons/widgets/unknown_level_banner.dart';
 import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/widgets/error_panel.dart';
 
 class StudentScreen extends StatefulWidget {
   final String studentId;
@@ -44,11 +45,10 @@ final class _StudentScreenState extends State<StudentScreen> {
                   view: view,
                   progress: progress,
                 ),
-                LessonsFailure(:final message) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(message, textAlign: TextAlign.center),
-                  ),
+                LessonsFailure(:final report) => ErrorPanel(
+                  report: report,
+                  onRetry: () =>
+                      context.read<LessonsCubitSignal>().load(widget.studentId),
                 ),
                 _ => const SizedBox.shrink(),
               },
@@ -97,9 +97,16 @@ final class _ProgressSection extends StatelessWidget {
             'O progresso não pode ser calculado.',
       ),
       ProgressUnknownLevel(:final raw) => UnknownLevelBanner(raw: raw),
-      ProgressUnavailable(:final message) => _ProgressNotice(
+      ProgressNotAMusician() => const _ProgressNotice(
         icon: Icons.info_outline,
-        message: 'Progresso indisponível: $message',
+        message:
+            'O progresso só é calculado para músicos; '
+            'este aluno tem outra função no SAM.',
+      ),
+      ProgressUnavailable(:final report) => _ProgressNotice(
+        icon: Icons.info_outline,
+        message: 'Progresso indisponível. ${report.userMessage}',
+        details: report.details,
       ),
     };
   }
@@ -108,8 +115,13 @@ final class _ProgressSection extends StatelessWidget {
 final class _ProgressNotice extends StatelessWidget {
   final IconData icon;
   final String message;
+  final String details;
 
-  const _ProgressNotice({required this.icon, required this.message});
+  const _ProgressNotice({
+    required this.icon,
+    required this.message,
+    this.details = '',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -117,11 +129,20 @@ final class _ProgressNotice extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant),
-            const SizedBox(width: 12),
-            Expanded(child: Text(message)),
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(message)),
+              ],
+            ),
+            if (details.isNotEmpty) TechnicalDetails(details: details),
           ],
         ),
       ),

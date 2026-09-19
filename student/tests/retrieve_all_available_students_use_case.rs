@@ -2,7 +2,7 @@ use std::sync::Arc;
 use student::{
     application::{
         dto::{StudentPositionDto, StudentSummaryDto},
-        gateways::{StudentGateway, StudentGatewayError},
+        gateways::{FailureKind, StudentGateway, StudentGatewayError},
         use_cases::{RetrieveAllAvailableStudentsResult, RetrieveAllAvailableStudentsUseCase},
     },
     domain::entities::{
@@ -86,18 +86,21 @@ fn assert_students_map() {
 }
 
 #[test]
-fn propagates_gateway_errors() {
-    let gateway: FakeFailureGateway = FakeFailureGateway;
+fn propagates_gateway_errors_with_their_kind_and_details() {
+    let error: StudentGatewayError = StudentGatewayError::UnableToPerformOperation {
+        kind: FailureKind::UnexpectedResponse,
+        details: "missing table".to_owned(),
+    };
+    let gateway: FakeFailureGateway = FakeFailureGateway {
+        error: error.clone(),
+    };
 
     let use_case: RetrieveAllAvailableStudentsUseCase =
         RetrieveAllAvailableStudentsUseCase::new(Arc::new(gateway));
 
     let result: RetrieveAllAvailableStudentsResult = use_case.execute();
 
-    assert_eq!(
-        result,
-        RetrieveAllAvailableStudentsResult::Failure(StudentGatewayError::UnableToPerformOperation)
-    );
+    assert_eq!(result, RetrieveAllAvailableStudentsResult::Failure(error));
 }
 
 struct FakeSuccessGateway {
@@ -109,9 +112,11 @@ impl StudentGateway for FakeSuccessGateway {
     }
 }
 
-struct FakeFailureGateway;
+struct FakeFailureGateway {
+    error: StudentGatewayError,
+}
 impl StudentGateway for FakeFailureGateway {
     fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
-        Err(StudentGatewayError::UnableToPerformOperation)
+        Err(self.error.clone())
     }
 }

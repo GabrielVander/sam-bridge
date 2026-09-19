@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 use crate::lessons::domain::entities::{MusicianProfile, StudentLessons};
+use crate::shared::application::failure_kind::FailureKind;
 pub trait StudentLessonsGateway: Send + Sync {
     fn get_all_for_student_with_id(
         &self,
@@ -8,21 +9,21 @@ pub trait StudentLessonsGateway: Send + Sync {
     ) -> Result<StudentLessons, StudentLessonsGatewayError>;
 }
 
-#[derive(Error, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Error, Debug, Clone, PartialEq, Eq)]
 pub enum StudentLessonsGatewayError {
-    #[error("Unable to retrieve student lessons")]
-    UnableToPerformOperation,
+    #[error("Unable to retrieve student lessons: {details}")]
+    UnableToPerformOperation { kind: FailureKind, details: String },
 }
 pub trait MusicianProfileGateway: Send + Sync {
     fn get_by_id(&self, id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError>;
 }
 
-#[derive(Error, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Error, Debug, Clone, PartialEq, Eq)]
 pub enum MusicianProfileGatewayError {
     #[error("no student found with the given id")]
     NotFound,
     #[error("student is not a musician")]
     NotAMusician,
-    #[error("Unable to retrieve student profile")]
-    UnableToPerformOperation,
+    #[error("Unable to retrieve student profile: {details}")]
+    UnableToPerformOperation { kind: FailureKind, details: String },
 }

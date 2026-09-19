@@ -35,8 +35,8 @@ impl LoginAndRememberCredentialsUseCase {
                 Ok(())
             }
             Ok(AuthorizationResult::Unauthorized) => Err(LoginUseCaseError::InvalidEmailOrPassword),
-            Err(CredentialGatewayError::UnableToPerformOperation) => {
-                Err(LoginUseCaseError::UnableToPerformAuthorization)
+            Err(CredentialGatewayError::UnableToPerformOperation { kind, details }) => {
+                Err(LoginUseCaseError::UnableToPerformAuthorization { kind, details })
             }
         }
     }

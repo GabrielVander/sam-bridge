@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
 use crate::{
-    application::gateways::{AuthorizationResult, CredentialGateway, CredentialGatewayError},
+    application::gateways::{
+        AuthorizationResult, CredentialGateway, CredentialGatewayError, FailureKind,
+    },
     domain::entities::{Credential, Email, Password},
 };
 
@@ -24,11 +26,9 @@ impl LoginUseCase {
                 AuthorizationResult::Authorized => Ok(()),
                 AuthorizationResult::Unauthorized => Err(LoginUseCaseError::InvalidEmailOrPassword),
             },
-            Err(err) => match err {
-                CredentialGatewayError::UnableToPerformOperation => {
-                    Err(LoginUseCaseError::UnableToPerformAuthorization)
-                }
-            },
+            Err(CredentialGatewayError::UnableToPerformOperation { kind, details }) => {
+                Err(LoginUseCaseError::UnableToPerformAuthorization { kind, details })
+            }
         }
     }
 }
@@ -48,7 +48,7 @@ impl LoginCommand {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LoginUseCaseError {
     InvalidEmailOrPassword,
-    UnableToPerformAuthorization,
+    UnableToPerformAuthorization { kind: FailureKind, details: String },
 }
 
 impl From<LoginCommand> for Credential {

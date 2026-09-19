@@ -3,6 +3,7 @@ use student::application::gateways::{MusicianProfileGateway, MusicianProfileGate
 use student::domain::entities::{MusicianProfile, Student, StudentPosition};
 
 use crate::client::{SamClient, SamStudent};
+use crate::diagnostics::{error_chain, failure_kind};
 
 pub struct MusicianProfileGatewaySamImpl {
     client: Arc<dyn SamClient + Send + Sync>,
@@ -15,10 +16,12 @@ impl MusicianProfileGatewaySamImpl {
 }
 impl MusicianProfileGateway for MusicianProfileGatewaySamImpl {
     fn get_by_id(&self, id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
-        let sam_students: Vec<SamStudent> = self
-            .client
-            .students()
-            .map_err(|_| MusicianProfileGatewayError::UnableToPerformOperation)?;
+        let sam_students: Vec<SamStudent> = self.client.students().map_err(|error| {
+            MusicianProfileGatewayError::UnableToPerformOperation {
+                kind: failure_kind(&error),
+                details: error_chain(&error),
+            }
+        })?;
 
         let sam_student = sam_students
             .into_iter()

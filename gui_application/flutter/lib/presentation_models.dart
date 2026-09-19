@@ -188,3 +188,21 @@ class ProgressView {
           overallCheckpointPercent == other.overallCheckpointPercent &&
           nextLevelLabel == other.nextLevelLabel;
 }
+
+class ErrorReport {
+  final String userMessage;
+  final String details;
+
+  const ErrorReport({required this.userMessage, required this.details});
+
+  @override
+  int get hashCode => userMessage.hashCode ^ details.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ErrorReport &&
+          runtimeType == other.runtimeType &&
+          userMessage == other.userMessage &&
+          details == other.details;
+}

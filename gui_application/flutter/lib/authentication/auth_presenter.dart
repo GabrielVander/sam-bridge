@@ -1,7 +1,9 @@
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/authentication/application/use_cases/login_use_case.dart';
 import 'package:flutter_application/authentication/application/use_cases/restore_session_use_case.dart';
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/rust/bootstrap/infra/application.dart';
 
 sealed class AuthState extends Equatable {
@@ -32,12 +34,12 @@ final class AuthUnauthorized extends AuthState {
 }
 
 final class AuthFailure extends AuthState {
-  final String message;
+  final ErrorReport report;
 
-  const AuthFailure(this.message);
+  const AuthFailure(this.report);
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [report];
 }
 
 class AuthPresenter extends CubitSignal<AuthState> {
@@ -51,13 +53,18 @@ class AuthPresenter extends CubitSignal<AuthState> {
 
   Future<void> restoreSession() async {
     emit(const AuthLoading());
-    final RestoreSessionOutcome outcome = await restoreSessionUseCase();
+    try {
+      final RestoreSessionOutcome outcome = await restoreSessionUseCase();
 
-    switch (outcome) {
-      case RestoreSessionOutcome.restored:
-        emit(const AuthSuccess());
-      case RestoreSessionOutcome.notAvailable:
-        emit(const AuthIdle());
+      switch (outcome) {
+        case RestoreSessionOutcome.restored:
+          emit(const AuthSuccess());
+        case RestoreSessionOutcome.notAvailable:
+          emit(const AuthIdle());
+      }
+    } catch (_) {
+      // A failed restore must never block startup: fall back to the login form.
+      emit(const AuthIdle());
     }
   }
 
@@ -68,19 +75,22 @@ class AuthPresenter extends CubitSignal<AuthState> {
     }
 
     emit(const AuthLoading());
-    final LoginResult loginResult = await loginUseCase(
-      email: username,
-      password: password,
-    );
+    try {
+      final LoginResult loginResult = await loginUseCase(
+        email: username,
+        password: password,
+      );
 
-    switch (loginResult) {
-      case LoginResult.successful:
-        emit(const AuthSuccess());
-
-      case LoginResult.invalidEmailOrPassword:
-        emit(const AuthUnauthorized());
-      case LoginResult.unableToPerformAuthorization:
-        emit(AuthFailure("Algo deu errado"));
+      switch (loginResult) {
+        case LoginResult_Successful():
+          emit(const AuthSuccess());
+        case LoginResult_InvalidEmailOrPassword():
+          emit(const AuthUnauthorized());
+        case LoginResult_UnableToPerformAuthorization(:final field0):
+          emit(AuthFailure(ErrorReportMapper.toViewModel(field0)));
+      }
+    } catch (e) {
+      emit(AuthFailure(ErrorReportMapper.fromThrown(e)));
     }
   }
 

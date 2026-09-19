@@ -1,6 +1,6 @@
 use authentication::application::gateways::{
     AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
-    CredentialStoreError,
+    CredentialStoreError, FailureKind,
 };
 use authentication::application::use_cases::{
     RememberCredentialsError, RememberCredentialsUseCase, RestoreSessionResult,
@@ -117,7 +117,10 @@ fn restore_session_when_gateway_is_unavailable_leaves_the_store_untouched() {
         "secretpassword123".to_string(),
     ))));
     let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Err(
-        CredentialGatewayError::UnableToPerformOperation,
+        CredentialGatewayError::UnableToPerformOperation {
+            kind: FailureKind::Network,
+            details: "connection refused".to_owned(),
+        },
     )));
 
     let use_case: RestoreSessionUseCase =

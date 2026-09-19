@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import 'error_view.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lessons_view.freezed.dart';
@@ -89,7 +90,7 @@ sealed class RetrieveStudentLessonsOutcome
   const factory RetrieveStudentLessonsOutcome.success(
     StudentLessonsDto field0,
   ) = RetrieveStudentLessonsOutcome_Success;
-  const factory RetrieveStudentLessonsOutcome.failure(String field0) =
+  const factory RetrieveStudentLessonsOutcome.failure(ErrorReportDto field0) =
       RetrieveStudentLessonsOutcome_Failure;
 }
 

@@ -1,6 +1,7 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -25,8 +26,9 @@ class LoginScreen extends StatelessWidget {
           AuthUnauthorized() => _LoginFormCard(
             errorMessage: 'Usuário ou senha inválido(a)',
           ),
-          AuthFailure(:final String message) => _LoginFormCard(
-            errorMessage: message,
+          AuthFailure(:final report) => _LoginFormCard(
+            errorMessage: report.userMessage,
+            errorDetails: report.details,
           ),
         },
       ),
@@ -36,8 +38,9 @@ class LoginScreen extends StatelessWidget {
 
 final class _LoginFormCard extends StatefulWidget {
   final String? errorMessage;
+  final String errorDetails;
 
-  const _LoginFormCard({this.errorMessage});
+  const _LoginFormCard({this.errorMessage, this.errorDetails = ''});
 
   @override
   State<_LoginFormCard> createState() => _LoginFormCardState();
@@ -111,6 +114,8 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                         textAlign: TextAlign.center,
                       ),
                     ),
+                    if (widget.errorDetails.isNotEmpty)
+                      TechnicalDetails(details: widget.errorDetails),
                   ],
                   const SizedBox(height: 28),
                   TextField(

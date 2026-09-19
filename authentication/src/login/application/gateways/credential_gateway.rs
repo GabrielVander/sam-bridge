@@ -1,5 +1,6 @@
 use thiserror::Error;
 
+use crate::shared::application::failure_kind::FailureKind;
 use crate::shared::domain::entities::Credential;
 pub trait CredentialGateway {
     fn authorize(
@@ -14,8 +15,8 @@ pub enum AuthorizationResult {
     Unauthorized,
 }
 
-#[derive(Error, Debug, Clone, Copy)]
+#[derive(Error, Debug, Clone, PartialEq, Eq)]
 pub enum CredentialGatewayError {
-    #[error("Unable to perform credential authorization")]
-    UnableToPerformOperation,
+    #[error("Unable to perform credential authorization: {details}")]
+    UnableToPerformOperation { kind: FailureKind, details: String },
 }

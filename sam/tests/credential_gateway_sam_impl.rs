@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
-use authentication::application::gateways::{AuthorizationResult, CredentialGateway};
+use authentication::application::gateways::{
+    AuthorizationResult, CredentialGateway, CredentialGatewayError, FailureKind,
+};
 use authentication::domain::entities::{Credential, Email, Password};
 use sam::authentication::adapters::gateways::CredentialGatewaySamImpl;
 use sam::client::SamClientImpl;
@@ -26,6 +28,17 @@ fn build_gateway(mock_server: &MockServer) -> Result<CredentialGatewaySamImpl, r
     let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
 
     Ok(CredentialGatewaySamImpl::new(sam_client))
+}
+
+fn failure_of(
+    result: Result<AuthorizationResult, CredentialGatewayError>,
+) -> Option<(FailureKind, String)> {
+    match result {
+        Err(CredentialGatewayError::UnableToPerformOperation { kind, details }) => {
+            Some((kind, details))
+        }
+        Ok(_) => None,
+    }
 }
 
 fn credential() -> Credential {
@@ -92,9 +105,14 @@ fn given_an_unexpected_response_authorization_fails() {
         let gateway: CredentialGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<AuthorizationResult, _> = gateway.authorize(&credential());
+        let (kind, details) =
+            failure_of(gateway.authorize(&credential())).expect("authorization should have failed");
 
-        assert!(result.is_err());
+        assert_eq!(kind, FailureKind::UnexpectedResponse);
+        assert!(
+            details.contains("Unexpected authentication response"),
+            "got: {details}"
+        );
     });
 }
 
@@ -117,8 +135,18 @@ fn given_a_connection_failure_authorization_fails() {
         let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
         let gateway: CredentialGatewaySamImpl = CredentialGatewaySamImpl::new(sam_client);
 
-        let result: Result<AuthorizationResult, _> = gateway.authorize(&credential());
+        let (kind, details) =
+            failure_of(gateway.authorize(&credential())).expect("authorization should have failed");
 
-        assert!(result.is_err());
+        assert_eq!(kind, FailureKind::Network);
+        assert!(details.contains("authentication"), "got: {details}");
+        assert!(
+            !details.contains("hunter2"),
+            "the password must never appear in diagnostics, got: {details}"
+        );
+        assert!(
+            !details.contains("someone@example.com"),
+            "the email must never appear in diagnostics, got: {details}"
+        );
     });
 }

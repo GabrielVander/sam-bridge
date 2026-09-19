@@ -20,9 +20,17 @@ impl<'a, T: StudentLessonsGateway + ?Sized> RetrieveStudentLessonsUseCase<'a, T>
 #[cfg(test)]
 mod tests {
     use crate::lessons::domain::entities::{Clef, Lesson, Range};
+    use crate::shared::application::failure_kind::FailureKind;
 
     use super::*;
     use chrono::NaiveDate;
+
+    fn failure() -> StudentLessonsGatewayError {
+        StudentLessonsGatewayError::UnableToPerformOperation {
+            kind: FailureKind::Network,
+            details: "connection refused".to_owned(),
+        }
+    }
 
     struct FakeStudentLessonsGateway {
         bundle: StudentLessons,
@@ -34,7 +42,7 @@ mod tests {
             _student_id: &str,
         ) -> Result<StudentLessons, StudentLessonsGatewayError> {
             if self.fail {
-                return Err(StudentLessonsGatewayError::UnableToPerformOperation);
+                return Err(failure());
             }
             Ok(self.bundle.clone())
         }
@@ -75,7 +83,7 @@ mod tests {
     }
 
     #[test]
-    fn propagates_gateway_errors() {
+    fn propagates_gateway_errors_with_their_kind_and_details() {
         let gateway = FakeStudentLessonsGateway {
             bundle: StudentLessons::default(),
             fail: true,
@@ -84,9 +92,6 @@ mod tests {
 
         let result = use_case.execute("500132");
 
-        assert_eq!(
-            result,
-            Err(StudentLessonsGatewayError::UnableToPerformOperation)
-        );
+        assert_eq!(result, Err(failure()));
     }
 }

@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import 'error_view.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'progress_view.freezed.dart';
@@ -21,7 +22,9 @@ sealed class AssessStudentProgressOutcome with _$AssessStudentProgressOutcome {
       AssessStudentProgressOutcome_NoInstrumentAssigned;
   const factory AssessStudentProgressOutcome.unknownLevel(String field0) =
       AssessStudentProgressOutcome_UnknownLevel;
-  const factory AssessStudentProgressOutcome.failure(String field0) =
+  const factory AssessStudentProgressOutcome.notAMusician() =
+      AssessStudentProgressOutcome_NotAMusician;
+  const factory AssessStudentProgressOutcome.failure(ErrorReportDto field0) =
       AssessStudentProgressOutcome_Failure;
 }
 

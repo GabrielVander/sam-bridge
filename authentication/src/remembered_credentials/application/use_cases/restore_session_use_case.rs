@@ -34,7 +34,7 @@ impl RestoreSessionUseCase {
                 let _ = self.credential_store.clear();
                 RestoreSessionResult::CredentialsRejected
             }
-            Err(CredentialGatewayError::UnableToPerformOperation) => {
+            Err(CredentialGatewayError::UnableToPerformOperation { .. }) => {
                 RestoreSessionResult::UnableToPerformOperation
             }
         }

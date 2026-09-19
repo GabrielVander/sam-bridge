@@ -13,7 +13,9 @@ use sam::{
     lessons::adapters::gateways::{MusicianProfileGatewaySamImpl, StudentLessonsGatewaySamImpl},
     roster::adapters::gateways::StudentGatewaySamImpl,
 };
-use student::application::gateways::{MusicianProfileGateway, StudentLessonsGateway};
+use student::application::gateways::{
+    MusicianProfileGateway, MusicianProfileGatewayError, StudentLessonsGateway,
+};
 use student::application::use_cases::{
     AssessStudentProgressError, AssessStudentProgressUseCase, RetrieveAllAvailableStudentsResult,
     RetrieveAllAvailableStudentsUseCase, RetrieveStudentLessonsUseCase,
@@ -21,7 +23,7 @@ use student::application::use_cases::{
 use student::domain::entities::AssessError;
 
 use crate::infra::{
-    AssessStudentProgressOutcome, Config, ProgressAssessmentDto,
+    AssessStudentProgressOutcome, Config, ErrorReportDto, ProgressAssessmentDto,
     RetrieveAllAvailableStudentsOutcome, RetrieveStudentLessonsOutcome, StudentSummaryDto,
 };
 
@@ -128,7 +130,7 @@ impl ApplicationFacade {
                 )
             }
             RetrieveAllAvailableStudentsResult::Failure(gateway_error) => {
-                RetrieveAllAvailableStudentsOutcome::Failure(gateway_error.to_string())
+                RetrieveAllAvailableStudentsOutcome::Failure(gateway_error.into())
             }
         }
     }
@@ -145,7 +147,7 @@ impl ApplicationFacade {
                 let dto: student::application::dto::StudentLessonsDto = lessons.into();
                 RetrieveStudentLessonsOutcome::Success(dto.into())
             }
-            Err(err) => RetrieveStudentLessonsOutcome::Failure(err.to_string()),
+            Err(err) => RetrieveStudentLessonsOutcome::Failure(err.into()),
         }
     }
 
@@ -168,7 +170,10 @@ impl ApplicationFacade {
             Err(AssessStudentProgressError::Assessment(AssessError::UnknownLevel(raw))) => {
                 AssessStudentProgressOutcome::UnknownLevel(raw)
             }
-            Err(err) => AssessStudentProgressOutcome::Failure(err.to_string()),
+            Err(AssessStudentProgressError::Profile(MusicianProfileGatewayError::NotAMusician)) => {
+                AssessStudentProgressOutcome::NotAMusician
+            }
+            Err(err) => AssessStudentProgressOutcome::Failure(err.into()),
         }
     }
 }
@@ -177,7 +182,7 @@ impl ApplicationFacade {
 pub enum LoginResult {
     Successful,
     InvalidEmailOrPassword,
-    UnableToPerformAuthorization,
+    UnableToPerformAuthorization(ErrorReportDto),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -199,7 +204,12 @@ impl From<LoginUseCaseError> for LoginResult {
     fn from(value: LoginUseCaseError) -> Self {
         match value {
             LoginUseCaseError::InvalidEmailOrPassword => Self::InvalidEmailOrPassword,
-            LoginUseCaseError::UnableToPerformAuthorization => Self::UnableToPerformAuthorization,
+            LoginUseCaseError::UnableToPerformAuthorization { kind, details } => {
+                Self::UnableToPerformAuthorization(ErrorReportDto {
+                    kind: kind.into(),
+                    details,
+                })
+            }
         }
     }
 }
@@ -207,14 +217,14 @@ impl From<LoginUseCaseError> for LoginResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::infra::{StudentLessonsDto, StudentPositionDto};
+    use crate::infra::{ErrorKindDto, ErrorReportDto, StudentLessonsDto, StudentPositionDto};
     use authentication::application::gateways::{
         AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
     };
     use authentication::domain::entities::{Credential, Email, Password};
     use credential_store::FileCredentialStore;
     use student::application::gateways::{
-        MusicianProfileGatewayError, StudentGateway, StudentGatewayError,
+        FailureKind, MusicianProfileGatewayError, StudentGateway, StudentGatewayError,
         StudentLessonsGatewayError,
     };
     use student::domain::entities::{
@@ -253,9 +263,12 @@ mod tests {
     }
 
     #[test]
-    fn login_gateway_failure_is_reported() {
+    fn login_gateway_failure_is_reported_with_its_kind_and_details() {
         let (facade, _credential_dir) = facade(
-            Err(CredentialGatewayError::UnableToPerformOperation),
+            Err(CredentialGatewayError::UnableToPerformOperation {
+                kind: authentication::application::gateways::FailureKind::Network,
+                details: "Request failed for operation 'authentication'".to_owned(),
+            }),
             None,
             Ok(Vec::new()),
             Err(MusicianProfileGatewayError::NotFound),
@@ -264,7 +277,13 @@ mod tests {
 
         let result = facade.login("e".to_owned(), "p".to_owned());
 
-        assert_eq!(result, LoginResult::UnableToPerformAuthorization);
+        assert_eq!(
+            result,
+            LoginResult::UnableToPerformAuthorization(ErrorReportDto {
+                kind: ErrorKindDto::Network,
+                details: "Request failed for operation 'authentication'".to_owned(),
+            })
+        );
     }
 
     #[test]
@@ -322,21 +341,46 @@ mod tests {
     }
 
     #[test]
-    fn available_students_failure_is_reported() {
+    fn available_students_failure_is_reported_with_its_kind_and_details() {
         let (facade, _credential_dir) = facade(
             Ok(AuthorizationResult::Authorized),
             None,
-            Err(StudentGatewayError::UnableToPerformOperation),
+            Err(StudentGatewayError::UnableToPerformOperation {
+                kind: FailureKind::UnexpectedResponse,
+                details: "Unable to decode student listing JSON response: expected value"
+                    .to_owned(),
+            }),
             Err(MusicianProfileGatewayError::NotFound),
             Ok(StudentLessons::default()),
         );
 
         let result = facade.retrieve_all_available_students();
 
-        assert!(matches!(
+        assert_eq!(
             result,
-            RetrieveAllAvailableStudentsOutcome::Failure(_)
-        ));
+            RetrieveAllAvailableStudentsOutcome::Failure(ErrorReportDto {
+                kind: ErrorKindDto::UnexpectedResponse,
+                details: "Unable to decode student listing JSON response: expected value"
+                    .to_owned(),
+            })
+        );
+    }
+
+    #[test]
+    fn every_failure_kind_has_a_matching_error_kind_dto() {
+        let cases = [
+            (FailureKind::Network, ErrorKindDto::Network),
+            (
+                FailureKind::UnexpectedResponse,
+                ErrorKindDto::UnexpectedResponse,
+            ),
+            (FailureKind::SessionExpired, ErrorKindDto::SessionExpired),
+            (FailureKind::Unknown, ErrorKindDto::Unknown),
+        ];
+
+        for (kind, expected) in cases {
+            assert_eq!(ErrorKindDto::from(kind), expected);
+        }
     }
 
     #[test]
@@ -361,18 +405,27 @@ mod tests {
     }
 
     #[test]
-    fn student_lessons_failure_is_reported() {
+    fn student_lessons_failure_is_reported_with_its_kind_and_details() {
         let (facade, _credential_dir) = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
             Err(MusicianProfileGatewayError::NotFound),
-            Err(StudentLessonsGatewayError::UnableToPerformOperation),
+            Err(StudentLessonsGatewayError::UnableToPerformOperation {
+                kind: FailureKind::Network,
+                details: "Request failed for operation 'student_lessons'".to_owned(),
+            }),
         );
 
         let result = facade.retrieve_student_lessons("1".to_owned());
 
-        assert!(matches!(result, RetrieveStudentLessonsOutcome::Failure(_)));
+        assert_eq!(
+            result,
+            RetrieveStudentLessonsOutcome::Failure(ErrorReportDto {
+                kind: ErrorKindDto::Network,
+                details: "Request failed for operation 'student_lessons'".to_owned(),
+            })
+        );
     }
 
     #[test]
@@ -433,7 +486,7 @@ mod tests {
     }
 
     #[test]
-    fn progress_assessment_reports_other_failures() {
+    fn progress_assessment_of_an_unlisted_student_is_an_unexpected_response() {
         let (facade, _credential_dir) = facade(
             Ok(AuthorizationResult::Authorized),
             None,
@@ -444,7 +497,79 @@ mod tests {
 
         let result = facade.assess_student_progress("1".to_owned());
 
-        assert!(matches!(result, AssessStudentProgressOutcome::Failure(_)));
+        assert_eq!(
+            result,
+            AssessStudentProgressOutcome::Failure(ErrorReportDto {
+                kind: ErrorKindDto::UnexpectedResponse,
+                details: "no student found with the given id".to_owned(),
+            })
+        );
+    }
+
+    #[test]
+    fn progress_assessment_reports_a_non_musician_without_calling_it_a_failure() {
+        let (facade, _credential_dir) = facade(
+            Ok(AuthorizationResult::Authorized),
+            None,
+            Ok(Vec::new()),
+            Err(MusicianProfileGatewayError::NotAMusician),
+            Ok(StudentLessons::default()),
+        );
+
+        let result = facade.assess_student_progress("1".to_owned());
+
+        assert_eq!(result, AssessStudentProgressOutcome::NotAMusician);
+    }
+
+    #[test]
+    fn progress_assessment_reports_profile_retrieval_failures_with_kind_and_details() {
+        let (facade, _credential_dir) = facade(
+            Ok(AuthorizationResult::Authorized),
+            None,
+            Ok(Vec::new()),
+            Err(MusicianProfileGatewayError::UnableToPerformOperation {
+                kind: FailureKind::SessionExpired,
+                details: "Session expired".to_owned(),
+            }),
+            Ok(StudentLessons::default()),
+        );
+
+        let result = facade.assess_student_progress("1".to_owned());
+
+        assert_eq!(
+            result,
+            AssessStudentProgressOutcome::Failure(ErrorReportDto {
+                kind: ErrorKindDto::SessionExpired,
+                details: "Session expired".to_owned(),
+            })
+        );
+    }
+
+    #[test]
+    fn progress_assessment_reports_lessons_retrieval_failures_with_kind_and_details() {
+        let (facade, _credential_dir) = facade(
+            Ok(AuthorizationResult::Authorized),
+            None,
+            Ok(Vec::new()),
+            Ok(MusicianProfile {
+                level: MusicianLevel::Candidate,
+                instrument: Some(Instrument::Violin),
+            }),
+            Err(StudentLessonsGatewayError::UnableToPerformOperation {
+                kind: FailureKind::Network,
+                details: "connection refused".to_owned(),
+            }),
+        );
+
+        let result = facade.assess_student_progress("1".to_owned());
+
+        assert_eq!(
+            result,
+            AssessStudentProgressOutcome::Failure(ErrorReportDto {
+                kind: ErrorKindDto::Network,
+                details: "connection refused".to_owned(),
+            })
+        );
     }
 
     #[test]

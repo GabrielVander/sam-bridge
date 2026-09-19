@@ -1,4 +1,5 @@
 import 'package:bloc_signals/bloc_signals.dart';
+import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/lessons/application/use_cases/assess_student_progress_use_case.dart';
 import 'package:flutter_application/lessons/application/use_cases/retrieve_student_lessons_use_case.dart';
 import 'package:flutter_application/lessons/lessons_mapper.dart';
@@ -26,8 +27,8 @@ final class LessonsLoaded extends LessonsState {
 }
 
 final class LessonsFailure extends LessonsState {
-  final String message;
-  const LessonsFailure(this.message);
+  final ErrorReport report;
+  const LessonsFailure(this.report);
 }
 
 sealed class ProgressStatus {
@@ -48,9 +49,13 @@ final class ProgressUnknownLevel extends ProgressStatus {
   const ProgressUnknownLevel(this.raw);
 }
 
+final class ProgressNotAMusician extends ProgressStatus {
+  const ProgressNotAMusician();
+}
+
 final class ProgressUnavailable extends ProgressStatus {
-  final String message;
-  const ProgressUnavailable(this.message);
+  final ErrorReport report;
+  const ProgressUnavailable(this.report);
 }
 
 class LessonsCubitSignal extends CubitSignal<LessonsState> {
@@ -80,10 +85,10 @@ class LessonsCubitSignal extends CubitSignal<LessonsState> {
             ),
           );
         case RetrieveStudentLessonsOutcome_Failure(:final field0):
-          emit(LessonsFailure(field0));
+          emit(LessonsFailure(ErrorReportMapper.toViewModel(field0)));
       }
     } catch (e) {
-      emit(LessonsFailure(e.toString()));
+      emit(LessonsFailure(ErrorReportMapper.fromThrown(e)));
     }
   }
 
@@ -95,7 +100,9 @@ class LessonsCubitSignal extends CubitSignal<LessonsState> {
           const ProgressNoInstrumentAssigned(),
         AssessStudentProgressOutcome_UnknownLevel(:final field0) =>
           ProgressUnknownLevel(field0),
+        AssessStudentProgressOutcome_NotAMusician() =>
+          const ProgressNotAMusician(),
         AssessStudentProgressOutcome_Failure(:final field0) =>
-          ProgressUnavailable(field0),
+          ProgressUnavailable(ErrorReportMapper.toViewModel(field0)),
       };
 }

@@ -1,6 +1,8 @@
 use student::application::dto as student_dto;
 use student::domain::entities::Clef;
 
+use crate::infra::ErrorReportDto;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RangeDto {
     pub from: String,
@@ -36,7 +38,7 @@ pub struct StudentLessonsDto {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RetrieveStudentLessonsOutcome {
     Success(StudentLessonsDto),
-    Failure(String),
+    Failure(ErrorReportDto),
 }
 
 impl From<student_dto::StudentLessonsDto> for StudentLessonsDto {

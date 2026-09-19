@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_application/lessons/application/use_cases/assess_student_progress_use_case.dart';
 import 'package:flutter_application/lessons/application/use_cases/retrieve_student_lessons_use_case.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
+import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
 import 'package:flutter_application/rust/bootstrap/infra/lessons_view.dart';
 import 'package:flutter_application/rust/bootstrap/infra/progress_view.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -64,18 +66,49 @@ void main() {
     });
 
     test(
-      'load() transitions Loading -> Failure when the outcome reports a failure',
+      'load() transitions Loading -> Failure carrying the mapped error report',
       () async {
         final cubit = _buildCubit(
           retrieveStudentLessons: ({required studentId}) async =>
-              const RetrieveStudentLessonsOutcome.failure('boom'),
+              const RetrieveStudentLessonsOutcome.failure(
+                ErrorReportDto(
+                  kind: ErrorKindDto.network,
+                  details: "Request failed for operation 'student_lessons'",
+                ),
+              ),
         );
 
         await cubit.load('500132');
 
         final state = cubit.stateValue;
         expect(state, isA<LessonsFailure>());
-        expect((state as LessonsFailure).message, 'boom');
+        expect(
+          (state as LessonsFailure).report,
+          const ErrorReport(
+            userMessage:
+                'Não foi possível conectar ao SAM. '
+                'Verifique sua conexão com a internet e tente novamente.',
+            details: "Request failed for operation 'student_lessons'",
+          ),
+        );
+      },
+    );
+
+    test(
+      'load() never shows a raw exception as the message when a use case throws',
+      () async {
+        final cubit = _buildCubit(
+          retrieveStudentLessons: ({required studentId}) async =>
+              throw StateError('bridge down'),
+        );
+
+        await cubit.load('500132');
+
+        final state = cubit.stateValue;
+        expect(state, isA<LessonsFailure>());
+        final report = (state as LessonsFailure).report;
+        expect(report.userMessage, 'Algo deu errado. Tente novamente.');
+        expect(report.details, contains('bridge down'));
       },
     );
 
@@ -142,19 +175,42 @@ void main() {
     );
 
     test(
-      'a progress failure maps to ProgressUnavailable without failing the whole screen',
+      'a progress failure maps to ProgressUnavailable carrying the error report, without failing the whole screen',
       () async {
         final cubit = _buildCubit(
           assessStudentProgress: ({required studentId}) async =>
-              const AssessStudentProgressOutcome.failure('boom'),
+              const AssessStudentProgressOutcome.failure(
+                ErrorReportDto(
+                  kind: ErrorKindDto.sessionExpired,
+                  details: 'Session expired',
+                ),
+              ),
         );
 
         await cubit.load('500132');
 
         final loaded = cubit.stateValue as LessonsLoaded;
         expect(loaded.progress, isA<ProgressUnavailable>());
-        expect((loaded.progress as ProgressUnavailable).message, 'boom');
+        expect(
+          (loaded.progress as ProgressUnavailable).report,
+          const ErrorReport(
+            userMessage: 'Sua sessão expirou. Entre novamente.',
+            details: 'Session expired',
+          ),
+        );
       },
     );
+
+    test('a non-musician maps to ProgressNotAMusician', () async {
+      final cubit = _buildCubit(
+        assessStudentProgress: ({required studentId}) async =>
+            const AssessStudentProgressOutcome.notAMusician(),
+      );
+
+      await cubit.load('500132');
+
+      final loaded = cubit.stateValue as LessonsLoaded;
+      expect(loaded.progress, isA<ProgressNotAMusician>());
+    });
   });
 }

@@ -1,5 +1,7 @@
 use student::application::dto as student_dto;
 
+use crate::infra::ErrorReportDto;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StudentSummaryDto {
     pub id: String,
@@ -12,7 +14,7 @@ pub struct StudentSummaryDto {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RetrieveAllAvailableStudentsOutcome {
     Success(Vec<StudentSummaryDto>),
-    Failure(String),
+    Failure(ErrorReportDto),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

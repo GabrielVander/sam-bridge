@@ -5,6 +5,7 @@
 
 import 'api.dart';
 import 'bootstrap/infra/application.dart';
+import 'bootstrap/infra/error_view.dart';
 import 'bootstrap/infra/lessons_view.dart';
 import 'bootstrap/infra/progress_view.dart';
 import 'bootstrap/infra/roster_view.dart';
@@ -417,7 +418,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dco_decode_String(arr[1]),
         );
       case 3:
-        return AssessStudentProgressOutcome_Failure(dco_decode_String(arr[1]));
+        return AssessStudentProgressOutcome_NotAMusician();
+      case 4:
+        return AssessStudentProgressOutcome_Failure(
+          dco_decode_box_autoadd_error_report_dto(arr[1]),
+        );
       default:
         throw Exception("unreachable");
     }
@@ -433,6 +438,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ClefDto dco_decode_box_autoadd_clef_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_clef_dto(raw);
+  }
+
+  @protected
+  ErrorReportDto dco_decode_box_autoadd_error_report_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_error_report_dto(raw);
   }
 
   @protected
@@ -473,6 +484,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ClefDto dco_decode_clef_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ClefDto.values[dcoDecodePrimitiveInt(raw)];
+  }
+
+  @protected
+  ErrorKindDto dco_decode_error_kind_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ErrorKindDto.values[dcoDecodePrimitiveInt(raw)];
+  }
+
+  @protected
+  ErrorReportDto dco_decode_error_report_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = dcoDecodeList(raw);
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ErrorReportDto(
+      kind: dco_decode_error_kind_dto(arr[0]),
+      details: dco_decode_String(arr[1]),
+    );
   }
 
   @protected
@@ -533,7 +562,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   LoginResult dco_decode_login_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return LoginResult.values[dcoDecodePrimitiveInt(raw)];
+    final arr = dcoDecodeList(raw);
+    switch (dcoDecodePrimitiveInt(arr[0])) {
+      case 0:
+        return LoginResult_Successful();
+      case 1:
+        return LoginResult_InvalidEmailOrPassword();
+      case 2:
+        return LoginResult_UnableToPerformAuthorization(
+          dco_decode_box_autoadd_error_report_dto(arr[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
   }
 
   @protected
@@ -612,7 +653,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         );
       case 1:
         return RetrieveAllAvailableStudentsOutcome_Failure(
-          dco_decode_String(arr[1]),
+          dco_decode_box_autoadd_error_report_dto(arr[1]),
         );
       default:
         throw Exception("unreachable");
@@ -631,7 +672,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dco_decode_box_autoadd_student_lessons_dto(arr[1]),
         );
       case 1:
-        return RetrieveStudentLessonsOutcome_Failure(dco_decode_String(arr[1]));
+        return RetrieveStudentLessonsOutcome_Failure(
+          dco_decode_box_autoadd_error_report_dto(arr[1]),
+        );
       default:
         throw Exception("unreachable");
     }
@@ -780,7 +823,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_field0 = sse_decode_String(deserializer);
         return AssessStudentProgressOutcome_UnknownLevel(var_field0);
       case 3:
-        var var_field0 = sse_decode_String(deserializer);
+        return AssessStudentProgressOutcome_NotAMusician();
+      case 4:
+        var var_field0 = sse_decode_box_autoadd_error_report_dto(deserializer);
         return AssessStudentProgressOutcome_Failure(var_field0);
       default:
         throw UnimplementedError('');
@@ -797,6 +842,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ClefDto sse_decode_box_autoadd_clef_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_clef_dto(deserializer));
+  }
+
+  @protected
+  ErrorReportDto sse_decode_box_autoadd_error_report_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_error_report_dto(deserializer));
   }
 
   @protected
@@ -843,6 +896,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return ClefDto.values[inner];
+  }
+
+  @protected
+  ErrorKindDto sse_decode_error_kind_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ErrorKindDto.values[inner];
+  }
+
+  @protected
+  ErrorReportDto sse_decode_error_report_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_kind = sse_decode_error_kind_dto(deserializer);
+    var var_details = sse_decode_String(deserializer);
+    return ErrorReportDto(kind: var_kind, details: var_details);
   }
 
   @protected
@@ -932,8 +1000,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   LoginResult sse_decode_login_result(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return LoginResult.values[inner];
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        return LoginResult_Successful();
+      case 1:
+        return LoginResult_InvalidEmailOrPassword();
+      case 2:
+        var var_field0 = sse_decode_box_autoadd_error_report_dto(deserializer);
+        return LoginResult_UnableToPerformAuthorization(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
   }
 
   @protected
@@ -1030,7 +1109,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_field0 = sse_decode_list_student_summary_dto(deserializer);
         return RetrieveAllAvailableStudentsOutcome_Success(var_field0);
       case 1:
-        var var_field0 = sse_decode_String(deserializer);
+        var var_field0 = sse_decode_box_autoadd_error_report_dto(deserializer);
         return RetrieveAllAvailableStudentsOutcome_Failure(var_field0);
       default:
         throw UnimplementedError('');
@@ -1051,7 +1130,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         );
         return RetrieveStudentLessonsOutcome_Success(var_field0);
       case 1:
-        var var_field0 = sse_decode_String(deserializer);
+        var var_field0 = sse_decode_box_autoadd_error_report_dto(deserializer);
         return RetrieveStudentLessonsOutcome_Failure(var_field0);
       default:
         throw UnimplementedError('');
@@ -1204,9 +1283,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case AssessStudentProgressOutcome_UnknownLevel(field0: final field0):
         sse_encode_i_32(2, serializer);
         sse_encode_String(field0, serializer);
-      case AssessStudentProgressOutcome_Failure(field0: final field0):
+      case AssessStudentProgressOutcome_NotAMusician():
         sse_encode_i_32(3, serializer);
-        sse_encode_String(field0, serializer);
+      case AssessStudentProgressOutcome_Failure(field0: final field0):
+        sse_encode_i_32(4, serializer);
+        sse_encode_box_autoadd_error_report_dto(field0, serializer);
     }
   }
 
@@ -1220,6 +1301,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_box_autoadd_clef_dto(ClefDto self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_clef_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_error_report_dto(
+    ErrorReportDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_error_report_dto(self, serializer);
   }
 
   @protected
@@ -1265,6 +1355,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_clef_dto(ClefDto self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_error_kind_dto(ErrorKindDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_error_report_dto(
+    ErrorReportDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_error_kind_dto(self.kind, serializer);
+    sse_encode_String(self.details, serializer);
   }
 
   @protected
@@ -1342,7 +1448,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_login_result(LoginResult self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
+    switch (self) {
+      case LoginResult_Successful():
+        sse_encode_i_32(0, serializer);
+      case LoginResult_InvalidEmailOrPassword():
+        sse_encode_i_32(1, serializer);
+      case LoginResult_UnableToPerformAuthorization(field0: final field0):
+        sse_encode_i_32(2, serializer);
+        sse_encode_box_autoadd_error_report_dto(field0, serializer);
+    }
   }
 
   @protected
@@ -1433,7 +1547,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_list_student_summary_dto(field0, serializer);
       case RetrieveAllAvailableStudentsOutcome_Failure(field0: final field0):
         sse_encode_i_32(1, serializer);
-        sse_encode_String(field0, serializer);
+        sse_encode_box_autoadd_error_report_dto(field0, serializer);
     }
   }
 
@@ -1449,7 +1563,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_student_lessons_dto(field0, serializer);
       case RetrieveStudentLessonsOutcome_Failure(field0: final field0):
         sse_encode_i_32(1, serializer);
-        sse_encode_String(field0, serializer);
+        sse_encode_box_autoadd_error_report_dto(field0, serializer);
     }
   }
 

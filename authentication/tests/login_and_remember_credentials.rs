@@ -1,6 +1,6 @@
 use authentication::application::gateways::{
     AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
-    CredentialStoreError,
+    CredentialStoreError, FailureKind,
 };
 use authentication::application::use_cases::{
     LoginAndRememberCredentialsUseCase, LoginUseCaseError,
@@ -75,9 +75,12 @@ fn a_failure_to_remember_the_credential_does_not_fail_the_login() {
 }
 
 #[test]
-fn gateway_failure_is_reported_as_unable_to_perform_authorization() {
+fn gateway_failure_is_reported_with_its_kind_and_details() {
     let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Err(
-        CredentialGatewayError::UnableToPerformOperation,
+        CredentialGatewayError::UnableToPerformOperation {
+            kind: FailureKind::Network,
+            details: "connection refused".to_owned(),
+        },
     )));
     let credential_store: Arc<SpyCredentialStore> = Arc::new(SpyCredentialStore::new());
 
@@ -86,7 +89,13 @@ fn gateway_failure_is_reported_as_unable_to_perform_authorization() {
 
     let result = use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
-    assert_eq!(result, Err(LoginUseCaseError::UnableToPerformAuthorization));
+    assert_eq!(
+        result,
+        Err(LoginUseCaseError::UnableToPerformAuthorization {
+            kind: FailureKind::Network,
+            details: "connection refused".to_owned(),
+        })
+    );
     assert!(
         credential_store
             .saved_credential

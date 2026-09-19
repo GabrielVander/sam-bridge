@@ -7,6 +7,7 @@ use student::{
 };
 
 use crate::client::{SamClient, SamStudent};
+use crate::diagnostics::{error_chain, failure_kind};
 
 pub struct StudentGatewaySamImpl {
     client: Arc<dyn SamClient + Send + Sync>,
@@ -19,10 +20,12 @@ impl StudentGatewaySamImpl {
 }
 impl StudentGateway for StudentGatewaySamImpl {
     fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
-        let sam_students: Vec<SamStudent> = self
-            .client
-            .students()
-            .map_err(|_| StudentGatewayError::UnableToPerformOperation)?;
+        let sam_students: Vec<SamStudent> = self.client.students().map_err(|error| {
+            StudentGatewayError::UnableToPerformOperation {
+                kind: failure_kind(&error),
+                details: error_chain(&error),
+            }
+        })?;
 
         Ok(sam_students.into_iter().map(Student::from).collect())
     }

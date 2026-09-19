@@ -5,6 +5,7 @@ use authentication::{
 use std::sync::Arc;
 
 use crate::client::{SamClient, SamClientError, SamCredentials};
+use crate::diagnostics::{authentication_failure_kind, error_chain};
 
 pub struct CredentialGatewaySamImpl {
     client: Arc<dyn SamClient + Send + Sync>,
@@ -25,9 +26,11 @@ impl CredentialGateway for CredentialGatewaySamImpl {
         match result {
             Ok(()) => Ok(AuthorizationResult::Authorized),
             Err(e) => match e {
-                SamClientError::RequestError { http_error: _ }
-                | SamClientError::UnexpectedResponse { context: _ } => {
-                    Err(CredentialGatewayError::UnableToPerformOperation)
+                SamClientError::RequestError { .. } | SamClientError::UnexpectedResponse { .. } => {
+                    Err(CredentialGatewayError::UnableToPerformOperation {
+                        kind: authentication_failure_kind(&e),
+                        details: error_chain(&e),
+                    })
                 }
                 SamClientError::InvalidCredentials | SamClientError::SessionExpired => {
                     Ok(AuthorizationResult::Unauthorized)

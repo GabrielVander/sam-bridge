@@ -321,7 +321,11 @@ impl SseDecode for crate::bootstrap::infra::progress_view::AssessStudentProgress
                 return crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::UnknownLevel(var_field0);
             }
             3 => {
-                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::NotAMusician;
+            }
+            4 => {
+                let mut var_field0 =
+                    <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_decode(deserializer);
                 return crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::Failure(var_field0);
             }
             _ => {
@@ -366,6 +370,33 @@ impl SseDecode for crate::bootstrap::infra::lessons_view::ClefDto {
             1 => crate::bootstrap::infra::lessons_view::ClefDto::C,
             2 => crate::bootstrap::infra::lessons_view::ClefDto::F,
             _ => unreachable!("Invalid variant for ClefDto: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::error_view::ErrorKindDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::bootstrap::infra::error_view::ErrorKindDto::Network,
+            1 => crate::bootstrap::infra::error_view::ErrorKindDto::UnexpectedResponse,
+            2 => crate::bootstrap::infra::error_view::ErrorKindDto::SessionExpired,
+            3 => crate::bootstrap::infra::error_view::ErrorKindDto::Unknown,
+            _ => unreachable!("Invalid variant for ErrorKindDto: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::bootstrap::infra::error_view::ErrorReportDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_kind =
+            <crate::bootstrap::infra::error_view::ErrorKindDto>::sse_decode(deserializer);
+        let mut var_details = <String>::sse_decode(deserializer);
+        return crate::bootstrap::infra::error_view::ErrorReportDto {
+            kind: var_kind,
+            details: var_details,
         };
     }
 }
@@ -471,13 +502,23 @@ impl SseDecode for Vec<crate::bootstrap::infra::roster_view::StudentSummaryDto> 
 impl SseDecode for crate::bootstrap::infra::application::LoginResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
-        return match inner {
-            0 => crate::bootstrap::infra::application::LoginResult::Successful,
-            1 => crate::bootstrap::infra::application::LoginResult::InvalidEmailOrPassword,
-            2 => crate::bootstrap::infra::application::LoginResult::UnableToPerformAuthorization,
-            _ => unreachable!("Invalid variant for LoginResult: {}", inner),
-        };
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                return crate::bootstrap::infra::application::LoginResult::Successful;
+            }
+            1 => {
+                return crate::bootstrap::infra::application::LoginResult::InvalidEmailOrPassword;
+            }
+            2 => {
+                let mut var_field0 =
+                    <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_decode(deserializer);
+                return crate::bootstrap::infra::application::LoginResult::UnableToPerformAuthorization(var_field0);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -590,7 +631,8 @@ impl SseDecode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStu
                 return crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome::Success(var_field0);
             }
             1 => {
-                let mut var_field0 = <String>::sse_decode(deserializer);
+                let mut var_field0 =
+                    <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_decode(deserializer);
                 return crate::bootstrap::infra::roster_view::RetrieveAllAvailableStudentsOutcome::Failure(var_field0);
             }
             _ => {
@@ -613,7 +655,8 @@ impl SseDecode for crate::bootstrap::infra::lessons_view::RetrieveStudentLessons
                 return crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome::Success(var_field0);
             }
             1 => {
-                let mut var_field0 = <String>::sse_decode(deserializer);
+                let mut var_field0 =
+                    <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_decode(deserializer);
                 return crate::bootstrap::infra::lessons_view::RetrieveStudentLessonsOutcome::Failure(var_field0);
             }
             _ => {
@@ -787,7 +830,8 @@ field0.into_into_dart().into_dart()].into_dart() }
 crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::NoInstrumentAssigned => { [1.into_dart()].into_dart() }
 crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::UnknownLevel(field0) => { [2.into_dart(),
 field0.into_into_dart().into_dart()].into_dart() }
-crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::Failure(field0) => { [3.into_dart(),
+crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::NotAMusician => { [3.into_dart()].into_dart() }
+crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::Failure(field0) => { [4.into_dart(),
 field0.into_into_dart().into_dart()].into_dart() }
  _ => { unimplemented!(""); }}
     }
@@ -853,6 +897,50 @@ impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::lessons_view::Cl
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::error_view::ErrorKindDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Network => 0.into_dart(),
+            Self::UnexpectedResponse => 1.into_dart(),
+            Self::SessionExpired => 2.into_dart(),
+            Self::Unknown => 3.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::error_view::ErrorKindDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::error_view::ErrorKindDto>
+    for crate::bootstrap::infra::error_view::ErrorKindDto
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::error_view::ErrorKindDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::error_view::ErrorReportDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.kind.into_into_dart().into_dart(),
+            self.details.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::bootstrap::infra::error_view::ErrorReportDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::error_view::ErrorReportDto>
+    for crate::bootstrap::infra::error_view::ErrorReportDto
+{
+    fn into_into_dart(self) -> crate::bootstrap::infra::error_view::ErrorReportDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::lessons_view::LessonDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -884,10 +972,18 @@ impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::lessons_view::Le
 impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::application::LoginResult {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            Self::Successful => 0.into_dart(),
-            Self::InvalidEmailOrPassword => 1.into_dart(),
-            Self::UnableToPerformAuthorization => 2.into_dart(),
-            _ => unreachable!(),
+            crate::bootstrap::infra::application::LoginResult::Successful => {
+                [0.into_dart()].into_dart()
+            }
+            crate::bootstrap::infra::application::LoginResult::InvalidEmailOrPassword => {
+                [1.into_dart()].into_dart()
+            }
+            crate::bootstrap::infra::application::LoginResult::UnableToPerformAuthorization(
+                field0,
+            ) => [2.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            _ => {
+                unimplemented!("");
+            }
         }
     }
 }
@@ -1171,7 +1267,8 @@ impl SseEncode for crate::bootstrap::infra::progress_view::AssessStudentProgress
 crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::NoInstrumentAssigned => { <i32>::sse_encode(1, serializer);  }
 crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::UnknownLevel(field0) => { <i32>::sse_encode(2, serializer); <String>::sse_encode(field0, serializer);
  }
-crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::Failure(field0) => { <i32>::sse_encode(3, serializer); <String>::sse_encode(field0, serializer);
+crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::NotAMusician => { <i32>::sse_encode(3, serializer);  }
+crate::bootstrap::infra::progress_view::AssessStudentProgressOutcome::Failure(field0) => { <i32>::sse_encode(4, serializer); <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_encode(field0, serializer);
  }
  _ => { unimplemented!(""); }}
     }
@@ -1211,6 +1308,32 @@ impl SseEncode for crate::bootstrap::infra::lessons_view::ClefDto {
             },
             serializer,
         );
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::error_view::ErrorKindDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::bootstrap::infra::error_view::ErrorKindDto::Network => 0,
+                crate::bootstrap::infra::error_view::ErrorKindDto::UnexpectedResponse => 1,
+                crate::bootstrap::infra::error_view::ErrorKindDto::SessionExpired => 2,
+                crate::bootstrap::infra::error_view::ErrorKindDto::Unknown => 3,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::bootstrap::infra::error_view::ErrorReportDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::bootstrap::infra::error_view::ErrorKindDto>::sse_encode(self.kind, serializer);
+        <String>::sse_encode(self.details, serializer);
     }
 }
 
@@ -1295,19 +1418,25 @@ impl SseEncode for Vec<crate::bootstrap::infra::roster_view::StudentSummaryDto> 
 impl SseEncode for crate::bootstrap::infra::application::LoginResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                crate::bootstrap::infra::application::LoginResult::Successful => 0,
-                crate::bootstrap::infra::application::LoginResult::InvalidEmailOrPassword => 1,
-                crate::bootstrap::infra::application::LoginResult::UnableToPerformAuthorization => {
-                    2
-                }
-                _ => {
-                    unimplemented!("");
-                }
-            },
-            serializer,
-        );
+        match self {
+            crate::bootstrap::infra::application::LoginResult::Successful => {
+                <i32>::sse_encode(0, serializer);
+            }
+            crate::bootstrap::infra::application::LoginResult::InvalidEmailOrPassword => {
+                <i32>::sse_encode(1, serializer);
+            }
+            crate::bootstrap::infra::application::LoginResult::UnableToPerformAuthorization(
+                field0,
+            ) => {
+                <i32>::sse_encode(2, serializer);
+                <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_encode(
+                    field0, serializer,
+                );
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -1404,7 +1533,9 @@ impl SseEncode for crate::bootstrap::infra::roster_view::RetrieveAllAvailableStu
                 field0,
             ) => {
                 <i32>::sse_encode(1, serializer);
-                <String>::sse_encode(field0, serializer);
+                <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_encode(
+                    field0, serializer,
+                );
             }
             _ => {
                 unimplemented!("");
@@ -1429,7 +1560,9 @@ impl SseEncode for crate::bootstrap::infra::lessons_view::RetrieveStudentLessons
                 field0,
             ) => {
                 <i32>::sse_encode(1, serializer);
-                <String>::sse_encode(field0, serializer);
+                <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_encode(
+                    field0, serializer,
+                );
             }
             _ => {
                 unimplemented!("");

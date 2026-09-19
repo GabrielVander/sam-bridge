@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import 'error_view.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'roster_view.freezed.dart';
@@ -18,8 +19,9 @@ sealed class RetrieveAllAvailableStudentsOutcome
   const factory RetrieveAllAvailableStudentsOutcome.success(
     List<StudentSummaryDto> field0,
   ) = RetrieveAllAvailableStudentsOutcome_Success;
-  const factory RetrieveAllAvailableStudentsOutcome.failure(String field0) =
-      RetrieveAllAvailableStudentsOutcome_Failure;
+  const factory RetrieveAllAvailableStudentsOutcome.failure(
+    ErrorReportDto field0,
+  ) = RetrieveAllAvailableStudentsOutcome_Failure;
 }
 
 @freezed

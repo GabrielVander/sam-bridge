@@ -4,10 +4,13 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import 'error_view.dart';
 import 'lessons_view.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 import 'progress_view.dart';
 import 'roster_view.dart';
+part 'application.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `new`, `with_credential_store`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `from`, `from`
@@ -29,10 +32,16 @@ abstract class ApplicationFacade implements RustOpaqueInterface {
   });
 }
 
-enum LoginResult {
-  successful,
-  invalidEmailOrPassword,
-  unableToPerformAuthorization,
+@freezed
+sealed class LoginResult with _$LoginResult {
+  const LoginResult._();
+
+  const factory LoginResult.successful() = LoginResult_Successful;
+  const factory LoginResult.invalidEmailOrPassword() =
+      LoginResult_InvalidEmailOrPassword;
+  const factory LoginResult.unableToPerformAuthorization(
+    ErrorReportDto field0,
+  ) = LoginResult_UnableToPerformAuthorization;
 }
 
 enum RestoreSessionOutcome { restored, notAvailable }

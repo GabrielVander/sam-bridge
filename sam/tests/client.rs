@@ -253,3 +253,12 @@ fn given_connection_refused_should_fail() {
         "Expected lessons retrieval to fail but got {result:#?}"
     );
 }
+
+#[test]
+fn unexpected_response_error_message_includes_its_context() {
+    let error: sam::client::SamClientError = sam::client::SamClientError::UnexpectedResponse {
+        context: "missing table".to_string(),
+    };
+
+    assert!(error.to_string().contains("missing table"), "got: {error}");
+}

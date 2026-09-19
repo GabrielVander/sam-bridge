@@ -65,7 +65,7 @@ impl SamClient for SamClientImpl {
 
         parsing::parse_students_listing(status, &response.body).map_err(|e| {
             SamClientError::UnexpectedResponse {
-                context: e.to_string(),
+                context: format!("{e:#}"),
             }
         })
     }
@@ -94,7 +94,7 @@ pub enum SamClientError {
         #[from]
         http_error: SamOperationError,
     },
-    #[error("Unable to determine request result")]
+    #[error("Unexpected response: {context}")]
     UnexpectedResponse { context: String },
     #[error("Invalid credentials")]
     InvalidCredentials,

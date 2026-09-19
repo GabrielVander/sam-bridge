@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
+import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
 import 'package:flutter_application/rust/bootstrap/infra/roster_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -48,18 +50,48 @@ void main() {
     });
 
     test(
-      'load() transitions Loading -> Failure when the outcome reports a failure',
+      'load() transitions Loading -> Failure carrying the mapped error report',
       () async {
         final cubit = StudentsPresenter(
           retrieveStudents: () async =>
-              const RetrieveAllAvailableStudentsOutcome.failure('boom'),
+              const RetrieveAllAvailableStudentsOutcome.failure(
+                ErrorReportDto(
+                  kind: ErrorKindDto.unexpectedResponse,
+                  details: 'missing table',
+                ),
+              ),
         );
 
         await cubit.load();
 
         final state = cubit.stateValue;
         expect(state, isA<StudentsFailure>());
-        expect((state as StudentsFailure).message, 'boom');
+        expect(
+          (state as StudentsFailure).report,
+          const ErrorReport(
+            userMessage:
+                'O SAM respondeu de forma inesperada. '
+                'Tente novamente em instantes.',
+            details: 'missing table',
+          ),
+        );
+      },
+    );
+
+    test(
+      'load() reports a failure instead of hanging when the use case throws',
+      () async {
+        final cubit = StudentsPresenter(
+          retrieveStudents: () async => throw StateError('bridge down'),
+        );
+
+        await cubit.load();
+
+        final state = cubit.stateValue;
+        expect(state, isA<StudentsFailure>());
+        final report = (state as StudentsFailure).report;
+        expect(report.userMessage, 'Algo deu errado. Tente novamente.');
+        expect(report.details, contains('bridge down'));
       },
     );
 

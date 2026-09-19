@@ -3,12 +3,16 @@ use std::sync::Arc;
 use sam::client::SamClientImpl;
 use sam::http::SamOperations;
 use sam::roster::adapters::gateways::StudentGatewaySamImpl;
-use student::application::gateways::{StudentGateway, StudentGatewayError};
+use student::application::gateways::{FailureKind, StudentGateway, StudentGatewayError};
 use student::domain::entities::{Instrument, MusicianLevel, Student, StudentPosition};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 fn build_gateway(mock_server: &MockServer) -> Result<StudentGatewaySamImpl, reqwest::Error> {
+    build_gateway_for(&mock_server.uri())
+}
+
+fn build_gateway_for(base_url: &str) -> Result<StudentGatewaySamImpl, reqwest::Error> {
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .cookie_store(true)
@@ -16,7 +20,7 @@ fn build_gateway(mock_server: &MockServer) -> Result<StudentGatewaySamImpl, reqw
 
     let sam_operations: SamOperations = SamOperations::new(
         client,
-        &mock_server.uri(),
+        base_url,
         "autenticar",
         "painel",
         "alunos/listagem",
@@ -26,6 +30,15 @@ fn build_gateway(mock_server: &MockServer) -> Result<StudentGatewaySamImpl, reqw
     let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
 
     Ok(StudentGatewaySamImpl::new(sam_client))
+}
+
+fn failure_of(result: Result<Vec<Student>, StudentGatewayError>) -> Option<(FailureKind, String)> {
+    match result {
+        Err(StudentGatewayError::UnableToPerformOperation { kind, details }) => {
+            Some((kind, details))
+        }
+        Ok(_) => None,
+    }
 }
 
 #[test]
@@ -149,12 +162,11 @@ fn given_inaccessible_dashboard_students_retrieval_should_fail() {
         let gateway: StudentGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<Vec<Student>, StudentGatewayError> = gateway.get_available_records();
+        let (kind, details) = failure_of(gateway.get_available_records())
+            .expect("students retrieval should have failed");
 
-        assert!(
-            result.is_err(),
-            "expected students retrieval to fail without an accessible dashboard"
-        );
+        assert_eq!(kind, FailureKind::SessionExpired);
+        assert!(details.contains("Session expired"), "got: {details}");
     });
 }
 
@@ -178,11 +190,58 @@ fn given_unexpected_listing_status_students_retrieval_should_fail() {
         let gateway: StudentGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<Vec<Student>, StudentGatewayError> = gateway.get_available_records();
+        let (kind, details) = failure_of(gateway.get_available_records())
+            .expect("students retrieval should have failed");
 
+        assert_eq!(kind, FailureKind::UnexpectedResponse);
+        assert!(details.contains("500"), "got: {details}");
+    });
+}
+
+#[test]
+fn given_a_listing_that_is_not_json_the_details_explain_what_could_not_be_decoded() {
+    smol::block_on(async {
+        let mock_server: MockServer = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/painel"))
+            .respond_with(ResponseTemplate::new(200))
+            .mount(&mock_server)
+            .await;
+
+        Mock::given(method("GET"))
+            .and(path("/alunos/listagem"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("<html>maintenance</html>"))
+            .mount(&mock_server)
+            .await;
+
+        let gateway: StudentGatewaySamImpl =
+            build_gateway(&mock_server).expect("client should be built");
+
+        let (kind, details) = failure_of(gateway.get_available_records())
+            .expect("students retrieval should have failed");
+
+        assert_eq!(kind, FailureKind::UnexpectedResponse);
         assert!(
-            result.is_err(),
-            "expected students retrieval to fail on an unexpected listing status"
+            details.contains("Unable to decode student listing JSON response"),
+            "got: {details}"
+        );
+        assert!(
+            details.contains("expected value"),
+            "the underlying parse error should be kept, got: {details}"
         );
     });
+}
+
+#[test]
+fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation() {
+    // Port 1 is reserved and nothing listens on it, so the connection is refused.
+    let gateway: StudentGatewaySamImpl =
+        build_gateway_for("http://127.0.0.1:1").expect("client should be built");
+
+    let (kind, details) =
+        failure_of(gateway.get_available_records()).expect("students retrieval should have failed");
+
+    assert_eq!(kind, FailureKind::Network);
+    assert!(details.contains("dashboard"), "got: {details}");
 }

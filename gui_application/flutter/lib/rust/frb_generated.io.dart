@@ -5,6 +5,7 @@
 
 import 'api.dart';
 import 'bootstrap/infra/application.dart';
+import 'bootstrap/infra/error_view.dart';
 import 'bootstrap/infra/lessons_view.dart';
 import 'bootstrap/infra/progress_view.dart';
 import 'bootstrap/infra/roster_view.dart';
@@ -59,6 +60,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ClefDto dco_decode_box_autoadd_clef_dto(dynamic raw);
 
   @protected
+  ErrorReportDto dco_decode_box_autoadd_error_report_dto(dynamic raw);
+
+  @protected
   ProgressAssessmentDto dco_decode_box_autoadd_progress_assessment_dto(
     dynamic raw,
   );
@@ -74,6 +78,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ClefDto dco_decode_clef_dto(dynamic raw);
+
+  @protected
+  ErrorKindDto dco_decode_error_kind_dto(dynamic raw);
+
+  @protected
+  ErrorReportDto dco_decode_error_report_dto(dynamic raw);
 
   @protected
   double dco_decode_f_64(dynamic raw);
@@ -180,6 +190,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ClefDto sse_decode_box_autoadd_clef_dto(SseDeserializer deserializer);
 
   @protected
+  ErrorReportDto sse_decode_box_autoadd_error_report_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ProgressAssessmentDto sse_decode_box_autoadd_progress_assessment_dto(
     SseDeserializer deserializer,
   );
@@ -199,6 +214,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ClefDto sse_decode_clef_dto(SseDeserializer deserializer);
+
+  @protected
+  ErrorKindDto sse_decode_error_kind_dto(SseDeserializer deserializer);
+
+  @protected
+  ErrorReportDto sse_decode_error_report_dto(SseDeserializer deserializer);
 
   @protected
   double sse_decode_f_64(SseDeserializer deserializer);
@@ -327,6 +348,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_clef_dto(ClefDto self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_error_report_dto(
+    ErrorReportDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_progress_assessment_dto(
     ProgressAssessmentDto self,
     SseSerializer serializer,
@@ -352,6 +379,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_clef_dto(ClefDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_error_kind_dto(ErrorKindDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_error_report_dto(
+    ErrorReportDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_f_64(double self, SseSerializer serializer);

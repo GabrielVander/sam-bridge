@@ -3,7 +3,9 @@ use std::sync::Arc;
 use sam::client::SamClientImpl;
 use sam::http::SamOperations;
 use sam::lessons::adapters::gateways::MusicianProfileGatewaySamImpl;
-use student::application::gateways::{MusicianProfileGateway, MusicianProfileGatewayError};
+use student::application::gateways::{
+    FailureKind, MusicianProfileGateway, MusicianProfileGatewayError,
+};
 use student::domain::entities::{Instrument, MusicianLevel, MusicianProfile};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -11,6 +13,10 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 fn build_gateway(
     mock_server: &MockServer,
 ) -> Result<MusicianProfileGatewaySamImpl, reqwest::Error> {
+    build_gateway_for(&mock_server.uri())
+}
+
+fn build_gateway_for(base_url: &str) -> Result<MusicianProfileGatewaySamImpl, reqwest::Error> {
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .cookie_store(true)
@@ -18,7 +24,7 @@ fn build_gateway(
 
     let sam_operations: SamOperations = SamOperations::new(
         client,
-        &mock_server.uri(),
+        base_url,
         "autenticar",
         "painel",
         "alunos/listagem",
@@ -28,6 +34,17 @@ fn build_gateway(
     let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
 
     Ok(MusicianProfileGatewaySamImpl::new(sam_client))
+}
+
+fn failure_of(
+    result: Result<MusicianProfile, MusicianProfileGatewayError>,
+) -> Option<(FailureKind, String)> {
+    match result {
+        Err(MusicianProfileGatewayError::UnableToPerformOperation { kind, details }) => {
+            Some((kind, details))
+        }
+        Ok(_) | Err(_) => None,
+    }
 }
 
 async fn mount_listing(mock_server: &MockServer, row_json: &str) {
@@ -148,7 +165,7 @@ fn non_musician_is_reported_as_not_a_musician() {
 }
 
 #[test]
-fn client_failure_is_reported_as_unable_to_perform_operation() {
+fn an_expired_session_is_reported_with_its_kind_and_details() {
     smol::block_on(async {
         let mock_server: MockServer = MockServer::start().await;
 
@@ -161,11 +178,23 @@ fn client_failure_is_reported_as_unable_to_perform_operation() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<MusicianProfile, MusicianProfileGatewayError> = gateway.get_by_id("1");
+        let (kind, details) =
+            failure_of(gateway.get_by_id("1")).expect("profile retrieval should have failed");
 
-        assert_eq!(
-            result,
-            Err(MusicianProfileGatewayError::UnableToPerformOperation)
-        );
+        assert_eq!(kind, FailureKind::SessionExpired);
+        assert!(details.contains("Session expired"), "got: {details}");
     });
+}
+
+#[test]
+fn an_unreachable_site_is_a_network_error_naming_the_operation() {
+    // Port 1 is reserved and nothing listens on it, so the connection is refused.
+    let gateway: MusicianProfileGatewaySamImpl =
+        build_gateway_for("http://127.0.0.1:1").expect("client should be built");
+
+    let (kind, details) =
+        failure_of(gateway.get_by_id("1")).expect("profile retrieval should have failed");
+
+    assert_eq!(kind, FailureKind::Network);
+    assert!(details.contains("dashboard"), "got: {details}");
 }

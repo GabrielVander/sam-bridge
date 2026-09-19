@@ -1,5 +1,6 @@
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:diacritic/diacritic.dart';
+import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/roster/application/use_cases/retrieve_students_use_case.dart';
 import 'package:flutter_application/roster/roster_mapper.dart';
@@ -34,8 +35,8 @@ final class StudentsLoaded extends StudentsState {
 }
 
 final class StudentsFailure extends StudentsState {
-  final String message;
-  const StudentsFailure(this.message);
+  final ErrorReport report;
+  const StudentsFailure(this.report);
 }
 
 class StudentsPresenter extends CubitSignal<StudentsState> {
@@ -49,13 +50,17 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
 
   Future<void> load() async {
     emit(const StudentsLoading());
-    final outcome = await _retrieveStudents();
-    switch (outcome) {
-      case RetrieveAllAvailableStudentsOutcome_Success(:final field0):
-        _all = RosterMapper.toViewModels(field0);
-        emit(_filteredState());
-      case RetrieveAllAvailableStudentsOutcome_Failure(:final field0):
-        emit(StudentsFailure(field0));
+    try {
+      final outcome = await _retrieveStudents();
+      switch (outcome) {
+        case RetrieveAllAvailableStudentsOutcome_Success(:final field0):
+          _all = RosterMapper.toViewModels(field0);
+          emit(_filteredState());
+        case RetrieveAllAvailableStudentsOutcome_Failure(:final field0):
+          emit(StudentsFailure(ErrorReportMapper.toViewModel(field0)));
+      }
+    } catch (e) {
+      emit(StudentsFailure(ErrorReportMapper.fromThrown(e)));
     }
   }
 

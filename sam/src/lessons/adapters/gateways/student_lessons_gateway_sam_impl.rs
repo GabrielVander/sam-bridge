@@ -3,6 +3,7 @@ use student::application::gateways::{StudentLessonsGateway, StudentLessonsGatewa
 use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
 
 use crate::client::{MsaLesson, MtdLesson, SamClient, StudentLessonsPage};
+use crate::diagnostics::{error_chain, failure_kind};
 
 pub struct StudentLessonsGatewaySamImpl {
     client: Arc<dyn SamClient + Send + Sync>,
@@ -18,10 +19,12 @@ impl StudentLessonsGateway for StudentLessonsGatewaySamImpl {
         &self,
         id: &str,
     ) -> Result<StudentLessons, StudentLessonsGatewayError> {
-        let page: StudentLessonsPage = self
-            .client
-            .student_lessons(id)
-            .map_err(|_| StudentLessonsGatewayError::UnableToPerformOperation)?;
+        let page: StudentLessonsPage = self.client.student_lessons(id).map_err(|error| {
+            StudentLessonsGatewayError::UnableToPerformOperation {
+                kind: failure_kind(&error),
+                details: error_chain(&error),
+            }
+        })?;
 
         Ok(StudentLessons {
             approved: page.msa.into_iter().map(Lesson::from).collect(),
