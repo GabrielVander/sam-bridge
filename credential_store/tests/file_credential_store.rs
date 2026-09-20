@@ -16,17 +16,6 @@ fn credential() -> Credential {
 }
 
 #[test]
-fn round_trip_preserves_credential() {
-    let (store, _dir) = temp_store().expect("tempdir");
-
-    store.save(&credential()).expect("save should succeed");
-    let loaded = store.load().expect("load should return Some");
-
-    assert_eq!(loaded.email.0, "test_user@example.com");
-    assert_eq!(loaded.password.0, "test_pass");
-}
-
-#[test]
 fn saved_file_is_encrypted_not_plaintext() {
     let (store, dir) = temp_store().expect("tempdir");
 
@@ -38,13 +27,6 @@ fn saved_file_is_encrypted_not_plaintext() {
         !raw_str.contains("test_pass"),
         "encrypted file must not contain the plaintext password"
     );
-}
-
-#[test]
-fn missing_file_loads_as_none() {
-    let (store, _dir) = temp_store().expect("tempdir");
-
-    assert!(store.load().is_none());
 }
 
 #[test]
@@ -226,20 +208,12 @@ fn save_fails_when_the_directory_is_not_writable_for_the_credential_file() {
 
 #[cfg(unix)]
 #[test]
-fn new_creates_the_platform_data_directory_with_restricted_permissions() {
+fn under_creates_the_data_directory_with_restricted_permissions() {
     use std::os::unix::fs::PermissionsExt;
 
     let base = tempfile::tempdir().expect("tempdir");
 
-    unsafe {
-        std::env::set_var("XDG_DATA_HOME", base.path());
-    }
-
-    let _store = credential_store::FileCredentialStore::new();
-
-    unsafe {
-        std::env::remove_var("XDG_DATA_HOME");
-    }
+    let _store = credential_store::FileCredentialStore::under(base.path());
 
     let created_dir = base.path().join("sam_bridge");
     assert!(created_dir.is_dir(), "the data directory should be created");
@@ -250,6 +224,18 @@ fn new_creates_the_platform_data_directory_with_restricted_permissions() {
         .mode()
         & 0o777;
     assert_eq!(mode, 0o700);
+}
+
+#[test]
+fn a_store_under_a_base_directory_keeps_its_credentials_there() {
+    let base = tempfile::tempdir().expect("tempdir");
+    let store = credential_store::FileCredentialStore::under(base.path());
+
+    store.save(&credential()).expect("save");
+
+    assert!(base.path().join("sam_bridge").join("session.enc").is_file());
+    let loaded = store.load().expect("load should return Some");
+    assert_eq!(loaded.email.0, "test_user@example.com");
 }
 
 #[cfg(unix)]

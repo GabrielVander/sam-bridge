@@ -1,93 +1,78 @@
-use authentication::application::gateways::{
-    AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
-    CredentialStoreError, FailureKind,
-};
+use authentication::application::gateways::{CredentialGatewayError, CredentialStore, FailureKind};
 use authentication::application::use_cases::{
     LoginAndRememberCredentialsUseCase, LoginUseCaseError,
 };
-use authentication::domain::entities::Credential;
 use pretty_assertions::assert_eq;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use test_support::credentials::{
+    FailingCredentialStore, FakeCredentialGateway, InMemoryCredentialStore,
+};
+
+fn remembered(store: &InMemoryCredentialStore) -> Option<(String, String)> {
+    store
+        .load()
+        .map(|credential| (credential.email.0, credential.password.0))
+}
+
+fn login(
+    gateway: FakeCredentialGateway,
+    store: Arc<dyn CredentialStore + Send + Sync>,
+) -> Result<(), LoginUseCaseError> {
+    LoginAndRememberCredentialsUseCase::new(Arc::new(gateway), store)
+        .execute("Some email".to_string(), "secretpassword123".to_string())
+}
 
 #[test]
 fn successful_login_remembers_the_credential() {
-    let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Ok(
-        AuthorizationResult::Authorized,
-    )));
-    let credential_store: Arc<SpyCredentialStore> = Arc::new(SpyCredentialStore::new());
+    let credential_store: Arc<InMemoryCredentialStore> = Arc::new(InMemoryCredentialStore::new());
 
-    let use_case: LoginAndRememberCredentialsUseCase =
-        LoginAndRememberCredentialsUseCase::new(credential_gateway, credential_store.clone());
-
-    let result = use_case.execute("Some email".to_string(), "secretpassword123".to_string());
+    let result = login(
+        FakeCredentialGateway::authorizing(),
+        credential_store.clone(),
+    );
 
     assert_eq!(result, Ok(()));
-
-    let saved_credential: (String, String) = credential_store
-        .saved_credential
-        .lock()
-        .expect("mutex is not poisoned")
-        .clone()
-        .expect("save should have been called");
-
     assert_eq!(
-        saved_credential,
-        ("Some email".to_string(), "secretpassword123".to_string())
+        remembered(&credential_store),
+        Some(("Some email".to_string(), "secretpassword123".to_string()))
     );
 }
 
 #[test]
 fn failed_login_never_attempts_to_remember_the_credential() {
-    let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Ok(
-        AuthorizationResult::Unauthorized,
-    )));
-    let credential_store: Arc<SpyCredentialStore> = Arc::new(SpyCredentialStore::new());
+    let credential_store: Arc<InMemoryCredentialStore> = Arc::new(InMemoryCredentialStore::new());
 
-    let use_case: LoginAndRememberCredentialsUseCase =
-        LoginAndRememberCredentialsUseCase::new(credential_gateway, credential_store.clone());
-
-    let result = use_case.execute("Some email".to_string(), "secretpassword123".to_string());
+    let result = login(FakeCredentialGateway::rejecting(), credential_store.clone());
 
     assert_eq!(result, Err(LoginUseCaseError::InvalidEmailOrPassword));
-    assert!(
-        credential_store
-            .saved_credential
-            .lock()
-            .expect("mutex is not poisoned")
-            .is_none(),
+    assert_eq!(
+        remembered(&credential_store),
+        None,
         "a rejected login must never be remembered"
     );
 }
 
 #[test]
 fn a_failure_to_remember_the_credential_does_not_fail_the_login() {
-    let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Ok(
-        AuthorizationResult::Authorized,
-    )));
-    let credential_store: Arc<FailingCredentialStore> = Arc::new(FailingCredentialStore);
-
-    let use_case: LoginAndRememberCredentialsUseCase =
-        LoginAndRememberCredentialsUseCase::new(credential_gateway, credential_store);
-
-    let result = use_case.execute("Some email".to_string(), "secretpassword123".to_string());
+    let result = login(
+        FakeCredentialGateway::authorizing(),
+        Arc::new(FailingCredentialStore),
+    );
 
     assert_eq!(result, Ok(()));
 }
 
 #[test]
 fn gateway_failure_is_reported_with_its_kind_and_details() {
-    let credential_gateway: Arc<FakeCredentialGateway> = Arc::new(FakeCredentialGateway::new(Err(
-        CredentialGatewayError::UnableToPerformOperation {
+    let credential_store: Arc<InMemoryCredentialStore> = Arc::new(InMemoryCredentialStore::new());
+
+    let result = login(
+        FakeCredentialGateway::new(Err(CredentialGatewayError::UnableToPerformOperation {
             kind: FailureKind::Network,
             details: "connection refused".to_owned(),
-        },
-    )));
-    let credential_store: Arc<SpyCredentialStore> = Arc::new(SpyCredentialStore::new());
-
-    let use_case: LoginAndRememberCredentialsUseCase =
-        LoginAndRememberCredentialsUseCase::new(credential_gateway, credential_store.clone());
-
-    let result = use_case.execute("Some email".to_string(), "secretpassword123".to_string());
+        })),
+        credential_store.clone(),
+    );
 
     assert_eq!(
         result,
@@ -96,70 +81,9 @@ fn gateway_failure_is_reported_with_its_kind_and_details() {
             details: "connection refused".to_owned(),
         })
     );
-    assert!(
-        credential_store
-            .saved_credential
-            .lock()
-            .expect("mutex is not poisoned")
-            .is_none(),
+    assert_eq!(
+        remembered(&credential_store),
+        None,
         "a failed authorization attempt must never be remembered"
     );
-}
-
-struct FakeCredentialGateway {
-    result: Result<AuthorizationResult, CredentialGatewayError>,
-}
-
-impl FakeCredentialGateway {
-    const fn new(result: Result<AuthorizationResult, CredentialGatewayError>) -> Self {
-        Self { result }
-    }
-}
-impl CredentialGateway for FakeCredentialGateway {
-    fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, CredentialGatewayError> {
-        self.result.clone()
-    }
-}
-
-struct SpyCredentialStore {
-    saved_credential: Mutex<Option<(String, String)>>,
-}
-
-impl SpyCredentialStore {
-    const fn new() -> Self {
-        Self {
-            saved_credential: Mutex::new(None),
-        }
-    }
-}
-impl CredentialStore for SpyCredentialStore {
-    fn save(&self, credential: &Credential) -> Result<(), CredentialStoreError> {
-        if let Ok(mut saved) = self.saved_credential.lock() {
-            *saved = Some((credential.email.0.clone(), credential.password.0.clone()));
-        }
-        Ok(())
-    }
-
-    fn load(&self) -> Option<Credential> {
-        None
-    }
-
-    fn clear(&self) -> Result<(), CredentialStoreError> {
-        Ok(())
-    }
-}
-
-struct FailingCredentialStore;
-impl CredentialStore for FailingCredentialStore {
-    fn save(&self, _: &Credential) -> Result<(), CredentialStoreError> {
-        Err(CredentialStoreError::UnableToPerformOperation)
-    }
-
-    fn load(&self) -> Option<Credential> {
-        None
-    }
-
-    fn clear(&self) -> Result<(), CredentialStoreError> {
-        Ok(())
-    }
 }

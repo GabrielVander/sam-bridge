@@ -1,0 +1,17 @@
+[package]
+name = "test_support"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+# Shared fakes, builders and contract suites for the workspace's tests. It is
+# only ever a dev-dependency, so none of it ships in the application.
+
+[dependencies]
+authentication = { workspace = true }
+student = { workspace = true }
+sam = { workspace = true }
+reqwest = { workspace = true }
+
+[lints]
+workspace = true

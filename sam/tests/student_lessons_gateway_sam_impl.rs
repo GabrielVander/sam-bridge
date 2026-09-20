@@ -8,6 +8,7 @@ use student::application::gateways::{
     FailureKind, StudentLessonsGateway, StudentLessonsGatewayError,
 };
 use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
+use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -16,19 +17,7 @@ fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImp
 }
 
 fn build_gateway_for(base_url: &str) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
-    let http_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
-        .redirect(reqwest::redirect::Policy::none())
-        .cookie_store(true)
-        .build()?;
-
-    let sam_operations: SamOperations = SamOperations::new(
-        http_client,
-        base_url,
-        "autenticar",
-        "painel",
-        "alunos/listagem",
-        "licoes/index",
-    );
+    let sam_operations: SamOperations = sam_operations_for(base_url)?;
 
     let client: Arc<dyn SamClient + Send + Sync> = Arc::new(SamClientImpl::new(sam_operations));
 

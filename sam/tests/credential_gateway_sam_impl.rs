@@ -7,23 +7,12 @@ use authentication::domain::entities::{Credential, Email, Password};
 use sam::authentication::adapters::gateways::CredentialGatewaySamImpl;
 use sam::client::SamClientImpl;
 use sam::http::SamOperations;
+use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 fn build_gateway(mock_server: &MockServer) -> Result<CredentialGatewaySamImpl, reqwest::Error> {
-    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
-        .redirect(reqwest::redirect::Policy::none())
-        .cookie_store(true)
-        .build()?;
-
-    let sam_operations: SamOperations = SamOperations::new(
-        client,
-        &mock_server.uri(),
-        "autenticar",
-        "painel",
-        "alunos/listagem",
-        "licoes/index",
-    );
+    let sam_operations: SamOperations = sam_operations_for(&mock_server.uri())?;
 
     let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
 

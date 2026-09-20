@@ -20,6 +20,30 @@ impl std::fmt::Debug for StoredCredential {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
+#[error("no platform data directory is available to store credentials")]
+pub struct NoDataDirectory;
+
+// The two conversions below are excluded from coverage because tests cannot
+// provoke these failures and no supported platform is expected to hit them:
+// - `getrandom` only fails when the OS has no random source at all. Linux
+//   falls back to `/dev/urandom`, and macOS, iOS, Windows and Android have none
+//   of the failure modes it documents.
+// - `cocoon` only fails to encrypt a message too large for the AEAD (tens of
+//   gigabytes). Ours is a few hundred bytes of JSON.
+// They still report a clear error instead of panicking if the impossible occurs.
+
+#[cfg_attr(coverage_nightly, coverage(off))]
+fn key_generation_failed(error: getrandom::Error) -> anyhow::Error {
+    anyhow::anyhow!("Failed to generate encryption key: {error}")
+}
+
+#[cfg_attr(coverage_nightly, coverage(off))]
+#[allow(clippy::needless_pass_by_value)] // `map_err` hands the error over by value
+fn encryption_failed(error: cocoon::Error) -> anyhow::Error {
+    anyhow::anyhow!("Failed to encrypt credential file: {error:?}")
+}
+
 pub struct FileCredentialStore {
     dir: PathBuf,
     credential_path: PathBuf,
@@ -27,12 +51,13 @@ pub struct FileCredentialStore {
 }
 
 impl FileCredentialStore {
+    pub fn new() -> Result<Self, NoDataDirectory> {
+        Self::in_platform_data_dir(dirs::data_local_dir())
+    }
+
     #[must_use]
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        let data_dir = dirs::data_local_dir()
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join("sam_bridge");
+    pub fn under(base: &Path) -> Self {
+        let data_dir = base.join("sam_bridge");
         let _ = std::fs::create_dir_all(&data_dir);
         #[cfg(unix)]
         {
@@ -42,6 +67,12 @@ impl FileCredentialStore {
             );
         }
         Self::with_dir(&data_dir.to_string_lossy())
+    }
+
+    fn in_platform_data_dir(platform_data_dir: Option<PathBuf>) -> Result<Self, NoDataDirectory> {
+        platform_data_dir
+            .map(|base| Self::under(&base))
+            .ok_or(NoDataDirectory)
     }
 
     #[must_use]
@@ -64,8 +95,7 @@ impl FileCredentialStore {
         }
 
         let mut key = [0u8; 32];
-        getrandom::fill(&mut key)
-            .map_err(|e| anyhow::anyhow!("Failed to generate encryption key: {e}"))?;
+        getrandom::fill(&mut key).map_err(key_generation_failed)?;
 
         let _ = std::fs::create_dir_all(&self.dir);
         let tmp = self.dir.join(".key.bin.tmp");
@@ -90,9 +120,7 @@ impl FileCredentialStore {
     fn encrypt(&self, plaintext: &[u8]) -> anyhow::Result<Vec<u8>> {
         let key = self.load_or_create_key()?;
         let mut cocoon = cocoon::Cocoon::new(&key);
-        cocoon
-            .wrap(plaintext)
-            .map_err(|e| anyhow::anyhow!("Failed to encrypt credential file: {e:?}"))
+        cocoon.wrap(plaintext).map_err(encryption_failed)
     }
 
     fn decrypt(&self, ciphertext: &[u8]) -> Option<Vec<u8>> {
@@ -170,7 +198,7 @@ impl CredentialStore for FileCredentialStore {
 
 #[cfg(test)]
 mod tests {
-    use super::StoredCredential;
+    use super::{FileCredentialStore, NoDataDirectory, StoredCredential};
 
     #[test]
     fn debug_formatting_redacts_the_password() {
@@ -183,5 +211,20 @@ mod tests {
 
         assert!(formatted.contains("someone@example.com"));
         assert!(!formatted.contains("super-secret"));
+    }
+
+    #[test]
+    fn without_a_platform_data_dir_there_is_nowhere_to_store_credentials() {
+        let result = FileCredentialStore::in_platform_data_dir(None);
+
+        assert_eq!(result.err(), Some(NoDataDirectory));
+    }
+
+    #[test]
+    fn the_missing_data_dir_error_explains_itself() {
+        assert_eq!(
+            NoDataDirectory.to_string(),
+            "no platform data directory is available to store credentials"
+        );
     }
 }

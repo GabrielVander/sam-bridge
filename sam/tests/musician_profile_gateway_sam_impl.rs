@@ -7,6 +7,7 @@ use student::application::gateways::{
     FailureKind, MusicianProfileGateway, MusicianProfileGatewayError,
 };
 use student::domain::entities::{Instrument, MusicianLevel, MusicianProfile};
+use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -17,19 +18,7 @@ fn build_gateway(
 }
 
 fn build_gateway_for(base_url: &str) -> Result<MusicianProfileGatewaySamImpl, reqwest::Error> {
-    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
-        .redirect(reqwest::redirect::Policy::none())
-        .cookie_store(true)
-        .build()?;
-
-    let sam_operations: SamOperations = SamOperations::new(
-        client,
-        base_url,
-        "autenticar",
-        "painel",
-        "alunos/listagem",
-        "licoes/index",
-    );
+    let sam_operations: SamOperations = sam_operations_for(base_url)?;
 
     let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
 

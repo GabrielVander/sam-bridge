@@ -247,6 +247,7 @@ pub fn assess(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::lessons::domain::entities::MethodComponent;
 
     fn msa_lesson(phase_from: &str, phase_to: &str) -> Lesson {
         Lesson {
@@ -519,5 +520,169 @@ mod tests {
         fn meets_any_above(&self) -> bool {
             self.checkpoints.iter().any(|c| c.ready_to_advance)
         }
+    }
+
+    // The rules for comparing recorded progress with a method milestone are pure,
+    // so they are pinned directly with milestones built here: that keeps them
+    // independent of the published requirement tables.
+
+    fn recorded(page: f64, lesson: f64, phase: f64) -> RecordedProgress {
+        RecordedProgress {
+            page,
+            lesson,
+            phase,
+        }
+    }
+
+    #[test]
+    fn a_page_milestone_is_met_from_the_target_page_on() {
+        let milestone = MethodMilestone::Page(10);
+
+        assert_eq!(
+            milestone_met(&milestone, &recorded(10.0, 0.0, 0.0)),
+            Some(true)
+        );
+        assert_eq!(
+            milestone_met(&milestone, &recorded(9.0, 0.0, 0.0)),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn a_lesson_milestone_is_met_from_the_target_lesson_on() {
+        let milestone = MethodMilestone::Lesson(20);
+
+        assert_eq!(
+            milestone_met(&milestone, &recorded(0.0, 20.0, 0.0)),
+            Some(true)
+        );
+        assert_eq!(
+            milestone_met(&milestone, &recorded(0.0, 19.0, 0.0)),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn a_phase_milestone_is_met_from_the_target_phase_on() {
+        let milestone = MethodMilestone::Phase(4);
+
+        assert_eq!(
+            milestone_met(&milestone, &recorded(0.0, 0.0, 4.0)),
+            Some(true)
+        );
+        assert_eq!(
+            milestone_met(&milestone, &recorded(0.0, 0.0, 3.0)),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn a_page_and_lesson_milestone_needs_both_targets_reached() {
+        let milestone = MethodMilestone::PageAndLesson {
+            page: 10,
+            lesson: 20,
+        };
+
+        assert_eq!(
+            milestone_met(&milestone, &recorded(10.0, 20.0, 0.0)),
+            Some(true)
+        );
+        assert_eq!(
+            milestone_met(&milestone, &recorded(10.0, 19.0, 0.0)),
+            Some(false),
+            "the page alone is not enough"
+        );
+        assert_eq!(
+            milestone_met(&milestone, &recorded(9.0, 20.0, 0.0)),
+            Some(false),
+            "the lesson alone is not enough"
+        );
+    }
+
+    #[test]
+    fn milestones_that_cannot_be_measured_from_the_lessons_are_neither_met_nor_unmet() {
+        for milestone in [
+            MethodMilestone::Module(2),
+            MethodMilestone::ExerciseRange { from: 1, to: 9 },
+            MethodMilestone::Complete,
+            MethodMilestone::Described("a prova prática"),
+        ] {
+            assert_eq!(milestone_met(&milestone, &recorded(99.0, 99.0, 99.0)), None);
+            assert_eq!(
+                milestone_percent(&milestone, &recorded(99.0, 99.0, 99.0)),
+                None
+            );
+        }
+    }
+
+    fn component(milestone: MethodMilestone) -> MethodComponent {
+        MethodComponent {
+            method_name: "Método",
+            milestone,
+        }
+    }
+
+    #[test]
+    fn an_alternative_is_met_only_when_every_component_is() {
+        let alternative = MethodAlternative {
+            components: vec![
+                component(MethodMilestone::Page(10)),
+                component(MethodMilestone::Lesson(20)),
+            ],
+        };
+
+        let (_, met) = assess_alternative(&alternative, &recorded(10.0, 19.0, 0.0));
+
+        assert!(!met, "one unmet component keeps the alternative unmet");
+        let (_, met) = assess_alternative(&alternative, &recorded(10.0, 20.0, 0.0));
+        assert!(met);
+    }
+
+    #[test]
+    fn an_alternative_with_a_component_that_cannot_be_measured_is_never_met() {
+        let alternative = MethodAlternative {
+            components: vec![
+                component(MethodMilestone::Page(10)),
+                component(MethodMilestone::Complete),
+            ],
+        };
+
+        let (percent, met) = assess_alternative(&alternative, &recorded(10.0, 0.0, 0.0));
+
+        assert!(!met);
+        assert_eq!(percent, 100.0, "only the measurable component counts");
+    }
+
+    #[test]
+    fn an_alternatives_percent_is_the_average_of_its_measurable_components() {
+        let alternative = MethodAlternative {
+            components: vec![
+                component(MethodMilestone::Page(20)),
+                component(MethodMilestone::Lesson(10)),
+            ],
+        };
+
+        let (percent, _) = assess_alternative(&alternative, &recorded(10.0, 10.0, 0.0));
+
+        assert_eq!(percent, 75.0, "the average of 50% and 100%");
+    }
+
+    #[test]
+    fn overall_progress_adds_the_share_of_the_next_level_already_covered() {
+        // Candidate: 1 of 5 checkpoints achieved. Towards Practice, MSA is at
+        // 6 of 12 phases (50%) and the method at 0%, so the combined progress
+        // is 25% and the journey is (1 + 0.25) / 5 = 25% complete.
+        let approved = vec![msa_lesson("6", "6")];
+
+        let report = assess(
+            &MusicianLevel::Candidate,
+            Instrument::Violin,
+            &approved,
+            &[],
+        )
+        .unwrap();
+
+        assert_eq!(report.combinedPercent, 25.0);
+        assert_eq!(report.overallCheckpointPercent, 25.0);
     }
 }

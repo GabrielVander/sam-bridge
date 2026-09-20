@@ -1,24 +1,11 @@
 use sam::client::{MsaLesson, MtdLesson, SamClient, SamClientImpl, StudentLessonsPage};
 use sam::http::SamOperations;
+use test_support::sam_site::sam_client_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 fn build_client(mock_server: &MockServer) -> Result<SamClientImpl, reqwest::Error> {
-    let http_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
-        .redirect(reqwest::redirect::Policy::none())
-        .cookie_store(true)
-        .build()?;
-
-    let sam_operations: SamOperations = SamOperations::new(
-        http_client,
-        &mock_server.uri(),
-        "autenticar",
-        "painel",
-        "alunos/listagem",
-        "licoes/index",
-    );
-
-    Ok(SamClientImpl::new(sam_operations))
+    sam_client_for(&mock_server.uri())
 }
 
 fn msa_table_fragment(rows_html: &str) -> String {

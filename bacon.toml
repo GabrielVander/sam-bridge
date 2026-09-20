@@ -129,7 +129,7 @@ command = [
   "nextest",
   "--workspace",
   "--ignore-filename-regex",
-  "frb_generated\\.rs|session_opener\\.rs",
+  "frb_generated\\.rs|test_support/",
 ]
 need_stdout = true
 analyzer = "nextest"

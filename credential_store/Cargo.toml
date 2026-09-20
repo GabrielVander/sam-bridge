@@ -11,10 +11,12 @@ serde_json = { workspace = true }
 dirs = { workspace = true }
 cocoon = { workspace = true, features = ["std"] }
 getrandom = { workspace = true }
+thiserror = { workspace = true }
 zeroize = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 tempfile = { workspace = true }
+test_support = { workspace = true }
 
 [lints]
 workspace = true

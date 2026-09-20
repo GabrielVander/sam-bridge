@@ -1000,4 +1000,24 @@ mod tests {
             None
         );
     }
+
+    #[test]
+    fn youth_service_reads_hymns_431_to_480_and_every_other_level_the_whole_hymnal() {
+        let requirements = InstrumentRequirements::violin();
+
+        let youth = requirements
+            .requirement_for(&MusicianLevel::YouthService)
+            .expect("youth service requirement exists");
+        assert_eq!(youth.metric_reading, "Hinos 431 a 480");
+        assert_eq!(youth.hymnal, "431 a 480 - Voz principal + Voz alternativa");
+
+        let official = requirements
+            .requirement_for(&MusicianLevel::OfficialService)
+            .expect("official service requirement exists");
+        assert_eq!(official.metric_reading, "Todos os Hinos");
+        assert_eq!(
+            official.hymnal,
+            "Completo - Voz principal + Voz alternativa"
+        );
+    }
 }

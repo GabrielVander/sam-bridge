@@ -10,8 +10,16 @@
 # - lib/main.dart: the native bootstrap (loads the compiled Rust library and asks
 #   the platform for package info). It needs a real device and holds no logic;
 #   everything it hands to composeApp is tested through lib/app.dart.
+#
+# Usage: tool/coverage.sh [--fail-under PERCENT]
+# With --fail-under the script exits non-zero when total line coverage is lower.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+fail_under=0
+if [ "${1:-}" = "--fail-under" ]; then
+  fail_under="${2:?--fail-under needs a percentage}"
+fi
 
 helper=test/coverage_helper_test.dart
 trap 'rm -f "$helper"' EXIT
@@ -27,7 +35,7 @@ package=$(sed -n 's/^name: *//p' pubspec.yaml | head -1)
 
 flutter test --coverage >/dev/null
 
-python3 - <<'PY'
+python3 - "$fail_under" <<'PY'
 import re, sys
 records = open("coverage/lcov.info").read().split("end_of_record")
 kept, total, hit = [], 0, 0
@@ -64,4 +72,9 @@ for path, lh, lf, missed in sorted(kept):
     print(f"{pct:6.2f}%  {lh:4}/{lf:<4}  {path}{suffix}")
 pct = 100.0 if total == 0 else 100.0 * hit / total
 print(f"{pct:6.2f}%  {hit:4}/{total:<4}  TOTAL")
+
+threshold = float(sys.argv[1])
+if pct < threshold:
+    print(f"coverage {pct:.2f}% is below the required {threshold:g}%", file=sys.stderr)
+    sys.exit(1)
 PY

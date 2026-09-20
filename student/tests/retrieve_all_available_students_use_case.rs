@@ -2,7 +2,7 @@ use std::sync::Arc;
 use student::{
     application::{
         dto::{StudentPositionDto, StudentSummaryDto},
-        gateways::{FailureKind, StudentGateway, StudentGatewayError},
+        gateways::{FailureKind, StudentGatewayError},
         use_cases::{RetrieveAllAvailableStudentsResult, RetrieveAllAvailableStudentsUseCase},
     },
     domain::entities::{
@@ -11,6 +11,7 @@ use student::{
 };
 
 use pretty_assertions::assert_eq;
+use test_support::students::FakeStudentGateway;
 
 #[test]
 fn assert_students_map() {
@@ -73,9 +74,7 @@ fn assert_students_map() {
         .to_vec(),
     );
 
-    let gateway: FakeSuccessGateway = FakeSuccessGateway {
-        students: students.to_vec(),
-    };
+    let gateway: FakeStudentGateway = FakeStudentGateway::new(Ok(students.to_vec()));
 
     let use_case: RetrieveAllAvailableStudentsUseCase =
         RetrieveAllAvailableStudentsUseCase::new(Arc::new(gateway));
@@ -91,9 +90,7 @@ fn propagates_gateway_errors_with_their_kind_and_details() {
         kind: FailureKind::UnexpectedResponse,
         details: "missing table".to_owned(),
     };
-    let gateway: FakeFailureGateway = FakeFailureGateway {
-        error: error.clone(),
-    };
+    let gateway: FakeStudentGateway = FakeStudentGateway::new(Err(error.clone()));
 
     let use_case: RetrieveAllAvailableStudentsUseCase =
         RetrieveAllAvailableStudentsUseCase::new(Arc::new(gateway));
@@ -101,22 +98,4 @@ fn propagates_gateway_errors_with_their_kind_and_details() {
     let result: RetrieveAllAvailableStudentsResult = use_case.execute();
 
     assert_eq!(result, RetrieveAllAvailableStudentsResult::Failure(error));
-}
-
-struct FakeSuccessGateway {
-    students: Vec<Student>,
-}
-impl StudentGateway for FakeSuccessGateway {
-    fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
-        Ok(self.students.clone())
-    }
-}
-
-struct FakeFailureGateway {
-    error: StudentGatewayError,
-}
-impl StudentGateway for FakeFailureGateway {
-    fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
-        Err(self.error.clone())
-    }
 }

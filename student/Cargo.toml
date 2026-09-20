@@ -9,6 +9,7 @@ chrono = { workspace = true }
 
 [dev-dependencies]
 pretty_assertions = { workspace = true }
+test_support = { workspace = true }
 
 [lints]
 workspace = true

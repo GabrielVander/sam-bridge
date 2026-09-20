@@ -231,22 +231,24 @@ mod tests {
     use super::*;
     use crate::infra::{ErrorKindDto, ErrorReportDto, StudentLessonsDto, StudentPositionDto};
     use authentication::application::gateways::{
-        AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
+        AuthorizationResult, CredentialGateway, CredentialGatewayError,
     };
-    use authentication::domain::entities::{Credential, Email, Password};
     use credential_store::{FileCredentialStore, NoDataDirectory};
     use student::application::gateways::{
-        FailureKind, MusicianProfileGatewayError, StudentGateway, StudentGatewayError,
-        StudentLessonsGatewayError,
+        FailureKind, MusicianProfileGatewayError, StudentGatewayError, StudentLessonsGatewayError,
     };
     use student::domain::entities::{
         Instrument, MusicianLevel, MusicianProfile, Region, Student, StudentLessons,
         StudentPosition,
     };
+    use test_support::credentials::{FakeCredentialGateway, InMemoryCredentialStore};
+    use test_support::students::{
+        FakeMusicianProfileGateway, FakeStudentGateway, FakeStudentLessonsGateway,
+    };
 
     #[test]
     fn login_success_is_reported() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -261,7 +263,7 @@ mod tests {
 
     #[test]
     fn login_failure_is_reported() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Unauthorized),
             None,
             Ok(Vec::new()),
@@ -276,7 +278,7 @@ mod tests {
 
     #[test]
     fn login_gateway_failure_is_reported_with_its_kind_and_details() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Err(CredentialGatewayError::UnableToPerformOperation {
                 kind: authentication::application::gateways::FailureKind::Network,
                 details: "Request failed for operation 'authentication'".to_owned(),
@@ -300,7 +302,7 @@ mod tests {
 
     #[test]
     fn restore_session_with_valid_stored_credentials_is_restored() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             Some(("someone@example.com".to_owned(), "hunter2".to_owned())),
             Ok(Vec::new()),
@@ -315,7 +317,7 @@ mod tests {
 
     #[test]
     fn restore_session_without_stored_credentials_is_not_available() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -330,7 +332,7 @@ mod tests {
 
     #[test]
     fn available_students_are_mapped_to_dtos() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(vec![student()]),
@@ -354,7 +356,7 @@ mod tests {
 
     #[test]
     fn available_students_failure_is_reported_with_its_kind_and_details() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Err(StudentGatewayError::UnableToPerformOperation {
@@ -397,7 +399,7 @@ mod tests {
 
     #[test]
     fn student_lessons_are_mapped_to_dtos() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -418,7 +420,7 @@ mod tests {
 
     #[test]
     fn student_lessons_failure_is_reported_with_its_kind_and_details() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -442,7 +444,7 @@ mod tests {
 
     #[test]
     fn progress_assessment_success_is_mapped_to_a_dto() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -460,7 +462,7 @@ mod tests {
 
     #[test]
     fn progress_assessment_reports_missing_instrument() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -478,7 +480,7 @@ mod tests {
 
     #[test]
     fn progress_assessment_reports_unknown_level() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -499,7 +501,7 @@ mod tests {
 
     #[test]
     fn progress_assessment_of_an_unlisted_student_is_an_unexpected_response() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -520,7 +522,7 @@ mod tests {
 
     #[test]
     fn progress_assessment_reports_a_non_musician_without_calling_it_a_failure() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -535,7 +537,7 @@ mod tests {
 
     #[test]
     fn progress_assessment_reports_profile_retrieval_failures_with_kind_and_details() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -559,7 +561,7 @@ mod tests {
 
     #[test]
     fn progress_assessment_reports_lessons_retrieval_failures_with_kind_and_details() {
-        let (facade, _credential_dir) = facade(
+        let facade = facade(
             Ok(AuthorizationResult::Authorized),
             None,
             Ok(Vec::new()),
@@ -584,9 +586,109 @@ mod tests {
         );
     }
 
+    /// The real facade wired to a stand-in SAM site, with credentials stored in
+    /// a temporary directory that lives as long as the returned guard.
+    fn facade_talking_to(
+        mock_server: &wiremock::MockServer,
+    ) -> (ApplicationFacade, tempfile::TempDir) {
+        let config: Config = Config {
+            sam_client_base_url: mock_server.uri(),
+            sam_auth_endpoint: "autenticar".to_owned(),
+            sam_dashboard_endpoint: "painel".to_owned(),
+            sam_students_listing_endpoint: "alunos/listagem".to_owned(),
+            sam_student_lessons_endpoint: "licoes/index".to_owned(),
+        };
+        let credential_dir = tempfile::tempdir().expect("tempdir");
+        let facade: ApplicationFacade = ApplicationFacade::with_credential_store(
+            &config,
+            Ok(FileCredentialStore::with_dir(
+                &credential_dir.path().to_string_lossy(),
+            )),
+            ApplicationFacade::http_client_builder(),
+        )
+        .expect("facade should be built");
+
+        (facade, credential_dir)
+    }
+
+    // SAM answers a successful login with a redirect and tracks the session in
+    // a cookie, so the application's HTTP client must do neither of the usual
+    // things: follow the redirect, or forget the cookie.
+
+    #[test]
+    fn a_login_redirect_is_read_as_success_instead_of_being_followed() {
+        use wiremock::matchers::{method, path};
+        use wiremock::{Mock, MockServer, ResponseTemplate};
+
+        smol::block_on(async {
+            let mock_server: MockServer = MockServer::start().await;
+            Mock::given(method("POST"))
+                .and(path("/autenticar"))
+                .respond_with(ResponseTemplate::new(303).insert_header("Location", "/painel"))
+                .mount(&mock_server)
+                .await;
+            Mock::given(method("GET"))
+                .and(path("/painel"))
+                .respond_with(ResponseTemplate::new(200))
+                .mount(&mock_server)
+                .await;
+            let (facade, _credential_dir) = facade_talking_to(&mock_server);
+
+            let result = facade.login("user@example.com".to_owned(), "hunter2".to_owned());
+
+            assert_eq!(result, LoginResult::Successful);
+        });
+    }
+
+    #[test]
+    fn the_session_cookie_from_login_is_sent_on_later_requests() {
+        use wiremock::matchers::{header, method, path};
+        use wiremock::{Mock, MockServer, ResponseTemplate};
+
+        smol::block_on(async {
+            let mock_server: MockServer = MockServer::start().await;
+            Mock::given(method("POST"))
+                .and(path("/autenticar"))
+                .respond_with(
+                    ResponseTemplate::new(303).insert_header("Set-Cookie", "session=abc; Path=/"),
+                )
+                .mount(&mock_server)
+                .await;
+            Mock::given(method("GET"))
+                .and(path("/painel"))
+                .and(header("cookie", "session=abc"))
+                .respond_with(ResponseTemplate::new(200))
+                .mount(&mock_server)
+                .await;
+            Mock::given(method("GET"))
+                .and(path("/alunos/listagem"))
+                .and(header("cookie", "session=abc"))
+                .respond_with(
+                    ResponseTemplate::new(200)
+                        .set_body_string(
+                            r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#,
+                        )
+                        .insert_header("Content-Type", "application/json"),
+                )
+                .mount(&mock_server)
+                .await;
+            let (facade, _credential_dir) = facade_talking_to(&mock_server);
+            assert_eq!(
+                facade.login("user@example.com".to_owned(), "hunter2".to_owned()),
+                LoginResult::Successful
+            );
+
+            let result = facade.retrieve_all_available_students();
+
+            assert_eq!(
+                result,
+                RetrieveAllAvailableStudentsOutcome::Success(Vec::new())
+            );
+        });
+    }
+
     #[test]
     fn repeated_reads_of_the_students_listing_hit_the_site_once() {
-        use crate::infra::Config;
         use wiremock::matchers::{method, path};
         use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -611,22 +713,7 @@ mod tests {
                 .mount(&mock_server)
                 .await;
 
-            let config: Config = Config {
-                sam_client_base_url: mock_server.uri(),
-                sam_auth_endpoint: "autenticar".to_owned(),
-                sam_dashboard_endpoint: "painel".to_owned(),
-                sam_students_listing_endpoint: "alunos/listagem".to_owned(),
-                sam_student_lessons_endpoint: "licoes/index".to_owned(),
-            };
-            let credential_dir = tempfile::tempdir().expect("tempdir");
-            let facade: ApplicationFacade = ApplicationFacade::with_credential_store(
-                &config,
-                Ok(FileCredentialStore::with_dir(
-                    &credential_dir.path().to_string_lossy(),
-                )),
-                ApplicationFacade::http_client_builder(),
-            )
-            .expect("facade should be built");
+            let (facade, _credential_dir) = facade_talking_to(&mock_server);
 
             let _ = facade.retrieve_all_available_students();
             let _ = facade.retrieve_all_available_students();
@@ -686,68 +773,26 @@ mod tests {
         );
     }
 
-    struct FakeCredentialGateway {
-        result: Result<AuthorizationResult, CredentialGatewayError>,
-    }
-    impl CredentialGateway for FakeCredentialGateway {
-        fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, CredentialGatewayError> {
-            self.result.clone()
-        }
-    }
-
-    struct FakeStudentGateway {
-        result: Result<Vec<Student>, StudentGatewayError>,
-    }
-    impl StudentGateway for FakeStudentGateway {
-        fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
-            self.result.clone()
-        }
-    }
-
-    struct FakeMusicianProfileGateway {
-        result: Result<MusicianProfile, MusicianProfileGatewayError>,
-    }
-    impl MusicianProfileGateway for FakeMusicianProfileGateway {
-        fn get_by_id(&self, _id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
-            self.result.clone()
-        }
-    }
-
-    struct FakeStudentLessonsGateway {
-        result: Result<StudentLessons, StudentLessonsGatewayError>,
-    }
-    impl StudentLessonsGateway for FakeStudentLessonsGateway {
-        fn get_all_for_student_with_id(
-            &self,
-            _student_id: &str,
-        ) -> Result<StudentLessons, StudentLessonsGatewayError> {
-            self.result.clone()
-        }
-    }
-
+    /// The facade over fakes. Credentials live in the in-memory store, which the
+    /// contract suite keeps faithful to the real one; only the tests that build
+    /// the production wiring (`facade_talking_to`) use the encrypted file store.
     fn facade(
         credential_gateway_result: Result<AuthorizationResult, CredentialGatewayError>,
         stored_credential: Option<(String, String)>,
         students_result: Result<Vec<Student>, StudentGatewayError>,
         musician_profile_result: Result<MusicianProfile, MusicianProfileGatewayError>,
         student_lessons_result: Result<StudentLessons, StudentLessonsGatewayError>,
-    ) -> (ApplicationFacade, tempfile::TempDir) {
+    ) -> ApplicationFacade {
         let credential_gateway: Arc<dyn CredentialGateway + Send + Sync> =
-            Arc::new(FakeCredentialGateway {
-                result: credential_gateway_result,
-            });
+            Arc::new(FakeCredentialGateway::new(credential_gateway_result));
 
-        let credential_dir = tempfile::tempdir().expect("tempdir");
-        let credential_store: Arc<FileCredentialStore> = Arc::new(FileCredentialStore::with_dir(
-            &credential_dir.path().to_string_lossy(),
-        ));
-        if let Some((email, password)) = stored_credential {
-            credential_store
-                .save(&Credential::new(Email(email), Password(password)))
-                .expect("seeding the credential store should succeed");
-        }
+        let credential_store: Arc<InMemoryCredentialStore> = Arc::new(
+            stored_credential.map_or_else(InMemoryCredentialStore::new, |(email, password)| {
+                InMemoryCredentialStore::holding(email, password)
+            }),
+        );
 
-        let facade = ApplicationFacade {
+        ApplicationFacade {
             login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase::new(
                 credential_gateway.clone(),
                 credential_store.clone(),
@@ -757,19 +802,15 @@ mod tests {
                 credential_gateway,
             ),
             retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase::new(
-                Arc::new(FakeStudentGateway {
-                    result: students_result,
-                }),
+                Arc::new(FakeStudentGateway::new(students_result)),
             ),
-            sam_student_lessons_gateway: Arc::new(FakeStudentLessonsGateway {
-                result: student_lessons_result,
-            }),
-            sam_musician_profile_gateway: Arc::new(FakeMusicianProfileGateway {
-                result: musician_profile_result,
-            }),
-        };
-
-        (facade, credential_dir)
+            sam_student_lessons_gateway: Arc::new(FakeStudentLessonsGateway::new(
+                student_lessons_result,
+            )),
+            sam_musician_profile_gateway: Arc::new(FakeMusicianProfileGateway::new(
+                musician_profile_result,
+            )),
+        }
     }
 
     fn student() -> Student {

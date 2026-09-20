@@ -55,16 +55,23 @@ Common commands (from the repository root unless noted):
 # Rust
 cargo test --workspace
 cargo clippy --workspace --all-targets
-cargo llvm-cov nextest -p sam --summary-only
-cargo llvm-cov nextest -p gui_application --summary-only \
-  --ignore-filename-regex 'frb_generated\.rs'
+cargo llvm-cov nextest --workspace --summary-only \
+  --ignore-filename-regex 'frb_generated\.rs|test_support/'
 
 # Flutter (inside gui_application/flutter)
 flutter pub get
 flutter analyze
 flutter test
+tool/coverage.sh                # per-file line coverage of every hand-written lib/ file
 flutter run linux
 flutter build linux --debug     # rm -rf build/linux if CMake cache goes stale
+
+# Both stacks (repository root): fails unless line coverage is 100%
+scripts/check-coverage.sh
+
+# Rust mutation testing: fails if a code change goes unnoticed by every test
+# (needs `cargo install cargo-mutants`; takes several minutes)
+scripts/mutation-test.sh [crate...]
 
 # Regenerate FRB bindings after changing gui_application/src/api.rs
 cd gui_application/flutter && flutter_rust_bridge_codegen generate

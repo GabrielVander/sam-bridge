@@ -10,6 +10,7 @@ use sam::roster::adapters::gateways::StudentGatewaySamImpl;
 use student::application::gateways::{
     MusicianProfileGateway, StudentGateway, StudentLessonsGateway,
 };
+use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -72,19 +73,7 @@ const LISTING_ROW: &str =
 fn client_with_cache_decorator(
     mock_server: &MockServer,
 ) -> Result<Arc<dyn SamClient + Send + Sync>, reqwest::Error> {
-    let http_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
-        .redirect(reqwest::redirect::Policy::none())
-        .cookie_store(true)
-        .build()?;
-
-    let sam_operations: SamOperations = SamOperations::new(
-        http_client,
-        &mock_server.uri(),
-        "autenticar",
-        "painel",
-        "alunos/listagem",
-        "licoes/index",
-    );
+    let sam_operations: SamOperations = sam_operations_for(&mock_server.uri())?;
 
     Ok(Arc::new(SamClientCacheDecorator::new(
         Arc::new(SamClientImpl::new(sam_operations)),

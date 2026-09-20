@@ -1,10 +1,13 @@
 use std::sync::Arc;
 
-use sam::client::SamClientImpl;
+use sam::client::{
+    SamClient, SamClientError, SamClientImpl, SamCredentials, SamStudent, StudentLessonsPage,
+};
 use sam::http::SamOperations;
 use sam::roster::adapters::gateways::StudentGatewaySamImpl;
 use student::application::gateways::{FailureKind, StudentGateway, StudentGatewayError};
 use student::domain::entities::{Instrument, MusicianLevel, Student, StudentPosition};
+use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -13,19 +16,7 @@ fn build_gateway(mock_server: &MockServer) -> Result<StudentGatewaySamImpl, reqw
 }
 
 fn build_gateway_for(base_url: &str) -> Result<StudentGatewaySamImpl, reqwest::Error> {
-    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
-        .redirect(reqwest::redirect::Policy::none())
-        .cookie_store(true)
-        .build()?;
-
-    let sam_operations: SamOperations = SamOperations::new(
-        client,
-        base_url,
-        "autenticar",
-        "painel",
-        "alunos/listagem",
-        "licoes/index",
-    );
+    let sam_operations: SamOperations = sam_operations_for(base_url)?;
 
     let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
 
@@ -244,4 +235,31 @@ fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation
 
     assert_eq!(kind, FailureKind::Network);
     assert!(details.contains("dashboard"), "got: {details}");
+}
+
+struct FailingSamClient;
+
+impl SamClient for FailingSamClient {
+    fn login(&self, _credentials: &SamCredentials) -> Result<(), SamClientError> {
+        Err(SamClientError::InvalidCredentials)
+    }
+
+    fn students(&self) -> Result<Vec<SamStudent>, SamClientError> {
+        Err(SamClientError::InvalidCredentials)
+    }
+
+    fn student_lessons(&self, _student_id: &str) -> Result<StudentLessonsPage, SamClientError> {
+        Err(SamClientError::InvalidCredentials)
+    }
+}
+
+#[test]
+fn a_client_reporting_invalid_credentials_for_a_data_fetch_fails_with_an_unknown_kind() {
+    let gateway: StudentGatewaySamImpl = StudentGatewaySamImpl::new(Arc::new(FailingSamClient));
+
+    let (kind, details) =
+        failure_of(gateway.get_available_records()).expect("students retrieval should have failed");
+
+    assert_eq!(kind, FailureKind::Unknown);
+    assert!(details.contains("Invalid credentials"), "got: {details}");
 }
