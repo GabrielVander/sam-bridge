@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
+import 'package:flutter_application/widgets/loading_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -113,7 +114,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
   Widget build(BuildContext context) {
     return BlocSignalBuilder<StudentsPresenter, StudentsState>(
       builder: (context, state) => switch (state) {
-        StudentsLoading() => const Center(child: CircularProgressIndicator()),
+        StudentsLoading() => const LoadingIndicator(),
         StudentsLoaded(
           :final students,
           :final allStudents,

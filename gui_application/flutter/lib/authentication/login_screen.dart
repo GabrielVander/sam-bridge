@@ -2,6 +2,7 @@ import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
+import 'package:flutter_application/widgets/loading_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -18,7 +19,7 @@ class LoginScreen extends StatelessWidget {
       child: BlocSignalBuilder<AuthPresenter, AuthState>(
         builder: (BuildContext context, AuthState state) => switch (state) {
           AuthIdle() => const _LoginFormCard(),
-          AuthLoading() => const Center(child: CircularProgressIndicator()),
+          AuthLoading() => const LoadingIndicator(),
           AuthSuccess() => const Center(child: Icon(Icons.check_rounded)),
           AuthMissingFields() => _LoginFormCard(
             errorMessage: 'Informe usuário e senha',

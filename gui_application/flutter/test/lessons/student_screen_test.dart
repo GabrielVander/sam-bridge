@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
@@ -47,6 +49,37 @@ Future<List<String>> pumpScreen(
 }
 
 void main() {
+  group('StudentScreen loading', () {
+    testWidgets('says SAM is slow when the lessons take over ten seconds', (
+      tester,
+    ) async {
+      final answer = Completer<RetrieveStudentLessonsOutcome>();
+      final cubit = LessonsCubitSignal(
+        retrieveStudentLessons: ({required studentId}) => answer.future,
+        assessStudentProgress: ({required studentId}) async =>
+            const AssessStudentProgressOutcome.noInstrumentAssigned(),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: BlocSignalProvider<LessonsCubitSignal>.value(
+            value: cubit,
+            child: const StudentScreen(
+              studentId: '500132',
+              studentName: 'Jane',
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.textContaining('O SAM está demorando'), findsNothing);
+
+      await tester.pump(const Duration(seconds: 10));
+
+      expect(find.textContaining('O SAM está demorando'), findsOneWidget);
+    });
+  });
+
   group('StudentScreen failure', () {
     testWidgets('shows the friendly message with the details collapsed', (
       tester,

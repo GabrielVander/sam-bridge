@@ -28,6 +28,7 @@ use crate::infra::{
     RetrieveAllAvailableStudentsOutcome, RetrieveStudentLessonsOutcome, StudentSummaryDto,
 };
 
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(120);
 const STUDENTS_CACHE_TTL: Duration = Duration::from_secs(300);
 const LESSONS_CACHE_TTL: Duration = Duration::from_secs(60);
 
@@ -49,7 +50,12 @@ impl ApplicationFacade {
     }
 
     fn http_client_builder() -> reqwest::blocking::ClientBuilder {
+        Self::http_client_builder_with_timeout(REQUEST_TIMEOUT)
+    }
+
+    fn http_client_builder_with_timeout(timeout: Duration) -> reqwest::blocking::ClientBuilder {
         reqwest::blocking::Client::builder()
+            .timeout(timeout)
             .redirect(reqwest::redirect::Policy::none())
             .cookie_store(true)
     }
@@ -771,6 +777,43 @@ mod tests {
             message.contains(": "),
             "the message should include the underlying cause, got: {message}"
         );
+    }
+
+    // SAM has been seen taking 87 seconds to answer, more than the 30 seconds
+    // reqwest allows by default, which made every request fail. The timeout is
+    // therefore set deliberately rather than inherited.
+
+    #[test]
+    fn a_response_slower_than_the_request_timeout_fails_as_a_timeout() {
+        use wiremock::matchers::{method, path};
+        use wiremock::{Mock, MockServer, ResponseTemplate};
+
+        smol::block_on(async {
+            let mock_server: MockServer = MockServer::start().await;
+            Mock::given(method("GET"))
+                .and(path("/painel"))
+                .respond_with(ResponseTemplate::new(200).set_delay(Duration::from_millis(1500)))
+                .mount(&mock_server)
+                .await;
+            let client: reqwest::blocking::Client =
+                ApplicationFacade::http_client_builder_with_timeout(Duration::from_millis(200))
+                    .build()
+                    .expect("HTTP client should be built");
+
+            let error: reqwest::Error = client
+                .get(format!("{}/painel", mock_server.uri()))
+                .send()
+                .expect_err("the response should have been abandoned");
+
+            assert!(error.is_timeout(), "expected a timeout, got: {error:?}");
+        });
+    }
+
+    #[test]
+    fn the_request_timeout_outlasts_the_slowest_sam_response_observed() {
+        const SLOWEST_OBSERVED_RESPONSE: Duration = Duration::from_millis(87_500);
+
+        assert!(REQUEST_TIMEOUT > SLOWEST_OBSERVED_RESPONSE);
     }
 
     /// The facade over fakes. Credentials live in the in-memory store, which the

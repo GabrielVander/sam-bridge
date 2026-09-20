@@ -1,4 +1,9 @@
+import 'dart:async';
+
+import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/roster/students_presenter.dart';
+import 'package:flutter_application/roster/students_screen.dart';
 import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
 import 'package:flutter_application/rust/bootstrap/infra/roster_view.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,6 +11,30 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/roster.dart';
 
 void main() {
+  group('StudentsScreen loading', () {
+    testWidgets('says SAM is slow when the list takes over ten seconds', (
+      tester,
+    ) async {
+      final answer = Completer<RetrieveAllAvailableStudentsOutcome>();
+      final presenter = StudentsPresenter(
+        retrieveStudents: () => answer.future,
+      );
+      await tester.pumpWidget(
+        BlocSignalProvider<StudentsPresenter>.value(
+          value: presenter,
+          child: const MaterialApp(home: Scaffold(body: StudentsScreen())),
+        ),
+      );
+      await tester.pump();
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.textContaining('O SAM está demorando'), findsNothing);
+
+      await tester.pump(const Duration(seconds: 10));
+
+      expect(find.textContaining('O SAM está demorando'), findsOneWidget);
+    });
+  });
+
   group('StudentsScreen row', () {
     testWidgets('shows the instrument with a music note icon', (tester) async {
       await pumpRoster(tester, [

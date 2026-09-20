@@ -19,22 +19,21 @@ impl SamOperations {
         students_listing_endpoint: &str,
         student_lessons_endpoint: &str,
     ) -> Self {
-        let normalized_base_url: &str = base_url.trim_end_matches('/');
-
-        let authentication_url: String = format!("{normalized_base_url}/{authentication_endpoint}");
-        let dashboard_url: String = format!("{normalized_base_url}/{dashboard_endpoint}");
-        let students_listing_url: String =
-            format!("{normalized_base_url}/{students_listing_endpoint}");
-        let student_lessons_base_url: String =
-            format!("{normalized_base_url}/{student_lessons_endpoint}");
-
         Self {
             client,
-            authentication_url,
-            dashboard_url,
-            students_listing_url,
-            student_lessons_base_url,
+            authentication_url: Self::join(base_url, authentication_endpoint),
+            dashboard_url: Self::join(base_url, dashboard_endpoint),
+            students_listing_url: Self::join(base_url, students_listing_endpoint),
+            student_lessons_base_url: Self::join(base_url, student_lessons_endpoint),
         }
+    }
+
+    fn join(base_url: &str, endpoint: &str) -> String {
+        format!(
+            "{}/{}",
+            base_url.trim_end_matches('/'),
+            endpoint.trim_start_matches('/')
+        )
     }
 
     pub(crate) fn authenticate(

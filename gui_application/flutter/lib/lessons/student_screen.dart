@@ -7,6 +7,7 @@ import 'package:flutter_application/lessons/widgets/checkpoint_timeline.dart';
 import 'package:flutter_application/lessons/widgets/unknown_level_banner.dart';
 import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
+import 'package:flutter_application/widgets/loading_indicator.dart';
 
 class StudentScreen extends StatefulWidget {
   final String studentId;
@@ -38,9 +39,7 @@ final class _StudentScreenState extends State<StudentScreen> {
           Expanded(
             child: BlocSignalBuilder<LessonsCubitSignal, LessonsState>(
               builder: (context, state) => switch (state) {
-                LessonsLoading() => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                LessonsLoading() => const LoadingIndicator(),
                 LessonsLoaded(:final view, :final progress) => _StudentDetail(
                   view: view,
                   progress: progress,

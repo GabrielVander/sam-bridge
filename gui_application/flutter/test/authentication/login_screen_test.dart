@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
@@ -13,8 +15,6 @@ const _details = "Request failed for operation 'authentication'";
 Finder get _emailField => find.widgetWithText(TextField, 'Email');
 Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
 
-/// Shows the login screen inside a router, so that a successful sign-in has
-/// somewhere to go. Returns the credentials the presenter was asked to check.
 Future<List<(String, String)>> pumpLoginForm(
   WidgetTester tester, {
   LoginResult result = const LoginResult.invalidEmailOrPassword(),
@@ -77,6 +77,38 @@ Future<void> pumpLogin(
 }
 
 void main() {
+  group('LoginScreen loading', () {
+    testWidgets('says SAM is slow when signing in takes over ten seconds', (
+      tester,
+    ) async {
+      final answer = Completer<LoginResult>();
+      final presenter = AuthPresenter(
+        loginUseCase: ({required email, required password}) => answer.future,
+        restoreSessionUseCase: () async => RestoreSessionOutcome.notAvailable,
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: BlocSignalProvider<AuthPresenter>.value(
+              value: presenter,
+              child: const LoginScreen(),
+            ),
+          ),
+        ),
+      );
+      await tester.enterText(_emailField, 'user@example.com');
+      await tester.enterText(_passwordField, 'hunter2-secret');
+      await tester.tap(find.text('Entrar'));
+      await tester.pump();
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.textContaining('O SAM está demorando'), findsNothing);
+
+      await tester.pump(const Duration(seconds: 10));
+
+      expect(find.textContaining('O SAM está demorando'), findsOneWidget);
+    });
+  });
+
   group('LoginScreen failure', () {
     testWidgets(
       'shows the friendly message with the technical details collapsed',
