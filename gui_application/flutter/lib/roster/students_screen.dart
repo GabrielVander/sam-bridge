@@ -47,6 +47,11 @@ final class _StudentsScreenState extends State<StudentsScreen> {
     });
   }
 
+  void _clearFilters() {
+    _searchController.clear();
+    context.read<StudentsPresenter>().clearFilters();
+  }
+
   Future<void> _showLocationPicker(
     List<String> available,
     Set<String> selected,
@@ -163,10 +168,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                         selectedLocations.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       TextButton(
-                        onPressed: () {
-                          _searchController.clear();
-                          context.read<StudentsPresenter>().clearFilters();
-                        },
+                        onPressed: _clearFilters,
                         child: const Text('Limpar'),
                       ),
                     ],
@@ -202,6 +204,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                   allStudents: allStudents,
                   nameQuery: nameQuery,
                   selectedLocations: selectedLocations,
+                  onClearFilters: _clearFilters,
                 ),
               ),
             ],
@@ -221,12 +224,14 @@ final class _StudentsListContent extends StatelessWidget {
   final List<StudentListItem> allStudents;
   final String nameQuery;
   final Set<String> selectedLocations;
+  final VoidCallback onClearFilters;
 
   const _StudentsListContent({
     required this.students,
     required this.allStudents,
     required this.nameQuery,
     required this.selectedLocations,
+    required this.onClearFilters,
   });
 
   @override
@@ -235,43 +240,38 @@ final class _StudentsListContent extends StatelessWidget {
       return const Center(child: Text('Nenhum aluno disponível.'));
     }
     if (students.isEmpty) {
-      final hasFilter = nameQuery.isNotEmpty || selectedLocations.isNotEmpty;
-      if (hasFilter) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.search_off, size: 48),
-                const SizedBox(height: 12),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.search_off, size: 48),
+              const SizedBox(height: 12),
+              Text(
+                nameQuery.isNotEmpty
+                    ? 'Nenhum resultado para "$nameQuery"'
+                    : 'Nenhum resultado',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              if (selectedLocations.isNotEmpty) ...[
+                const SizedBox(height: 4),
                 Text(
-                  nameQuery.isNotEmpty
-                      ? 'Nenhum resultado para "$nameQuery"'
-                      : 'Nenhum resultado',
+                  'em ${selectedLocations.join(', ')}',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                if (selectedLocations.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    'em ${selectedLocations.join(', ')}',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-                const SizedBox(height: 16),
-                FilledButton.tonal(
-                  onPressed: () =>
-                      context.read<StudentsPresenter>().clearFilters(),
-                  child: const Text('Limpar filtros'),
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
-            ),
+              const SizedBox(height: 16),
+              FilledButton.tonal(
+                onPressed: onClearFilters,
+                child: const Text('Limpar filtros'),
+              ),
+            ],
           ),
-        );
-      }
-      return const Center(child: Text('Nenhum aluno disponível.'));
+        ),
+      );
     }
     return _StudentsList(students);
   }
@@ -284,10 +284,6 @@ final class _StudentsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (students.isEmpty) {
-      return const Center(child: Text('Nenhum aluno disponível.'));
-    }
-
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       itemCount: students.length,

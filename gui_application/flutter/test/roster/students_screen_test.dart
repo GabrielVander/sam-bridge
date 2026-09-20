@@ -1,45 +1,16 @@
-import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/roster/students_presenter.dart';
-import 'package:flutter_application/roster/students_screen.dart';
 import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
 import 'package:flutter_application/rust/bootstrap/infra/roster_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future<void> pumpRoster(
-  WidgetTester tester,
-  List<StudentSummaryDto> students,
-) async {
-  final presenter = StudentsPresenter(
-    retrieveStudents: () async =>
-        RetrieveAllAvailableStudentsOutcome.success(students),
-  );
-
-  await tester.pumpWidget(
-    MaterialApp(
-      home: Scaffold(
-        body: BlocSignalProvider<StudentsPresenter>.value(
-          value: presenter,
-          child: const StudentsScreen(),
-        ),
-      ),
-    ),
-  );
-  await tester.pumpAndSettle();
-}
-
-StudentSummaryDto student({String? instrumentName}) => StudentSummaryDto(
-  id: '1',
-  name: 'Jane Doe',
-  position: const StudentPositionDto.practice(),
-  location: 'Some Location',
-  instrumentName: instrumentName,
-);
+import '../support/roster.dart';
 
 void main() {
   group('StudentsScreen row', () {
     testWidgets('shows the instrument with a music note icon', (tester) async {
-      await pumpRoster(tester, [student(instrumentName: 'SAXOFONE TENOR')]);
+      await pumpRoster(tester, [
+        studentSummary(instrumentName: 'SAXOFONE TENOR'),
+      ]);
 
       expect(find.text('Saxofone tenor'), findsOneWidget);
       expect(find.byIcon(Icons.music_note_outlined), findsOneWidget);
@@ -48,7 +19,7 @@ void main() {
     testWidgets('puts the instrument between position and location', (
       tester,
     ) async {
-      await pumpRoster(tester, [student(instrumentName: 'OBOÉ')]);
+      await pumpRoster(tester, [studentSummary(instrumentName: 'OBOÉ')]);
 
       final position = tester.getTopLeft(find.text('Ensaio')).dy;
       final instrument = tester.getTopLeft(find.text('Oboé')).dy;
@@ -61,7 +32,7 @@ void main() {
     testWidgets('shows no instrument line when there is no instrument', (
       tester,
     ) async {
-      await pumpRoster(tester, [student()]);
+      await pumpRoster(tester, [studentSummary()]);
 
       expect(find.byIcon(Icons.music_note_outlined), findsNothing);
       expect(find.text('Ensaio'), findsOneWidget);
@@ -76,7 +47,7 @@ void main() {
       addTearDown(tester.view.reset);
       final longName = List.filled(12, 'INSTRUMENTO').join(' ');
 
-      await pumpRoster(tester, [student(instrumentName: longName)]);
+      await pumpRoster(tester, [studentSummary(instrumentName: longName)]);
 
       final text = tester.widget<Text>(find.textContaining('Instrumento'));
       expect(text.maxLines, 1);
@@ -87,7 +58,7 @@ void main() {
     testWidgets('hides the decorative icon from screen readers', (
       tester,
     ) async {
-      await pumpRoster(tester, [student(instrumentName: 'VIOLINO')]);
+      await pumpRoster(tester, [studentSummary(instrumentName: 'VIOLINO')]);
 
       expect(
         find.ancestor(
@@ -99,6 +70,55 @@ void main() {
     });
   });
 
+  group('StudentsScreen navigation', () {
+    testWidgets('tapping a student opens their page, passing the name along', (
+      tester,
+    ) async {
+      await pumpRoster(tester, [
+        studentSummary(id: '500132', name: 'Jane Doe'),
+      ]);
+
+      await tester.tap(find.text('Jane Doe'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('página do aluno 500132 (Jane Doe)'), findsOneWidget);
+    });
+
+    testWidgets('a student without an id cannot be opened', (tester) async {
+      await pumpRoster(tester, [studentSummary(id: '', name: 'Jane Doe')]);
+
+      await tester.tap(find.text('Jane Doe'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('página do aluno'), findsNothing);
+      expect(find.byIcon(Icons.chevron_right), findsNothing);
+    });
+
+    testWidgets('a student with an id shows that the row can be opened', (
+      tester,
+    ) async {
+      await pumpRoster(tester, [studentSummary(id: '1')]);
+
+      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+    });
+  });
+
+  group('StudentsScreen avatar', () {
+    testWidgets('shows the capitalised first letter of the name', (
+      tester,
+    ) async {
+      await pumpRoster(tester, [studentSummary(name: 'jane doe')]);
+
+      expect(find.text('J'), findsOneWidget);
+    });
+
+    testWidgets('shows a question mark when the name is empty', (tester) async {
+      await pumpRoster(tester, [studentSummary(name: '')]);
+
+      expect(find.text('?'), findsOneWidget);
+    });
+  });
+
   group('StudentsScreen failure', () {
     const failure = RetrieveAllAvailableStudentsOutcome.failure(
       ErrorReportDto(
@@ -107,28 +127,10 @@ void main() {
       ),
     );
 
-    Future<StudentsPresenter> pumpFailingRoster(
+    Future<void> pumpFailingRoster(
       WidgetTester tester, {
       required List<RetrieveAllAvailableStudentsOutcome> outcomes,
-    }) async {
-      final remaining = [...outcomes];
-      final presenter = StudentsPresenter(
-        retrieveStudents: () async => remaining.removeAt(0),
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: BlocSignalProvider<StudentsPresenter>.value(
-              value: presenter,
-              child: const StudentsScreen(),
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      return presenter;
-    }
+    }) => pumpStudents(tester, presenterAnswering(outcomes));
 
     testWidgets('shows the friendly message with the details collapsed', (
       tester,
@@ -148,7 +150,7 @@ void main() {
         tester,
         outcomes: [
           failure,
-          RetrieveAllAvailableStudentsOutcome.success([student()]),
+          RetrieveAllAvailableStudentsOutcome.success([studentSummary()]),
         ],
       );
 

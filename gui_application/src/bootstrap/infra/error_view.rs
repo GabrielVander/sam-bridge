@@ -4,8 +4,6 @@ use student::application::gateways::{
 };
 use student::application::use_cases::AssessStudentProgressError;
 
-/// What the UI receives when an operation fails: a coarse `kind` to pick
-/// user-facing copy from, and technical `details` for bug reports.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ErrorReportDto {
     pub kind: ErrorKindDto,
@@ -85,5 +83,43 @@ impl From<AssessStudentProgressError> for ErrorReportDto {
                 details: other.to_string(),
             },
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn every_authentication_failure_kind_has_a_matching_error_kind_dto() {
+        let cases = [
+            (AuthenticationFailureKind::Network, ErrorKindDto::Network),
+            (
+                AuthenticationFailureKind::UnexpectedResponse,
+                ErrorKindDto::UnexpectedResponse,
+            ),
+            (
+                AuthenticationFailureKind::SessionExpired,
+                ErrorKindDto::SessionExpired,
+            ),
+            (AuthenticationFailureKind::Unknown, ErrorKindDto::Unknown),
+        ];
+
+        for (kind, expected) in cases {
+            assert_eq!(ErrorKindDto::from(kind), expected);
+        }
+    }
+
+    #[test]
+    fn a_student_without_an_instrument_is_reported_as_unknown_with_the_reason() {
+        let report = ErrorReportDto::from(AssessStudentProgressError::NoInstrumentAssigned);
+
+        assert_eq!(
+            report,
+            ErrorReportDto {
+                kind: ErrorKindDto::Unknown,
+                details: "student has no instrument assigned yet".to_owned(),
+            }
+        );
     }
 }

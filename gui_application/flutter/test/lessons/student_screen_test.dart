@@ -102,6 +102,20 @@ void main() {
       },
     );
 
+    testWidgets('an unrecognised level is explained with its raw value', (
+      tester,
+    ) async {
+      await pumpScreen(
+        tester,
+        outcomes: [_emptyLessons],
+        progress: const AssessStudentProgressOutcome.unknownLevel('EXÓTICO'),
+      );
+
+      expect(find.text('nível não reconhecido'), findsOneWidget);
+      expect(find.text('Valor: EXÓTICO'), findsOneWidget);
+      expect(find.textContaining('Progresso indisponível'), findsNothing);
+    });
+
     testWidgets('a non-musician gets a friendly notice, not a failure', (
       tester,
     ) async {

@@ -1,4 +1,6 @@
-class StudentListItem {
+import 'package:equatable/equatable.dart';
+
+class StudentListItem extends Equatable {
   final String id;
   final String name;
   final String location;
@@ -14,28 +16,12 @@ class StudentListItem {
   });
 
   @override
-  int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      location.hashCode ^
-      position.hashCode ^
-      instrument.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StudentListItem &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name &&
-          location == other.location &&
-          position == other.position &&
-          instrument == other.instrument;
+  List<Object?> get props => [id, name, location, position, instrument];
 }
 
 enum LessonKind { msa, method }
 
-class LessonItem {
+class LessonItem extends Equatable {
   final LessonKind kind;
   final String id;
   final String date;
@@ -61,36 +47,21 @@ class LessonItem {
   });
 
   @override
-  int get hashCode =>
-      kind.hashCode ^
-      id.hashCode ^
-      date.hashCode ^
-      phase.hashCode ^
-      page.hashCode ^
-      lesson.hashCode ^
-      clef.hashCode ^
-      description.hashCode ^
-      instructor.hashCode ^
-      method.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LessonItem &&
-          runtimeType == other.runtimeType &&
-          kind == other.kind &&
-          id == other.id &&
-          date == other.date &&
-          phase == other.phase &&
-          page == other.page &&
-          lesson == other.lesson &&
-          clef == other.clef &&
-          description == other.description &&
-          instructor == other.instructor &&
-          method == other.method;
+  List<Object?> get props => [
+    kind,
+    id,
+    date,
+    phase,
+    page,
+    lesson,
+    clef,
+    description,
+    instructor,
+    method,
+  ];
 }
 
-class StudentLessonsView {
+class StudentLessonsView extends Equatable {
   final List<LessonItem> msa;
   final List<LessonItem> method;
 
@@ -100,18 +71,10 @@ class StudentLessonsView {
       const StudentLessonsView(msa: [], method: []);
 
   @override
-  int get hashCode => msa.hashCode ^ method.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StudentLessonsView &&
-          runtimeType == other.runtimeType &&
-          msa == other.msa &&
-          method == other.method;
+  List<Object?> get props => [msa, method];
 }
 
-class CheckpointView {
+class CheckpointView extends Equatable {
   final String levelKey;
   final String label;
   final bool achieved;
@@ -129,28 +92,17 @@ class CheckpointView {
   });
 
   @override
-  int get hashCode =>
-      levelKey.hashCode ^
-      label.hashCode ^
-      achieved.hashCode ^
-      readyToAdvance.hashCode ^
-      msaMet.hashCode ^
-      methodMet.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CheckpointView &&
-          runtimeType == other.runtimeType &&
-          levelKey == other.levelKey &&
-          label == other.label &&
-          achieved == other.achieved &&
-          readyToAdvance == other.readyToAdvance &&
-          msaMet == other.msaMet &&
-          methodMet == other.methodMet;
+  List<Object?> get props => [
+    levelKey,
+    label,
+    achieved,
+    readyToAdvance,
+    msaMet,
+    methodMet,
+  ];
 }
 
-class ProgressView {
+class ProgressView extends Equatable {
   final List<CheckpointView> checkpoints;
   final double msaRelativePercent;
   final double methodRelativePercent;
@@ -168,41 +120,22 @@ class ProgressView {
   });
 
   @override
-  int get hashCode =>
-      checkpoints.hashCode ^
-      msaRelativePercent.hashCode ^
-      methodRelativePercent.hashCode ^
-      combinedPercent.hashCode ^
-      overallCheckpointPercent.hashCode ^
-      nextLevelLabel.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ProgressView &&
-          runtimeType == other.runtimeType &&
-          checkpoints == other.checkpoints &&
-          msaRelativePercent == other.msaRelativePercent &&
-          methodRelativePercent == other.methodRelativePercent &&
-          combinedPercent == other.combinedPercent &&
-          overallCheckpointPercent == other.overallCheckpointPercent &&
-          nextLevelLabel == other.nextLevelLabel;
+  List<Object?> get props => [
+    checkpoints,
+    msaRelativePercent,
+    methodRelativePercent,
+    combinedPercent,
+    overallCheckpointPercent,
+    nextLevelLabel,
+  ];
 }
 
-class ErrorReport {
+class ErrorReport extends Equatable {
   final String userMessage;
   final String details;
 
   const ErrorReport({required this.userMessage, required this.details});
 
   @override
-  int get hashCode => userMessage.hashCode ^ details.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ErrorReport &&
-          runtimeType == other.runtimeType &&
-          userMessage == other.userMessage &&
-          details == other.details;
+  List<Object?> get props => [userMessage, details];
 }

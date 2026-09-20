@@ -5,10 +5,11 @@ use authentication::application::use_cases::{
     LoginAndRememberCredentialsUseCase, LoginUseCaseError, RestoreSessionResult,
     RestoreSessionUseCase,
 };
-use credential_store::FileCredentialStore;
+use credential_store::{FileCredentialStore, NoDataDirectory};
 use sam::{
     authentication::adapters::gateways::CredentialGatewaySamImpl,
     client::{CacheTtl, SamClient, SamClientCacheDecorator, SamClientImpl, SystemClock},
+    diagnostics::error_chain,
     http::SamOperations,
     lessons::adapters::gateways::{MusicianProfileGatewaySamImpl, StudentLessonsGatewaySamImpl},
     roster::adapters::gateways::StudentGatewaySamImpl,
@@ -40,18 +41,29 @@ pub struct ApplicationFacade {
 
 impl ApplicationFacade {
     pub(crate) fn new(config: &Config) -> Result<Self, String> {
-        Self::with_credential_store(config, Arc::new(FileCredentialStore::new()))
+        Self::with_credential_store(
+            config,
+            FileCredentialStore::new(),
+            Self::http_client_builder(),
+        )
+    }
+
+    fn http_client_builder() -> reqwest::blocking::ClientBuilder {
+        reqwest::blocking::Client::builder()
+            .redirect(reqwest::redirect::Policy::none())
+            .cookie_store(true)
     }
 
     fn with_credential_store(
         config: &Config,
-        file_credential_store: Arc<FileCredentialStore>,
+        credential_store: Result<FileCredentialStore, NoDataDirectory>,
+        http_client_builder: reqwest::blocking::ClientBuilder,
     ) -> Result<Self, String> {
-        let reqwest_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
-            .redirect(reqwest::redirect::Policy::none())
-            .cookie_store(true)
-            .build()
-            .map_err(|e| e.to_string())?;
+        let file_credential_store: Arc<FileCredentialStore> =
+            Arc::new(credential_store.map_err(|e| error_chain(&e))?);
+
+        let reqwest_client: reqwest::blocking::Client =
+            http_client_builder.build().map_err(|e| error_chain(&e))?;
 
         let sam_operations: SamOperations = SamOperations::new(
             reqwest_client,
@@ -222,7 +234,7 @@ mod tests {
         AuthorizationResult, CredentialGateway, CredentialGatewayError, CredentialStore,
     };
     use authentication::domain::entities::{Credential, Email, Password};
-    use credential_store::FileCredentialStore;
+    use credential_store::{FileCredentialStore, NoDataDirectory};
     use student::application::gateways::{
         FailureKind, MusicianProfileGatewayError, StudentGateway, StudentGatewayError,
         StudentLessonsGatewayError,
@@ -609,9 +621,10 @@ mod tests {
             let credential_dir = tempfile::tempdir().expect("tempdir");
             let facade: ApplicationFacade = ApplicationFacade::with_credential_store(
                 &config,
-                Arc::new(FileCredentialStore::with_dir(
+                Ok(FileCredentialStore::with_dir(
                     &credential_dir.path().to_string_lossy(),
                 )),
+                ApplicationFacade::http_client_builder(),
             )
             .expect("facade should be built");
 
@@ -627,6 +640,50 @@ mod tests {
                 .count();
             assert_eq!(listing_requests, 1);
         });
+    }
+
+    fn any_config() -> Config {
+        Config {
+            sam_client_base_url: "http://127.0.0.1:1".to_owned(),
+            sam_auth_endpoint: "autenticar".to_owned(),
+            sam_dashboard_endpoint: "painel".to_owned(),
+            sam_students_listing_endpoint: "alunos/listagem".to_owned(),
+            sam_student_lessons_endpoint: "licoes/index".to_owned(),
+        }
+    }
+
+    #[test]
+    fn without_a_data_directory_the_application_cannot_be_built() {
+        let result = ApplicationFacade::with_credential_store(
+            &any_config(),
+            Err(NoDataDirectory),
+            ApplicationFacade::http_client_builder(),
+        );
+
+        assert_eq!(
+            result.err(),
+            Some("no platform data directory is available to store credentials".to_owned())
+        );
+    }
+
+    #[test]
+    fn when_the_http_client_cannot_be_built_the_application_reports_why() {
+        let credential_dir = tempfile::tempdir().expect("tempdir");
+        let impossible_tls_range = reqwest::blocking::Client::builder()
+            .min_tls_version(reqwest::tls::Version::TLS_1_3)
+            .max_tls_version(reqwest::tls::Version::TLS_1_2);
+
+        let result = ApplicationFacade::with_credential_store(
+            &any_config(),
+            Ok(FileCredentialStore::under(credential_dir.path())),
+            impossible_tls_range,
+        );
+
+        let message = result.err().expect("building should fail");
+        assert!(
+            message.contains(": "),
+            "the message should include the underlying cause, got: {message}"
+        );
     }
 
     struct FakeCredentialGateway {
