@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use authentication::application::use_cases::{
-    LoginAndRememberCredentialsUseCase, LoginUseCaseError, RestoreSessionResult,
+    LoginAndRememberCredentialsUseCase, LoginUseCaseError, LogoutUseCase, RestoreSessionResult,
     RestoreSessionUseCase,
 };
 use credential_store::{FileCredentialStore, NoDataDirectory};
@@ -35,6 +35,7 @@ const LESSONS_CACHE_TTL: Duration = Duration::from_secs(60);
 pub struct ApplicationFacade {
     login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase,
     restore_session_use_case: RestoreSessionUseCase,
+    logout_use_case: LogoutUseCase,
     retrieve_all_available_students_use_case: RetrieveAllAvailableStudentsUseCase,
     sam_student_lessons_gateway: Arc<dyn StudentLessonsGateway + Send + Sync>,
     sam_musician_profile_gateway: Arc<dyn MusicianProfileGateway + Send + Sync>,
@@ -98,6 +99,8 @@ impl ApplicationFacade {
                 file_credential_store.clone(),
             );
 
+        let logout_use_case: LogoutUseCase = LogoutUseCase::new(file_credential_store.clone());
+
         let restore_session_use_case: RestoreSessionUseCase =
             RestoreSessionUseCase::new(file_credential_store, sam_credential_gateway);
 
@@ -116,6 +119,7 @@ impl ApplicationFacade {
         Ok(Self {
             login_and_remember_credentials_use_case,
             restore_session_use_case,
+            logout_use_case,
             retrieve_all_available_students_use_case,
             sam_student_lessons_gateway,
             sam_musician_profile_gateway,
@@ -136,6 +140,14 @@ impl ApplicationFacade {
             RestoreSessionResult::NoStoredCredentials
             | RestoreSessionResult::CredentialsRejected
             | RestoreSessionResult::UnableToPerformOperation => RestoreSessionOutcome::NotAvailable,
+        }
+    }
+
+    #[must_use]
+    pub fn logout(&self) -> LogoutOutcome {
+        match self.logout_use_case.execute() {
+            Ok(()) => LogoutOutcome::Successful,
+            Err(_) => LogoutOutcome::Failed,
         }
     }
 
@@ -207,6 +219,12 @@ pub enum LoginResult {
 pub enum RestoreSessionOutcome {
     Restored,
     NotAvailable,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LogoutOutcome {
+    Successful,
+    Failed,
 }
 
 impl From<Result<(), LoginUseCaseError>> for LoginResult {
@@ -319,6 +337,25 @@ mod tests {
         let result = facade.restore_session();
 
         assert_eq!(result, RestoreSessionOutcome::Restored);
+    }
+
+    #[test]
+    fn logout_clears_the_stored_credential_so_restore_session_finds_none() {
+        let facade = facade(
+            Ok(AuthorizationResult::Authorized),
+            Some(("someone@example.com".to_owned(), "hunter2".to_owned())),
+            Ok(Vec::new()),
+            Err(MusicianProfileGatewayError::NotFound),
+            Ok(StudentLessons::default()),
+        );
+
+        let result = facade.logout();
+
+        assert_eq!(result, LogoutOutcome::Successful);
+        assert_eq!(
+            facade.restore_session(),
+            RestoreSessionOutcome::NotAvailable
+        );
     }
 
     #[test]
@@ -840,6 +877,7 @@ mod tests {
                 credential_gateway.clone(),
                 credential_store.clone(),
             ),
+            logout_use_case: LogoutUseCase::new(credential_store.clone()),
             restore_session_use_case: RestoreSessionUseCase::new(
                 credential_store,
                 credential_gateway,

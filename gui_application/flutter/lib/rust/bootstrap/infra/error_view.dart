@@ -10,8 +10,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 enum ErrorKindDto { network, unexpectedResponse, sessionExpired, unknown }
 
-/// What the UI receives when an operation fails: a coarse `kind` to pick
-/// user-facing copy from, and technical `details` for bug reports.
 class ErrorReportDto {
   final ErrorKindDto kind;
   final String details;

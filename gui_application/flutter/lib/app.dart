@@ -1,6 +1,7 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/application/use_cases/login_use_case.dart';
+import 'package:flutter_application/authentication/application/use_cases/logout_use_case.dart';
 import 'package:flutter_application/authentication/application/use_cases/restore_session_use_case.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/lessons/application/use_cases/assess_student_progress_use_case.dart';
@@ -20,6 +21,7 @@ Future<SamSiteApp> composeApp({
   required String versionDisplay,
   required LoginUseCase login,
   required RestoreSessionUseCase restoreSession,
+  required LogoutUseCase logout,
   required RetrieveStudentsUseCase retrieveStudents,
   required RetrieveStudentLessonsUseCase retrieveStudentLessons,
   required AssessStudentProgressUseCase assessStudentProgress,
@@ -27,6 +29,7 @@ Future<SamSiteApp> composeApp({
   final AuthPresenter authPresenter = AuthPresenter(
     loginUseCase: login,
     restoreSessionUseCase: restoreSession,
+    logoutUseCase: logout,
   );
 
   await authPresenter.restoreSession();

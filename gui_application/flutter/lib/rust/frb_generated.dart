@@ -69,7 +69,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.14.0-beta.2';
 
   @override
-  int get rustContentHash => -1973232432;
+  int get rustContentHash => -112371004;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -91,6 +91,10 @@ abstract class RustLibApi extends BaseApi {
     required ApplicationFacade that,
     required String email,
     required String password,
+  });
+
+  Future<LogoutOutcome> crateBootstrapInfraApplicationApplicationFacadeLogout({
+    required ApplicationFacade that,
   });
 
   Future<RestoreSessionOutcome>
@@ -213,6 +217,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<LogoutOutcome> crateBootstrapInfraApplicationApplicationFacadeLogout({
+    required ApplicationFacade that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_logout_outcome,
+          decodeErrorData: null,
+        ),
+        constMeta:
+            kCrateBootstrapInfraApplicationApplicationFacadeLogoutConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateBootstrapInfraApplicationApplicationFacadeLogoutConstMeta =>
+      const TaskConstMeta(
+        debugName: "ApplicationFacade_logout",
+        argNames: ["that"],
+      );
+
+  @override
   Future<RestoreSessionOutcome>
   crateBootstrapInfraApplicationApplicationFacadeRestoreSession({
     required ApplicationFacade that,
@@ -228,7 +270,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 3,
+            funcId: 4,
             port: port_,
           );
         },
@@ -267,7 +309,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 5,
             port: port_,
           );
         },
@@ -308,7 +350,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 6,
             port: port_,
           );
         },
@@ -340,7 +382,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 7,
             port: port_,
           );
         },
@@ -575,6 +617,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw Exception("unreachable");
     }
+  }
+
+  @protected
+  LogoutOutcome dco_decode_logout_outcome(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LogoutOutcome.values[dcoDecodePrimitiveInt(raw)];
   }
 
   @protected
@@ -1013,6 +1061,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw UnimplementedError('');
     }
+  }
+
+  @protected
+  LogoutOutcome sse_decode_logout_outcome(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return LogoutOutcome.values[inner];
   }
 
   @protected
@@ -1460,6 +1515,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_logout_outcome(LogoutOutcome self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1685,6 +1746,9 @@ class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
         email: email,
         password: password,
       );
+
+  Future<LogoutOutcome> logout() => RustLib.instance.api
+      .crateBootstrapInfraApplicationApplicationFacadeLogout(that: this);
 
   Future<RestoreSessionOutcome> restoreSession() => RustLib.instance.api
       .crateBootstrapInfraApplicationApplicationFacadeRestoreSession(

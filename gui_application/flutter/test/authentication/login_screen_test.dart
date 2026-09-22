@@ -26,6 +26,7 @@ Future<List<(String, String)>> pumpLoginForm(
       return result;
     },
     restoreSessionUseCase: () async => RestoreSessionOutcome.notAvailable,
+    logoutUseCase: () async => LogoutOutcome.successful,
   );
   final router = GoRouter(
     initialLocation: '/login',
@@ -57,6 +58,7 @@ Future<void> pumpLogin(
   final presenter = AuthPresenter(
     loginUseCase: ({required email, required password}) async => result,
     restoreSessionUseCase: () async => RestoreSessionOutcome.notAvailable,
+    logoutUseCase: () async => LogoutOutcome.successful,
   );
 
   await tester.pumpWidget(
@@ -85,6 +87,7 @@ void main() {
       final presenter = AuthPresenter(
         loginUseCase: ({required email, required password}) => answer.future,
         restoreSessionUseCase: () async => RestoreSessionOutcome.notAvailable,
+        logoutUseCase: () async => LogoutOutcome.successful,
       );
       await tester.pumpWidget(
         MaterialApp(

@@ -12,8 +12,8 @@ import 'progress_view.dart';
 import 'roster_view.dart';
 part 'application.freezed.dart';
 
-// These functions are ignored because they are not marked as `pub`: `new`, `with_credential_store`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `from`, `from`
+// These functions are ignored because they are not marked as `pub`: `http_client_builder_with_timeout`, `http_client_builder`, `new`, `with_credential_store`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `from`, `from`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>
 abstract class ApplicationFacade implements RustOpaqueInterface {
@@ -22,6 +22,8 @@ abstract class ApplicationFacade implements RustOpaqueInterface {
   });
 
   Future<LoginResult> login({required String email, required String password});
+
+  Future<LogoutOutcome> logout();
 
   Future<RestoreSessionOutcome> restoreSession();
 
@@ -43,5 +45,7 @@ sealed class LoginResult with _$LoginResult {
     ErrorReportDto field0,
   ) = LoginResult_UnableToPerformAuthorization;
 }
+
+enum LogoutOutcome { successful, failed }
 
 enum RestoreSessionOutcome { restored, notAvailable }

@@ -2,6 +2,7 @@ import 'package:bloc_signals/bloc_signals.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/authentication/application/use_cases/login_use_case.dart';
+import 'package:flutter_application/authentication/application/use_cases/logout_use_case.dart';
 import 'package:flutter_application/authentication/application/use_cases/restore_session_use_case.dart';
 import 'package:flutter_application/presentation_models.dart';
 import 'package:flutter_application/rust/bootstrap/infra/application.dart';
@@ -45,10 +46,12 @@ final class AuthFailure extends AuthState {
 class AuthPresenter extends CubitSignal<AuthState> {
   final LoginUseCase loginUseCase;
   final RestoreSessionUseCase restoreSessionUseCase;
+  final LogoutUseCase logoutUseCase;
 
   AuthPresenter({
     required this.loginUseCase,
     required this.restoreSessionUseCase,
+    required this.logoutUseCase,
   }) : super(initialState: const AuthIdle());
 
   Future<void> restoreSession() async {
@@ -92,6 +95,17 @@ class AuthPresenter extends CubitSignal<AuthState> {
     } catch (e) {
       emit(AuthFailure(ErrorReportMapper.fromThrown(e)));
     }
+  }
+
+  Future<void> signOut() async {
+    emit(const AuthLoading());
+    try {
+      await logoutUseCase();
+    } catch (_) {
+      // Local logout must always succeed from the UI's perspective; the
+      // stored credential file is best-effort cleanup.
+    }
+    emit(const AuthIdle());
   }
 
   bool get isAuthenticated => stateValue is AuthSuccess;

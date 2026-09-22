@@ -12,12 +12,14 @@ import 'roster.dart';
 Future<SamSiteApp> composeFakeApp({
   RestoreSessionOutcome restoreSession = RestoreSessionOutcome.notAvailable,
   LoginResult login = const LoginResult.successful(),
+  LogoutOutcome logout = LogoutOutcome.successful,
   List<StudentSummaryDto>? students,
   String versionDisplay = 'v1.0.0+1',
 }) => composeApp(
   versionDisplay: versionDisplay,
   login: ({required email, required password}) async => login,
   restoreSession: () async => restoreSession,
+  logout: () async => logout,
   retrieveStudents: () async => RetrieveAllAvailableStudentsOutcome.success(
     students ?? [studentSummary(id: '500132', name: 'Jane Doe')],
   ),

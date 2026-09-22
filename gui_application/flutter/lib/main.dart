@@ -26,6 +26,7 @@ Future<void> main() async {
       ),
       login: application.login,
       restoreSession: application.restoreSession,
+      logout: application.logout,
       retrieveStudents: application.retrieveAllAvailableStudents,
       retrieveStudentLessons: application.retrieveStudentLessons,
       assessStudentProgress: application.assessStudentProgress,

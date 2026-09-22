@@ -55,8 +55,7 @@ Common commands (from the repository root unless noted):
 # Rust
 cargo test --workspace
 cargo clippy --workspace --all-targets
-cargo llvm-cov nextest --workspace --summary-only \
-  --ignore-filename-regex 'frb_generated\.rs|test_support/'
+cargo llvm-cov nextest --workspace --summary-only --ignore-filename-regex 'frb_generated\.rs|test_support/'
 
 # Flutter (inside gui_application/flutter)
 flutter pub get

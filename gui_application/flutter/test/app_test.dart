@@ -118,6 +118,28 @@ void main() {
     });
   });
 
+  group('signing out', () {
+    testWidgets('is not offered on the login form', (tester) async {
+      await pumpApp(tester, await composeFakeApp());
+
+      expect(find.byTooltip('Log out'), findsNothing);
+    });
+
+    testWidgets('returns to the login form', (tester) async {
+      await pumpApp(
+        tester,
+        await composeFakeApp(restoreSession: RestoreSessionOutcome.restored),
+      );
+      expect(find.text('Jane Doe'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Log out'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
+      expect(find.text('Jane Doe'), findsNothing);
+    });
+  });
+
   group('opening a student', () {
     testWidgets('shows their page and can return to the list', (tester) async {
       await pumpApp(

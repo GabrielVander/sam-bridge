@@ -13,6 +13,7 @@ AuthPresenter buildPresenter({
   })?
   loginUseCase,
   Future<RestoreSessionOutcome> Function()? restoreSessionUseCase,
+  Future<LogoutOutcome> Function()? logoutUseCase,
 }) {
   return AuthPresenter(
     loginUseCase:
@@ -21,6 +22,7 @@ AuthPresenter buildPresenter({
             const LoginResult.successful(),
     restoreSessionUseCase:
         restoreSessionUseCase ?? () async => RestoreSessionOutcome.notAvailable,
+    logoutUseCase: logoutUseCase ?? () async => LogoutOutcome.successful,
   );
 }
 
@@ -167,5 +169,37 @@ void main() {
         expect(presenter.stateValue, isA<AuthIdle>());
       },
     );
+
+    test('signOut() clears the session and returns to Idle', () async {
+      var called = false;
+      final presenter = buildPresenter(
+        restoreSessionUseCase: () async => RestoreSessionOutcome.restored,
+        logoutUseCase: () async {
+          called = true;
+          return LogoutOutcome.successful;
+        },
+      );
+      await presenter.restoreSession();
+      expect(presenter.isAuthenticated, isTrue);
+
+      await presenter.signOut();
+
+      expect(called, isTrue);
+      expect(presenter.stateValue, isA<AuthIdle>());
+      expect(presenter.isAuthenticated, isFalse);
+    });
+
+    test('signOut() still returns to Idle when the use case throws', () async {
+      final presenter = buildPresenter(
+        restoreSessionUseCase: () async => RestoreSessionOutcome.restored,
+        logoutUseCase: () async => throw StateError('bridge down'),
+      );
+      await presenter.restoreSession();
+
+      await presenter.signOut();
+
+      expect(presenter.stateValue, isA<AuthIdle>());
+      expect(presenter.isAuthenticated, isFalse);
+    });
   });
 }

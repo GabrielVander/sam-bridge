@@ -1,6 +1,6 @@
 use authentication::application::gateways::{CredentialGatewayError, CredentialStore, FailureKind};
 use authentication::application::use_cases::{
-    RememberCredentialsError, RememberCredentialsUseCase, RestoreSessionResult,
+    LogoutUseCase, RememberCredentialsError, RememberCredentialsUseCase, RestoreSessionResult,
     RestoreSessionUseCase,
 };
 use authentication::domain::entities::{Credential, Email, Password};
@@ -50,6 +50,20 @@ fn remember_credentials_surfaces_store_failures() {
     let result = use_case.execute(&credential());
 
     assert_eq!(result, Err(RememberCredentialsError::UnableToPersist));
+}
+
+#[test]
+fn logout_clears_the_store() {
+    let credential_store = store_holding_a_credential();
+
+    let result = LogoutUseCase::new(credential_store.clone()).execute();
+
+    assert_eq!(result, Ok(()));
+    assert_eq!(
+        remembered(&credential_store),
+        None,
+        "logging out should forget the stored credential"
+    );
 }
 
 #[test]

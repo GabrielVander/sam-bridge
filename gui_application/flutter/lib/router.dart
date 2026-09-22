@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bloc_signals/bloc_signals.dart';
+import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/authentication/login_screen.dart';
@@ -84,6 +84,17 @@ class MainScreen extends StatelessWidget {
         title: const Text('SAM Bridge'),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+        actions: [
+          BlocSignalBuilder<AuthPresenter, AuthState>(
+            builder: (context, state) => state is AuthSuccess
+                ? IconButton(
+                    icon: const Icon(Icons.logout),
+                    tooltip: 'Log out',
+                    onPressed: () => context.read<AuthPresenter>().signOut(),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
       ),
       bottomNavigationBar: Container(
         width: double.infinity,

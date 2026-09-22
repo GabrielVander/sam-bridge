@@ -112,6 +112,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LoginResult dco_decode_login_result(dynamic raw);
 
   @protected
+  LogoutOutcome dco_decode_logout_outcome(dynamic raw);
+
+  @protected
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
@@ -250,6 +253,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LoginResult sse_decode_login_result(SseDeserializer deserializer);
+
+  @protected
+  LogoutOutcome sse_decode_logout_outcome(SseDeserializer deserializer);
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
@@ -426,6 +432,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_login_result(LoginResult self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_logout_outcome(LogoutOutcome self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
