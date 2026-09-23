@@ -16,10 +16,10 @@ const _emptyLessonsSuccess = RetrieveStudentLessonsOutcome.success(
 const _noInstrumentProgress =
     AssessStudentProgressOutcome.noInstrumentAssigned();
 
-LessonsCubitSignal _buildCubit({
+LessonsPresenter _buildCubit({
   RetrieveStudentLessonsUseCase? retrieveStudentLessons,
   AssessStudentProgressUseCase? assessStudentProgress,
-}) => LessonsCubitSignal(
+}) => LessonsPresenter(
   retrieveStudentLessons:
       retrieveStudentLessons ??
       ({required studentId}) async => _emptyLessonsSuccess,

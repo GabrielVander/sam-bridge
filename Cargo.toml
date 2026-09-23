@@ -5,7 +5,7 @@ members = [
   "gui_application",
   "authentication",
   "credential_store",
-  "test_support",
+  "shared_kernel",
 ]
 resolver = "3"
 
@@ -14,7 +14,7 @@ authentication = { path = "authentication" }
 credential_store = { path = "credential_store" }
 student = { path = "student" }
 sam = { path = "sam" }
-test_support = { path = "test_support" }
+shared_kernel = { path = "shared_kernel" }
 anyhow = "1.0.103"
 thiserror = "2.0.18"
 chrono = "0.4.45"
@@ -49,10 +49,6 @@ opt-level = 3
 
 [profile.dev.package.sha2]
 opt-level = 3
-
-[workspace.lints.rust]
-# `cargo llvm-cov` sets this cfg on nightly so `#[coverage(off)]` can be used there.
-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(coverage_nightly)"] }
 
 [workspace.lints.clippy]
 pedantic = { level = "deny", priority = -1 } # UM, ACTUALLY

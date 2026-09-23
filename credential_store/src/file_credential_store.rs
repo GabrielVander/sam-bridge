@@ -1,5 +1,8 @@
 use authentication::{
-    application::gateways::{CredentialStore, CredentialStoreError},
+    application::gateways::{
+        ClearCredentialGateway, ClearCredentialGatewayError, LoadCredentialGateway,
+        SaveCredentialGateway, SaveCredentialGatewayError,
+    },
     domain::entities::{Credential, Email, Password},
 };
 use std::path::{Path, PathBuf};
@@ -24,21 +27,10 @@ impl std::fmt::Debug for StoredCredential {
 #[error("no platform data directory is available to store credentials")]
 pub struct NoDataDirectory;
 
-// The two conversions below are excluded from coverage because tests cannot
-// provoke these failures and no supported platform is expected to hit them:
-// - `getrandom` only fails when the OS has no random source at all. Linux
-//   falls back to `/dev/urandom`, and macOS, iOS, Windows and Android have none
-//   of the failure modes it documents.
-// - `cocoon` only fails to encrypt a message too large for the AEAD (tens of
-//   gigabytes). Ours is a few hundred bytes of JSON.
-// They still report a clear error instead of panicking if the impossible occurs.
-
-#[cfg_attr(coverage_nightly, coverage(off))]
 fn key_generation_failed(error: getrandom::Error) -> anyhow::Error {
     anyhow::anyhow!("Failed to generate encryption key: {error}")
 }
 
-#[cfg_attr(coverage_nightly, coverage(off))]
 #[allow(clippy::needless_pass_by_value)] // `map_err` hands the error over by value
 fn encryption_failed(error: cocoon::Error) -> anyhow::Error {
     anyhow::anyhow!("Failed to encrypt credential file: {error:?}")
@@ -170,17 +162,19 @@ impl FileCredentialStore {
         let _ = std::fs::remove_file(&self.credential_path);
     }
 }
-impl CredentialStore for FileCredentialStore {
-    fn save(&self, credential: &Credential) -> Result<(), CredentialStoreError> {
+impl SaveCredentialGateway for FileCredentialStore {
+    fn save(&self, credential: &Credential) -> Result<(), SaveCredentialGatewayError> {
         let stored = StoredCredential {
             email: credential.email.0.clone(),
             password: credential.password.0.clone(),
         };
 
         self.save_sync(&stored)
-            .map_err(|_| CredentialStoreError::UnableToPerformOperation)
+            .map_err(|_| SaveCredentialGatewayError::UnableToPerformOperation)
     }
+}
 
+impl LoadCredentialGateway for FileCredentialStore {
     fn load(&self) -> Option<Credential> {
         self.load_sync().map(|stored| {
             Credential::new(
@@ -189,9 +183,12 @@ impl CredentialStore for FileCredentialStore {
             )
         })
     }
+}
 
-    fn clear(&self) -> Result<(), CredentialStoreError> {
+impl ClearCredentialGateway for FileCredentialStore {
+    fn clear(&self) -> Result<(), ClearCredentialGatewayError> {
         self.clear_sync();
+
         Ok(())
     }
 }

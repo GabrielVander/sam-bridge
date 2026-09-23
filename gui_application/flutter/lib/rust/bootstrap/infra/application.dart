@@ -48,4 +48,15 @@ sealed class LoginResult with _$LoginResult {
 
 enum LogoutOutcome { successful, failed }
 
-enum RestoreSessionOutcome { restored, notAvailable }
+@freezed
+sealed class RestoreSessionOutcome with _$RestoreSessionOutcome {
+  const RestoreSessionOutcome._();
+
+  const factory RestoreSessionOutcome.restored() =
+      RestoreSessionOutcome_Restored;
+  const factory RestoreSessionOutcome.notAvailable() =
+      RestoreSessionOutcome_NotAvailable;
+  const factory RestoreSessionOutcome.unableToPerformOperation(
+    ErrorReportDto field0,
+  ) = RestoreSessionOutcome_UnableToPerformOperation;
+}

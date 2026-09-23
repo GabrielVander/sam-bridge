@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 use crate::lessons::domain::entities::{MusicianProfile, StudentLessons};
-use crate::shared::application::failure_kind::FailureKind;
+use shared_kernel::failure_kind::FailureKind;
 pub trait StudentLessonsGateway: Send + Sync {
     fn get_all_for_student_with_id(
         &self,

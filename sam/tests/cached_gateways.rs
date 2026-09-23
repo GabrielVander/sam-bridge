@@ -10,9 +10,11 @@ use sam::roster::adapters::gateways::StudentGatewaySamImpl;
 use student::application::gateways::{
     MusicianProfileGateway, StudentGateway, StudentLessonsGateway,
 };
-use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
+
+mod support;
+use support::sam_operations_for;
 
 #[test]
 fn the_student_and_musician_profile_gateways_share_a_single_listing_fetch() {

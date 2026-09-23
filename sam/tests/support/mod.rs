@@ -3,6 +3,10 @@
 //! It mirrors how the application configures its HTTP client: redirects are
 //! not followed and cookies are kept, because SAM tracks the login session in a
 //! cookie.
+//!
+//! Not every item here is used by every test binary that includes this
+//! module, since each `tests/*.rs` file is compiled separately.
+#![allow(dead_code)]
 
 use sam::client::SamClientImpl;
 use sam::http::SamOperations;

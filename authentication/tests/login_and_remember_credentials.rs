@@ -1,89 +1,144 @@
-use authentication::application::gateways::{CredentialGatewayError, CredentialStore, FailureKind};
+use authentication::adapters::InMemoryCredentialStore;
+use authentication::application::gateways::{
+    AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, FailureKind,
+    LoadCredentialGateway, SaveCredentialGateway, SaveCredentialGatewayError,
+};
 use authentication::application::use_cases::{
     LoginAndRememberCredentialsUseCase, LoginUseCaseError,
 };
+use authentication::domain::entities::{Credential, Email, Password};
 use pretty_assertions::assert_eq;
 use std::sync::Arc;
-use test_support::credentials::{
-    FailingCredentialStore, FakeCredentialGateway, InMemoryCredentialStore,
-};
-
-fn remembered(store: &InMemoryCredentialStore) -> Option<(String, String)> {
-    store
-        .load()
-        .map(|credential| (credential.email.0, credential.password.0))
-}
-
-fn login(
-    gateway: FakeCredentialGateway,
-    store: Arc<dyn CredentialStore + Send + Sync>,
-) -> Result<(), LoginUseCaseError> {
-    LoginAndRememberCredentialsUseCase::new(Arc::new(gateway), store)
-        .execute("Some email".to_string(), "secretpassword123".to_string())
-}
 
 #[test]
-fn successful_login_remembers_the_credential() {
-    let credential_store: Arc<InMemoryCredentialStore> = Arc::new(InMemoryCredentialStore::new());
+fn successful_login_saves_the_credential() {
+    let authorization_gateway: Arc<FakeAuthorizationGateway> =
+        Arc::new(FakeAuthorizationGateway::always_authorized());
+    let in_memory_credential_store: Arc<InMemoryCredentialStore> =
+        Arc::new(InMemoryCredentialStore::new());
 
-    let result = login(
-        FakeCredentialGateway::authorizing(),
-        credential_store.clone(),
+    let use_case: LoginAndRememberCredentialsUseCase = LoginAndRememberCredentialsUseCase::new(
+        authorization_gateway,
+        in_memory_credential_store.clone(),
     );
+
+    let result: Result<(), LoginUseCaseError> =
+        use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(result, Ok(()));
     assert_eq!(
-        remembered(&credential_store),
-        Some(("Some email".to_string(), "secretpassword123".to_string()))
+        in_memory_credential_store.load(),
+        Some(Credential::new(
+            Email("Some email".to_string()),
+            Password("secretpassword123".to_string())
+        ))
     );
 }
 
 #[test]
-fn failed_login_never_attempts_to_remember_the_credential() {
-    let credential_store: Arc<InMemoryCredentialStore> = Arc::new(InMemoryCredentialStore::new());
+fn failed_login_never_attempts_to_save_the_credential() {
+    let authorization_gateway: Arc<FakeAuthorizationGateway> =
+        Arc::new(FakeAuthorizationGateway::always_unauthorized());
+    let credential_gateway: Arc<InMemoryCredentialStore> = Arc::new(InMemoryCredentialStore::new());
 
-    let result = login(FakeCredentialGateway::rejecting(), credential_store.clone());
+    let use_case: LoginAndRememberCredentialsUseCase =
+        LoginAndRememberCredentialsUseCase::new(authorization_gateway, credential_gateway.clone());
+
+    let result: Result<(), LoginUseCaseError> =
+        use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(result, Err(LoginUseCaseError::InvalidEmailOrPassword));
     assert_eq!(
-        remembered(&credential_store),
+        credential_gateway.load(),
         None,
         "a rejected login must never be remembered"
     );
 }
 
 #[test]
-fn a_failure_to_remember_the_credential_does_not_fail_the_login() {
-    let result = login(
-        FakeCredentialGateway::authorizing(),
-        Arc::new(FailingCredentialStore),
-    );
+fn a_failure_to_save_the_credential_does_not_fail_the_login() {
+    let authorization_gateway: Arc<FakeAuthorizationGateway> =
+        Arc::new(FakeAuthorizationGateway::always_authorized());
+    let credential_gateway: Arc<FakeSaveCredentialGateway> =
+        Arc::new(FakeSaveCredentialGateway::unable_to_perform_operation());
+
+    let use_case: LoginAndRememberCredentialsUseCase =
+        LoginAndRememberCredentialsUseCase::new(authorization_gateway, credential_gateway);
+
+    let result: Result<(), LoginUseCaseError> =
+        use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(result, Ok(()));
 }
 
 #[test]
-fn gateway_failure_is_reported_with_its_kind_and_details() {
-    let credential_store: Arc<InMemoryCredentialStore> = Arc::new(InMemoryCredentialStore::new());
-
-    let result = login(
-        FakeCredentialGateway::new(Err(CredentialGatewayError::UnableToPerformOperation {
-            kind: FailureKind::Network,
+fn authorization_gateway_failure_is_reported_with_its_kind_and_details() {
+    let fake_authorization: Arc<FakeAuthorizationGateway> = Arc::new(
+        FakeAuthorizationGateway::failing_with(AuthorizationError::UnableToPerformOperation {
+            kind: FailureKind::Transient,
             details: "connection refused".to_owned(),
-        })),
-        credential_store.clone(),
+        }),
     );
+    let fake_save_credential: Arc<FakeSaveCredentialGateway> =
+        Arc::new(FakeSaveCredentialGateway::unable_to_perform_operation());
+
+    let use_case =
+        LoginAndRememberCredentialsUseCase::new(fake_authorization, fake_save_credential);
+
+    let result: Result<(), LoginUseCaseError> =
+        use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(
         result,
         Err(LoginUseCaseError::UnableToPerformAuthorization {
-            kind: FailureKind::Network,
+            kind: FailureKind::Transient,
             details: "connection refused".to_owned(),
         })
     );
-    assert_eq!(
-        remembered(&credential_store),
-        None,
-        "a failed authorization attempt must never be remembered"
-    );
+}
+
+struct FakeAuthorizationGateway {
+    result: Result<AuthorizationResult, AuthorizationError>,
+}
+
+impl FakeAuthorizationGateway {
+    const fn always_authorized() -> Self {
+        Self {
+            result: Ok(AuthorizationResult::Authorized),
+        }
+    }
+
+    const fn always_unauthorized() -> Self {
+        Self {
+            result: Ok(AuthorizationResult::Unauthorized),
+        }
+    }
+
+    const fn failing_with(error: AuthorizationError) -> Self {
+        Self { result: Err(error) }
+    }
+}
+
+impl AuthorizeCredentialGateway for FakeAuthorizationGateway {
+    fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, AuthorizationError> {
+        self.result.clone()
+    }
+}
+
+struct FakeSaveCredentialGateway {
+    result: Result<(), SaveCredentialGatewayError>,
+}
+
+impl FakeSaveCredentialGateway {
+    const fn unable_to_perform_operation() -> Self {
+        Self {
+            result: Err(SaveCredentialGatewayError::UnableToPerformOperation),
+        }
+    }
+}
+
+impl SaveCredentialGateway for FakeSaveCredentialGateway {
+    fn save(&self, _credential: &Credential) -> Result<(), SaveCredentialGatewayError> {
+        self.result
+    }
 }

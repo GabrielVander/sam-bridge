@@ -8,9 +8,11 @@ use student::application::gateways::{
     FailureKind, StudentLessonsGateway, StudentLessonsGatewayError,
 };
 use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
-use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
+
+mod support;
+use support::sam_operations_for;
 
 fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
     build_gateway_for(&mock_server.uri())
@@ -173,7 +175,7 @@ fn given_an_unexpected_status_the_failure_names_it() {
         let (kind, details) = failure_of(gateway.get_all_for_student_with_id("500132"))
             .expect("lessons retrieval should have failed");
 
-        assert_eq!(kind, FailureKind::UnexpectedResponse);
+        assert_eq!(kind, FailureKind::Unexpected);
         assert!(details.contains("500"), "got: {details}");
     });
 }
@@ -187,6 +189,6 @@ fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation
     let (kind, details) = failure_of(gateway.get_all_for_student_with_id("500132"))
         .expect("lessons retrieval should have failed");
 
-    assert_eq!(kind, FailureKind::Network);
+    assert_eq!(kind, FailureKind::Transient);
     assert!(details.contains("student_lessons"), "got: {details}");
 }

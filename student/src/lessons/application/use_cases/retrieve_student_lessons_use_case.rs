@@ -20,14 +20,14 @@ impl<'a, T: StudentLessonsGateway + ?Sized> RetrieveStudentLessonsUseCase<'a, T>
 #[cfg(test)]
 mod tests {
     use crate::lessons::domain::entities::{Clef, Lesson, Range};
-    use crate::shared::application::failure_kind::FailureKind;
+    use shared_kernel::failure_kind::FailureKind;
 
     use super::*;
     use chrono::NaiveDate;
 
     fn failure() -> StudentLessonsGatewayError {
         StudentLessonsGatewayError::UnableToPerformOperation {
-            kind: FailureKind::Network,
+            kind: FailureKind::Transient,
             details: "connection refused".to_owned(),
         }
     }

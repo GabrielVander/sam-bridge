@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/app.dart';
+import 'package:flutter_application/main.dart' show formatVersion;
 import 'package:flutter_application/router.dart';
 import 'package:flutter_application/rust/bootstrap/infra/application.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -41,7 +42,9 @@ void main() {
     ) async {
       await pumpApp(
         tester,
-        await composeFakeApp(restoreSession: RestoreSessionOutcome.restored),
+        await composeFakeApp(
+          restoreSession: const RestoreSessionOutcome.restored(),
+        ),
       );
 
       expect(find.text('Jane Doe'), findsOneWidget);
@@ -107,7 +110,9 @@ void main() {
     ) async {
       await pumpApp(
         tester,
-        await composeFakeApp(restoreSession: RestoreSessionOutcome.restored),
+        await composeFakeApp(
+          restoreSession: const RestoreSessionOutcome.restored(),
+        ),
       );
 
       routerOf(tester).go('/login');
@@ -128,7 +133,9 @@ void main() {
     testWidgets('returns to the login form', (tester) async {
       await pumpApp(
         tester,
-        await composeFakeApp(restoreSession: RestoreSessionOutcome.restored),
+        await composeFakeApp(
+          restoreSession: const RestoreSessionOutcome.restored(),
+        ),
       );
       expect(find.text('Jane Doe'), findsOneWidget);
 
@@ -144,7 +151,9 @@ void main() {
     testWidgets('shows their page and can return to the list', (tester) async {
       await pumpApp(
         tester,
-        await composeFakeApp(restoreSession: RestoreSessionOutcome.restored),
+        await composeFakeApp(
+          restoreSession: const RestoreSessionOutcome.restored(),
+        ),
       );
 
       await tester.tap(find.text('Jane Doe'));

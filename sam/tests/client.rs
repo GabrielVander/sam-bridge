@@ -1,8 +1,10 @@
 use sam::client::{MsaLesson, MtdLesson, SamClient, SamClientImpl, StudentLessonsPage};
 use sam::http::SamOperations;
-use test_support::sam_site::sam_client_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
+
+mod support;
+use support::sam_client_for;
 
 fn build_client(mock_server: &MockServer) -> Result<SamClientImpl, reqwest::Error> {
     sam_client_for(&mock_server.uri())

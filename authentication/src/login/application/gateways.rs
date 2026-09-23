@@ -1,3 +1,3 @@
-mod credential_gateway;
+mod authorization_gateway;
 
-pub use credential_gateway::*;
+pub use authorization_gateway::*;

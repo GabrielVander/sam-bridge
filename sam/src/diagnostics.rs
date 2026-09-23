@@ -23,10 +23,10 @@ pub fn error_chain(error: &dyn Error) -> String {
 
 pub(crate) const fn failure_kind(error: &SamClientError) -> FailureKind {
     match error {
-        SamClientError::RequestError { .. } => FailureKind::Network,
-        SamClientError::UnexpectedResponse { .. } => FailureKind::UnexpectedResponse,
+        SamClientError::RequestError { .. } => FailureKind::Transient,
+        SamClientError::UnexpectedResponse { .. } => FailureKind::Unexpected,
         SamClientError::SessionExpired => FailureKind::SessionExpired,
-        SamClientError::InvalidCredentials => FailureKind::Unknown,
+        SamClientError::InvalidCredentials => FailureKind::Unclassified,
     }
 }
 

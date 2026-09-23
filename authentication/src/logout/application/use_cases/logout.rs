@@ -2,20 +2,20 @@ use std::sync::Arc;
 
 use thiserror::Error;
 
-use crate::remembered_credentials::application::gateways::CredentialStore;
+use crate::application::gateways::ClearCredentialGateway;
 
 #[derive(Clone)]
 pub struct LogoutUseCase {
-    credential_store: Arc<dyn CredentialStore + Send + Sync>,
+    credential_clearer: Arc<dyn ClearCredentialGateway + Send + Sync>,
 }
 
 impl LogoutUseCase {
-    pub fn new(credential_store: Arc<dyn CredentialStore + Send + Sync>) -> Self {
-        Self { credential_store }
+    pub fn new(credential_clearer: Arc<dyn ClearCredentialGateway + Send + Sync>) -> Self {
+        Self { credential_clearer }
     }
 
     pub fn execute(&self) -> Result<(), LogoutError> {
-        self.credential_store
+        self.credential_clearer
             .clear()
             .map_err(|_| LogoutError::UnableToClearCredentials)
     }
@@ -23,6 +23,6 @@ impl LogoutUseCase {
 
 #[derive(Error, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogoutError {
-    #[error("Unable to clear the stored credential")]
+    #[error("Unable to clear credentials")]
     UnableToClearCredentials,
 }

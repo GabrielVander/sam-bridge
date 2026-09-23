@@ -2,7 +2,7 @@ use std::sync::Arc;
 use student::{
     application::{
         dto::{StudentPositionDto, StudentSummaryDto},
-        gateways::{FailureKind, StudentGatewayError},
+        gateways::{FailureKind, StudentGateway, StudentGatewayError},
         use_cases::{RetrieveAllAvailableStudentsResult, RetrieveAllAvailableStudentsUseCase},
     },
     domain::entities::{
@@ -11,7 +11,22 @@ use student::{
 };
 
 use pretty_assertions::assert_eq;
-use test_support::students::FakeStudentGateway;
+
+struct FakeStudentGateway {
+    result: Result<Vec<Student>, StudentGatewayError>,
+}
+
+impl FakeStudentGateway {
+    const fn new(result: Result<Vec<Student>, StudentGatewayError>) -> Self {
+        Self { result }
+    }
+}
+
+impl StudentGateway for FakeStudentGateway {
+    fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
+        self.result.clone()
+    }
+}
 
 #[test]
 fn assert_students_map() {
@@ -87,7 +102,7 @@ fn assert_students_map() {
 #[test]
 fn propagates_gateway_errors_with_their_kind_and_details() {
     let error: StudentGatewayError = StudentGatewayError::UnableToPerformOperation {
-        kind: FailureKind::UnexpectedResponse,
+        kind: FailureKind::Unexpected,
         details: "missing table".to_owned(),
     };
     let gateway: FakeStudentGateway = FakeStudentGateway::new(Err(error.clone()));

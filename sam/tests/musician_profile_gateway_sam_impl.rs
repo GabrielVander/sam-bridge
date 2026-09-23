@@ -7,9 +7,11 @@ use student::application::gateways::{
     FailureKind, MusicianProfileGateway, MusicianProfileGatewayError,
 };
 use student::domain::entities::{Instrument, MusicianLevel, MusicianProfile};
-use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
+
+mod support;
+use support::sam_operations_for;
 
 fn build_gateway(
     mock_server: &MockServer,
@@ -184,6 +186,6 @@ fn an_unreachable_site_is_a_network_error_naming_the_operation() {
     let (kind, details) =
         failure_of(gateway.get_by_id("1")).expect("profile retrieval should have failed");
 
-    assert_eq!(kind, FailureKind::Network);
+    assert_eq!(kind, FailureKind::Transient);
     assert!(details.contains("dashboard"), "got: {details}");
 }

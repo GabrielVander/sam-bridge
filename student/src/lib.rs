@@ -11,7 +11,7 @@ pub mod application {
     pub mod gateways {
         pub use crate::lessons::application::gateways::*;
         pub use crate::roster::application::gateways::*;
-        pub use crate::shared::application::failure_kind::FailureKind;
+        pub use shared_kernel::failure_kind::FailureKind;
     }
 
     pub mod use_cases {

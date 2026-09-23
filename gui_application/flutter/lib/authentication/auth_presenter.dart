@@ -60,9 +60,11 @@ class AuthPresenter extends CubitSignal<AuthState> {
       final RestoreSessionOutcome outcome = await restoreSessionUseCase();
 
       switch (outcome) {
-        case RestoreSessionOutcome.restored:
+        case RestoreSessionOutcome_Restored():
           emit(const AuthSuccess());
-        case RestoreSessionOutcome.notAvailable:
+        case RestoreSessionOutcome_NotAvailable():
+          emit(const AuthIdle());
+        case RestoreSessionOutcome_UnableToPerformOperation():
           emit(const AuthIdle());
       }
     } catch (_) {

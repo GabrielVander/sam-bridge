@@ -21,7 +21,8 @@ AuthPresenter buildPresenter({
         ({required email, required password}) async =>
             const LoginResult.successful(),
     restoreSessionUseCase:
-        restoreSessionUseCase ?? () async => RestoreSessionOutcome.notAvailable,
+        restoreSessionUseCase ??
+            () async => const RestoreSessionOutcome.notAvailable(),
     logoutUseCase: logoutUseCase ?? () async => LogoutOutcome.successful,
   );
 }
@@ -45,7 +46,7 @@ void main() {
         final restoreFuture = presenter.restoreSession();
         expect(presenter.stateValue, isA<AuthLoading>());
 
-        completer.complete(RestoreSessionOutcome.restored);
+        completer.complete(const RestoreSessionOutcome.restored());
         await restoreFuture;
 
         expect(presenter.stateValue, isA<AuthSuccess>());
@@ -57,7 +58,8 @@ void main() {
       'restoreSession() transitions Loading -> Idle when not available',
       () async {
         final presenter = buildPresenter(
-          restoreSessionUseCase: () async => RestoreSessionOutcome.notAvailable,
+          restoreSessionUseCase: () async =>
+              const RestoreSessionOutcome.notAvailable(),
         );
 
         await presenter.restoreSession();
@@ -173,7 +175,7 @@ void main() {
     test('signOut() clears the session and returns to Idle', () async {
       var called = false;
       final presenter = buildPresenter(
-        restoreSessionUseCase: () async => RestoreSessionOutcome.restored,
+        restoreSessionUseCase: () async => const RestoreSessionOutcome.restored(),
         logoutUseCase: () async {
           called = true;
           return LogoutOutcome.successful;
@@ -191,7 +193,7 @@ void main() {
 
     test('signOut() still returns to Idle when the use case throws', () async {
       final presenter = buildPresenter(
-        restoreSessionUseCase: () async => RestoreSessionOutcome.restored,
+        restoreSessionUseCase: () async => const RestoreSessionOutcome.restored(),
         logoutUseCase: () async => throw StateError('bridge down'),
       );
       await presenter.restoreSession();

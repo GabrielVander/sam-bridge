@@ -25,7 +25,7 @@ final class _StudentScreenState extends State<StudentScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<LessonsCubitSignal>().load(widget.studentId);
+      context.read<LessonsPresenter>().load(widget.studentId);
     });
   }
 
@@ -37,7 +37,7 @@ final class _StudentScreenState extends State<StudentScreen> {
           BackBar(studentName: widget.studentName),
           const Divider(height: 1),
           Expanded(
-            child: BlocSignalBuilder<LessonsCubitSignal, LessonsState>(
+            child: BlocSignalBuilder<LessonsPresenter, LessonsState>(
               builder: (context, state) => switch (state) {
                 LessonsLoading() => const LoadingIndicator(),
                 LessonsLoaded(:final view, :final progress) => _StudentDetail(
@@ -47,7 +47,7 @@ final class _StudentScreenState extends State<StudentScreen> {
                 LessonsFailure(:final report) => ErrorPanel(
                   report: report,
                   onRetry: () =>
-                      context.read<LessonsCubitSignal>().load(widget.studentId),
+                      context.read<LessonsPresenter>().load(widget.studentId),
                 ),
                 _ => const SizedBox.shrink(),
               },

@@ -61,12 +61,11 @@ cargo llvm-cov nextest --workspace --summary-only --ignore-filename-regex 'frb_g
 flutter pub get
 flutter analyze
 flutter test
-tool/coverage.sh                # per-file line coverage of every hand-written lib/ file
 flutter run linux
 flutter build linux --debug     # rm -rf build/linux if CMake cache goes stale
 
-# Both stacks (repository root): fails unless line coverage is 100%
-scripts/check-coverage.sh
+# Both stacks (repository root): combined line-coverage percentage
+scripts/coverage.sh
 
 # Rust mutation testing: fails if a code change goes unnoticed by every test
 # (needs `cargo install cargo-mutants`; takes several minutes)

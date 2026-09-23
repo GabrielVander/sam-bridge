@@ -674,12 +674,23 @@ impl SseDecode for crate::bootstrap::infra::progress_view::RequirementStatusDto 
 impl SseDecode for crate::bootstrap::infra::application::RestoreSessionOutcome {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
-        return match inner {
-            0 => crate::bootstrap::infra::application::RestoreSessionOutcome::Restored,
-            1 => crate::bootstrap::infra::application::RestoreSessionOutcome::NotAvailable,
-            _ => unreachable!("Invalid variant for RestoreSessionOutcome: {}", inner),
-        };
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                return crate::bootstrap::infra::application::RestoreSessionOutcome::Restored;
+            }
+            1 => {
+                return crate::bootstrap::infra::application::RestoreSessionOutcome::NotAvailable;
+            }
+            2 => {
+                let mut var_field0 =
+                    <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_decode(deserializer);
+                return crate::bootstrap::infra::application::RestoreSessionOutcome::UnableToPerformOperation(var_field0);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -1160,11 +1171,11 @@ impl flutter_rust_bridge::IntoIntoDart<crate::bootstrap::infra::progress_view::R
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::bootstrap::infra::application::RestoreSessionOutcome {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self {
-            Self::Restored => 0.into_dart(),
-            Self::NotAvailable => 1.into_dart(),
-            _ => unreachable!(),
-        }
+        match self {crate::bootstrap::infra::application::RestoreSessionOutcome::Restored => { [0.into_dart()].into_dart() }
+crate::bootstrap::infra::application::RestoreSessionOutcome::NotAvailable => { [1.into_dart()].into_dart() }
+crate::bootstrap::infra::application::RestoreSessionOutcome::UnableToPerformOperation(field0) => { [2.into_dart(),
+field0.into_into_dart().into_dart()].into_dart() }
+ _ => { unimplemented!(""); }}
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
@@ -1607,16 +1618,11 @@ impl SseEncode for crate::bootstrap::infra::progress_view::RequirementStatusDto 
 impl SseEncode for crate::bootstrap::infra::application::RestoreSessionOutcome {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                crate::bootstrap::infra::application::RestoreSessionOutcome::Restored => 0,
-                crate::bootstrap::infra::application::RestoreSessionOutcome::NotAvailable => 1,
-                _ => {
-                    unimplemented!("");
-                }
-            },
-            serializer,
-        );
+        match self {crate::bootstrap::infra::application::RestoreSessionOutcome::Restored => { <i32>::sse_encode(0, serializer);  }
+crate::bootstrap::infra::application::RestoreSessionOutcome::NotAvailable => { <i32>::sse_encode(1, serializer);  }
+crate::bootstrap::infra::application::RestoreSessionOutcome::UnableToPerformOperation(field0) => { <i32>::sse_encode(2, serializer); <crate::bootstrap::infra::error_view::ErrorReportDto>::sse_encode(field0, serializer);
+ }
+ _ => { unimplemented!(""); }}
     }
 }
 

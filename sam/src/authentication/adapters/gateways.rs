@@ -1,3 +1,3 @@
-mod credential_gateway_sam_impl;
+mod authorization_gateway_sam_impl;
 
-pub use credential_gateway_sam_impl::*;
+pub use authorization_gateway_sam_impl::*;

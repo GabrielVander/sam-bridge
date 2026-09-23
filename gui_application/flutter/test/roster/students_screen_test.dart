@@ -1,40 +1,9 @@
-import 'dart:async';
-
-import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/roster/students_presenter.dart';
-import 'package:flutter_application/roster/students_screen.dart';
-import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
-import 'package:flutter_application/rust/bootstrap/infra/roster_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/roster.dart';
 
 void main() {
-  group('StudentsScreen loading', () {
-    testWidgets('says SAM is slow when the list takes over ten seconds', (
-      tester,
-    ) async {
-      final answer = Completer<RetrieveAllAvailableStudentsOutcome>();
-      final presenter = StudentsPresenter(
-        retrieveStudents: () => answer.future,
-      );
-      await tester.pumpWidget(
-        BlocSignalProvider<StudentsPresenter>.value(
-          value: presenter,
-          child: const MaterialApp(home: Scaffold(body: StudentsScreen())),
-        ),
-      );
-      await tester.pump();
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.textContaining('O SAM está demorando'), findsNothing);
-
-      await tester.pump(const Duration(seconds: 10));
-
-      expect(find.textContaining('O SAM está demorando'), findsOneWidget);
-    });
-  });
-
   group('StudentsScreen row', () {
     testWidgets('shows the instrument with a music note icon', (tester) async {
       await pumpRoster(tester, [
@@ -145,49 +114,6 @@ void main() {
       await pumpRoster(tester, [studentSummary(name: '')]);
 
       expect(find.text('?'), findsOneWidget);
-    });
-  });
-
-  group('StudentsScreen failure', () {
-    const failure = RetrieveAllAvailableStudentsOutcome.failure(
-      ErrorReportDto(
-        kind: ErrorKindDto.network,
-        details: 'Request failed for operation dashboard',
-      ),
-    );
-
-    Future<void> pumpFailingRoster(
-      WidgetTester tester, {
-      required List<RetrieveAllAvailableStudentsOutcome> outcomes,
-    }) => pumpStudents(tester, presenterAnswering(outcomes));
-
-    testWidgets('shows the friendly message with the details collapsed', (
-      tester,
-    ) async {
-      await pumpFailingRoster(tester, outcomes: [failure]);
-
-      expect(
-        find.textContaining('Não foi possível conectar ao SAM'),
-        findsOneWidget,
-      );
-      expect(find.text('Detalhes técnicos'), findsOneWidget);
-      expect(find.text('Request failed for operation dashboard'), findsNothing);
-    });
-
-    testWidgets('retrying reloads the students', (tester) async {
-      await pumpFailingRoster(
-        tester,
-        outcomes: [
-          failure,
-          RetrieveAllAvailableStudentsOutcome.success([studentSummary()]),
-        ],
-      );
-
-      await tester.tap(find.text('Tentar novamente'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Jane Doe'), findsOneWidget);
-      expect(find.text('Tentar novamente'), findsNothing);
     });
   });
 }

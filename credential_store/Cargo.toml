@@ -16,7 +16,6 @@ zeroize = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 tempfile = { workspace = true }
-test_support = { workspace = true }
 
 [lints]
 workspace = true

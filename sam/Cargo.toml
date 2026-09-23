@@ -17,7 +17,6 @@ chrono = { workspace = true }
 [dev-dependencies]
 smol = { workspace = true }
 wiremock = { workspace = true }
-test_support = { workspace = true }
 
 [lints]
 workspace = true

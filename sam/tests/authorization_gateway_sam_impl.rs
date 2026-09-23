@@ -1,29 +1,31 @@
 use std::sync::Arc;
 
 use authentication::application::gateways::{
-    AuthorizationResult, CredentialGateway, CredentialGatewayError, FailureKind,
+    AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, FailureKind,
 };
 use authentication::domain::entities::{Credential, Email, Password};
-use sam::authentication::adapters::gateways::CredentialGatewaySamImpl;
+use sam::authentication::adapters::gateways::AuthorizationGatewaySamImpl;
 use sam::client::SamClientImpl;
 use sam::http::SamOperations;
-use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
-fn build_gateway(mock_server: &MockServer) -> Result<CredentialGatewaySamImpl, reqwest::Error> {
+mod support;
+use support::sam_operations_for;
+
+fn build_gateway(mock_server: &MockServer) -> Result<AuthorizationGatewaySamImpl, reqwest::Error> {
     let sam_operations: SamOperations = sam_operations_for(&mock_server.uri())?;
 
     let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
 
-    Ok(CredentialGatewaySamImpl::new(sam_client))
+    Ok(AuthorizationGatewaySamImpl::new(sam_client))
 }
 
 fn failure_of(
-    result: Result<AuthorizationResult, CredentialGatewayError>,
+    result: Result<AuthorizationResult, AuthorizationError>,
 ) -> Option<(FailureKind, String)> {
     match result {
-        Err(CredentialGatewayError::UnableToPerformOperation { kind, details }) => {
+        Err(AuthorizationError::UnableToPerformOperation { kind, details }) => {
             Some((kind, details))
         }
         Ok(_) => None,
@@ -48,7 +50,7 @@ fn given_a_303_response_authorization_succeeds() {
             .mount(&mock_server)
             .await;
 
-        let gateway: CredentialGatewaySamImpl =
+        let gateway: AuthorizationGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
         let result: AuthorizationResult = gateway.authorize(&credential()).expect("should succeed");
@@ -71,7 +73,7 @@ fn given_the_invalid_credentials_marker_authorization_is_unauthorized() {
             .mount(&mock_server)
             .await;
 
-        let gateway: CredentialGatewaySamImpl =
+        let gateway: AuthorizationGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
         let result: AuthorizationResult = gateway.authorize(&credential()).expect("should succeed");
@@ -91,13 +93,13 @@ fn given_an_unexpected_response_authorization_fails() {
             .mount(&mock_server)
             .await;
 
-        let gateway: CredentialGatewaySamImpl =
+        let gateway: AuthorizationGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
         let (kind, details) =
             failure_of(gateway.authorize(&credential())).expect("authorization should have failed");
 
-        assert_eq!(kind, FailureKind::UnexpectedResponse);
+        assert_eq!(kind, FailureKind::Unexpected);
         assert!(
             details.contains("Unexpected authentication response"),
             "got: {details}"
@@ -122,12 +124,12 @@ fn given_a_connection_failure_authorization_fails() {
             "licoes/index",
         );
         let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
-        let gateway: CredentialGatewaySamImpl = CredentialGatewaySamImpl::new(sam_client);
+        let gateway: AuthorizationGatewaySamImpl = AuthorizationGatewaySamImpl::new(sam_client);
 
         let (kind, details) =
             failure_of(gateway.authorize(&credential())).expect("authorization should have failed");
 
-        assert_eq!(kind, FailureKind::Network);
+        assert_eq!(kind, FailureKind::Transient);
         assert!(details.contains("authentication"), "got: {details}");
         assert!(
             !details.contains("hunter2"),

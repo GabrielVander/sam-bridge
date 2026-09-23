@@ -1,18 +1,41 @@
-use authentication::application::gateways::CredentialStore;
+use authentication::application::gateways::{
+    ClearCredentialGateway, LoadCredentialGateway, SaveCredentialGateway,
+};
 use authentication::domain::entities::{Credential, Email, Password};
 use credential_store::FileCredentialStore;
 
-fn temp_store() -> std::io::Result<(FileCredentialStore, tempfile::TempDir)> {
-    let dir = tempfile::tempdir()?;
-    let store = FileCredentialStore::with_dir(&dir.path().to_string_lossy());
-    Ok((store, dir))
+#[test]
+fn a_new_store_holds_no_credential() {
+    let (store, _dir) = temp_store().expect("tempdir");
+
+    assert!(store.load().is_none());
 }
 
-fn credential() -> Credential {
-    Credential::new(
-        Email("test_user@example.com".to_owned()),
-        Password("test_pass".to_owned()),
-    )
+#[test]
+fn saving_again_replaces_the_previous_credential() {
+    let (store, _dir) = temp_store().expect("tempdir");
+
+    store.save(&credential()).expect("first save");
+    let second = Credential::new(
+        Email("someone_else@example.com".to_owned()),
+        Password("different_pass".to_owned()),
+    );
+    store.save(&second).expect("second save");
+
+    let loaded = store.load().expect("load should return Some");
+    assert_eq!(loaded.email.0, "someone_else@example.com");
+    assert_eq!(loaded.password.0, "different_pass");
+}
+
+#[test]
+fn clearing_an_empty_store_is_not_an_error() {
+    let (store, _dir) = temp_store().expect("tempdir");
+
+    store
+        .clear()
+        .expect("clearing an empty store should succeed");
+
+    assert!(store.load().is_none());
 }
 
 #[test]
@@ -251,4 +274,17 @@ fn files_have_restricted_permissions() {
     assert_eq!(meta.permissions().mode() & 0o777, 0o600);
     let key_meta = std::fs::metadata(dir.path().join("key.bin")).expect("key meta");
     assert_eq!(key_meta.permissions().mode() & 0o777, 0o600);
+}
+
+fn temp_store() -> std::io::Result<(FileCredentialStore, tempfile::TempDir)> {
+    let dir = tempfile::tempdir()?;
+    let store = FileCredentialStore::with_dir(&dir.path().to_string_lossy());
+    Ok((store, dir))
+}
+
+fn credential() -> Credential {
+    Credential::new(
+        Email("test_user@example.com".to_owned()),
+        Password("test_pass".to_owned()),
+    )
 }

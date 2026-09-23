@@ -686,7 +686,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RestoreSessionOutcome dco_decode_restore_session_outcome(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return RestoreSessionOutcome.values[dcoDecodePrimitiveInt(raw)];
+    final arr = dcoDecodeList(raw);
+    switch (dcoDecodePrimitiveInt(arr[0])) {
+      case 0:
+        return RestoreSessionOutcome_Restored();
+      case 1:
+        return RestoreSessionOutcome_NotAvailable();
+      case 2:
+        return RestoreSessionOutcome_UnableToPerformOperation(
+          dco_decode_box_autoadd_error_report_dto(arr[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
   }
 
   @protected
@@ -1147,8 +1159,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return RestoreSessionOutcome.values[inner];
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        return RestoreSessionOutcome_Restored();
+      case 1:
+        return RestoreSessionOutcome_NotAvailable();
+      case 2:
+        var var_field0 = sse_decode_box_autoadd_error_report_dto(deserializer);
+        return RestoreSessionOutcome_UnableToPerformOperation(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
   }
 
   @protected
@@ -1593,7 +1616,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
+    switch (self) {
+      case RestoreSessionOutcome_Restored():
+        sse_encode_i_32(0, serializer);
+      case RestoreSessionOutcome_NotAvailable():
+        sse_encode_i_32(1, serializer);
+      case RestoreSessionOutcome_UnableToPerformOperation(field0: final field0):
+        sse_encode_i_32(2, serializer);
+        sse_encode_box_autoadd_error_report_dto(field0, serializer);
+    }
   }
 
   @protected

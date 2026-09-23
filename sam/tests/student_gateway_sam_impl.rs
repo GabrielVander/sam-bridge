@@ -7,9 +7,11 @@ use sam::http::SamOperations;
 use sam::roster::adapters::gateways::StudentGatewaySamImpl;
 use student::application::gateways::{FailureKind, StudentGateway, StudentGatewayError};
 use student::domain::entities::{Instrument, MusicianLevel, Student, StudentPosition};
-use test_support::sam_site::sam_operations_for;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
+
+mod support;
+use support::sam_operations_for;
 
 fn build_gateway(mock_server: &MockServer) -> Result<StudentGatewaySamImpl, reqwest::Error> {
     build_gateway_for(&mock_server.uri())
@@ -184,7 +186,7 @@ fn given_unexpected_listing_status_students_retrieval_should_fail() {
         let (kind, details) = failure_of(gateway.get_available_records())
             .expect("students retrieval should have failed");
 
-        assert_eq!(kind, FailureKind::UnexpectedResponse);
+        assert_eq!(kind, FailureKind::Unexpected);
         assert!(details.contains("500"), "got: {details}");
     });
 }
@@ -212,7 +214,7 @@ fn given_a_listing_that_is_not_json_the_details_explain_what_could_not_be_decode
         let (kind, details) = failure_of(gateway.get_available_records())
             .expect("students retrieval should have failed");
 
-        assert_eq!(kind, FailureKind::UnexpectedResponse);
+        assert_eq!(kind, FailureKind::Unexpected);
         assert!(
             details.contains("Unable to decode student listing JSON response"),
             "got: {details}"
@@ -233,7 +235,7 @@ fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation
     let (kind, details) =
         failure_of(gateway.get_available_records()).expect("students retrieval should have failed");
 
-    assert_eq!(kind, FailureKind::Network);
+    assert_eq!(kind, FailureKind::Transient);
     assert!(details.contains("dashboard"), "got: {details}");
 }
 
@@ -260,6 +262,6 @@ fn a_client_reporting_invalid_credentials_for_a_data_fetch_fails_with_an_unknown
     let (kind, details) =
         failure_of(gateway.get_available_records()).expect("students retrieval should have failed");
 
-    assert_eq!(kind, FailureKind::Unknown);
+    assert_eq!(kind, FailureKind::Unclassified);
     assert!(details.contains("Invalid credentials"), "got: {details}");
 }

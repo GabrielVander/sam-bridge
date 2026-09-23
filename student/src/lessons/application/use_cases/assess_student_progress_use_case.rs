@@ -64,12 +64,12 @@ impl<'a, P: MusicianProfileGateway + ?Sized, L: StudentLessonsGateway + ?Sized>
 mod tests {
     use super::*;
     use crate::lessons::domain::entities::{Lesson, MusicianProfile, Range, StudentLessons};
-    use crate::shared::application::failure_kind::FailureKind;
     use crate::shared::domain::entities::{Instrument, MusicianLevel};
+    use shared_kernel::failure_kind::FailureKind;
 
     fn lessons_failure() -> StudentLessonsGatewayError {
         StudentLessonsGatewayError::UnableToPerformOperation {
-            kind: FailureKind::Network,
+            kind: FailureKind::Transient,
             details: "connection refused".to_owned(),
         }
     }

@@ -2,12 +2,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use authentication::application::use_cases::{
-    LoginAndRememberCredentialsUseCase, LoginUseCaseError, LogoutUseCase, RestoreSessionResult,
-    RestoreSessionUseCase,
+    LoginAndRememberCredentialsUseCase, LoginUseCaseError, LogoutUseCase, RestoreSessionError,
+    RestoreSessionOutcome as RestoreSessionUseCaseOutcome, RestoreSessionUseCase,
 };
 use credential_store::{FileCredentialStore, NoDataDirectory};
 use sam::{
-    authentication::adapters::gateways::CredentialGatewaySamImpl,
+    authentication::adapters::gateways::AuthorizationGatewaySamImpl,
     client::{CacheTtl, SamClient, SamClientCacheDecorator, SamClientImpl, SystemClock},
     diagnostics::error_chain,
     http::SamOperations,
@@ -90,8 +90,8 @@ impl ApplicationFacade {
             },
         ));
 
-        let sam_credential_gateway: Arc<CredentialGatewaySamImpl> =
-            Arc::new(CredentialGatewaySamImpl::new(sam_client.clone()));
+        let sam_credential_gateway: Arc<AuthorizationGatewaySamImpl> =
+            Arc::new(AuthorizationGatewaySamImpl::new(sam_client.clone()));
 
         let login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase =
             LoginAndRememberCredentialsUseCase::new(
@@ -101,8 +101,11 @@ impl ApplicationFacade {
 
         let logout_use_case: LogoutUseCase = LogoutUseCase::new(file_credential_store.clone());
 
-        let restore_session_use_case: RestoreSessionUseCase =
-            RestoreSessionUseCase::new(file_credential_store, sam_credential_gateway);
+        let restore_session_use_case: RestoreSessionUseCase = RestoreSessionUseCase::new(
+            file_credential_store.clone(),
+            file_credential_store,
+            sam_credential_gateway,
+        );
 
         let sam_student_gateway: Arc<StudentGatewaySamImpl> =
             Arc::new(StudentGatewaySamImpl::new(sam_client.clone()));
@@ -136,10 +139,22 @@ impl ApplicationFacade {
     #[must_use]
     pub fn restore_session(&self) -> RestoreSessionOutcome {
         match self.restore_session_use_case.execute() {
-            RestoreSessionResult::Restored => RestoreSessionOutcome::Restored,
-            RestoreSessionResult::NoStoredCredentials
-            | RestoreSessionResult::CredentialsRejected
-            | RestoreSessionResult::UnableToPerformOperation => RestoreSessionOutcome::NotAvailable,
+            Ok(RestoreSessionUseCaseOutcome::Restored) => RestoreSessionOutcome::Restored,
+            Ok(
+                RestoreSessionUseCaseOutcome::NoStoredCredentials
+                | RestoreSessionUseCaseOutcome::CredentialsRejected,
+            ) => RestoreSessionOutcome::NotAvailable,
+            Err(RestoreSessionError::UnableToPerformOperation { kind, details }) => {
+                RestoreSessionOutcome::UnableToPerformOperation(ErrorReportDto {
+                    kind: kind.into(),
+                    details,
+                })
+            }
+            // Clearing a rejected local credential is best-effort cleanup; there's
+            // nothing actionable for the caller, so it still routes to the login form.
+            Err(RestoreSessionError::UnableToClearRejectedCredentials) => {
+                RestoreSessionOutcome::NotAvailable
+            }
         }
     }
 
@@ -219,6 +234,7 @@ pub enum LoginResult {
 pub enum RestoreSessionOutcome {
     Restored,
     NotAvailable,
+    UnableToPerformOperation(ErrorReportDto),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -254,21 +270,87 @@ impl From<LoginUseCaseError> for LoginResult {
 mod tests {
     use super::*;
     use crate::infra::{ErrorKindDto, ErrorReportDto, StudentLessonsDto, StudentPositionDto};
+    use authentication::adapters::InMemoryCredentialStore;
     use authentication::application::gateways::{
-        AuthorizationResult, CredentialGateway, CredentialGatewayError,
+        AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, SaveCredentialGateway,
     };
+    use authentication::domain::entities::{Credential, Email, Password};
     use credential_store::{FileCredentialStore, NoDataDirectory};
     use student::application::gateways::{
-        FailureKind, MusicianProfileGatewayError, StudentGatewayError, StudentLessonsGatewayError,
+        FailureKind, MusicianProfileGateway, MusicianProfileGatewayError, StudentGateway,
+        StudentGatewayError, StudentLessonsGateway, StudentLessonsGatewayError,
     };
     use student::domain::entities::{
         Instrument, MusicianLevel, MusicianProfile, Region, Student, StudentLessons,
         StudentPosition,
     };
-    use test_support::credentials::{FakeCredentialGateway, InMemoryCredentialStore};
-    use test_support::students::{
-        FakeMusicianProfileGateway, FakeStudentGateway, FakeStudentLessonsGateway,
-    };
+
+    struct FakeAuthorizationGateway {
+        result: Result<AuthorizationResult, AuthorizationError>,
+    }
+
+    impl FakeAuthorizationGateway {
+        const fn new(result: Result<AuthorizationResult, AuthorizationError>) -> Self {
+            Self { result }
+        }
+    }
+
+    impl AuthorizeCredentialGateway for FakeAuthorizationGateway {
+        fn authorize(&self, _: &Credential) -> Result<AuthorizationResult, AuthorizationError> {
+            self.result.clone()
+        }
+    }
+
+    struct FakeStudentGateway {
+        result: Result<Vec<Student>, StudentGatewayError>,
+    }
+
+    impl FakeStudentGateway {
+        const fn new(result: Result<Vec<Student>, StudentGatewayError>) -> Self {
+            Self { result }
+        }
+    }
+
+    impl StudentGateway for FakeStudentGateway {
+        fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
+            self.result.clone()
+        }
+    }
+
+    struct FakeMusicianProfileGateway {
+        result: Result<MusicianProfile, MusicianProfileGatewayError>,
+    }
+
+    impl FakeMusicianProfileGateway {
+        const fn new(result: Result<MusicianProfile, MusicianProfileGatewayError>) -> Self {
+            Self { result }
+        }
+    }
+
+    impl MusicianProfileGateway for FakeMusicianProfileGateway {
+        fn get_by_id(&self, _id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+            self.result.clone()
+        }
+    }
+
+    struct FakeStudentLessonsGateway {
+        result: Result<StudentLessons, StudentLessonsGatewayError>,
+    }
+
+    impl FakeStudentLessonsGateway {
+        const fn new(result: Result<StudentLessons, StudentLessonsGatewayError>) -> Self {
+            Self { result }
+        }
+    }
+
+    impl StudentLessonsGateway for FakeStudentLessonsGateway {
+        fn get_all_for_student_with_id(
+            &self,
+            _student_id: &str,
+        ) -> Result<StudentLessons, StudentLessonsGatewayError> {
+            self.result.clone()
+        }
+    }
 
     #[test]
     fn login_success_is_reported() {
@@ -303,8 +385,8 @@ mod tests {
     #[test]
     fn login_gateway_failure_is_reported_with_its_kind_and_details() {
         let facade = facade(
-            Err(CredentialGatewayError::UnableToPerformOperation {
-                kind: authentication::application::gateways::FailureKind::Network,
+            Err(AuthorizationError::UnableToPerformOperation {
+                kind: authentication::application::gateways::FailureKind::Transient,
                 details: "Request failed for operation 'authentication'".to_owned(),
             }),
             None,
@@ -374,6 +456,30 @@ mod tests {
     }
 
     #[test]
+    fn restore_session_gateway_failure_is_reported_with_its_kind_and_details() {
+        let facade = facade(
+            Err(AuthorizationError::UnableToPerformOperation {
+                kind: authentication::application::gateways::FailureKind::Transient,
+                details: "Request failed for operation 'authentication'".to_owned(),
+            }),
+            Some(("someone@example.com".to_owned(), "hunter2".to_owned())),
+            Ok(Vec::new()),
+            Err(MusicianProfileGatewayError::NotFound),
+            Ok(StudentLessons::default()),
+        );
+
+        let result = facade.restore_session();
+
+        assert_eq!(
+            result,
+            RestoreSessionOutcome::UnableToPerformOperation(ErrorReportDto {
+                kind: ErrorKindDto::Network,
+                details: "Request failed for operation 'authentication'".to_owned(),
+            })
+        );
+    }
+
+    #[test]
     fn available_students_are_mapped_to_dtos() {
         let facade = facade(
             Ok(AuthorizationResult::Authorized),
@@ -403,7 +509,7 @@ mod tests {
             Ok(AuthorizationResult::Authorized),
             None,
             Err(StudentGatewayError::UnableToPerformOperation {
-                kind: FailureKind::UnexpectedResponse,
+                kind: FailureKind::Unexpected,
                 details: "Unable to decode student listing JSON response: expected value"
                     .to_owned(),
             }),
@@ -426,13 +532,10 @@ mod tests {
     #[test]
     fn every_failure_kind_has_a_matching_error_kind_dto() {
         let cases = [
-            (FailureKind::Network, ErrorKindDto::Network),
-            (
-                FailureKind::UnexpectedResponse,
-                ErrorKindDto::UnexpectedResponse,
-            ),
+            (FailureKind::Transient, ErrorKindDto::Network),
+            (FailureKind::Unexpected, ErrorKindDto::UnexpectedResponse),
             (FailureKind::SessionExpired, ErrorKindDto::SessionExpired),
-            (FailureKind::Unknown, ErrorKindDto::Unknown),
+            (FailureKind::Unclassified, ErrorKindDto::Unknown),
         ];
 
         for (kind, expected) in cases {
@@ -469,7 +572,7 @@ mod tests {
             Ok(Vec::new()),
             Err(MusicianProfileGatewayError::NotFound),
             Err(StudentLessonsGatewayError::UnableToPerformOperation {
-                kind: FailureKind::Network,
+                kind: FailureKind::Transient,
                 details: "Request failed for operation 'student_lessons'".to_owned(),
             }),
         );
@@ -613,7 +716,7 @@ mod tests {
                 instrument: Some(Instrument::Violin),
             }),
             Err(StudentLessonsGatewayError::UnableToPerformOperation {
-                kind: FailureKind::Network,
+                kind: FailureKind::Transient,
                 details: "connection refused".to_owned(),
             }),
         );
@@ -853,24 +956,27 @@ mod tests {
         assert!(REQUEST_TIMEOUT > SLOWEST_OBSERVED_RESPONSE);
     }
 
-    /// The facade over fakes. Credentials live in the in-memory store, which the
-    /// contract suite keeps faithful to the real one; only the tests that build
-    /// the production wiring (`facade_talking_to`) use the encrypted file store.
+    /// The facade over fakes. Credentials live in the real in-memory gateway;
+    /// only the tests that build the production wiring (`facade_talking_to`)
+    /// use the encrypted file store.
     fn facade(
-        credential_gateway_result: Result<AuthorizationResult, CredentialGatewayError>,
+        credential_gateway_result: Result<AuthorizationResult, AuthorizationError>,
         stored_credential: Option<(String, String)>,
         students_result: Result<Vec<Student>, StudentGatewayError>,
         musician_profile_result: Result<MusicianProfile, MusicianProfileGatewayError>,
         student_lessons_result: Result<StudentLessons, StudentLessonsGatewayError>,
     ) -> ApplicationFacade {
-        let credential_gateway: Arc<dyn CredentialGateway + Send + Sync> =
-            Arc::new(FakeCredentialGateway::new(credential_gateway_result));
+        let credential_gateway: Arc<dyn AuthorizeCredentialGateway + Send + Sync> =
+            Arc::new(FakeAuthorizationGateway::new(credential_gateway_result));
 
-        let credential_store: Arc<InMemoryCredentialStore> = Arc::new(
-            stored_credential.map_or_else(InMemoryCredentialStore::new, |(email, password)| {
-                InMemoryCredentialStore::holding(email, password)
-            }),
-        );
+        let credential_store: Arc<InMemoryCredentialStore> =
+            Arc::new(InMemoryCredentialStore::new());
+        if let Some((email, password)) = stored_credential {
+            // Saving to a fresh in-memory store cannot fail.
+            credential_store
+                .save(&Credential::new(Email(email), Password(password)))
+                .ok();
+        }
 
         ApplicationFacade {
             login_and_remember_credentials_use_case: LoginAndRememberCredentialsUseCase::new(
@@ -879,6 +985,7 @@ mod tests {
             ),
             logout_use_case: LogoutUseCase::new(credential_store.clone()),
             restore_session_use_case: RestoreSessionUseCase::new(
+                credential_store.clone(),
                 credential_store,
                 credential_gateway,
             ),

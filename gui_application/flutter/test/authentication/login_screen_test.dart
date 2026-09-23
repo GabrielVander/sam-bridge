@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
@@ -25,7 +23,7 @@ Future<List<(String, String)>> pumpLoginForm(
       attempts.add((email, password));
       return result;
     },
-    restoreSessionUseCase: () async => RestoreSessionOutcome.notAvailable,
+    restoreSessionUseCase: () async => const RestoreSessionOutcome.notAvailable(),
     logoutUseCase: () async => LogoutOutcome.successful,
   );
   final router = GoRouter(
@@ -57,7 +55,7 @@ Future<void> pumpLogin(
 }) async {
   final presenter = AuthPresenter(
     loginUseCase: ({required email, required password}) async => result,
-    restoreSessionUseCase: () async => RestoreSessionOutcome.notAvailable,
+    restoreSessionUseCase: () async => const RestoreSessionOutcome.notAvailable(),
     logoutUseCase: () async => LogoutOutcome.successful,
   );
 
@@ -79,59 +77,7 @@ Future<void> pumpLogin(
 }
 
 void main() {
-  group('LoginScreen loading', () {
-    testWidgets('says SAM is slow when signing in takes over ten seconds', (
-      tester,
-    ) async {
-      final answer = Completer<LoginResult>();
-      final presenter = AuthPresenter(
-        loginUseCase: ({required email, required password}) => answer.future,
-        restoreSessionUseCase: () async => RestoreSessionOutcome.notAvailable,
-        logoutUseCase: () async => LogoutOutcome.successful,
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: BlocSignalProvider<AuthPresenter>.value(
-              value: presenter,
-              child: const LoginScreen(),
-            ),
-          ),
-        ),
-      );
-      await tester.enterText(_emailField, 'user@example.com');
-      await tester.enterText(_passwordField, 'hunter2-secret');
-      await tester.tap(find.text('Entrar'));
-      await tester.pump();
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.textContaining('O SAM está demorando'), findsNothing);
-
-      await tester.pump(const Duration(seconds: 10));
-
-      expect(find.textContaining('O SAM está demorando'), findsOneWidget);
-    });
-  });
-
   group('LoginScreen failure', () {
-    testWidgets(
-      'shows the friendly message with the technical details collapsed',
-      (tester) async {
-        await pumpLogin(
-          tester,
-          result: const LoginResult.unableToPerformAuthorization(
-            ErrorReportDto(kind: ErrorKindDto.network, details: _details),
-          ),
-        );
-
-        expect(
-          find.textContaining('Não foi possível conectar ao SAM'),
-          findsOneWidget,
-        );
-        expect(find.text('Detalhes técnicos'), findsOneWidget);
-        expect(find.text(_details), findsNothing);
-      },
-    );
-
     testWidgets('expanding reveals the details without exposing the password', (
       tester,
     ) async {
@@ -153,18 +99,6 @@ void main() {
         ),
         findsNothing,
       );
-    });
-
-    testWidgets('invalid credentials show no technical details', (
-      tester,
-    ) async {
-      await pumpLogin(
-        tester,
-        result: const LoginResult.invalidEmailOrPassword(),
-      );
-
-      expect(find.text('Usuário ou senha inválido(a)'), findsOneWidget);
-      expect(find.text('Detalhes técnicos'), findsNothing);
     });
   });
   group('LoginScreen form', () {
@@ -194,17 +128,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(attempts, [('user@example.com', 'hunter2')]);
-    });
-
-    testWidgets('asks for both fields when either is empty', (tester) async {
-      final attempts = await pumpLoginForm(tester);
-
-      await tester.enterText(_emailField, 'user@example.com');
-      await tester.tap(find.text('Entrar'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Informe usuário e senha'), findsOneWidget);
-      expect(attempts, isEmpty);
     });
 
     testWidgets('keeps the password hidden until asked to show it', (

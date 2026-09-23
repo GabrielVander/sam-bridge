@@ -20,7 +20,6 @@ smol = { workspace = true }
 wiremock = { workspace = true }
 chrono = { workspace = true }
 tempfile = { workspace = true }
-test_support = { workspace = true }
 
 [lints]
 workspace = true

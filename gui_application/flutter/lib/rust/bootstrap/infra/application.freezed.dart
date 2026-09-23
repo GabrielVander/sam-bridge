@@ -307,4 +307,300 @@ as ErrorReportDto,
 
 }
 
+/// @nodoc
+mixin _$RestoreSessionOutcome {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcome);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'RestoreSessionOutcome()';
+}
+
+
+}
+
+/// @nodoc
+class $RestoreSessionOutcomeCopyWith<$Res>  {
+$RestoreSessionOutcomeCopyWith(RestoreSessionOutcome _, $Res Function(RestoreSessionOutcome) __);
+}
+
+
+/// Adds pattern-matching-related methods to [RestoreSessionOutcome].
+extension RestoreSessionOutcomePatterns on RestoreSessionOutcome {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( RestoreSessionOutcome_Restored value)?  restored,TResult Function( RestoreSessionOutcome_NotAvailable value)?  notAvailable,TResult Function( RestoreSessionOutcome_UnableToPerformOperation value)?  unableToPerformOperation,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case RestoreSessionOutcome_Restored() when restored != null:
+return restored(_that);case RestoreSessionOutcome_NotAvailable() when notAvailable != null:
+return notAvailable(_that);case RestoreSessionOutcome_UnableToPerformOperation() when unableToPerformOperation != null:
+return unableToPerformOperation(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( RestoreSessionOutcome_Restored value)  restored,required TResult Function( RestoreSessionOutcome_NotAvailable value)  notAvailable,required TResult Function( RestoreSessionOutcome_UnableToPerformOperation value)  unableToPerformOperation,}){
+final _that = this;
+switch (_that) {
+case RestoreSessionOutcome_Restored():
+return restored(_that);case RestoreSessionOutcome_NotAvailable():
+return notAvailable(_that);case RestoreSessionOutcome_UnableToPerformOperation():
+return unableToPerformOperation(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( RestoreSessionOutcome_Restored value)?  restored,TResult? Function( RestoreSessionOutcome_NotAvailable value)?  notAvailable,TResult? Function( RestoreSessionOutcome_UnableToPerformOperation value)?  unableToPerformOperation,}){
+final _that = this;
+switch (_that) {
+case RestoreSessionOutcome_Restored() when restored != null:
+return restored(_that);case RestoreSessionOutcome_NotAvailable() when notAvailable != null:
+return notAvailable(_that);case RestoreSessionOutcome_UnableToPerformOperation() when unableToPerformOperation != null:
+return unableToPerformOperation(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  restored,TResult Function()?  notAvailable,TResult Function( ErrorReportDto field0)?  unableToPerformOperation,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case RestoreSessionOutcome_Restored() when restored != null:
+return restored();case RestoreSessionOutcome_NotAvailable() when notAvailable != null:
+return notAvailable();case RestoreSessionOutcome_UnableToPerformOperation() when unableToPerformOperation != null:
+return unableToPerformOperation(_that.field0);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  restored,required TResult Function()  notAvailable,required TResult Function( ErrorReportDto field0)  unableToPerformOperation,}) {final _that = this;
+switch (_that) {
+case RestoreSessionOutcome_Restored():
+return restored();case RestoreSessionOutcome_NotAvailable():
+return notAvailable();case RestoreSessionOutcome_UnableToPerformOperation():
+return unableToPerformOperation(_that.field0);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  restored,TResult? Function()?  notAvailable,TResult? Function( ErrorReportDto field0)?  unableToPerformOperation,}) {final _that = this;
+switch (_that) {
+case RestoreSessionOutcome_Restored() when restored != null:
+return restored();case RestoreSessionOutcome_NotAvailable() when notAvailable != null:
+return notAvailable();case RestoreSessionOutcome_UnableToPerformOperation() when unableToPerformOperation != null:
+return unableToPerformOperation(_that.field0);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class RestoreSessionOutcome_Restored extends RestoreSessionOutcome {
+  const RestoreSessionOutcome_Restored(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcome_Restored);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'RestoreSessionOutcome.restored()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class RestoreSessionOutcome_NotAvailable extends RestoreSessionOutcome {
+  const RestoreSessionOutcome_NotAvailable(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcome_NotAvailable);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'RestoreSessionOutcome.notAvailable()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class RestoreSessionOutcome_UnableToPerformOperation extends RestoreSessionOutcome {
+  const RestoreSessionOutcome_UnableToPerformOperation(this.field0): super._();
+  
+
+ final  ErrorReportDto field0;
+
+/// Create a copy of RestoreSessionOutcome
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$RestoreSessionOutcome_UnableToPerformOperationCopyWith<RestoreSessionOutcome_UnableToPerformOperation> get copyWith => _$RestoreSessionOutcome_UnableToPerformOperationCopyWithImpl<RestoreSessionOutcome_UnableToPerformOperation>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcome_UnableToPerformOperation&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'RestoreSessionOutcome.unableToPerformOperation(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $RestoreSessionOutcome_UnableToPerformOperationCopyWith<$Res> implements $RestoreSessionOutcomeCopyWith<$Res> {
+  factory $RestoreSessionOutcome_UnableToPerformOperationCopyWith(RestoreSessionOutcome_UnableToPerformOperation value, $Res Function(RestoreSessionOutcome_UnableToPerformOperation) _then) = _$RestoreSessionOutcome_UnableToPerformOperationCopyWithImpl;
+@useResult
+$Res call({
+ ErrorReportDto field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$RestoreSessionOutcome_UnableToPerformOperationCopyWithImpl<$Res>
+    implements $RestoreSessionOutcome_UnableToPerformOperationCopyWith<$Res> {
+  _$RestoreSessionOutcome_UnableToPerformOperationCopyWithImpl(this._self, this._then);
+
+  final RestoreSessionOutcome_UnableToPerformOperation _self;
+  final $Res Function(RestoreSessionOutcome_UnableToPerformOperation) _then;
+
+/// Create a copy of RestoreSessionOutcome
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(RestoreSessionOutcome_UnableToPerformOperation(
+null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as ErrorReportDto,
+  ));
+}
+
+
+}
+
 // dart format on

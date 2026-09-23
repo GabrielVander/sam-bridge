@@ -58,11 +58,11 @@ final class ProgressUnavailable extends ProgressStatus {
   const ProgressUnavailable(this.report);
 }
 
-class LessonsCubitSignal extends CubitSignal<LessonsState> {
+class LessonsPresenter extends CubitSignal<LessonsState> {
   final RetrieveStudentLessonsUseCase retrieveStudentLessons;
   final AssessStudentProgressUseCase assessStudentProgress;
 
-  LessonsCubitSignal({
+  LessonsPresenter({
     required this.retrieveStudentLessons,
     required this.assessStudentProgress,
   }) : super(initialState: const LessonsIdle());
