@@ -1,5 +1,6 @@
 use authentication::application::gateways::{
-    ClearCredentialGateway, LoadCredentialGateway, SaveCredentialGateway,
+    ClearCredentialGateway, ClearCredentialGatewayError, LoadCredentialGateway,
+    SaveCredentialGateway,
 };
 use authentication::domain::entities::{Credential, Email, Password};
 use credential_store::FileCredentialStore;
@@ -182,6 +183,26 @@ fn save_fails_when_the_credential_file_path_is_a_directory() {
     assert!(
         result.is_err(),
         "a credential file path occupied by a directory must fail rather than silently succeed"
+    );
+}
+
+#[test]
+fn clear_fails_when_the_credential_file_cannot_be_removed() {
+    let (store, dir) = temp_store().expect("tempdir");
+    std::fs::create_dir(dir.path().join("session.enc"))
+        .expect("occupy the credential path with a directory");
+
+    let result = store.clear();
+
+    let Err(ClearCredentialGatewayError::UnableToPerformOperation { details }) = result else {
+        panic!("a credential that could not be removed must not be reported as cleared");
+    };
+    let os_reason = std::fs::remove_file(dir.path().join("session.enc"))
+        .expect_err("the directory still occupies the credential path")
+        .to_string();
+    assert!(
+        details.contains(&os_reason),
+        "details should say why the credential file could not be removed, got: {details}"
     );
 }
 

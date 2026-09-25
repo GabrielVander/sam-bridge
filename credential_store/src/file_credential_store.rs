@@ -158,8 +158,11 @@ impl FileCredentialStore {
         serde_json::from_slice::<StoredCredential>(&plaintext).ok()
     }
 
-    fn clear_sync(&self) {
-        let _ = std::fs::remove_file(&self.credential_path);
+    fn clear_sync(&self) -> std::io::Result<()> {
+        match std::fs::remove_file(&self.credential_path) {
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            result => result,
+        }
     }
 }
 impl SaveCredentialGateway for FileCredentialStore {
@@ -187,9 +190,11 @@ impl LoadCredentialGateway for FileCredentialStore {
 
 impl ClearCredentialGateway for FileCredentialStore {
     fn clear(&self) -> Result<(), ClearCredentialGatewayError> {
-        self.clear_sync();
-
-        Ok(())
+        self.clear_sync().map_err(
+            |error| ClearCredentialGatewayError::UnableToPerformOperation {
+                details: format!("Unable to remove the credential file: {error}"),
+            },
+        )
     }
 }
 
