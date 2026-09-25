@@ -177,15 +177,17 @@ struct FakeClearCredentialGateway {
 }
 
 impl FakeClearCredentialGateway {
-    const fn unable_to_perform_operation() -> Self {
+    fn unable_to_perform_operation() -> Self {
         Self {
-            clear: Err(ClearCredentialGatewayError::UnableToPerformOperation),
+            clear: Err(ClearCredentialGatewayError::UnableToPerformOperation {
+                details: "Unable to remove the credential file: Permission denied".to_owned(),
+            }),
         }
     }
 }
 
 impl ClearCredentialGateway for FakeClearCredentialGateway {
     fn clear(&self) -> Result<(), ClearCredentialGatewayError> {
-        self.clear
+        self.clear.clone()
     }
 }

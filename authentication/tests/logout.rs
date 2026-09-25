@@ -30,13 +30,18 @@ fn clears_the_store() {
 }
 
 #[test]
-fn surfaces_gateway_failures() {
+fn surfaces_gateway_failures_with_their_details() {
     let fake_clear_credential: Arc<FakeClearCredentialGateway> =
         Arc::new(FakeClearCredentialGateway::unable_to_perform_operation());
 
     let result: Result<(), LogoutError> = LogoutUseCase::new(fake_clear_credential).execute();
 
-    assert_eq!(result, Err(LogoutError::UnableToClearCredentials));
+    assert_eq!(
+        result,
+        Err(LogoutError::UnableToClearCredentials {
+            details: "Unable to remove the credential file: Permission denied".to_owned()
+        })
+    );
 }
 
 struct FakeClearCredentialGateway {
@@ -44,15 +49,17 @@ struct FakeClearCredentialGateway {
 }
 
 impl FakeClearCredentialGateway {
-    const fn unable_to_perform_operation() -> Self {
+    fn unable_to_perform_operation() -> Self {
         Self {
-            clear: Err(ClearCredentialGatewayError::UnableToPerformOperation),
+            clear: Err(ClearCredentialGatewayError::UnableToPerformOperation {
+                details: "Unable to remove the credential file: Permission denied".to_owned(),
+            }),
         }
     }
 }
 
 impl ClearCredentialGateway for FakeClearCredentialGateway {
     fn clear(&self) -> Result<(), ClearCredentialGatewayError> {
-        self.clear
+        self.clear.clone()
     }
 }
