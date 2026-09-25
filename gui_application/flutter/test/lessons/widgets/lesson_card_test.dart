@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/widgets/lesson_card.dart';
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/builders.dart';

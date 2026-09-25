@@ -5,7 +5,7 @@ import 'package:flutter_application/lessons/widgets/back_bar.dart';
 import 'package:flutter_application/lessons/widgets/category_lessons_view.dart';
 import 'package:flutter_application/lessons/widgets/checkpoint_timeline.dart';
 import 'package:flutter_application/lessons/widgets/unknown_level_banner.dart';
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_application/widgets/loading_indicator.dart';
 

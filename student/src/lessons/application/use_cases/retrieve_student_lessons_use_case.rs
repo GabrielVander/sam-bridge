@@ -1,14 +1,17 @@
+use std::sync::Arc;
+
 use crate::lessons::{
     application::gateways::{StudentLessonsGateway, StudentLessonsGatewayError},
     domain::entities::StudentLessons,
 };
 
-pub struct RetrieveStudentLessonsUseCase<'a, T: StudentLessonsGateway + ?Sized> {
-    gateway: &'a T,
+#[derive(Clone)]
+pub struct RetrieveStudentLessonsUseCase {
+    gateway: Arc<dyn StudentLessonsGateway + Send + Sync>,
 }
 
-impl<'a, T: StudentLessonsGateway + ?Sized> RetrieveStudentLessonsUseCase<'a, T> {
-    pub const fn new(gateway: &'a T) -> Self {
+impl RetrieveStudentLessonsUseCase {
+    pub fn new(gateway: Arc<dyn StudentLessonsGateway + Send + Sync>) -> Self {
         Self { gateway }
     }
 
@@ -50,7 +53,7 @@ mod tests {
 
     fn fixture_bundle() -> StudentLessons {
         StudentLessons {
-            approved: vec![Lesson {
+            msa: vec![Lesson {
                 id: Some("559783".to_owned()),
                 date: Some(NaiveDate::from_ymd_opt(2025, 9, 9).expect("valid date")),
                 phase: Some(Range {
@@ -75,7 +78,7 @@ mod tests {
             bundle: bundle.clone(),
             fail: false,
         };
-        let use_case = RetrieveStudentLessonsUseCase::new(&gateway);
+        let use_case = RetrieveStudentLessonsUseCase::new(Arc::new(gateway));
 
         let result = use_case.execute("500132").expect("should succeed");
 
@@ -88,7 +91,7 @@ mod tests {
             bundle: StudentLessons::default(),
             fail: true,
         };
-        let use_case = RetrieveStudentLessonsUseCase::new(&gateway);
+        let use_case = RetrieveStudentLessonsUseCase::new(Arc::new(gateway));
 
         let result = use_case.execute("500132");
 

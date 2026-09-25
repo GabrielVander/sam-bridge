@@ -13,7 +13,7 @@ pub struct Lesson {
 
 #[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct StudentLessons {
-    pub approved: Vec<Lesson>,
+    pub msa: Vec<Lesson>,
     pub method: Vec<Lesson>,
 }
 
@@ -66,7 +66,7 @@ mod tests {
         let l = Lesson::default();
         assert!(l.id.is_none());
         let sl = StudentLessons::default();
-        assert_eq!(sl.approved, Vec::new());
+        assert_eq!(sl.msa, Vec::new());
         assert_eq!(l, Lesson::default());
         assert_eq!(Clef::G.clone(), Clef::G);
     }

@@ -10,18 +10,6 @@ pub enum MusicianLevel {
 
 impl MusicianLevel {
     #[must_use]
-    pub fn name(&self) -> String {
-        match self {
-            Self::Candidate => "Candidate".to_owned(),
-            Self::Practice => "Practice".to_owned(),
-            Self::YouthService => "YouthService".to_owned(),
-            Self::OfficialService => "OfficialService".to_owned(),
-            Self::Officialized => "Officialized".to_owned(),
-            Self::Unknown(raw) => raw.clone(),
-        }
-    }
-
-    #[must_use]
     pub const fn rank(&self) -> u8 {
         match self {
             Self::Candidate => 0,
@@ -37,19 +25,6 @@ impl MusicianLevel {
 #[cfg(test)]
 mod tests {
     use super::MusicianLevel;
-
-    #[test]
-    fn name_matches_every_known_variant() {
-        assert_eq!(MusicianLevel::Candidate.name(), "Candidate");
-        assert_eq!(MusicianLevel::Practice.name(), "Practice");
-        assert_eq!(MusicianLevel::YouthService.name(), "YouthService");
-        assert_eq!(MusicianLevel::OfficialService.name(), "OfficialService");
-        assert_eq!(MusicianLevel::Officialized.name(), "Officialized");
-        assert_eq!(
-            MusicianLevel::Unknown("Strawberry".to_owned()).name(),
-            "Strawberry"
-        );
-    }
 
     #[test]
     fn rank_orders_every_known_variant_below_unknown() {

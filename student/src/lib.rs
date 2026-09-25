@@ -3,11 +3,6 @@ mod roster;
 mod shared;
 
 pub mod application {
-    pub mod dto {
-        pub use crate::lessons::application::dto::*;
-        pub use crate::roster::application::dto::*;
-    }
-
     pub mod gateways {
         pub use crate::lessons::application::gateways::*;
         pub use crate::roster::application::gateways::*;

@@ -1,5 +1,6 @@
-import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/rust/bootstrap/infra/roster_view.dart';
+import 'package:flutter_application/roster/student_list_item.dart';
+import 'package:flutter_application/rust/api/roster.dart';
+import 'package:flutter_application/shared/level_labels.dart';
 
 class RosterMapper {
   static List<StudentListItem> toViewModels(List<StudentSummaryDto> dtos) =>
@@ -22,22 +23,22 @@ class RosterMapper {
 
   static String _positionLabel(StudentPositionDto position) =>
       switch (position) {
-        StudentPositionDto_Candidate() => 'Candidato(a)',
-        StudentPositionDto_Practice() => 'Ensaio',
-        StudentPositionDto_YouthService() => 'Reunião de Jovens e Menores',
-        StudentPositionDto_OfficialService() => 'Culto Oficial',
-        StudentPositionDto_Officialized() => 'Oficialização',
-        StudentPositionDto_HalfHour() => 'Meia Hora',
+        StudentPositionDto_Candidate() => LevelLabels.candidate,
+        StudentPositionDto_Practice() => LevelLabels.practice,
+        StudentPositionDto_YouthService() => LevelLabels.youthService,
+        StudentPositionDto_OfficialService() => LevelLabels.officialService,
+        StudentPositionDto_Officialized() => LevelLabels.officialized,
+        StudentPositionDto_HalfHour() => LevelLabels.halfHour,
         StudentPositionDto_YouthServiceHalfHour() =>
-          'Reunião de Jovens e Menores / Meia Hora',
+          '${LevelLabels.youthService} / ${LevelLabels.halfHour}',
         StudentPositionDto_YouthServicePractice() =>
-          'Reunião de Jovens e Menores / Ensaio',
+          '${LevelLabels.youthService} / ${LevelLabels.practice}',
         StudentPositionDto_YouthServiceOfficialService() =>
-          'Reunião de Jovens e Menores / Culto Oficial',
+          '${LevelLabels.youthService} / ${LevelLabels.officialService}',
         StudentPositionDto_YouthServiceOfficialized() =>
-          'Reunião de Jovens e Menores / Oficialização',
+          '${LevelLabels.youthService} / ${LevelLabels.officialized}',
         StudentPositionDto_GemSecretary() => 'Secretário(a) do GEM',
         StudentPositionDto_MusicSecretary() => 'Secretário(a) de Música',
-        StudentPositionDto_Invalid(:final field0) => field0,
+        StudentPositionDto_Invalid(:final raw) => raw,
       };
 }

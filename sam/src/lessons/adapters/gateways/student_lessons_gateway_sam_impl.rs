@@ -27,7 +27,7 @@ impl StudentLessonsGateway for StudentLessonsGatewaySamImpl {
         })?;
 
         Ok(StudentLessons {
-            approved: page.msa.into_iter().map(Lesson::from).collect(),
+            msa: page.msa.into_iter().map(Lesson::from).collect(),
             method: page.method.into_iter().map(Lesson::from).collect(),
         })
     }

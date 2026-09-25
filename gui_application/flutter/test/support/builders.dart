@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Builders keep tests independent of how many fields a model has: each test
@@ -29,14 +29,12 @@ LessonItem lessonItem({
 );
 
 CheckpointView checkpoint({
-  String levelKey = 'ensaio',
   String label = 'Ensaio',
   bool achieved = false,
   bool readyToAdvance = false,
   bool msaMet = false,
   bool methodMet = false,
 }) => CheckpointView(
-  levelKey: levelKey,
   label: label,
   achieved: achieved,
   readyToAdvance: readyToAdvance,

@@ -4,7 +4,6 @@ import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/rust/api.dart';
-import 'package:flutter_application/rust/bootstrap/infra/application.dart';
 import 'package:flutter_application/rust/frb_generated.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -38,7 +37,7 @@ Future<void> main() async {
       ),
       authPresenter: authPresenter,
       studentsPresenter: studentsPresenter,
-      lessonsCubitSignal: lessonsPresenter,
+      lessonsPresenter: lessonsPresenter,
     ),
   );
 }

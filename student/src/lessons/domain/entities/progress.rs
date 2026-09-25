@@ -27,14 +27,13 @@ pub struct CheckpointStatus {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-#[allow(non_snake_case)]
 pub struct ProgressAssessment {
     pub checkpoints: Vec<CheckpointStatus>,
-    pub msaRelativePercent: f64,
-    pub methodRelativePercent: f64,
-    pub combinedPercent: f64,
-    pub overallCheckpointPercent: f64,
-    pub nextLevel: Option<MusicianLevel>,
+    pub msa_relative_percent: f64,
+    pub method_relative_percent: f64,
+    pub combined_percent: f64,
+    pub overall_checkpoint_percent: f64,
+    pub next_level: Option<MusicianLevel>,
 }
 
 const LEVELS: [MusicianLevel; 5] = [
@@ -179,7 +178,7 @@ fn pct(current: f64, max: f64) -> f64 {
 pub fn assess(
     assigned_level: &MusicianLevel,
     instrument: Instrument,
-    approved: &[Lesson],
+    msa_lessons: &[Lesson],
     method: &[Lesson],
 ) -> Result<ProgressAssessment, AssessError> {
     if let MusicianLevel::Unknown(raw) = assigned_level {
@@ -188,7 +187,7 @@ pub fn assess(
     let catalog = InstrumentRequirements::for_instrument(&instrument)
         .ok_or(AssessError::UnpublishedRequirements(instrument))?;
 
-    let theory_recorded = max_field(approved.iter().map(|l| &l.phase));
+    let theory_recorded = max_field(msa_lessons.iter().map(|l| &l.phase));
     let method_recorded = recorded_progress(method);
 
     let checkpoints: Vec<CheckpointStatus> = LEVELS
@@ -236,11 +235,11 @@ pub fn assess(
 
     Ok(ProgressAssessment {
         checkpoints,
-        msaRelativePercent: msa_relative,
-        methodRelativePercent: method_relative,
-        combinedPercent: combined,
-        overallCheckpointPercent: overall_checkpoint,
-        nextLevel: next_level,
+        msa_relative_percent: msa_relative,
+        method_relative_percent: method_relative,
+        combined_percent: combined,
+        overall_checkpoint_percent: overall_checkpoint,
+        next_level,
     })
 }
 
@@ -290,20 +289,20 @@ mod tests {
         assert_ne!(report.checkpoints, Vec::new());
         assert!(report.checkpoints[0].achieved);
         assert!(!report.meets_any_above());
-        assert!((report.overallCheckpointPercent - 20.0).abs() < 0.1);
-        assert_eq!(report.msaRelativePercent, 0.0);
-        assert_eq!(report.methodRelativePercent, 0.0);
+        assert!((report.overall_checkpoint_percent - 20.0).abs() < 0.1);
+        assert_eq!(report.msa_relative_percent, 0.0);
+        assert_eq!(report.method_relative_percent, 0.0);
     }
 
     #[test]
     fn supreme_rule_assigned_level_auto_achieves_below_and_at() {
-        let approved = vec![msa_lesson("3", "3")];
+        let msa_lessons = vec![msa_lesson("3", "3")];
         let method = vec![method_lesson("10", "20")];
 
         let report = assess(
             &MusicianLevel::YouthService,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &method,
         )
         .unwrap();
@@ -317,13 +316,13 @@ mod tests {
 
     #[test]
     fn requirements_met_but_not_assigned_shows_ready_to_advance() {
-        let approved = vec![msa_lesson("12", "12")];
+        let msa_lessons = vec![msa_lesson("12", "12")];
         let method = vec![method_lesson("46", "113")];
 
         let report = assess(
             &MusicianLevel::Candidate,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &method,
         )
         .unwrap();
@@ -341,18 +340,18 @@ mod tests {
 
         let report = assess(&MusicianLevel::Candidate, Instrument::Violin, &[], &method).unwrap();
 
-        assert!(report.methodRelativePercent > 40.0);
+        assert!(report.method_relative_percent > 40.0);
     }
 
     #[test]
     fn meets_culto_oficial_requires_phase_16() {
-        let approved = vec![msa_lesson("15", "16")];
+        let msa_lessons = vec![msa_lesson("15", "16")];
         let method = vec![method_lesson("67", "162")];
 
         let report = assess(
             &MusicianLevel::YouthService,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &method,
         )
         .unwrap();
@@ -362,13 +361,13 @@ mod tests {
 
     #[test]
     fn officialization_is_unverifiable_from_data_alone() {
-        let approved = vec![msa_lesson("16", "16")];
+        let msa_lessons = vec![msa_lesson("16", "16")];
         let method = vec![method_lesson("999", "999")];
 
         let report = assess(
             &MusicianLevel::OfficialService,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &method,
         )
         .unwrap();
@@ -382,46 +381,46 @@ mod tests {
         let report = assess(&MusicianLevel::Officialized, Instrument::Violin, &[], &[]).unwrap();
 
         assert!(report.checkpoints.iter().all(|c| c.achieved));
-        assert_eq!(report.nextLevel, None);
-        assert!((report.overallCheckpointPercent - 100.0).abs() < f64::EPSILON);
-        assert!((report.combinedPercent - 100.0).abs() < f64::EPSILON);
+        assert_eq!(report.next_level, None);
+        assert!((report.overall_checkpoint_percent - 100.0).abs() < f64::EPSILON);
+        assert!((report.combined_percent - 100.0).abs() < f64::EPSILON);
     }
 
     #[test]
     fn absent_fields_contribute_zero() {
-        let approved = vec![Lesson::default()];
+        let msa_lessons = vec![Lesson::default()];
         let method = vec![Lesson::default()];
 
         let report = assess(
             &MusicianLevel::Candidate,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &method,
         )
         .unwrap();
 
-        assert_eq!(report.msaRelativePercent, 0.0);
-        assert_eq!(report.methodRelativePercent, 0.0);
-        assert_eq!(report.combinedPercent, 0.0);
+        assert_eq!(report.msa_relative_percent, 0.0);
+        assert_eq!(report.method_relative_percent, 0.0);
+        assert_eq!(report.combined_percent, 0.0);
     }
 
     #[test]
     fn unparseable_values_contribute_zero() {
-        let approved = vec![msa_lesson("abc", "def")];
+        let msa_lessons = vec![msa_lesson("abc", "def")];
         let report = assess(
             &MusicianLevel::Candidate,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &[],
         )
         .unwrap();
 
-        assert_eq!(report.msaRelativePercent, 0.0);
+        assert_eq!(report.msa_relative_percent, 0.0);
     }
 
     #[test]
     fn scan_all_takes_max_not_last() {
-        let approved = vec![
+        let msa_lessons = vec![
             msa_lesson("3", "3"),
             msa_lesson("14", "14"),
             msa_lesson("7", "7"),
@@ -429,41 +428,41 @@ mod tests {
         let report = assess(
             &MusicianLevel::Candidate,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &[],
         )
         .unwrap();
 
-        assert!((report.msaRelativePercent - 100.0).abs() < 0.1);
-        assert_eq!(report.nextLevel, Some(MusicianLevel::YouthService));
+        assert!((report.msa_relative_percent - 100.0).abs() < 0.1);
+        assert_eq!(report.next_level, Some(MusicianLevel::YouthService));
     }
 
     #[test]
     fn range_dash_takes_upper_bound() {
-        let approved = vec![msa_lesson("11", "13")];
+        let msa_lessons = vec![msa_lesson("11", "13")];
         let report = assess(
             &MusicianLevel::Candidate,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &[],
         )
         .unwrap();
 
-        assert!((report.msaRelativePercent - 100.0).abs() < 0.1);
+        assert!((report.msa_relative_percent - 100.0).abs() < 0.1);
     }
 
     #[test]
     fn msa_percent_is_phase_based() {
-        let approved = vec![msa_lesson("8", "8")];
+        let msa_lessons = vec![msa_lesson("8", "8")];
         let report = assess(
             &MusicianLevel::Candidate,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &[],
         )
         .unwrap();
 
-        assert!((report.msaRelativePercent - 66.6).abs() < 0.5);
+        assert!((report.msa_relative_percent - 66.6).abs() < 0.5);
     }
 
     #[test]
@@ -471,7 +470,7 @@ mod tests {
         let method = vec![method_phase_lesson("10")];
         let report = assess(&MusicianLevel::Candidate, Instrument::Flute, &[], &method).unwrap();
 
-        assert!(report.methodRelativePercent > 0.0);
+        assert!(report.method_relative_percent > 0.0);
     }
 
     #[test]
@@ -489,12 +488,12 @@ mod tests {
 
     #[test]
     fn unknown_level_does_not_calculate_even_with_high_lessons() {
-        let approved = vec![msa_lesson("16", "16")];
+        let msa_lessons = vec![msa_lesson("16", "16")];
         let method = vec![method_lesson("80", "214")];
         let result = assess(
             &MusicianLevel::Unknown("Foo".to_owned()),
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &method,
         );
         assert!(result.is_err());
@@ -672,17 +671,17 @@ mod tests {
         // Candidate: 1 of 5 checkpoints achieved. Towards Practice, MSA is at
         // 6 of 12 phases (50%) and the method at 0%, so the combined progress
         // is 25% and the journey is (1 + 0.25) / 5 = 25% complete.
-        let approved = vec![msa_lesson("6", "6")];
+        let msa_lessons = vec![msa_lesson("6", "6")];
 
         let report = assess(
             &MusicianLevel::Candidate,
             Instrument::Violin,
-            &approved,
+            &msa_lessons,
             &[],
         )
         .unwrap();
 
-        assert_eq!(report.combinedPercent, 25.0);
-        assert_eq!(report.overallCheckpointPercent, 25.0);
+        assert_eq!(report.combined_percent, 25.0);
+        assert_eq!(report.overall_checkpoint_percent, 25.0);
     }
 }

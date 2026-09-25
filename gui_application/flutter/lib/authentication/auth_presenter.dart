@@ -1,11 +1,11 @@
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_application/errors/error_report_mapper.dart';
-import 'package:flutter_application/authentication/application/use_cases/login_use_case.dart';
-import 'package:flutter_application/authentication/application/use_cases/logout_use_case.dart';
-import 'package:flutter_application/authentication/application/use_cases/restore_session_use_case.dart';
-import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/rust/bootstrap/infra/application.dart';
+import 'package:flutter_application/authentication/ports/login_use_case.dart';
+import 'package:flutter_application/authentication/ports/logout_use_case.dart';
+import 'package:flutter_application/authentication/ports/restore_session_use_case.dart';
+import 'package:flutter_application/errors/error_report.dart';
+import 'package:flutter_application/rust/api/authentication.dart';
 
 sealed class AuthState extends Equatable {
   const AuthState();
@@ -64,7 +64,7 @@ class AuthPresenter extends CubitSignal<AuthState> {
           emit(const AuthSuccess());
         case RestoreSessionOutcome_NotAvailable():
           emit(const AuthIdle());
-        case RestoreSessionOutcome_UnableToPerformOperation():
+        case RestoreSessionOutcome_Failure():
           emit(const AuthIdle());
       }
     } catch (_) {
@@ -81,18 +81,18 @@ class AuthPresenter extends CubitSignal<AuthState> {
 
     emit(const AuthLoading());
     try {
-      final LoginResult loginResult = await loginUseCase(
+      final LoginOutcome outcome = await loginUseCase(
         email: username,
         password: password,
       );
 
-      switch (loginResult) {
-        case LoginResult_Successful():
+      switch (outcome) {
+        case LoginOutcome_Successful():
           emit(const AuthSuccess());
-        case LoginResult_InvalidEmailOrPassword():
+        case LoginOutcome_InvalidEmailOrPassword():
           emit(const AuthUnauthorized());
-        case LoginResult_UnableToPerformAuthorization(:final field0):
-          emit(AuthFailure(ErrorReportMapper.toViewModel(field0)));
+        case LoginOutcome_Failure(:final report):
+          emit(AuthFailure(ErrorReportMapper.toViewModel(report)));
       }
     } catch (e) {
       emit(AuthFailure(ErrorReportMapper.fromThrown(e)));

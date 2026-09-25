@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter_application/authentication/auth_presenter.dart';
-import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/rust/bootstrap/infra/application.dart';
-import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
+import 'package:flutter_application/errors/error_report.dart';
+import 'package:flutter_application/rust/api/authentication.dart';
+import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 AuthPresenter buildPresenter({
-  Future<LoginResult> Function({
+  Future<LoginOutcome> Function({
     required String email,
     required String password,
   })?
@@ -19,10 +19,10 @@ AuthPresenter buildPresenter({
     loginUseCase:
         loginUseCase ??
         ({required email, required password}) async =>
-            const LoginResult.successful(),
+            const LoginOutcome.successful(),
     restoreSessionUseCase:
         restoreSessionUseCase ??
-            () async => const RestoreSessionOutcome.notAvailable(),
+        () async => const RestoreSessionOutcome.notAvailable(),
     logoutUseCase: logoutUseCase ?? () async => LogoutOutcome.successful,
   );
 }
@@ -76,7 +76,7 @@ void main() {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async {
             called = true;
-            return const LoginResult.successful();
+            return const LoginOutcome.successful();
           },
         );
 
@@ -90,7 +90,7 @@ void main() {
     test('submitLogin() transitions to Success on successful login', () async {
       final presenter = buildPresenter(
         loginUseCase: ({required email, required password}) async =>
-            const LoginResult.successful(),
+            const LoginOutcome.successful(),
       );
 
       await presenter.submitLogin('user@example.com', 'secret');
@@ -103,7 +103,7 @@ void main() {
       () async {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async =>
-              const LoginResult.invalidEmailOrPassword(),
+              const LoginOutcome.invalidEmailOrPassword(),
         );
 
         await presenter.submitLogin('user@example.com', 'wrong');
@@ -117,8 +117,8 @@ void main() {
       () async {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async =>
-              const LoginResult.unableToPerformAuthorization(
-                ErrorReportDto(
+              const LoginOutcome.failure(
+                report: ErrorReportDto(
                   kind: ErrorKindDto.network,
                   details: "Request failed for operation 'authentication'",
                 ),
@@ -175,7 +175,8 @@ void main() {
     test('signOut() clears the session and returns to Idle', () async {
       var called = false;
       final presenter = buildPresenter(
-        restoreSessionUseCase: () async => const RestoreSessionOutcome.restored(),
+        restoreSessionUseCase: () async =>
+            const RestoreSessionOutcome.restored(),
         logoutUseCase: () async {
           called = true;
           return LogoutOutcome.successful;
@@ -193,7 +194,8 @@ void main() {
 
     test('signOut() still returns to Idle when the use case throws', () async {
       final presenter = buildPresenter(
-        restoreSessionUseCase: () async => const RestoreSessionOutcome.restored(),
+        restoreSessionUseCase: () async =>
+            const RestoreSessionOutcome.restored(),
         logoutUseCase: () async => throw StateError('bridge down'),
       );
       await presenter.restoreSession();

@@ -10,15 +10,16 @@ crate-type = ["cdylib", "staticlib"]
 authentication = { workspace = true }
 credential_store = { workspace = true }
 sam = { workspace = true }
+shared_kernel = { workspace = true }
 student = { workspace = true }
 flutter_rust_bridge = { workspace = true }
 anyhow = { workspace = true }
 reqwest = { workspace = true }
+chrono = { workspace = true }
 
 [dev-dependencies]
 smol = { workspace = true }
 wiremock = { workspace = true }
-chrono = { workspace = true }
 tempfile = { workspace = true }
 
 [lints]

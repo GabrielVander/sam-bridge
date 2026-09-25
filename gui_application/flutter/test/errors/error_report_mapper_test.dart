@@ -1,6 +1,6 @@
 import 'package:flutter_application/errors/error_report_mapper.dart';
-import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
+import 'package:flutter_application/errors/error_report.dart';
+import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

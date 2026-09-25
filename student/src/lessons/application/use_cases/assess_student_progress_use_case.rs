@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::lessons::{
     application::gateways::{
         MusicianProfileGateway, MusicianProfileGatewayError, StudentLessonsGateway,
@@ -19,19 +21,17 @@ pub enum AssessStudentProgressError {
     Assessment(#[from] AssessError),
 }
 
-pub struct AssessStudentProgressUseCase<
-    'a,
-    P: MusicianProfileGateway + ?Sized,
-    L: StudentLessonsGateway + ?Sized,
-> {
-    profile_gateway: &'a P,
-    lessons_gateway: &'a L,
+#[derive(Clone)]
+pub struct AssessStudentProgressUseCase {
+    profile_gateway: Arc<dyn MusicianProfileGateway + Send + Sync>,
+    lessons_gateway: Arc<dyn StudentLessonsGateway + Send + Sync>,
 }
 
-impl<'a, P: MusicianProfileGateway + ?Sized, L: StudentLessonsGateway + ?Sized>
-    AssessStudentProgressUseCase<'a, P, L>
-{
-    pub const fn new(profile_gateway: &'a P, lessons_gateway: &'a L) -> Self {
+impl AssessStudentProgressUseCase {
+    pub fn new(
+        profile_gateway: Arc<dyn MusicianProfileGateway + Send + Sync>,
+        lessons_gateway: Arc<dyn StudentLessonsGateway + Send + Sync>,
+    ) -> Self {
         Self {
             profile_gateway,
             lessons_gateway,
@@ -54,7 +54,7 @@ impl<'a, P: MusicianProfileGateway + ?Sized, L: StudentLessonsGateway + ?Sized>
         Ok(assess(
             &profile.level,
             instrument,
-            &lessons.approved,
+            &lessons.msa,
             &lessons.method,
         )?)
     }
@@ -110,7 +110,7 @@ mod tests {
 
     fn ready_to_advance_bundle() -> StudentLessons {
         StudentLessons {
-            approved: vec![Lesson {
+            msa: vec![Lesson {
                 phase: Some(Range::new("12".to_owned(), "12".to_owned())),
                 ..Default::default()
             }],
@@ -129,7 +129,7 @@ mod tests {
             bundle: ready_to_advance_bundle(),
             fail: false,
         };
-        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let use_case = AssessStudentProgressUseCase::new(Arc::new(profiles), Arc::new(lessons));
 
         let report = use_case.execute("500132").expect("should succeed");
 
@@ -150,7 +150,7 @@ mod tests {
             bundle: StudentLessons::default(),
             fail: false,
         };
-        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let use_case = AssessStudentProgressUseCase::new(Arc::new(profiles), Arc::new(lessons));
 
         let result = use_case.execute("500132");
 
@@ -175,7 +175,7 @@ mod tests {
             bundle: StudentLessons::default(),
             fail: false,
         };
-        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let use_case = AssessStudentProgressUseCase::new(Arc::new(profiles), Arc::new(lessons));
 
         let result = use_case.execute("500132");
 
@@ -189,7 +189,7 @@ mod tests {
             bundle: StudentLessons::default(),
             fail: true,
         };
-        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let use_case = AssessStudentProgressUseCase::new(Arc::new(profiles), Arc::new(lessons));
 
         let result = use_case.execute("500132");
 
@@ -206,7 +206,7 @@ mod tests {
             bundle: StudentLessons::default(),
             fail: true,
         };
-        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let use_case = AssessStudentProgressUseCase::new(Arc::new(profiles), Arc::new(lessons));
 
         let result = use_case.execute("500132");
 
@@ -226,7 +226,7 @@ mod tests {
             bundle: StudentLessons::default(),
             fail: false,
         };
-        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let use_case = AssessStudentProgressUseCase::new(Arc::new(profiles), Arc::new(lessons));
 
         let result = use_case.execute("500132");
 
@@ -245,7 +245,7 @@ mod tests {
             bundle: StudentLessons::default(),
             fail: false,
         };
-        let use_case = AssessStudentProgressUseCase::new(&profiles, &lessons);
+        let use_case = AssessStudentProgressUseCase::new(Arc::new(profiles), Arc::new(lessons));
 
         let result = use_case.execute("500132");
 

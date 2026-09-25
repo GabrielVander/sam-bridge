@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_test/flutter_test.dart';
 

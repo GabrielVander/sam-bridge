@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/errors/error_report.dart';
 
-/// A friendly error message with a retry action, plus the technical details
-/// tucked into a collapsed expander so regular users are not overwhelmed but
-/// anyone can copy them into a bug report.
 class ErrorPanel extends StatelessWidget {
   final ErrorReport report;
   final VoidCallback onRetry;
@@ -45,7 +42,6 @@ class ErrorPanel extends StatelessWidget {
   }
 }
 
-/// Collapsed "Detalhes técnicos" expander with a copy button.
 class TechnicalDetails extends StatelessWidget {
   final String details;
 
@@ -84,8 +80,10 @@ class TechnicalDetails extends StatelessWidget {
   }
 
   Future<void> _copy(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+
     await Clipboard.setData(ClipboardData(text: details));
+
     messenger.showSnackBar(const SnackBar(content: Text('Detalhes copiados')));
   }
 }

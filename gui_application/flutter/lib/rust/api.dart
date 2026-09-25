@@ -3,9 +3,32 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
-import 'bootstrap/infra/application.dart';
+import 'api/authentication.dart';
+import 'api/error_report.dart';
+import 'api/lessons.dart';
+import 'api/progress.dart';
+import 'api/roster.dart';
 import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<ApplicationFacade> buildMainApplication() =>
     RustLib.instance.api.crateApiBuildMainApplication();
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>
+abstract class ApplicationFacade implements RustOpaqueInterface {
+  Future<AssessStudentProgressOutcome> assessStudentProgress({
+    required String studentId,
+  });
+
+  Future<LoginOutcome> login({required String email, required String password});
+
+  Future<LogoutOutcome> logout();
+
+  Future<RestoreSessionOutcome> restoreSession();
+
+  Future<RetrieveAllAvailableStudentsOutcome> retrieveAllAvailableStudents();
+
+  Future<RetrieveStudentLessonsOutcome> retrieveStudentLessons({
+    required String studentId,
+  });
+}

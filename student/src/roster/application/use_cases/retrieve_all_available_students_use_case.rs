@@ -1,10 +1,7 @@
 use std::sync::Arc;
 
 use crate::roster::{
-    application::{
-        dto::StudentSummaryDto,
-        gateways::{StudentGateway, StudentGatewayError},
-    },
+    application::gateways::{StudentGateway, StudentGatewayError},
     domain::entities::Student,
 };
 
@@ -20,21 +17,7 @@ impl RetrieveAllAvailableStudentsUseCase {
         }
     }
 
-    pub fn execute(&self) -> RetrieveAllAvailableStudentsResult {
-        let students_result: Result<Vec<Student>, StudentGatewayError> =
-            self.student_gateway.get_available_records();
-
-        match students_result {
-            Ok(students) => RetrieveAllAvailableStudentsResult::Success(
-                students.into_iter().map(StudentSummaryDto::from).collect(),
-            ),
-            Err(error) => RetrieveAllAvailableStudentsResult::Failure(error),
-        }
+    pub fn execute(&self) -> Result<Vec<Student>, StudentGatewayError> {
+        self.student_gateway.get_available_records()
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RetrieveAllAvailableStudentsResult {
-    Success(Vec<StudentSummaryDto>),
-    Failure(StudentGatewayError),
 }

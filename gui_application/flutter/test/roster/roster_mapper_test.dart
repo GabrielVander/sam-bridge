@@ -1,6 +1,6 @@
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:flutter_application/roster/roster_mapper.dart';
-import 'package:flutter_application/rust/bootstrap/infra/roster_view.dart';
+import 'package:flutter_application/rust/api/roster.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -30,7 +30,7 @@ void main() {
       const dto = StudentSummaryDto(
         id: '2',
         name: 'John Doe',
-        position: StudentPositionDto.invalid('ALGO DESCONHECIDO'),
+        position: StudentPositionDto.invalid(raw: 'ALGO DESCONHECIDO'),
         location: 'Somewhere',
       );
 

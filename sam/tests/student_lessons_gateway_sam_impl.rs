@@ -14,57 +14,6 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 mod support;
 use support::sam_operations_for;
 
-fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
-    build_gateway_for(&mock_server.uri())
-}
-
-fn build_gateway_for(base_url: &str) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
-    let sam_operations: SamOperations = sam_operations_for(base_url)?;
-
-    let client: Arc<dyn SamClient + Send + Sync> = Arc::new(SamClientImpl::new(sam_operations));
-
-    Ok(StudentLessonsGatewaySamImpl::new(client))
-}
-
-fn failure_of(
-    result: Result<StudentLessons, StudentLessonsGatewayError>,
-) -> Option<(FailureKind, String)> {
-    match result {
-        Err(StudentLessonsGatewayError::UnableToPerformOperation { kind, details }) => {
-            Some((kind, details))
-        }
-        Ok(_) => None,
-    }
-}
-
-fn student_lessons_page() -> String {
-    r#"<html><body>
-<div id="msa"><table id="datatable1"><tbody>
-<tr id="msa_559783" role="row" class="even">
-    <td>09/09/2025</td>
-    <td>4.5 - 4.5</td>
-    <td>38 - 38</td>
-    <td>7 - 8</td>
-    <td>Sol</td>
-    <td>Passou lições 7 e 8, estudar próximas lições.</td>
-    <td>MARCOS ROGÉRIO COSME</td>
-</tr>
-</tbody></table></div>
-<table id="datatable3"><tbody>
-<tr id="mtd_214020" role="row" class="even">
-    <td>00</td>
-    <td>00</td>
-    <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
-    <td>04/12/2023</td>
-    <td>MURILO FAGNER CARDOSO</td>
-    <td>04/12/2023 21:17:17</td>
-    <td>Postura do violino </td>
-</tr>
-</tbody></table>
-</body></html>"#
-        .to_string()
-}
-
 #[test]
 fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
     smol::block_on(async {
@@ -90,7 +39,7 @@ fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
         assert_eq!(
             result,
             StudentLessons {
-                approved: vec![Lesson {
+                msa: vec![Lesson {
                     id: Some("559783".to_owned()),
                     date: Some(NaiveDate::from_ymd_opt(2025, 9, 9).expect("valid date")),
                     phase: Some(Range {
@@ -191,4 +140,55 @@ fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation
 
     assert_eq!(kind, FailureKind::Transient);
     assert!(details.contains("student_lessons"), "got: {details}");
+}
+
+fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
+    build_gateway_for(&mock_server.uri())
+}
+
+fn build_gateway_for(base_url: &str) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
+    let sam_operations: SamOperations = sam_operations_for(base_url)?;
+
+    let client: Arc<dyn SamClient + Send + Sync> = Arc::new(SamClientImpl::new(sam_operations));
+
+    Ok(StudentLessonsGatewaySamImpl::new(client))
+}
+
+fn failure_of(
+    result: Result<StudentLessons, StudentLessonsGatewayError>,
+) -> Option<(FailureKind, String)> {
+    match result {
+        Err(StudentLessonsGatewayError::UnableToPerformOperation { kind, details }) => {
+            Some((kind, details))
+        }
+        Ok(_) => None,
+    }
+}
+
+fn student_lessons_page() -> String {
+    r#"<html><body>
+<div id="msa"><table id="datatable1"><tbody>
+<tr id="msa_559783" role="row" class="even">
+    <td>09/09/2025</td>
+    <td>4.5 - 4.5</td>
+    <td>38 - 38</td>
+    <td>7 - 8</td>
+    <td>Sol</td>
+    <td>Passou lições 7 e 8, estudar próximas lições.</td>
+    <td>MARCOS ROGÉRIO COSME</td>
+</tr>
+</tbody></table></div>
+<table id="datatable3"><tbody>
+<tr id="mtd_214020" role="row" class="even">
+    <td>00</td>
+    <td>00</td>
+    <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
+    <td>04/12/2023</td>
+    <td>MURILO FAGNER CARDOSO</td>
+    <td>04/12/2023 21:17:17</td>
+    <td>Postura do violino </td>
+</tr>
+</tbody></table>
+</body></html>"#
+        .to_string()
 }

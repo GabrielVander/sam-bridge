@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_application/widgets/loading_indicator.dart';

@@ -2,8 +2,8 @@ import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/authentication/login_screen.dart';
-import 'package:flutter_application/rust/bootstrap/infra/application.dart';
-import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
+import 'package:flutter_application/rust/api/authentication.dart';
+import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +15,7 @@ Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
 
 Future<List<(String, String)>> pumpLoginForm(
   WidgetTester tester, {
-  LoginResult result = const LoginResult.invalidEmailOrPassword(),
+  LoginOutcome result = const LoginOutcome.invalidEmailOrPassword(),
 }) async {
   final attempts = <(String, String)>[];
   final presenter = AuthPresenter(
@@ -23,7 +23,8 @@ Future<List<(String, String)>> pumpLoginForm(
       attempts.add((email, password));
       return result;
     },
-    restoreSessionUseCase: () async => const RestoreSessionOutcome.notAvailable(),
+    restoreSessionUseCase: () async =>
+        const RestoreSessionOutcome.notAvailable(),
     logoutUseCase: () async => LogoutOutcome.successful,
   );
   final router = GoRouter(
@@ -51,11 +52,12 @@ Future<List<(String, String)>> pumpLoginForm(
 
 Future<void> pumpLogin(
   WidgetTester tester, {
-  required LoginResult result,
+  required LoginOutcome result,
 }) async {
   final presenter = AuthPresenter(
     loginUseCase: ({required email, required password}) async => result,
-    restoreSessionUseCase: () async => const RestoreSessionOutcome.notAvailable(),
+    restoreSessionUseCase: () async =>
+        const RestoreSessionOutcome.notAvailable(),
     logoutUseCase: () async => LogoutOutcome.successful,
   );
 
@@ -83,8 +85,8 @@ void main() {
     ) async {
       await pumpLogin(
         tester,
-        result: const LoginResult.unableToPerformAuthorization(
-          ErrorReportDto(kind: ErrorKindDto.network, details: _details),
+        result: const LoginOutcome.failure(
+          report: ErrorReportDto(kind: ErrorKindDto.network, details: _details),
         ),
       );
 
@@ -107,7 +109,7 @@ void main() {
     ) async {
       final attempts = await pumpLoginForm(
         tester,
-        result: const LoginResult.successful(),
+        result: const LoginOutcome.successful(),
       );
 
       await tester.enterText(_emailField, 'user@example.com');

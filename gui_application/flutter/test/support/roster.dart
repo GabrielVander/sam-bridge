@@ -2,7 +2,7 @@ import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/roster/students_screen.dart';
-import 'package:flutter_application/rust/bootstrap/infra/roster_view.dart';
+import 'package:flutter_application/rust/api/roster.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -31,7 +31,7 @@ StudentsPresenter presenterAnswering(
 }
 
 RetrieveAllAvailableStudentsOutcome loaded(List<StudentSummaryDto> students) =>
-    RetrieveAllAvailableStudentsOutcome.success(students);
+    RetrieveAllAvailableStudentsOutcome.success(students: students);
 
 /// Shows the students screen, with the page a student row opens standing in
 /// for the real one so tests can see where a tap leads.

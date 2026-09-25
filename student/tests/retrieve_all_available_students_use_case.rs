@@ -1,9 +1,8 @@
 use std::sync::Arc;
 use student::{
     application::{
-        dto::{StudentPositionDto, StudentSummaryDto},
         gateways::{FailureKind, StudentGateway, StudentGatewayError},
-        use_cases::{RetrieveAllAvailableStudentsResult, RetrieveAllAvailableStudentsUseCase},
+        use_cases::RetrieveAllAvailableStudentsUseCase,
     },
     domain::entities::{
         Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
@@ -29,7 +28,7 @@ impl StudentGateway for FakeStudentGateway {
 }
 
 #[test]
-fn assert_students_map() {
+fn returns_every_available_student() {
     let students: [Student; 3] = [
         Student {
             id: "1".to_string(),
@@ -62,41 +61,14 @@ fn assert_students_map() {
         },
     ];
 
-    let expected: RetrieveAllAvailableStudentsResult = RetrieveAllAvailableStudentsResult::Success(
-        [
-            StudentSummaryDto {
-                id: "1".to_string(),
-                name: "Student A".to_string(),
-                position: StudentPositionDto::Candidate,
-                location: "Location A".to_string(),
-                instrument_name: Some("VIOLINO".to_string()),
-            },
-            StudentSummaryDto {
-                id: "2".to_string(),
-                name: "Student B".to_string(),
-                position: StudentPositionDto::MusicSecretary,
-                location: "Location B".to_owned(),
-                instrument_name: None,
-            },
-            StudentSummaryDto {
-                id: "3".to_string(),
-                name: "Student C".to_string(),
-                position: StudentPositionDto::YouthServiceHalfHour,
-                location: "Location A".to_string(),
-                instrument_name: None,
-            },
-        ]
-        .to_vec(),
-    );
-
     let gateway: FakeStudentGateway = FakeStudentGateway::new(Ok(students.to_vec()));
 
     let use_case: RetrieveAllAvailableStudentsUseCase =
         RetrieveAllAvailableStudentsUseCase::new(Arc::new(gateway));
 
-    let result: RetrieveAllAvailableStudentsResult = use_case.execute();
+    let result: Result<Vec<Student>, StudentGatewayError> = use_case.execute();
 
-    assert_eq!(result, expected);
+    assert_eq!(result, Ok(students.to_vec()));
 }
 
 #[test]
@@ -110,7 +82,7 @@ fn propagates_gateway_errors_with_their_kind_and_details() {
     let use_case: RetrieveAllAvailableStudentsUseCase =
         RetrieveAllAvailableStudentsUseCase::new(Arc::new(gateway));
 
-    let result: RetrieveAllAvailableStudentsResult = use_case.execute();
+    let result: Result<Vec<Student>, StudentGatewayError> = use_case.execute();
 
-    assert_eq!(result, RetrieveAllAvailableStudentsResult::Failure(error));
+    assert_eq!(result, Err(error));
 }

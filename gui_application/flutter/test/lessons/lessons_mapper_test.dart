@@ -1,16 +1,16 @@
 import 'package:flutter_application/lessons/lessons_mapper.dart';
-import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/rust/bootstrap/infra/lessons_view.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
+import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('LessonsMapper', () {
     test('maps a full MSA lesson', () {
       const dto = StudentLessonsDto(
-        approved: [
+        msa: [
           LessonDto(
             id: '559783',
-            date: '09/09/2025',
+            date: DateDto(year: 2025, month: 9, day: 9),
             phase: RangeDto(from: '4.5', to: '4.5'),
             page: RangeDto(from: '38', to: '38'),
             lesson: RangeDto(from: '7', to: '8'),
@@ -41,11 +41,11 @@ void main() {
 
     test('maps a full Método (instrument) lesson', () {
       const dto = StudentLessonsDto(
-        approved: [],
+        msa: [],
         method: [
           LessonDto(
             id: '214020',
-            date: '04/12/2023',
+            date: DateDto(year: 2023, month: 12, day: 4),
             page: RangeDto(from: '00', to: '00'),
             lesson: RangeDto(from: '00', to: '00'),
             description: 'Postura do violino',
@@ -67,7 +67,7 @@ void main() {
     });
 
     test('all-fields-absent lesson maps to empty strings, not nulls', () {
-      const dto = StudentLessonsDto(approved: [LessonDto()], method: []);
+      const dto = StudentLessonsDto(msa: [LessonDto()], method: []);
 
       final view = LessonsMapper.toViewModel(dto);
 

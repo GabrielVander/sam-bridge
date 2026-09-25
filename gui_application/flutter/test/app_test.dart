@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/app.dart';
 import 'package:flutter_application/main.dart' show formatVersion;
-import 'package:flutter_application/router.dart';
-import 'package:flutter_application/rust/bootstrap/infra/application.dart';
+import 'package:flutter_application/main_screen.dart';
+import 'package:flutter_application/rust/api/authentication.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -83,7 +83,9 @@ void main() {
     ) async {
       await pumpApp(
         tester,
-        await composeFakeApp(login: const LoginResult.invalidEmailOrPassword()),
+        await composeFakeApp(
+          login: const LoginOutcome.invalidEmailOrPassword(),
+        ),
       );
 
       await signIn(tester);

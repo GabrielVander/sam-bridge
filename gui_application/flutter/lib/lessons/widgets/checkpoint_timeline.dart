@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_application/widgets/progress_bar.dart';
 
 final class CheckpointTimeline extends StatelessWidget {

@@ -1,12 +1,13 @@
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:flutter_application/errors/error_report_mapper.dart';
-import 'package:flutter_application/lessons/application/use_cases/assess_student_progress_use_case.dart';
-import 'package:flutter_application/lessons/application/use_cases/retrieve_student_lessons_use_case.dart';
+import 'package:flutter_application/lessons/ports/assess_student_progress_use_case.dart';
+import 'package:flutter_application/lessons/ports/retrieve_student_lessons_use_case.dart';
 import 'package:flutter_application/lessons/lessons_mapper.dart';
 import 'package:flutter_application/lessons/progress_mapper.dart';
-import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/rust/bootstrap/infra/lessons_view.dart';
-import 'package:flutter_application/rust/bootstrap/infra/progress_view.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
+import 'package:flutter_application/errors/error_report.dart';
+import 'package:flutter_application/rust/api/lessons.dart';
+import 'package:flutter_application/rust/api/progress.dart';
 
 sealed class LessonsState {
   const LessonsState();
@@ -77,15 +78,15 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
       final progressOutcome = await progressFuture;
 
       switch (lessonsOutcome) {
-        case RetrieveStudentLessonsOutcome_Success(:final field0):
+        case RetrieveStudentLessonsOutcome_Success(:final lessons):
           emit(
             LessonsLoaded(
-              LessonsMapper.toViewModel(field0),
+              LessonsMapper.toViewModel(lessons),
               _toProgressStatus(progressOutcome),
             ),
           );
-        case RetrieveStudentLessonsOutcome_Failure(:final field0):
-          emit(LessonsFailure(ErrorReportMapper.toViewModel(field0)));
+        case RetrieveStudentLessonsOutcome_Failure(:final report):
+          emit(LessonsFailure(ErrorReportMapper.toViewModel(report)));
       }
     } catch (e) {
       emit(LessonsFailure(ErrorReportMapper.fromThrown(e)));
@@ -94,15 +95,15 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
 
   ProgressStatus _toProgressStatus(AssessStudentProgressOutcome outcome) =>
       switch (outcome) {
-        AssessStudentProgressOutcome_Success(:final field0) =>
-          ProgressAvailable(ProgressMapper.toViewModel(field0)),
+        AssessStudentProgressOutcome_Success(:final assessment) =>
+          ProgressAvailable(ProgressMapper.toViewModel(assessment)),
         AssessStudentProgressOutcome_NoInstrumentAssigned() =>
           const ProgressNoInstrumentAssigned(),
-        AssessStudentProgressOutcome_UnknownLevel(:final field0) =>
-          ProgressUnknownLevel(field0),
+        AssessStudentProgressOutcome_UnknownLevel(:final rawLevel) =>
+          ProgressUnknownLevel(rawLevel),
         AssessStudentProgressOutcome_NotAMusician() =>
           const ProgressNotAMusician(),
-        AssessStudentProgressOutcome_Failure(:final field0) =>
-          ProgressUnavailable(ErrorReportMapper.toViewModel(field0)),
+        AssessStudentProgressOutcome_Failure(:final report) =>
+          ProgressUnavailable(ErrorReportMapper.toViewModel(report)),
       };
 }

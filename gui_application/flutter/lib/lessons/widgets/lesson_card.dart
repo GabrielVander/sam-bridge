@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/presentation_models.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_application/widgets/info_chip.dart';
 
 final class LessonCard extends StatelessWidget {

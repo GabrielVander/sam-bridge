@@ -1,5 +1,5 @@
 import 'package:flutter_application/lessons/progress_mapper.dart';
-import 'package:flutter_application/rust/bootstrap/infra/progress_view.dart';
+import 'package:flutter_application/rust/api/progress.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -8,13 +8,13 @@ void main() {
       const dto = ProgressAssessmentDto(
         checkpoints: [
           CheckpointStatusDto(
-            level: 'Candidate',
+            level: MusicianLevelDto.candidate(),
             achieved: true,
             readyToAdvance: false,
             requirement: RequirementStatusDto(msaMet: true, methodMet: true),
           ),
           CheckpointStatusDto(
-            level: 'YouthService',
+            level: MusicianLevelDto.youthService(),
             achieved: false,
             readyToAdvance: true,
             requirement: RequirementStatusDto(msaMet: true, methodMet: true),
@@ -24,13 +24,12 @@ void main() {
         methodRelativePercent: 85,
         combinedPercent: 92.5,
         overallCheckpointPercent: 40,
-        nextLevel: 'YouthService',
+        nextLevel: MusicianLevelDto.youthService(),
       );
 
       final view = ProgressMapper.toViewModel(dto);
 
       expect(view.checkpoints, hasLength(2));
-      expect(view.checkpoints[0].levelKey, 'Candidate');
       expect(view.checkpoints[0].label, 'Candidato(a)');
       expect(view.checkpoints[0].achieved, isTrue);
       expect(view.checkpoints[1].label, 'Reunião de Jovens e Menores');
@@ -56,19 +55,36 @@ void main() {
       expect(view.nextLevelLabel, isNull);
     });
 
-    test('unrecognized level keys fall back to the raw value', () {
-      expect(ProgressMapper.levelLabel('SomethingNew'), 'SomethingNew');
+    test('an unrecognized level falls back to what SAM wrote', () {
+      expect(
+        ProgressMapper.levelLabel(
+          const MusicianLevelDto.unknown(raw: 'SomethingNew'),
+        ),
+        'SomethingNew',
+      );
     });
 
-    test('every known level key has a confirmed Portuguese label', () {
-      expect(ProgressMapper.levelLabel('Candidate'), 'Candidato(a)');
-      expect(ProgressMapper.levelLabel('Practice'), 'Ensaio');
+    test('every known level has a confirmed Portuguese label', () {
       expect(
-        ProgressMapper.levelLabel('YouthService'),
+        ProgressMapper.levelLabel(const MusicianLevelDto.candidate()),
+        'Candidato(a)',
+      );
+      expect(
+        ProgressMapper.levelLabel(const MusicianLevelDto.practice()),
+        'Ensaio',
+      );
+      expect(
+        ProgressMapper.levelLabel(const MusicianLevelDto.youthService()),
         'Reunião de Jovens e Menores',
       );
-      expect(ProgressMapper.levelLabel('OfficialService'), 'Culto Oficial');
-      expect(ProgressMapper.levelLabel('Officialized'), 'Oficialização');
+      expect(
+        ProgressMapper.levelLabel(const MusicianLevelDto.officialService()),
+        'Culto Oficial',
+      );
+      expect(
+        ProgressMapper.levelLabel(const MusicianLevelDto.officialized()),
+        'Oficialização',
+      );
     });
   });
 }

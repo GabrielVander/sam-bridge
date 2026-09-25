@@ -9,14 +9,14 @@ class SamSiteApp extends StatelessWidget {
   final String versionDisplay;
   final AuthPresenter authPresenter;
   final StudentsPresenter studentsPresenter;
-  final LessonsPresenter lessonsCubitSignal;
+  final LessonsPresenter lessonsPresenter;
 
   const SamSiteApp({
     super.key,
     required this.versionDisplay,
     required this.authPresenter,
     required this.studentsPresenter,
-    required this.lessonsCubitSignal,
+    required this.lessonsPresenter,
   });
 
   @override
@@ -25,7 +25,7 @@ class SamSiteApp extends StatelessWidget {
       providers: [
         BlocSignalProvider<AuthPresenter>.value(value: authPresenter),
         BlocSignalProvider<StudentsPresenter>.value(value: studentsPresenter),
-        BlocSignalProvider<LessonsPresenter>.value(value: lessonsCubitSignal),
+        BlocSignalProvider<LessonsPresenter>.value(value: lessonsPresenter),
       ],
       child: Builder(
         builder: (context) {

@@ -4,11 +4,11 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api.dart';
-import 'bootstrap/infra/application.dart';
-import 'bootstrap/infra/error_view.dart';
-import 'bootstrap/infra/lessons_view.dart';
-import 'bootstrap/infra/progress_view.dart';
-import 'bootstrap/infra/roster_view.dart';
+import 'api/authentication.dart';
+import 'api/error_report.dart';
+import 'api/lessons.dart';
+import 'api/progress.dart';
+import 'api/roster.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;
@@ -60,7 +60,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ClefDto dco_decode_box_autoadd_clef_dto(dynamic raw);
 
   @protected
+  DateDto dco_decode_box_autoadd_date_dto(dynamic raw);
+
+  @protected
   ErrorReportDto dco_decode_box_autoadd_error_report_dto(dynamic raw);
+
+  @protected
+  MusicianLevelDto dco_decode_box_autoadd_musician_level_dto(dynamic raw);
 
   @protected
   ProgressAssessmentDto dco_decode_box_autoadd_progress_assessment_dto(
@@ -78,6 +84,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ClefDto dco_decode_clef_dto(dynamic raw);
+
+  @protected
+  DateDto dco_decode_date_dto(dynamic raw);
 
   @protected
   ErrorKindDto dco_decode_error_kind_dto(dynamic raw);
@@ -107,16 +116,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<StudentSummaryDto> dco_decode_list_student_summary_dto(dynamic raw);
 
   @protected
-  LoginResult dco_decode_login_result(dynamic raw);
+  LoginOutcome dco_decode_login_outcome(dynamic raw);
 
   @protected
   LogoutOutcome dco_decode_logout_outcome(dynamic raw);
+
+  @protected
+  MusicianLevelDto dco_decode_musician_level_dto(dynamic raw);
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
   ClefDto? dco_decode_opt_box_autoadd_clef_dto(dynamic raw);
+
+  @protected
+  DateDto? dco_decode_opt_box_autoadd_date_dto(dynamic raw);
+
+  @protected
+  MusicianLevelDto? dco_decode_opt_box_autoadd_musician_level_dto(dynamic raw);
 
   @protected
   RangeDto? dco_decode_opt_box_autoadd_range_dto(dynamic raw);
@@ -150,6 +168,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   StudentSummaryDto dco_decode_student_summary_dto(dynamic raw);
+
+  @protected
+  int dco_decode_u_32(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -193,7 +214,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ClefDto sse_decode_box_autoadd_clef_dto(SseDeserializer deserializer);
 
   @protected
+  DateDto sse_decode_box_autoadd_date_dto(SseDeserializer deserializer);
+
+  @protected
   ErrorReportDto sse_decode_box_autoadd_error_report_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  MusicianLevelDto sse_decode_box_autoadd_musician_level_dto(
     SseDeserializer deserializer,
   );
 
@@ -217,6 +246,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ClefDto sse_decode_clef_dto(SseDeserializer deserializer);
+
+  @protected
+  DateDto sse_decode_date_dto(SseDeserializer deserializer);
 
   @protected
   ErrorKindDto sse_decode_error_kind_dto(SseDeserializer deserializer);
@@ -250,16 +282,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  LoginResult sse_decode_login_result(SseDeserializer deserializer);
+  LoginOutcome sse_decode_login_outcome(SseDeserializer deserializer);
 
   @protected
   LogoutOutcome sse_decode_logout_outcome(SseDeserializer deserializer);
+
+  @protected
+  MusicianLevelDto sse_decode_musician_level_dto(SseDeserializer deserializer);
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
   ClefDto? sse_decode_opt_box_autoadd_clef_dto(SseDeserializer deserializer);
+
+  @protected
+  DateDto? sse_decode_opt_box_autoadd_date_dto(SseDeserializer deserializer);
+
+  @protected
+  MusicianLevelDto? sse_decode_opt_box_autoadd_musician_level_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   RangeDto? sse_decode_opt_box_autoadd_range_dto(SseDeserializer deserializer);
@@ -309,6 +352,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  int sse_decode_u_32(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
@@ -354,8 +400,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_clef_dto(ClefDto self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_date_dto(DateDto self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_error_report_dto(
     ErrorReportDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_musician_level_dto(
+    MusicianLevelDto self,
     SseSerializer serializer,
   );
 
@@ -385,6 +440,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_clef_dto(ClefDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_date_dto(DateDto self, SseSerializer serializer);
 
   @protected
   void sse_encode_error_kind_dto(ErrorKindDto self, SseSerializer serializer);
@@ -429,10 +487,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_login_result(LoginResult self, SseSerializer serializer);
+  void sse_encode_login_outcome(LoginOutcome self, SseSerializer serializer);
 
   @protected
   void sse_encode_logout_outcome(LogoutOutcome self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_musician_level_dto(
+    MusicianLevelDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
@@ -440,6 +504,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_clef_dto(
     ClefDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_date_dto(
+    DateDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_musician_level_dto(
+    MusicianLevelDto? self,
     SseSerializer serializer,
   );
 
@@ -499,6 +575,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     StudentSummaryDto self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);

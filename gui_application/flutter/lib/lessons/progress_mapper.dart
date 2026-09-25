@@ -1,5 +1,6 @@
-import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/rust/bootstrap/infra/progress_view.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
+import 'package:flutter_application/rust/api/progress.dart';
+import 'package:flutter_application/shared/level_labels.dart';
 
 class ProgressMapper {
   static ProgressView toViewModel(ProgressAssessmentDto dto) => ProgressView(
@@ -8,12 +9,14 @@ class ProgressMapper {
     methodRelativePercent: dto.methodRelativePercent,
     combinedPercent: dto.combinedPercent,
     overallCheckpointPercent: dto.overallCheckpointPercent,
-    nextLevelLabel: dto.nextLevel == null ? null : levelLabel(dto.nextLevel!),
+    nextLevelLabel: switch (dto.nextLevel) {
+      final level? => levelLabel(level),
+      null => null,
+    },
   );
 
   static CheckpointView _toCheckpoint(CheckpointStatusDto dto) =>
       CheckpointView(
-        levelKey: dto.level,
         label: levelLabel(dto.level),
         achieved: dto.achieved,
         readyToAdvance: dto.readyToAdvance,
@@ -21,12 +24,12 @@ class ProgressMapper {
         methodMet: dto.requirement.methodMet,
       );
 
-  static String levelLabel(String rawLevel) => switch (rawLevel) {
-    'Candidate' => 'Candidato(a)',
-    'Practice' => 'Ensaio',
-    'YouthService' => 'Reunião de Jovens e Menores',
-    'OfficialService' => 'Culto Oficial',
-    'Officialized' => 'Oficialização',
-    _ => rawLevel,
+  static String levelLabel(MusicianLevelDto level) => switch (level) {
+    MusicianLevelDto_Candidate() => LevelLabels.candidate,
+    MusicianLevelDto_Practice() => LevelLabels.practice,
+    MusicianLevelDto_YouthService() => LevelLabels.youthService,
+    MusicianLevelDto_OfficialService() => LevelLabels.officialService,
+    MusicianLevelDto_Officialized() => LevelLabels.officialized,
+    MusicianLevelDto_Unknown(:final raw) => raw,
   };
 }

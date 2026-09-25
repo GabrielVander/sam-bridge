@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:flutter_application/lessons/application/use_cases/assess_student_progress_use_case.dart';
-import 'package:flutter_application/lessons/application/use_cases/retrieve_student_lessons_use_case.dart';
+import 'package:flutter_application/lessons/ports/assess_student_progress_use_case.dart';
+import 'package:flutter_application/lessons/ports/retrieve_student_lessons_use_case.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
-import 'package:flutter_application/presentation_models.dart';
-import 'package:flutter_application/rust/bootstrap/infra/error_view.dart';
-import 'package:flutter_application/rust/bootstrap/infra/lessons_view.dart';
-import 'package:flutter_application/rust/bootstrap/infra/progress_view.dart';
+import 'package:flutter_application/errors/error_report.dart';
+import 'package:flutter_application/rust/api/error_report.dart';
+import 'package:flutter_application/rust/api/lessons.dart';
+import 'package:flutter_application/rust/api/progress.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _emptyLessonsSuccess = RetrieveStudentLessonsOutcome.success(
-  StudentLessonsDto(approved: [], method: []),
+  lessons: StudentLessonsDto(msa: [], method: []),
 );
 
 const _noInstrumentProgress =
@@ -47,8 +47,8 @@ void main() {
 
       completer.complete(
         const RetrieveStudentLessonsOutcome.success(
-          StudentLessonsDto(
-            approved: [LessonDto(id: '1')],
+          lessons: StudentLessonsDto(
+            msa: [LessonDto(id: '1')],
             method: [
               LessonDto(id: '2'),
               LessonDto(id: '3'),
@@ -71,7 +71,7 @@ void main() {
         final cubit = _buildCubit(
           retrieveStudentLessons: ({required studentId}) async =>
               const RetrieveStudentLessonsOutcome.failure(
-                ErrorReportDto(
+                report: ErrorReportDto(
                   kind: ErrorKindDto.network,
                   details: "Request failed for operation 'student_lessons'",
                 ),
@@ -136,13 +136,13 @@ void main() {
       final cubit = _buildCubit(
         assessStudentProgress: ({required studentId}) async =>
             const AssessStudentProgressOutcome.success(
-              ProgressAssessmentDto(
+              assessment: ProgressAssessmentDto(
                 checkpoints: [],
                 msaRelativePercent: 50,
                 methodRelativePercent: 25,
                 combinedPercent: 37.5,
                 overallCheckpointPercent: 60,
-                nextLevel: 'OfficialService',
+                nextLevel: MusicianLevelDto.officialService(),
               ),
             ),
       );
@@ -161,7 +161,9 @@ void main() {
       () async {
         final cubit = _buildCubit(
           assessStudentProgress: ({required studentId}) async =>
-              const AssessStudentProgressOutcome.unknownLevel('EXÓTICO'),
+              const AssessStudentProgressOutcome.unknownLevel(
+                rawLevel: 'EXÓTICO',
+              ),
         );
 
         await cubit.load('500132');
@@ -180,7 +182,7 @@ void main() {
         final cubit = _buildCubit(
           assessStudentProgress: ({required studentId}) async =>
               const AssessStudentProgressOutcome.failure(
-                ErrorReportDto(
+                report: ErrorReportDto(
                   kind: ErrorKindDto.sessionExpired,
                   details: 'Session expired',
                 ),
