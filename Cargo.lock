@@ -1133,6 +1133,7 @@ dependencies = [
  "smol",
  "student",
  "tempfile",
+ "thiserror",
  "wiremock",
 ]
 

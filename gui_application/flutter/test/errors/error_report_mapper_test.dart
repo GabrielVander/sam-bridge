@@ -49,6 +49,20 @@ void main() {
       expect(report.userMessage, 'Sua sessão expirou. Entre novamente.');
     });
 
+    test('maps a local storage failure to a message about this device', () {
+      const dto = ErrorReportDto(
+        kind: ErrorKindDto.localStorage,
+        details: 'Unable to remove the credential file: Permission denied',
+      );
+
+      final report = ErrorReportMapper.toViewModel(dto);
+
+      expect(
+        report.userMessage,
+        'Não foi possível acessar os dados salvos neste dispositivo.',
+      );
+    });
+
     test('maps an unknown failure to a generic message', () {
       const dto = ErrorReportDto(kind: ErrorKindDto.unknown, details: 'boom');
 

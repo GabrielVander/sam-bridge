@@ -389,10 +389,11 @@ fn wire__crate__api__build_main_application_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             deserializer.end();
             move |context| {
-                transform_result_sse::<_, String>((move || {
+                transform_result_sse::<_, crate::api::error_report::ErrorReportDto>((move || {
                     let output_ok = crate::api::build_main_application()?;
                     std::result::Result::Ok(output_ok)
-                })())
+                })(
+                ))
             }
         },
     )
@@ -531,7 +532,8 @@ impl SseDecode for crate::api::error_report::ErrorKindDto {
             0 => crate::api::error_report::ErrorKindDto::Network,
             1 => crate::api::error_report::ErrorKindDto::UnexpectedResponse,
             2 => crate::api::error_report::ErrorKindDto::SessionExpired,
-            3 => crate::api::error_report::ErrorKindDto::Unknown,
+            3 => crate::api::error_report::ErrorKindDto::LocalStorage,
+            4 => crate::api::error_report::ErrorKindDto::Unknown,
             _ => unreachable!("Invalid variant for ErrorKindDto: {}", inner),
         };
     }

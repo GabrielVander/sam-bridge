@@ -377,7 +377,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         codec: SseCodec(
           decodeSuccessData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerApplicationFacade,
-          decodeErrorData: sse_decode_String,
+          decodeErrorData: sse_decode_error_report_dto,
         ),
         constMeta: kCrateApiBuildMainApplicationConstMeta,
         argValues: [],

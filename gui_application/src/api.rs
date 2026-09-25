@@ -13,13 +13,14 @@ use student::application::use_cases::{
 };
 
 use crate::api::authentication::{LoginOutcome, LogoutOutcome, RestoreSessionOutcome};
+use crate::api::error_report::ErrorReportDto;
 use crate::api::lessons::RetrieveStudentLessonsOutcome;
 use crate::api::progress::AssessStudentProgressOutcome;
 use crate::api::roster::RetrieveAllAvailableStudentsOutcome;
 use crate::composition::{self, Config};
 
-pub fn build_main_application() -> Result<ApplicationFacade, String> {
-    composition::build_application(&Config::production())
+pub fn build_main_application() -> Result<ApplicationFacade, ErrorReportDto> {
+    composition::build_application(&Config::production()).map_err(ErrorReportDto::from)
 }
 
 /// The single entry point Flutter talks to: each method runs one use case and

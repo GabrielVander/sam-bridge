@@ -1,8 +1,11 @@
+use sam::diagnostics::error_chain;
 use shared_kernel::failure_kind::FailureKind;
 use student::application::gateways::{
     MusicianProfileGatewayError, StudentGatewayError, StudentLessonsGatewayError,
 };
 use student::application::use_cases::AssessStudentProgressError;
+
+use crate::composition::StartupError;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ErrorReportDto {
@@ -15,6 +18,7 @@ pub enum ErrorKindDto {
     Network,
     UnexpectedResponse,
     SessionExpired,
+    LocalStorage,
     Unknown,
 }
 
@@ -34,6 +38,29 @@ impl From<FailureKind> for ErrorKindDto {
             FailureKind::Unexpected => Self::UnexpectedResponse,
             FailureKind::SessionExpired => Self::SessionExpired,
             FailureKind::Unclassified => Self::Unknown,
+        }
+    }
+}
+
+impl From<StartupError> for ErrorReportDto {
+    fn from(error: StartupError) -> Self {
+        let kind = match error {
+            StartupError::CredentialStorage(_) => ErrorKindDto::LocalStorage,
+            StartupError::HttpClient(_) => ErrorKindDto::Unknown,
+        };
+
+        Self {
+            kind,
+            details: error_chain(&error),
+        }
+    }
+}
+
+impl From<LogoutError> for ErrorReportDto {
+    fn from(error: LogoutError) -> Self {
+        Self {
+            kind: ErrorKindDto::LocalStorage,
+            details: error.to_string(),
         }
     }
 }

@@ -8,7 +8,6 @@ use credential_store::{FileCredentialStore, NoDataDirectory};
 use sam::{
     authentication::adapters::gateways::AuthorizationGatewaySamImpl,
     client::{CacheTtl, SamClient, SamClientCacheDecorator, SamClientImpl, SystemClock},
-    diagnostics::error_chain,
     http::SamOperations,
     lessons::adapters::gateways::{MusicianProfileGatewaySamImpl, StudentLessonsGatewaySamImpl},
     roster::adapters::gateways::StudentGatewaySamImpl,
@@ -20,6 +19,14 @@ use student::application::use_cases::{
 };
 
 use crate::api::ApplicationFacade;
+
+#[derive(Debug, thiserror::Error)]
+pub enum StartupError {
+    #[error("Unable to set up the credential storage")]
+    CredentialStorage(#[from] NoDataDirectory),
+    #[error("Unable to build the HTTP client")]
+    HttpClient(#[source] reqwest::Error),
+}
 
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(120);
 const STUDENTS_CACHE_TTL: Duration = Duration::from_secs(300);
@@ -45,7 +52,7 @@ impl Config {
     }
 }
 
-pub fn build_application(config: &Config) -> Result<ApplicationFacade, String> {
+pub fn build_application(config: &Config) -> Result<ApplicationFacade, StartupError> {
     build_application_with(config, FileCredentialStore::new(), http_client_builder())
 }
 
@@ -64,12 +71,12 @@ fn build_application_with(
     config: &Config,
     credential_store: Result<FileCredentialStore, NoDataDirectory>,
     http_client_builder: reqwest::blocking::ClientBuilder,
-) -> Result<ApplicationFacade, String> {
-    let file_credential_store: Arc<FileCredentialStore> =
-        Arc::new(credential_store.map_err(|e| error_chain(&e))?);
+) -> Result<ApplicationFacade, StartupError> {
+    let file_credential_store: Arc<FileCredentialStore> = Arc::new(credential_store?);
 
-    let reqwest_client: reqwest::blocking::Client =
-        http_client_builder.build().map_err(|e| error_chain(&e))?;
+    let reqwest_client: reqwest::blocking::Client = http_client_builder
+        .build()
+        .map_err(StartupError::HttpClient)?;
 
     let sam_operations: SamOperations = SamOperations::new(
         reqwest_client,
@@ -137,6 +144,7 @@ fn build_application_with(
 mod tests {
     use super::*;
     use crate::api::authentication::LoginOutcome;
+    use crate::api::error_report::{ErrorKindDto, ErrorReportDto};
     use crate::api::roster::RetrieveAllAvailableStudentsOutcome;
 
     fn facade_talking_to(
@@ -294,8 +302,13 @@ mod tests {
             build_application_with(&any_config(), Err(NoDataDirectory), http_client_builder());
 
         assert_eq!(
-            result.err(),
-            Some("no platform data directory is available to store credentials".to_owned())
+            result.err().map(ErrorReportDto::from),
+            Some(ErrorReportDto {
+                kind: ErrorKindDto::LocalStorage,
+                details: "Unable to set up the credential storage: \
+                          no platform data directory is available to store credentials"
+                    .to_owned(),
+            })
         );
     }
 
@@ -312,10 +325,17 @@ mod tests {
             impossible_tls_range,
         );
 
-        let message = result.err().expect("building should fail");
+        let report = result
+            .err()
+            .map(ErrorReportDto::from)
+            .expect("building should fail");
+        assert_eq!(report.kind, ErrorKindDto::Unknown);
         assert!(
-            message.contains(": "),
-            "the message should include the underlying cause, got: {message}"
+            report
+                .details
+                .starts_with("Unable to build the HTTP client: "),
+            "the details should include the underlying cause, got: {}",
+            report.details
         );
     }
 

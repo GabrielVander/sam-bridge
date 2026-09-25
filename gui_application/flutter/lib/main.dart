@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/app.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
+import 'package:flutter_application/startup_failure_app.dart';
 import 'package:flutter_application/rust/api.dart';
+import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_application/rust/frb_generated.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -12,7 +15,30 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  final ApplicationFacade application = await buildMainApplication();
+
+  await _start(
+    versionDisplay: formatVersion(
+      version: packageInfo.version,
+      buildNumber: packageInfo.buildNumber,
+    ),
+  );
+}
+
+Future<void> _start({required String versionDisplay}) async {
+  final ApplicationFacade application;
+
+  try {
+    application = await buildMainApplication();
+  } on ErrorReportDto catch (report) {
+    runApp(
+      StartupFailureApp(
+        report: ErrorReportMapper.toViewModel(report),
+        onRetry: () => _start(versionDisplay: versionDisplay),
+      ),
+    );
+
+    return;
+  }
 
   final AuthPresenter authPresenter = AuthPresenter(
     loginUseCase: application.login,
@@ -31,10 +57,7 @@ Future<void> main() async {
 
   runApp(
     SamSiteApp(
-      versionDisplay: formatVersion(
-        version: packageInfo.version,
-        buildNumber: packageInfo.buildNumber,
-      ),
+      versionDisplay: versionDisplay,
       authPresenter: authPresenter,
       studentsPresenter: studentsPresenter,
       lessonsPresenter: lessonsPresenter,
