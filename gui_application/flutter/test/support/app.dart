@@ -3,6 +3,7 @@ import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/rust/api/authentication.dart';
+import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_application/rust/api/progress.dart';
 import 'package:flutter_application/rust/api/roster.dart';
@@ -13,7 +14,7 @@ Future<SamSiteApp> composeFakeApp({
   RestoreSessionOutcome restoreSession =
       const RestoreSessionOutcome.notAvailable(),
   LoginOutcome login = const LoginOutcome.successful(),
-  LogoutOutcome logout = LogoutOutcome.successful,
+  LogoutOutcome logout = const LogoutOutcome.successful(),
   List<StudentSummaryDto>? students,
   String versionDisplay = 'v1.0.0+1',
 }) async {
@@ -45,3 +46,8 @@ Future<SamSiteApp> composeFakeApp({
     lessonsPresenter: lessonsPresenter,
   );
 }
+
+LogoutOutcome logoutUnableToClearStoredCredentials({required String details}) =>
+    LogoutOutcome.failure(
+      report: ErrorReportDto(kind: ErrorKindDto.localStorage, details: details),
+    );

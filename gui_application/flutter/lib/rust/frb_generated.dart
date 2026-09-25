@@ -635,7 +635,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   LogoutOutcome dco_decode_logout_outcome(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return LogoutOutcome.values[dcoDecodePrimitiveInt(raw)];
+    final arr = dcoDecodeList(raw);
+    switch (dcoDecodePrimitiveInt(arr[0])) {
+      case 0:
+        return LogoutOutcome_Successful();
+      case 1:
+        return LogoutOutcome_Failure(
+          report: dco_decode_box_autoadd_error_report_dto(arr[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
   }
 
   @protected
@@ -1156,8 +1166,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   LogoutOutcome sse_decode_logout_outcome(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return LogoutOutcome.values[inner];
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        return LogoutOutcome_Successful();
+      case 1:
+        var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
+        return LogoutOutcome_Failure(report: var_report);
+      default:
+        throw UnimplementedError('');
+    }
   }
 
   @protected
@@ -1699,7 +1718,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_logout_outcome(LogoutOutcome self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
+    switch (self) {
+      case LogoutOutcome_Successful():
+        sse_encode_i_32(0, serializer);
+      case LogoutOutcome_Failure(report: final report):
+        sse_encode_i_32(1, serializer);
+        sse_encode_box_autoadd_error_report_dto(report, serializer);
+    }
   }
 
   @protected

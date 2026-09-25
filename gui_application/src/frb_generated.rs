@@ -669,12 +669,20 @@ impl SseDecode for crate::api::authentication::LoginOutcome {
 impl SseDecode for crate::api::authentication::LogoutOutcome {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
-        return match inner {
-            0 => crate::api::authentication::LogoutOutcome::Successful,
-            1 => crate::api::authentication::LogoutOutcome::Failed,
-            _ => unreachable!("Invalid variant for LogoutOutcome: {}", inner),
-        };
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                return crate::api::authentication::LogoutOutcome::Successful;
+            }
+            1 => {
+                let mut var_report =
+                    <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
+                return crate::api::authentication::LogoutOutcome::Failure { report: var_report };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -1170,7 +1178,8 @@ impl flutter_rust_bridge::IntoDart for crate::api::error_report::ErrorKindDto {
             Self::Network => 0.into_dart(),
             Self::UnexpectedResponse => 1.into_dart(),
             Self::SessionExpired => 2.into_dart(),
-            Self::Unknown => 3.into_dart(),
+            Self::LocalStorage => 3.into_dart(),
+            Self::Unknown => 4.into_dart(),
             _ => unreachable!(),
         }
     }
@@ -1267,9 +1276,13 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::authentication::LoginOutcome>
 impl flutter_rust_bridge::IntoDart for crate::api::authentication::LogoutOutcome {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            Self::Successful => 0.into_dart(),
-            Self::Failed => 1.into_dart(),
-            _ => unreachable!(),
+            crate::api::authentication::LogoutOutcome::Successful => [0.into_dart()].into_dart(),
+            crate::api::authentication::LogoutOutcome::Failure { report } => {
+                [1.into_dart(), report.into_into_dart().into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
         }
     }
 }
@@ -1656,7 +1669,8 @@ impl SseEncode for crate::api::error_report::ErrorKindDto {
                 crate::api::error_report::ErrorKindDto::Network => 0,
                 crate::api::error_report::ErrorKindDto::UnexpectedResponse => 1,
                 crate::api::error_report::ErrorKindDto::SessionExpired => 2,
-                crate::api::error_report::ErrorKindDto::Unknown => 3,
+                crate::api::error_report::ErrorKindDto::LocalStorage => 3,
+                crate::api::error_report::ErrorKindDto::Unknown => 4,
                 _ => {
                     unimplemented!("");
                 }
@@ -1767,16 +1781,18 @@ impl SseEncode for crate::api::authentication::LoginOutcome {
 impl SseEncode for crate::api::authentication::LogoutOutcome {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                crate::api::authentication::LogoutOutcome::Successful => 0,
-                crate::api::authentication::LogoutOutcome::Failed => 1,
-                _ => {
-                    unimplemented!("");
-                }
-            },
-            serializer,
-        );
+        match self {
+            crate::api::authentication::LogoutOutcome::Successful => {
+                <i32>::sse_encode(0, serializer);
+            }
+            crate::api::authentication::LogoutOutcome::Failure { report } => {
+                <i32>::sse_encode(1, serializer);
+                <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 

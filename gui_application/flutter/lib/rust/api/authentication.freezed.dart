@@ -308,6 +308,264 @@ as ErrorReportDto,
 }
 
 /// @nodoc
+mixin _$LogoutOutcome {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcome);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'LogoutOutcome()';
+}
+
+
+}
+
+/// @nodoc
+class $LogoutOutcomeCopyWith<$Res>  {
+$LogoutOutcomeCopyWith(LogoutOutcome _, $Res Function(LogoutOutcome) __);
+}
+
+
+/// Adds pattern-matching-related methods to [LogoutOutcome].
+extension LogoutOutcomePatterns on LogoutOutcome {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LogoutOutcome_Successful value)?  successful,TResult Function( LogoutOutcome_Failure value)?  failure,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case LogoutOutcome_Successful() when successful != null:
+return successful(_that);case LogoutOutcome_Failure() when failure != null:
+return failure(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LogoutOutcome_Successful value)  successful,required TResult Function( LogoutOutcome_Failure value)  failure,}){
+final _that = this;
+switch (_that) {
+case LogoutOutcome_Successful():
+return successful(_that);case LogoutOutcome_Failure():
+return failure(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LogoutOutcome_Successful value)?  successful,TResult? Function( LogoutOutcome_Failure value)?  failure,}){
+final _that = this;
+switch (_that) {
+case LogoutOutcome_Successful() when successful != null:
+return successful(_that);case LogoutOutcome_Failure() when failure != null:
+return failure(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  successful,TResult Function( ErrorReportDto report)?  failure,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case LogoutOutcome_Successful() when successful != null:
+return successful();case LogoutOutcome_Failure() when failure != null:
+return failure(_that.report);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  successful,required TResult Function( ErrorReportDto report)  failure,}) {final _that = this;
+switch (_that) {
+case LogoutOutcome_Successful():
+return successful();case LogoutOutcome_Failure():
+return failure(_that.report);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  successful,TResult? Function( ErrorReportDto report)?  failure,}) {final _that = this;
+switch (_that) {
+case LogoutOutcome_Successful() when successful != null:
+return successful();case LogoutOutcome_Failure() when failure != null:
+return failure(_that.report);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class LogoutOutcome_Successful extends LogoutOutcome {
+  const LogoutOutcome_Successful(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcome_Successful);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'LogoutOutcome.successful()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class LogoutOutcome_Failure extends LogoutOutcome {
+  const LogoutOutcome_Failure({required this.report}): super._();
+  
+
+ final  ErrorReportDto report;
+
+/// Create a copy of LogoutOutcome
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LogoutOutcome_FailureCopyWith<LogoutOutcome_Failure> get copyWith => _$LogoutOutcome_FailureCopyWithImpl<LogoutOutcome_Failure>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcome_Failure&&(identical(other.report, report) || other.report == report));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,report);
+
+@override
+String toString() {
+  return 'LogoutOutcome.failure(report: $report)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $LogoutOutcome_FailureCopyWith<$Res> implements $LogoutOutcomeCopyWith<$Res> {
+  factory $LogoutOutcome_FailureCopyWith(LogoutOutcome_Failure value, $Res Function(LogoutOutcome_Failure) _then) = _$LogoutOutcome_FailureCopyWithImpl;
+@useResult
+$Res call({
+ ErrorReportDto report
+});
+
+
+
+
+}
+/// @nodoc
+class _$LogoutOutcome_FailureCopyWithImpl<$Res>
+    implements $LogoutOutcome_FailureCopyWith<$Res> {
+  _$LogoutOutcome_FailureCopyWithImpl(this._self, this._then);
+
+  final LogoutOutcome_Failure _self;
+  final $Res Function(LogoutOutcome_Failure) _then;
+
+/// Create a copy of LogoutOutcome
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? report = null,}) {
+  return _then(LogoutOutcome_Failure(
+report: null == report ? _self.report : report // ignore: cast_nullable_to_non_nullable
+as ErrorReportDto,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$RestoreSessionOutcome {
 
 

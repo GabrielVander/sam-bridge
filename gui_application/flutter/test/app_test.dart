@@ -147,6 +147,39 @@ void main() {
       expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
       expect(find.text('Jane Doe'), findsNothing);
     });
+
+    testWidgets(
+      'tells the user when the saved credentials could not be removed',
+      (tester) async {
+        await pumpApp(
+          tester,
+          await composeFakeApp(
+            restoreSession: const RestoreSessionOutcome.restored(),
+            logout: logoutUnableToClearStoredCredentials(
+              details:
+                  'Unable to remove the credential file: Permission denied',
+            ),
+          ),
+        );
+
+        await tester.tap(find.byTooltip('Log out'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Detalhes técnicos'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
+        expect(
+          find.text(
+            'Não foi possível acessar os dados salvos neste dispositivo.',
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Unable to remove the credential file: Permission denied'),
+          findsOneWidget,
+        );
+      },
+    );
   });
 
   group('opening a student', () {

@@ -23,7 +23,8 @@ AuthPresenter buildPresenter({
     restoreSessionUseCase:
         restoreSessionUseCase ??
         () async => const RestoreSessionOutcome.notAvailable(),
-    logoutUseCase: logoutUseCase ?? () async => LogoutOutcome.successful,
+    logoutUseCase:
+        logoutUseCase ?? () async => const LogoutOutcome.successful(),
   );
 }
 
@@ -179,7 +180,7 @@ void main() {
             const RestoreSessionOutcome.restored(),
         logoutUseCase: () async {
           called = true;
-          return LogoutOutcome.successful;
+          return const LogoutOutcome.successful();
         },
       );
       await presenter.restoreSession();

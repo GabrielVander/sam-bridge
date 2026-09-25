@@ -25,7 +25,7 @@ Future<List<(String, String)>> pumpLoginForm(
     },
     restoreSessionUseCase: () async =>
         const RestoreSessionOutcome.notAvailable(),
-    logoutUseCase: () async => LogoutOutcome.successful,
+    logoutUseCase: () async => const LogoutOutcome.successful(),
   );
   final router = GoRouter(
     initialLocation: '/login',
@@ -58,7 +58,7 @@ Future<void> pumpLogin(
     loginUseCase: ({required email, required password}) async => result,
     restoreSessionUseCase: () async =>
         const RestoreSessionOutcome.notAvailable(),
-    logoutUseCase: () async => LogoutOutcome.successful,
+    logoutUseCase: () async => const LogoutOutcome.successful(),
   );
 
   await tester.pumpWidget(

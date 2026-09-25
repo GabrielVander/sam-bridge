@@ -22,7 +22,7 @@ pub enum RestoreSessionOutcome {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LogoutOutcome {
     Successful,
-    Failed,
+    Failure { report: ErrorReportDto },
 }
 
 impl From<Result<(), LoginUseCaseError>> for LoginOutcome {
@@ -61,7 +61,9 @@ impl From<Result<(), LogoutError>> for LogoutOutcome {
     fn from(result: Result<(), LogoutError>) -> Self {
         match result {
             Ok(()) => Self::Successful,
-            Err(LogoutError::UnableToClearCredentials) => Self::Failed,
+            Err(error) => Self::Failure {
+                report: error.into(),
+            },
         }
     }
 }
@@ -69,6 +71,7 @@ impl From<Result<(), LogoutError>> for LogoutOutcome {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::api::error_report::ErrorKindDto;
 
     #[test]
     fn a_rejected_credential_that_cannot_be_cleared_still_routes_to_the_login_form() {
@@ -79,9 +82,21 @@ mod tests {
     }
 
     #[test]
-    fn a_logout_that_cannot_clear_the_credential_is_reported_as_failed() {
-        let outcome = LogoutOutcome::from(Err(LogoutError::UnableToClearCredentials));
+    fn a_logout_that_cannot_clear_the_credential_is_a_local_storage_failure_with_its_details() {
+        let outcome = LogoutOutcome::from(Err(LogoutError::UnableToClearCredentials {
+            details: "Unable to remove the credential file: Permission denied".to_owned(),
+        }));
 
-        assert_eq!(outcome, LogoutOutcome::Failed);
+        assert_eq!(
+            outcome,
+            LogoutOutcome::Failure {
+                report: ErrorReportDto {
+                    kind: ErrorKindDto::LocalStorage,
+                    details: "Unable to clear credentials: \
+                              Unable to remove the credential file: Permission denied"
+                        .to_owned(),
+                }
+            }
+        );
     }
 }

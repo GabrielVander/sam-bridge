@@ -1,3 +1,4 @@
+use authentication::application::use_cases::LogoutError;
 use sam::diagnostics::error_chain;
 use shared_kernel::failure_kind::FailureKind;
 use student::application::gateways::{

@@ -6,6 +6,7 @@ import 'package:flutter_application/authentication/ports/logout_use_case.dart';
 import 'package:flutter_application/authentication/ports/restore_session_use_case.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/rust/api/authentication.dart';
+import 'package:flutter_application/rust/api/error_report.dart';
 
 sealed class AuthState extends Equatable {
   const AuthState();
@@ -101,13 +102,19 @@ class AuthPresenter extends CubitSignal<AuthState> {
 
   Future<void> signOut() async {
     emit(const AuthLoading());
+
     try {
-      await logoutUseCase();
+      final LogoutOutcome outcome = await logoutUseCase();
+
+      switch (outcome) {
+        case LogoutOutcome_Successful():
+          emit(const AuthIdle());
+        case LogoutOutcome_Failure(:final ErrorReportDto report):
+          emit(AuthFailure(ErrorReportMapper.toViewModel(report)));
+      }
     } catch (_) {
-      // Local logout must always succeed from the UI's perspective; the
-      // stored credential file is best-effort cleanup.
+      emit(const AuthIdle());
     }
-    emit(const AuthIdle());
   }
 
   bool get isAuthenticated => stateValue is AuthSuccess;
