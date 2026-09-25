@@ -36,7 +36,7 @@ class SamSiteApp extends StatelessWidget {
               authPresenter: authPresenter,
             ),
             debugShowCheckedModeBanner: false,
-            theme: _buildTheme(),
+            theme: buildTheme(),
           );
         },
       ),
@@ -44,7 +44,7 @@ class SamSiteApp extends StatelessWidget {
   }
 }
 
-ThemeData _buildTheme() {
+ThemeData buildTheme() {
   final colorScheme = ColorScheme.fromSeed(
     seedColor: Colors.cyan,
     brightness: Brightness.dark,
