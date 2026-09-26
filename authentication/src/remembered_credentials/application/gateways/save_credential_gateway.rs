@@ -2,7 +2,7 @@ use thiserror::Error;
 
 use crate::shared::domain::entities::Credential;
 
-pub trait SaveCredentialGateway {
+pub trait SaveCredentialGateway: Send + Sync {
     fn save(&self, credential: &Credential) -> Result<(), SaveCredentialGatewayError>;
 }
 

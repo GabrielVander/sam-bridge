@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-pub trait ClearCredentialGateway {
+pub trait ClearCredentialGateway: Send + Sync {
     fn clear(&self) -> Result<(), ClearCredentialGatewayError>;
 }
 

@@ -3,7 +3,7 @@ use thiserror::Error;
 use crate::shared::domain::entities::Credential;
 use shared_kernel::failure_kind::FailureKind;
 
-pub trait AuthorizeCredentialGateway {
+pub trait AuthorizeCredentialGateway: Send + Sync {
     fn authorize(&self, credential: &Credential)
     -> Result<AuthorizationResult, AuthorizationError>;
 }

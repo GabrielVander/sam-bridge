@@ -6,11 +6,11 @@ use crate::application::gateways::{ClearCredentialGateway, ClearCredentialGatewa
 
 #[derive(Clone)]
 pub struct LogoutUseCase {
-    credential_clearer: Arc<dyn ClearCredentialGateway + Send + Sync>,
+    credential_clearer: Arc<dyn ClearCredentialGateway>,
 }
 
 impl LogoutUseCase {
-    pub fn new(credential_clearer: Arc<dyn ClearCredentialGateway + Send + Sync>) -> Self {
+    pub fn new(credential_clearer: Arc<dyn ClearCredentialGateway>) -> Self {
         Self { credential_clearer }
     }
 

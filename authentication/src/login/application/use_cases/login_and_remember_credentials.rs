@@ -9,15 +9,15 @@ use crate::{
 
 #[derive(Clone)]
 pub struct LoginAndRememberCredentialsUseCase {
-    authorizer: Arc<dyn AuthorizeCredentialGateway + Send + Sync>,
-    credential_storage: Arc<dyn SaveCredentialGateway + Send + Sync>,
+    authorizer: Arc<dyn AuthorizeCredentialGateway>,
+    credential_storage: Arc<dyn SaveCredentialGateway>,
 }
 
 impl LoginAndRememberCredentialsUseCase {
     #[must_use]
     pub const fn new(
-        authorizer: Arc<dyn AuthorizeCredentialGateway + Send + Sync>,
-        credential_storage: Arc<dyn SaveCredentialGateway + Send + Sync>,
+        authorizer: Arc<dyn AuthorizeCredentialGateway>,
+        credential_storage: Arc<dyn SaveCredentialGateway>,
     ) -> Self {
         Self {
             authorizer,

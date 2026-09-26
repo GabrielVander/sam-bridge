@@ -12,16 +12,16 @@ use crate::{
 
 #[derive(Clone)]
 pub struct RestoreSessionUseCase {
-    credential_loader: Arc<dyn LoadCredentialGateway + Send + Sync>,
-    credential_eraser: Arc<dyn ClearCredentialGateway + Send + Sync>,
-    authorizer: Arc<dyn AuthorizeCredentialGateway + Send + Sync>,
+    credential_loader: Arc<dyn LoadCredentialGateway>,
+    credential_eraser: Arc<dyn ClearCredentialGateway>,
+    authorizer: Arc<dyn AuthorizeCredentialGateway>,
 }
 
 impl RestoreSessionUseCase {
     pub fn new(
-        credential_loader: Arc<dyn LoadCredentialGateway + Send + Sync>,
-        credential_eraser: Arc<dyn ClearCredentialGateway + Send + Sync>,
-        authorizer: Arc<dyn AuthorizeCredentialGateway + Send + Sync>,
+        credential_loader: Arc<dyn LoadCredentialGateway>,
+        credential_eraser: Arc<dyn ClearCredentialGateway>,
+        authorizer: Arc<dyn AuthorizeCredentialGateway>,
     ) -> Self {
         Self {
             credential_loader,
