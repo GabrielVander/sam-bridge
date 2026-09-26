@@ -1,7 +1,13 @@
+import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application/lessons/lessons_presenter.dart';
+import 'package:flutter_application/lessons/student_screen.dart';
 import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_application/rust/api/progress.dart';
+import 'package:flutter_test/flutter_test.dart';
 
+import 'localization.dart';
 import 'pending.dart';
 
 LessonDto lesson({
@@ -105,3 +111,31 @@ AssessStudentProgressOutcomeDto notAMusician() =>
 
 AssessStudentProgressOutcomeDto progressFailed(ErrorReportDto report) =>
     AssessStudentProgressOutcomeDto.failure(report: report);
+
+Future<void> pumpStudent(
+  WidgetTester tester, {
+  List<RetrieveStudentLessonsOutcomeDto> lessons = const [],
+  AssessStudentProgressOutcomeDto? progress,
+  Locale locale = portuguese,
+}) async {
+  final remainingLessons = [...lessons];
+  final presenter = LessonsPresenter(
+    retrieveStudentLessons: ({required studentId}) async =>
+        remainingLessons.isEmpty
+        ? lessonsRetrieved()
+        : remainingLessons.removeAt(0),
+    assessStudentProgress: ({required studentId}) async =>
+        progress ?? noInstrumentAssigned(),
+  );
+
+  await tester.pumpWidget(
+    BlocSignalProvider<LessonsPresenter>.value(
+      value: presenter,
+      child: localizedApp(
+        locale: locale,
+        home: const StudentScreen(studentId: '500132'),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}

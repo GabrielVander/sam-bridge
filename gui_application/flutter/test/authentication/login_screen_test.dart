@@ -121,6 +121,17 @@ void main() {
       expect(find.text('lista de alunos aberta'), findsOneWidget);
     });
 
+    testWidgets('asks for both fields when one is missing', (tester) async {
+      final attempts = await pumpLoginForm(tester);
+
+      await tester.enterText(_emailField, 'user@example.com');
+      await tester.tap(find.text('Entrar'));
+      await tester.pumpAndSettle();
+
+      expect(attempts, isEmpty);
+      expect(find.text('Informe usuário e senha'), findsOneWidget);
+    });
+
     testWidgets('pressing done on the password field signs in', (tester) async {
       final attempts = await pumpLoginForm(tester);
 
