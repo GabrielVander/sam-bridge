@@ -1,13 +1,11 @@
 use authentication::{
-    application::gateways::{
-        AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, FailureKind,
-    },
+    application::gateways::{AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway},
     domain::entities::Credential,
 };
 use std::sync::Arc;
 
 use crate::client::{SamClient, SamClientError, SamCredentials};
-use crate::diagnostics::error_chain;
+use crate::diagnostics::{error_chain, failure_kind};
 
 pub struct AuthorizationGatewaySamImpl {
     client: Arc<dyn SamClient + Send + Sync>,
@@ -23,27 +21,15 @@ impl AuthorizeCredentialGateway for AuthorizationGatewaySamImpl {
         &self,
         credential: &Credential,
     ) -> Result<AuthorizationResult, AuthorizationError> {
-        let result: Result<(), SamClientError> = self.client.login(&credential.into());
-
-        match result {
+        match self.client.login(&credential.into()) {
             Ok(()) => Ok(AuthorizationResult::Authorized),
-            Err(e) => match e {
-                SamClientError::RequestError { .. } => {
-                    Err(AuthorizationError::UnableToPerformOperation {
-                        kind: FailureKind::Transient,
-                        details: error_chain(&e),
-                    })
-                }
-                SamClientError::UnexpectedResponse { .. } => {
-                    Err(AuthorizationError::UnableToPerformOperation {
-                        kind: FailureKind::Unexpected,
-                        details: error_chain(&e),
-                    })
-                }
-                SamClientError::InvalidCredentials | SamClientError::SessionExpired => {
-                    Ok(AuthorizationResult::Unauthorized)
-                }
-            },
+            Err(SamClientError::InvalidCredentials | SamClientError::SessionExpired) => {
+                Ok(AuthorizationResult::Unauthorized)
+            }
+            Err(error) => Err(AuthorizationError::UnableToPerformOperation {
+                kind: failure_kind(&error),
+                details: error_chain(&error),
+            }),
         }
     }
 }
