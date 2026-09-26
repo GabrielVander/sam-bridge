@@ -41,9 +41,7 @@ zeroize = "1"
 # save and every load. Unoptimised it takes seconds per call and made up nearly
 # all of the tests' CPU time, so the two crates that hold it are optimised even in
 # dev/test builds: `cocoon`, because the generic PBKDF2/HMAC loop is compiled
-# inside it, and `sha2`, which holds the block function. `hmac` and `pbkdf2` do
-# not matter, and changing only them made no difference.
-# Only dependencies change; production builds use the release profile.
+# inside it, and `sha2`, which holds the block function.
 [profile.dev.package.cocoon]
 opt-level = 3
 
@@ -55,9 +53,8 @@ opt-level = 3
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
 
 [workspace.lints.clippy]
-pedantic = { level = "deny", priority = -1 } # UM, ACTUALLY
-nursery = { level = "deny", priority = -1 }  # BETA LINTS
-# DENY PANICS
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
 unwrap_used = "deny"
 expect_used = "deny"
 indexing_slicing = "deny"
