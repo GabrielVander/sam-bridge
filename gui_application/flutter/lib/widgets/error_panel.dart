@@ -33,7 +33,7 @@ class ErrorPanel extends StatelessWidget {
               const SizedBox(height: 16),
               FilledButton.tonal(
                 onPressed: onRetry,
-                child: const Text('Tentar novamente'),
+                child: Text(context.l10n.retry),
               ),
               if (report.details.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -56,7 +56,7 @@ class TechnicalDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExpansionTile(
       title: Text(
-        'Detalhes técnicos',
+        context.l10n.technicalDetails,
         style: Theme.of(context).textTheme.labelLarge,
       ),
       maintainState: false,
@@ -75,7 +75,7 @@ class TechnicalDetails extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.copy),
-              tooltip: 'Copiar detalhes',
+              tooltip: context.l10n.copyDetails,
               onPressed: () => _copy(context),
             ),
           ],
@@ -86,9 +86,10 @@ class TechnicalDetails extends StatelessWidget {
 
   Future<void> _copy(BuildContext context) async {
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    final String confirmation = context.l10n.detailsCopied;
 
     await Clipboard.setData(ClipboardData(text: details));
 
-    messenger.showSnackBar(const SnackBar(content: Text('Detalhes copiados')));
+    messenger.showSnackBar(SnackBar(content: Text(confirmation)));
   }
 }

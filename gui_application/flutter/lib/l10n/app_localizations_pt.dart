@@ -225,4 +225,20 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get unknownLevelExplanation =>
       'O progresso não pode ser calculado para este nível.';
+
+  @override
+  String get retry => 'Tentar novamente';
+
+  @override
+  String get technicalDetails => 'Detalhes técnicos';
+
+  @override
+  String get copyDetails => 'Copiar detalhes';
+
+  @override
+  String get detailsCopied => 'Detalhes copiados';
+
+  @override
+  String get slowConnection =>
+      'O SAM está demorando para responder. Aguarde mais um pouco…';
 }

@@ -453,6 +453,36 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'O progresso não pode ser calculado para este nível.'**
   String get unknownLevelExplanation;
+
+  /// No description provided for @retry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tentar novamente'**
+  String get retry;
+
+  /// No description provided for @technicalDetails.
+  ///
+  /// In pt, this message translates to:
+  /// **'Detalhes técnicos'**
+  String get technicalDetails;
+
+  /// No description provided for @copyDetails.
+  ///
+  /// In pt, this message translates to:
+  /// **'Copiar detalhes'**
+  String get copyDetails;
+
+  /// No description provided for @detailsCopied.
+  ///
+  /// In pt, this message translates to:
+  /// **'Detalhes copiados'**
+  String get detailsCopied;
+
+  /// No description provided for @slowConnection.
+  ///
+  /// In pt, this message translates to:
+  /// **'O SAM está demorando para responder. Aguarde mais um pouco…'**
+  String get slowConnection;
 }
 
 class _AppLocalizationsDelegate

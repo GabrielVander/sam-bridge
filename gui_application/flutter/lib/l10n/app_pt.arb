@@ -150,5 +150,10 @@
       }
     }
   },
-  "unknownLevelExplanation": "O progresso não pode ser calculado para este nível."
+  "unknownLevelExplanation": "O progresso não pode ser calculado para este nível.",
+  "retry": "Tentar novamente",
+  "technicalDetails": "Detalhes técnicos",
+  "copyDetails": "Copiar detalhes",
+  "detailsCopied": "Detalhes copiados",
+  "slowConnection": "O SAM está demorando para responder. Aguarde mais um pouco…"
 }

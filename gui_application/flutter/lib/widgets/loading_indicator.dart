@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 
 const Duration _slowConnectionThreshold = Duration(seconds: 10);
 
@@ -41,11 +42,7 @@ class _LoadingIndicatorState extends State<LoadingIndicator> {
             const CircularProgressIndicator(),
             if (_slow) ...[
               const SizedBox(height: 16),
-              const Text(
-                'O SAM está demorando para responder. '
-                'Aguarde mais um pouco…',
-                textAlign: TextAlign.center,
-              ),
+              Text(context.l10n.slowConnection, textAlign: TextAlign.center),
             ],
           ],
         ),
