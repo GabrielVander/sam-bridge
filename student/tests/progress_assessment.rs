@@ -254,6 +254,13 @@ fn an_unknown_level_cannot_be_assessed() {
 }
 
 #[test]
+fn an_unknown_level_explains_itself_with_what_sam_wrote() {
+    let error: AssessError = AssessError::UnknownLevel("EXÓTICO".to_owned());
+
+    assert_eq!(error.to_string(), "unrecognized musician level \"EXÓTICO\"");
+}
+
+#[test]
 fn an_instrument_without_published_requirements_cannot_be_assessed() {
     let result: Result<ProgressAssessment, AssessError> = assess(
         &MusicianLevel::Candidate,

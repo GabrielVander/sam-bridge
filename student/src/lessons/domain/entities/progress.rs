@@ -6,7 +6,7 @@ use thiserror::Error;
 
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum AssessError {
-    #[error("UnknownLevel")]
+    #[error("unrecognized musician level {0:?}")]
     UnknownLevel(String),
     #[error("no published test requirements for {0:?}")]
     UnpublishedRequirements(Instrument),
