@@ -1,4 +1,5 @@
 import 'package:flutter_application/lessons/lessons_view_models.dart';
+import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/builders.dart';
@@ -51,7 +52,8 @@ void main() {
     expectValueEquality<CheckpointView>(
       build: checkpoint,
       variants: {
-        'label': () => checkpoint(label: 'Culto'),
+        'level': () =>
+            checkpoint(level: const KnownLevel(Level.officialService)),
         'achieved': () => checkpoint(achieved: true),
         'readyToAdvance': () => checkpoint(readyToAdvance: true),
         'msaMet': () => checkpoint(msaMet: true),
@@ -63,14 +65,17 @@ void main() {
     expectValueEquality<ProgressView>(
       build: progressView,
       variants: {
-        'the checkpoints': () =>
-            progressView(checkpoints: [checkpoint(label: 'Culto')]),
+        'the checkpoints': () => progressView(
+          checkpoints: [
+            checkpoint(level: const KnownLevel(Level.officialService)),
+          ],
+        ),
         'msaRelativePercent': () => progressView(msaRelativePercent: 41),
         'methodRelativePercent': () => progressView(methodRelativePercent: 76),
         'combinedPercent': () => progressView(combinedPercent: 51),
         'overallCheckpointPercent': () =>
             progressView(overallCheckpointPercent: 26),
-        'nextLevelLabel': () => progressView(nextLevelLabel: null),
+        'nextLevel': () => progressView(nextLevel: null),
       },
     );
   });

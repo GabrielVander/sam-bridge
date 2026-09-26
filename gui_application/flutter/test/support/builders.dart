@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/lessons_view_models.dart';
+import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'localization.dart';
@@ -29,13 +30,13 @@ LessonItem lessonItem({
 );
 
 CheckpointView checkpoint({
-  String label = 'Ensaio',
+  ReportedLevel level = const KnownLevel(Level.practice),
   bool achieved = false,
   bool readyToAdvance = false,
   bool msaMet = false,
   bool methodMet = false,
 }) => CheckpointView(
-  label: label,
+  level: level,
   achieved: achieved,
   readyToAdvance: readyToAdvance,
   msaMet: msaMet,
@@ -48,14 +49,14 @@ ProgressView progressView({
   double methodRelativePercent = 75,
   double combinedPercent = 50,
   double overallCheckpointPercent = 25,
-  String? nextLevelLabel = 'Culto',
+  ReportedLevel? nextLevel = const KnownLevel(Level.officialService),
 }) => ProgressView(
   checkpoints: checkpoints ?? [checkpoint()],
   msaRelativePercent: msaRelativePercent,
   methodRelativePercent: methodRelativePercent,
   combinedPercent: combinedPercent,
   overallCheckpointPercent: overallCheckpointPercent,
-  nextLevelLabel: nextLevelLabel,
+  nextLevel: nextLevel,
 );
 
 Future<void> pumpInApp(WidgetTester tester, Widget child) =>

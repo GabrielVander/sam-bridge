@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/lessons/lessons_view_models.dart';
+import 'package:flutter_application/shared/level_name.dart';
 import 'package:flutter_application/widgets/progress_bar.dart';
 
 final class CheckpointTimeline extends StatelessWidget {
@@ -9,7 +11,7 @@ final class CheckpointTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nextLevelLabel = progress.nextLevelLabel;
+    final nextLevel = progress.nextLevel;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -22,9 +24,9 @@ final class CheckpointTimeline extends StatelessWidget {
             const SizedBox(height: 16),
             _Timeline(checkpoints: progress.checkpoints),
             const SizedBox(height: 20),
-            if (nextLevelLabel != null) ...[
+            if (nextLevel != null) ...[
               Text(
-                'Rumo a: $nextLevelLabel',
+                'Rumo a: ${context.l10n.reportedLevelName(nextLevel)}',
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               const SizedBox(height: 10),
@@ -105,6 +107,7 @@ final class _CheckpointDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final label = context.l10n.reportedLevelName(checkpoint.level);
     final (icon, color) = switch (checkpoint) {
       CheckpointView(achieved: true) => (
         Icons.check_circle,
@@ -119,8 +122,8 @@ final class _CheckpointDot extends StatelessWidget {
 
     return Tooltip(
       message: checkpoint.readyToAdvance
-          ? '${checkpoint.label} - pronto para a prova'
-          : checkpoint.label,
+          ? '$label - pronto para a prova'
+          : label,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -129,7 +132,7 @@ final class _CheckpointDot extends StatelessWidget {
           SizedBox(
             width: 68,
             child: Text(
-              checkpoint.label,
+              label,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

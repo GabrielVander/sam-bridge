@@ -1,6 +1,6 @@
 import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_application/rust/api/progress.dart';
-import 'package:flutter_application/shared/level_labels.dart';
+import 'package:flutter_application/shared/level.dart';
 
 class ProgressMapper {
   static ProgressView toViewModel(ProgressAssessmentDto dto) => ProgressView(
@@ -9,27 +9,29 @@ class ProgressMapper {
     methodRelativePercent: dto.methodRelativePercent,
     combinedPercent: dto.combinedPercent,
     overallCheckpointPercent: dto.overallCheckpointPercent,
-    nextLevelLabel: switch (dto.nextLevel) {
-      final level? => levelLabel(level),
+    nextLevel: switch (dto.nextLevel) {
+      final level? => _toLevel(level),
       null => null,
     },
   );
 
   static CheckpointView _toCheckpoint(CheckpointStatusDto dto) =>
       CheckpointView(
-        label: levelLabel(dto.level),
+        level: _toLevel(dto.level),
         achieved: dto.achieved,
         readyToAdvance: dto.readyToAdvance,
         msaMet: dto.requirement.msaMet,
         methodMet: dto.requirement.methodMet,
       );
 
-  static String levelLabel(MusicianLevelDto level) => switch (level) {
-    MusicianLevelDto_Candidate() => LevelLabels.candidate,
-    MusicianLevelDto_Practice() => LevelLabels.practice,
-    MusicianLevelDto_YouthService() => LevelLabels.youthService,
-    MusicianLevelDto_OfficialService() => LevelLabels.officialService,
-    MusicianLevelDto_Officialized() => LevelLabels.officialized,
-    MusicianLevelDto_Unknown(:final raw) => raw,
+  static ReportedLevel _toLevel(MusicianLevelDto level) => switch (level) {
+    MusicianLevelDto_Candidate() => const KnownLevel(Level.candidate),
+    MusicianLevelDto_Practice() => const KnownLevel(Level.practice),
+    MusicianLevelDto_YouthService() => const KnownLevel(Level.youthService),
+    MusicianLevelDto_OfficialService() => const KnownLevel(
+      Level.officialService,
+    ),
+    MusicianLevelDto_Officialized() => const KnownLevel(Level.officialized),
+    MusicianLevelDto_Unknown(:final raw) => UnrecognizedLevel(raw),
   };
 }

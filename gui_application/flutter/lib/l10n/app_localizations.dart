@@ -135,6 +135,42 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Progresso indisponível. {reason}'**
   String progressUnavailable(String reason);
+
+  /// No description provided for @levelCandidate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Candidato(a)'**
+  String get levelCandidate;
+
+  /// No description provided for @levelPractice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ensaio'**
+  String get levelPractice;
+
+  /// No description provided for @levelYouthService.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reunião de Jovens e Menores'**
+  String get levelYouthService;
+
+  /// No description provided for @levelOfficialService.
+  ///
+  /// In pt, this message translates to:
+  /// **'Culto Oficial'**
+  String get levelOfficialService;
+
+  /// No description provided for @levelOfficialized.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oficialização'**
+  String get levelOfficialized;
+
+  /// No description provided for @levelHalfHour.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meia Hora'**
+  String get levelHalfHour;
 }
 
 class _AppLocalizationsDelegate

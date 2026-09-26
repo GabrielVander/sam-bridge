@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/widgets/checkpoint_timeline.dart';
+import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_application/widgets/progress_bar.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,9 +16,12 @@ void main() {
         CheckpointTimeline(
           progress: progressView(
             checkpoints: [
-              checkpoint(label: 'Ensaio', achieved: true),
-              checkpoint(label: 'Culto'),
-              checkpoint(label: 'Oficialização'),
+              checkpoint(
+                level: const KnownLevel(Level.practice),
+                achieved: true,
+              ),
+              checkpoint(level: const KnownLevel(Level.officialService)),
+              checkpoint(level: const KnownLevel(Level.officialized)),
             ],
           ),
         ),
@@ -25,8 +29,51 @@ void main() {
 
       expect(find.text('Progresso'), findsOneWidget);
       expect(find.text('Ensaio'), findsOneWidget);
-      expect(find.text('Culto'), findsOneWidget);
+      expect(find.text('Culto Oficial'), findsOneWidget);
       expect(find.text('Oficialização'), findsOneWidget);
+    });
+
+    const levelNames = {
+      Level.candidate: 'Candidato(a)',
+      Level.practice: 'Ensaio',
+      Level.youthService: 'Reunião de Jovens e Menores',
+      Level.officialService: 'Culto Oficial',
+      Level.officialized: 'Oficialização',
+      Level.halfHour: 'Meia Hora',
+    };
+
+    for (final MapEntry(key: level, value: name) in levelNames.entries) {
+      testWidgets('names the ${level.name} level', (tester) async {
+        await pumpInApp(
+          tester,
+          CheckpointTimeline(
+            progress: progressView(
+              checkpoints: [checkpoint(level: KnownLevel(level))],
+              nextLevel: null,
+            ),
+          ),
+        );
+
+        expect(find.text(name), findsOneWidget);
+      });
+    }
+
+    testWidgets('shows what SAM wrote for a level it does not recognize', (
+      tester,
+    ) async {
+      await pumpInApp(
+        tester,
+        CheckpointTimeline(
+          progress: progressView(
+            checkpoints: [
+              checkpoint(level: const UnrecognizedLevel('SomethingNew')),
+            ],
+            nextLevel: null,
+          ),
+        ),
+      );
+
+      expect(find.text('SomethingNew'), findsOneWidget);
     });
 
     testWidgets('marks achieved, ready and pending checkpoints differently', (
@@ -37,9 +84,15 @@ void main() {
         CheckpointTimeline(
           progress: progressView(
             checkpoints: [
-              checkpoint(label: 'Ensaio', achieved: true),
-              checkpoint(label: 'Culto', readyToAdvance: true),
-              checkpoint(label: 'Oficialização'),
+              checkpoint(
+                level: const KnownLevel(Level.practice),
+                achieved: true,
+              ),
+              checkpoint(
+                level: const KnownLevel(Level.officialService),
+                readyToAdvance: true,
+              ),
+              checkpoint(level: const KnownLevel(Level.officialized)),
             ],
           ),
         ),
@@ -58,14 +111,23 @@ void main() {
         CheckpointTimeline(
           progress: progressView(
             checkpoints: [
-              checkpoint(label: 'Ensaio', achieved: true),
-              checkpoint(label: 'Culto', readyToAdvance: true),
+              checkpoint(
+                level: const KnownLevel(Level.practice),
+                achieved: true,
+              ),
+              checkpoint(
+                level: const KnownLevel(Level.officialService),
+                readyToAdvance: true,
+              ),
             ],
           ),
         ),
       );
 
-      expect(find.byTooltip('Culto - pronto para a prova'), findsOneWidget);
+      expect(
+        find.byTooltip('Culto Oficial - pronto para a prova'),
+        findsOneWidget,
+      );
       expect(find.byTooltip('Ensaio'), findsOneWidget);
     });
 
@@ -76,9 +138,15 @@ void main() {
         CheckpointTimeline(
           progress: progressView(
             checkpoints: [
-              checkpoint(label: 'Ensaio', achieved: true),
-              checkpoint(label: 'Culto', achieved: true),
-              checkpoint(label: 'Oficialização'),
+              checkpoint(
+                level: const KnownLevel(Level.practice),
+                achieved: true,
+              ),
+              checkpoint(
+                level: const KnownLevel(Level.officialService),
+                achieved: true,
+              ),
+              checkpoint(level: const KnownLevel(Level.officialized)),
             ],
           ),
         ),
@@ -109,14 +177,14 @@ void main() {
         tester,
         CheckpointTimeline(
           progress: progressView(
-            nextLevelLabel: 'Culto',
+            nextLevel: const KnownLevel(Level.officialService),
             msaRelativePercent: 40,
             methodRelativePercent: 75,
           ),
         ),
       );
 
-      expect(find.text('Rumo a: Culto'), findsOneWidget);
+      expect(find.text('Rumo a: Culto Oficial'), findsOneWidget);
       expect(find.text('40%'), findsOneWidget);
       expect(find.text('75%'), findsOneWidget);
       expect(find.byType(ProgressBar), findsNWidgets(2));
@@ -126,7 +194,7 @@ void main() {
     testWidgets('celebrates once every level has been reached', (tester) async {
       await pumpInApp(
         tester,
-        CheckpointTimeline(progress: progressView(nextLevelLabel: null)),
+        CheckpointTimeline(progress: progressView(nextLevel: null)),
       );
 
       expect(find.text('Todos os níveis alcançados'), findsOneWidget);

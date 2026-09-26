@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_application/shared/level.dart';
 
 enum LessonKind { msa, method }
 
@@ -56,14 +57,14 @@ class StudentLessonsView extends Equatable {
 }
 
 class CheckpointView extends Equatable {
-  final String label;
+  final ReportedLevel level;
   final bool achieved;
   final bool readyToAdvance;
   final bool msaMet;
   final bool methodMet;
 
   const CheckpointView({
-    required this.label,
+    required this.level,
     required this.achieved,
     required this.readyToAdvance,
     required this.msaMet,
@@ -72,7 +73,7 @@ class CheckpointView extends Equatable {
 
   @override
   List<Object?> get props => [
-    label,
+    level,
     achieved,
     readyToAdvance,
     msaMet,
@@ -86,7 +87,7 @@ class ProgressView extends Equatable {
   final double methodRelativePercent;
   final double combinedPercent;
   final double overallCheckpointPercent;
-  final String? nextLevelLabel;
+  final ReportedLevel? nextLevel;
 
   const ProgressView({
     required this.checkpoints,
@@ -94,7 +95,7 @@ class ProgressView extends Equatable {
     required this.methodRelativePercent,
     required this.combinedPercent,
     required this.overallCheckpointPercent,
-    this.nextLevelLabel,
+    this.nextLevel,
   });
 
   @override
@@ -104,6 +105,6 @@ class ProgressView extends Equatable {
     methodRelativePercent,
     combinedPercent,
     overallCheckpointPercent,
-    nextLevelLabel,
+    nextLevel,
   ];
 }

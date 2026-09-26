@@ -3,6 +3,7 @@ import 'package:flutter_application/lessons/ports/retrieve_student_lessons_use_c
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/errors/error_reason.dart';
 import 'package:flutter_application/errors/error_report.dart';
+import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/errors.dart';
@@ -136,7 +137,7 @@ void main() {
       final loaded = cubit.stateValue as LessonsLoaded;
       expect(loaded.progress, isA<ProgressAvailable>());
       final progress = loaded.progress as ProgressAvailable;
-      expect(progress.view.nextLevelLabel, 'Culto Oficial');
+      expect(progress.view.nextLevel, const KnownLevel(Level.officialService));
       expect(progress.view.overallCheckpointPercent, 60);
     });
 

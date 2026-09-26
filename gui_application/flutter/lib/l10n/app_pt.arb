@@ -1,7 +1,6 @@
 {
   "@@locale": "pt",
   "appTitle": "SAM Bridge",
-
   "errorNetwork": "Não foi possível conectar ao SAM. Verifique sua conexão com a internet e tente novamente.",
   "errorUnexpectedResponse": "O SAM respondeu de forma inesperada. Tente novamente em instantes.",
   "errorSessionExpired": "Sua sessão expirou. Entre novamente.",
@@ -9,6 +8,16 @@
   "errorGeneric": "Algo deu errado. Tente novamente.",
   "progressUnavailable": "Progresso indisponível. {reason}",
   "@progressUnavailable": {
-    "placeholders": { "reason": { "type": "String" } }
-  }
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "levelCandidate": "Candidato(a)",
+  "levelPractice": "Ensaio",
+  "levelYouthService": "Reunião de Jovens e Menores",
+  "levelOfficialService": "Culto Oficial",
+  "levelOfficialized": "Oficialização",
+  "levelHalfHour": "Meia Hora"
 }

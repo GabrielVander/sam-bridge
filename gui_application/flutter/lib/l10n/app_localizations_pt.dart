@@ -33,4 +33,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String progressUnavailable(String reason) {
     return 'Progresso indisponível. $reason';
   }
+
+  @override
+  String get levelCandidate => 'Candidato(a)';
+
+  @override
+  String get levelPractice => 'Ensaio';
+
+  @override
+  String get levelYouthService => 'Reunião de Jovens e Menores';
+
+  @override
+  String get levelOfficialService => 'Culto Oficial';
+
+  @override
+  String get levelOfficialized => 'Oficialização';
+
+  @override
+  String get levelHalfHour => 'Meia Hora';
 }
