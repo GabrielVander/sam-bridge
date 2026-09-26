@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 authentication = { workspace = true }
 student = { workspace = true }
+shared_kernel = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 reqwest = { workspace = true }

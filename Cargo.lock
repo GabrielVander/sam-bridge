@@ -2321,6 +2321,7 @@ dependencies = [
  "scraper",
  "serde",
  "serde_json",
+ "shared_kernel",
  "smol",
  "student",
  "thiserror",

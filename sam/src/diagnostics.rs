@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use student::application::gateways::FailureKind;
+use shared_kernel::failure_kind::FailureKind;
 
 use crate::client::SamClientError;
 
