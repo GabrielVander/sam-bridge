@@ -78,12 +78,13 @@ mod tests {
     use crate::api::error_report::{ErrorKindDto, ErrorReportDto};
     use crate::api::lessons::StudentLessonsDto;
     use crate::api::roster::{StudentPositionDto, StudentSummaryDto};
-    use ::authentication::adapters::InMemoryCredentialStore;
     use ::authentication::application::gateways::{
-        AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, SaveCredentialGateway,
+        AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway,
+        ClearCredentialGateway, ClearCredentialGatewayError, LoadCredentialGateway,
+        SaveCredentialGateway, SaveCredentialGatewayError,
     };
     use ::authentication::domain::entities::{Credential, Email, Password};
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
     use student::application::gateways::{
         FailureKind, MusicianProfileGateway, MusicianProfileGatewayError, StudentGateway,
         StudentGatewayError, StudentLessonsGateway, StudentLessonsGatewayError,
@@ -495,14 +496,10 @@ mod tests {
         let student_lessons_gateway: Arc<dyn StudentLessonsGateway + Send + Sync> =
             Arc::new(FakeStudentLessonsGateway::new(student_lessons_result));
 
-        let credential_store: Arc<InMemoryCredentialStore> =
-            Arc::new(InMemoryCredentialStore::new());
-        if let Some((email, password)) = stored_credential {
-            // Saving to a fresh in-memory store cannot fail.
-            credential_store
-                .save(&Credential::new(Email(email), Password(password)))
-                .ok();
-        }
+        let credential_store: Arc<FakeCredentialStore> = Arc::new(FakeCredentialStore::holding(
+            stored_credential
+                .map(|(email, password)| Credential::new(Email(email), Password(password))),
+        ));
 
         ApplicationFacade {
             login_and_remember_credentials: LoginAndRememberCredentialsUseCase::new(
@@ -539,6 +536,38 @@ mod tests {
             },
             location: "Somewhere".to_owned(),
             region: Region::Other("Somewhere".to_owned()),
+        }
+    }
+
+    struct FakeCredentialStore {
+        stored: Mutex<Option<Credential>>,
+    }
+
+    impl FakeCredentialStore {
+        const fn holding(credential: Option<Credential>) -> Self {
+            Self {
+                stored: Mutex::new(credential),
+            }
+        }
+    }
+
+    impl SaveCredentialGateway for FakeCredentialStore {
+        fn save(&self, credential: &Credential) -> Result<(), SaveCredentialGatewayError> {
+            *self.stored.lock().unwrap() = Some(credential.clone());
+            Ok(())
+        }
+    }
+
+    impl LoadCredentialGateway for FakeCredentialStore {
+        fn load(&self) -> Option<Credential> {
+            self.stored.lock().unwrap().clone()
+        }
+    }
+
+    impl ClearCredentialGateway for FakeCredentialStore {
+        fn clear(&self) -> Result<(), ClearCredentialGatewayError> {
+            *self.stored.lock().unwrap() = None;
+            Ok(())
         }
     }
 
