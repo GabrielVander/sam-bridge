@@ -9,6 +9,7 @@ use student::domain::entities::{
     StudentPosition,
 };
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::FakeSam;
 

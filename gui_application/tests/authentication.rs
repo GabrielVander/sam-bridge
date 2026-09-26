@@ -5,6 +5,7 @@ use gui_application::api::authentication::{
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use pretty_assertions::assert_eq;
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::FakeSam;
 

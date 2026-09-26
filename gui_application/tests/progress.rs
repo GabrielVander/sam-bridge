@@ -11,6 +11,7 @@ use student::domain::entities::{
     Instrument, Lesson, MusicianLevel, MusicianProfile, Range, StudentLessons,
 };
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::FakeSam;
 

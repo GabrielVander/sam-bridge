@@ -6,6 +6,7 @@ use pretty_assertions::assert_eq;
 use student::application::gateways::{FailureKind, StudentLessonsGatewayError};
 use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::FakeSam;
 
