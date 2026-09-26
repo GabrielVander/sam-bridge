@@ -102,14 +102,13 @@ impl FakeSam {
 
     #[must_use]
     pub fn build(self) -> ApplicationFacade {
-        let authorizer: Arc<dyn AuthorizeCredentialGateway + Send + Sync> =
+        let authorizer: Arc<dyn AuthorizeCredentialGateway> =
             Arc::new(Answering(self.authorization));
         let credential_store = Arc::new(FakeCredentialStore {
             stored: Mutex::new(self.stored_credential),
             clear_failure: self.clear_failure,
         });
-        let lessons: Arc<dyn StudentLessonsGateway + Send + Sync> =
-            Arc::new(Answering(self.lessons));
+        let lessons: Arc<dyn StudentLessonsGateway> = Arc::new(Answering(self.lessons));
 
         ApplicationFacade::new(
             LoginAndRememberCredentialsUseCase::new(authorizer.clone(), credential_store.clone()),

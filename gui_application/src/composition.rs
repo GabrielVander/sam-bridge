@@ -88,7 +88,7 @@ pub fn build_application_with(
         &config.student_lessons_endpoint,
     );
 
-    let sam_client: Arc<dyn SamClient + Send + Sync> = Arc::new(SamClientCacheDecorator::new(
+    let sam_client: Arc<dyn SamClient> = Arc::new(SamClientCacheDecorator::new(
         Arc::new(SamClientImpl::new(sam_operations)),
         Arc::new(SystemClock),
         CacheTtl {
@@ -120,10 +120,10 @@ pub fn build_application_with(
     let retrieve_all_available_students: RetrieveAllAvailableStudentsUseCase =
         RetrieveAllAvailableStudentsUseCase::new(sam_student_gateway);
 
-    let sam_student_lessons_gateway: Arc<dyn StudentLessonsGateway + Send + Sync> =
+    let sam_student_lessons_gateway: Arc<dyn StudentLessonsGateway> =
         Arc::new(StudentLessonsGatewaySamImpl::new(sam_client.clone()));
 
-    let sam_musician_profile_gateway: Arc<dyn MusicianProfileGateway + Send + Sync> =
+    let sam_musician_profile_gateway: Arc<dyn MusicianProfileGateway> =
         Arc::new(MusicianProfileGatewaySamImpl::new(sam_client));
 
     Ok(ApplicationFacade::new(
