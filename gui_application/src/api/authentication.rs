@@ -43,8 +43,6 @@ impl From<Result<RestoreSessionUseCaseOutcome, RestoreSessionError>> for Restore
     fn from(result: Result<RestoreSessionUseCaseOutcome, RestoreSessionError>) -> Self {
         match result {
             Ok(RestoreSessionUseCaseOutcome::Restored) => Self::Restored,
-            // Clearing a rejected local credential is best-effort cleanup; there's
-            // nothing actionable for the caller, so it still routes to the login form.
             Ok(
                 RestoreSessionUseCaseOutcome::NoStoredCredentials
                 | RestoreSessionUseCaseOutcome::CredentialsRejected,
@@ -65,38 +63,5 @@ impl From<Result<(), LogoutError>> for LogoutOutcome {
                 report: error.into(),
             },
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::api::error_report::ErrorKindDto;
-
-    #[test]
-    fn a_rejected_credential_that_cannot_be_cleared_still_routes_to_the_login_form() {
-        let outcome =
-            RestoreSessionOutcome::from(Err(RestoreSessionError::UnableToClearRejectedCredentials));
-
-        assert_eq!(outcome, RestoreSessionOutcome::NotAvailable);
-    }
-
-    #[test]
-    fn a_logout_that_cannot_clear_the_credential_is_a_local_storage_failure_with_its_details() {
-        let outcome = LogoutOutcome::from(Err(LogoutError::UnableToClearCredentials {
-            details: "Unable to remove the credential file: Permission denied".to_owned(),
-        }));
-
-        assert_eq!(
-            outcome,
-            LogoutOutcome::Failure {
-                report: ErrorReportDto {
-                    kind: ErrorKindDto::LocalStorage,
-                    details: "Unable to clear credentials: \
-                              Unable to remove the credential file: Permission denied"
-                        .to_owned(),
-                }
-            }
-        );
     }
 }

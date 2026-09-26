@@ -50,6 +50,10 @@ opt-level = 3
 [profile.dev.package.sha2]
 opt-level = 3
 
+[workspace.lints.rust]
+# Set by flutter_rust_bridge's code generator while it expands `#[frb]` attributes.
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
+
 [workspace.lints.clippy]
 pedantic = { level = "deny", priority = -1 } # UM, ACTUALLY
 nursery = { level = "deny", priority = -1 }  # BETA LINTS

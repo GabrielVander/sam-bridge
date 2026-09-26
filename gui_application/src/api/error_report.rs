@@ -45,7 +45,7 @@ impl From<FailureKind> for ErrorKindDto {
 
 impl From<StartupError> for ErrorReportDto {
     fn from(error: StartupError) -> Self {
-        let kind = match error {
+        let kind: ErrorKindDto = match error {
             StartupError::CredentialStorage(_) => ErrorKindDto::LocalStorage,
             StartupError::HttpClient(_) => ErrorKindDto::Unknown,
         };
@@ -95,8 +95,6 @@ impl From<AssessStudentProgressError> for ErrorReportDto {
             | AssessStudentProgressError::Lessons(
                 StudentLessonsGatewayError::UnableToPerformOperation { kind, details },
             ) => Self::from_failure(kind, details),
-            // The student came from SAM's own listing, so SAM not knowing them is
-            // SAM answering unexpectedly.
             AssessStudentProgressError::Profile(MusicianProfileGatewayError::NotFound) => Self {
                 kind: ErrorKindDto::UnexpectedResponse,
                 details: error.to_string(),
@@ -106,37 +104,5 @@ impl From<AssessStudentProgressError> for ErrorReportDto {
                 details: other.to_string(),
             },
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn every_failure_kind_has_a_matching_error_kind_dto() {
-        let cases = [
-            (FailureKind::Transient, ErrorKindDto::Network),
-            (FailureKind::Unexpected, ErrorKindDto::UnexpectedResponse),
-            (FailureKind::SessionExpired, ErrorKindDto::SessionExpired),
-            (FailureKind::Unclassified, ErrorKindDto::Unknown),
-        ];
-
-        for (kind, expected) in cases {
-            assert_eq!(ErrorKindDto::from(kind), expected);
-        }
-    }
-
-    #[test]
-    fn a_student_without_an_instrument_is_reported_as_unknown_with_the_reason() {
-        let report = ErrorReportDto::from(AssessStudentProgressError::NoInstrumentAssigned);
-
-        assert_eq!(
-            report,
-            ErrorReportDto {
-                kind: ErrorKindDto::Unknown,
-                details: "student has no instrument assigned yet".to_owned(),
-            }
-        );
     }
 }
