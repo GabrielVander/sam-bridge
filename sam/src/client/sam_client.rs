@@ -12,7 +12,7 @@ pub struct SamClientImpl {
     sam_ops: SamOperations,
 }
 
-pub trait SamClient {
+pub trait SamClient: Send + Sync {
     fn login(&self, credentials: &SamCredentials) -> Result<(), SamClientError>;
 
     fn students(&self) -> Result<Vec<SamStudent>, SamClientError>;

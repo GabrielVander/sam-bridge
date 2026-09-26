@@ -11,11 +11,11 @@ use crate::diagnostics::{error_chain, failure_kind};
 use crate::shared::musicians::{MUSICIAN_ROLE, parse_instrument, parse_musician_level};
 
 pub struct StudentGatewaySamImpl {
-    client: Arc<dyn SamClient + Send + Sync>,
+    client: Arc<dyn SamClient>,
 }
 
 impl StudentGatewaySamImpl {
-    pub fn new(client: Arc<dyn SamClient + Send + Sync>) -> Self {
+    pub fn new(client: Arc<dyn SamClient>) -> Self {
         Self { client }
     }
 }

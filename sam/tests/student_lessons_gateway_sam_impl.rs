@@ -151,7 +151,7 @@ fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImp
 fn build_gateway_for(base_url: &str) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
     let sam_operations: SamOperations = sam_operations_for(base_url)?;
 
-    let client: Arc<dyn SamClient + Send + Sync> = Arc::new(SamClientImpl::new(sam_operations));
+    let client: Arc<dyn SamClient> = Arc::new(SamClientImpl::new(sam_operations));
 
     Ok(StudentLessonsGatewaySamImpl::new(client))
 }

@@ -6,11 +6,11 @@ use crate::client::{MsaLesson, MtdLesson, SamClient, StudentLessonsPage};
 use crate::diagnostics::{error_chain, failure_kind};
 
 pub struct StudentLessonsGatewaySamImpl {
-    client: Arc<dyn SamClient + Send + Sync>,
+    client: Arc<dyn SamClient>,
 }
 
 impl StudentLessonsGatewaySamImpl {
-    pub fn new(client: Arc<dyn SamClient + Send + Sync>) -> Self {
+    pub fn new(client: Arc<dyn SamClient>) -> Self {
         Self { client }
     }
 }

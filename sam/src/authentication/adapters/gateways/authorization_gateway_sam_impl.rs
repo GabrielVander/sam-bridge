@@ -8,11 +8,11 @@ use crate::client::{SamClient, SamClientError, SamCredentials};
 use crate::diagnostics::{error_chain, failure_kind};
 
 pub struct AuthorizationGatewaySamImpl {
-    client: Arc<dyn SamClient + Send + Sync>,
+    client: Arc<dyn SamClient>,
 }
 
 impl AuthorizationGatewaySamImpl {
-    pub fn new(client: Arc<dyn SamClient + Send + Sync>) -> Self {
+    pub fn new(client: Arc<dyn SamClient>) -> Self {
         Self { client }
     }
 }

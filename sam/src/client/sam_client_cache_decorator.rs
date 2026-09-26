@@ -45,7 +45,7 @@ struct Cache {
 /// successful reads are cached, and any login discards the cache because the session — and so
 /// the visible data — may belong to a different user afterwards.
 pub struct SamClientCacheDecorator {
-    inner: Arc<dyn SamClient + Send + Sync>,
+    inner: Arc<dyn SamClient>,
     clock: Arc<dyn Clock>,
     ttl: CacheTtl,
     cache: Mutex<Cache>,
@@ -53,11 +53,7 @@ pub struct SamClientCacheDecorator {
 
 impl SamClientCacheDecorator {
     #[must_use]
-    pub fn new(
-        inner: Arc<dyn SamClient + Send + Sync>,
-        clock: Arc<dyn Clock>,
-        ttl: CacheTtl,
-    ) -> Self {
+    pub fn new(inner: Arc<dyn SamClient>, clock: Arc<dyn Clock>, ttl: CacheTtl) -> Self {
         Self {
             inner,
             clock,

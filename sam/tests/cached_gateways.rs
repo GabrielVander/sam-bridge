@@ -77,7 +77,7 @@ const LISTING_ROW: &str =
 
 fn client_with_cache_decorator(
     mock_server: &MockServer,
-) -> Result<Arc<dyn SamClient + Send + Sync>, reqwest::Error> {
+) -> Result<Arc<dyn SamClient>, reqwest::Error> {
     let sam_operations: SamOperations = sam_operations_for(&mock_server.uri())?;
 
     Ok(Arc::new(SamClientCacheDecorator::new(
