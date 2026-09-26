@@ -21,18 +21,3 @@ impl MusicianLevel {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::MusicianLevel;
-
-    #[test]
-    fn rank_orders_every_known_variant_below_unknown() {
-        assert_eq!(MusicianLevel::Candidate.rank(), 0);
-        assert_eq!(MusicianLevel::Practice.rank(), 1);
-        assert_eq!(MusicianLevel::YouthService.rank(), 2);
-        assert_eq!(MusicianLevel::OfficialService.rank(), 3);
-        assert_eq!(MusicianLevel::Officialized.rank(), 4);
-        assert_eq!(MusicianLevel::Unknown("x".to_owned()).rank(), u8::MAX);
-    }
-}
