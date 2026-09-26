@@ -3,11 +3,8 @@
 # Report-only: always exits 0. Needs cargo-llvm-cov, cargo-nextest and flutter on PATH.
 #
 # Exclusions:
-# - Rust: generated FRB code and each crate's tests/support/ helper module (cargo
-#   llvm-cov's report never includes tests/*.rs anyway, but the regex documents the
-#   intent and stays correct if that changes).
-# - Flutter: generated code (lib/rust/**, *.freezed.dart, *.g.dart) and lib/main.dart
-#   (never imported by the coverage helper test below, so it never appears in the report).
+# - Rust: generated FRB code and each crate's tests/support/ helpers.
+# - Flutter: generated code (lib/rust/**, *.freezed.dart, *.g.dart) and lib/main.dart.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -21,9 +18,8 @@ echo "== Flutter"
   trap 'rm -rf "$(dirname "$helper")"' EXIT
 
   # flutter test --coverage only reports files a test imports, so untested files would
-  # silently vanish from the report. This helper test imports every hand-written file.
-  # It lives outside the project (flutter test accepts a target file anywhere, resolving
-  # package imports from the cwd's pubspec) so no generated file ever touches the working tree.
+  # silently vanish from the report. This helper test imports every hand-written file,
+  # and lives outside the project so it never touches the working tree.
   package=$(sed -n 's/^name: *//p' pubspec.yaml | head -1)
   {
     find lib -name '*.dart' \
