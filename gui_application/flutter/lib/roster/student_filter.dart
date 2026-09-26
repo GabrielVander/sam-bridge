@@ -3,8 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:fuzzy/fuzzy.dart';
 
-/// What the user is narrowing the roster by: part of a name and a set of
-/// locations. An empty criterion lets everyone through.
 class StudentFilter extends Equatable {
   final String nameQuery;
   final Set<String> locations;
@@ -27,7 +25,6 @@ class StudentFilter extends Equatable {
     return byName.where((s) => locations.contains(s.location)).toList();
   }
 
-  /// Every location worth offering as a choice: once each, alphabetically.
   static List<String> locationsOf(List<StudentListItem> students) => {
     for (final s in students)
       if (s.location.isNotEmpty) s.location,

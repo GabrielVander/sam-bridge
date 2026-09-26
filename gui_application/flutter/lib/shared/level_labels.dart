@@ -1,5 +1,3 @@
-/// SAM's names for the stages a musician or organist goes through, shared by
-/// every screen that names one.
 abstract final class LevelLabels {
   static const String candidate = 'Candidato(a)';
   static const String practice = 'Ensaio';
