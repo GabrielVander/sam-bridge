@@ -1,12 +1,12 @@
 use std::time::Duration;
 
 use credential_store::{FileCredentialStore, NoDataDirectory};
+use gui_application::api::ApplicationFacade;
 use gui_application::api::authentication::LoginOutcomeDto;
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use gui_application::api::roster::RetrieveAllAvailableStudentsOutcomeDto;
-use gui_application::api::ApplicationFacade;
 use gui_application::composition::{
-    build_application_with, http_client_builder, Config, REQUEST_TIMEOUT,
+    Config, REQUEST_TIMEOUT, build_application_with, http_client_builder,
 };
 use pretty_assertions::assert_eq;
 use wiremock::matchers::{header, method, path};
