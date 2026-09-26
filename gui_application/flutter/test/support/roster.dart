@@ -46,8 +46,23 @@ abstract final class Positions {
   static const StudentPositionDto practice = StudentPositionDto.practice();
   static const StudentPositionDto youthService =
       StudentPositionDto.youthService();
+  static const StudentPositionDto officialService =
+      StudentPositionDto.officialService();
+  static const StudentPositionDto officialized =
+      StudentPositionDto.officialized();
+  static const StudentPositionDto halfHour = StudentPositionDto.halfHour();
+  static const StudentPositionDto youthServiceHalfHour =
+      StudentPositionDto.youthServiceHalfHour();
+  static const StudentPositionDto youthServicePractice =
+      StudentPositionDto.youthServicePractice();
+  static const StudentPositionDto youthServiceOfficialService =
+      StudentPositionDto.youthServiceOfficialService();
+  static const StudentPositionDto youthServiceOfficialized =
+      StudentPositionDto.youthServiceOfficialized();
   static const StudentPositionDto gemSecretary =
       StudentPositionDto.gemSecretary();
+  static const StudentPositionDto musicSecretary =
+      StudentPositionDto.musicSecretary();
 
   static StudentPositionDto invalid(String raw) =>
       StudentPositionDto.invalid(raw: raw);

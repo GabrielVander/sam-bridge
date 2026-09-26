@@ -1,12 +1,14 @@
 import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:flutter_application/roster/roster_mapper.dart';
+import 'package:flutter_application/roster/student_position.dart';
+import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/roster.dart';
 
 void main() {
   group('RosterMapper', () {
-    test('maps a known position to its Portuguese label', () {
+    test('maps a student with their position', () {
       final dto = studentSummary(
         id: '1',
         name: 'Jane Doe',
@@ -22,23 +24,52 @@ void main() {
           id: '1',
           name: 'Jane Doe',
           location: 'Some Location',
-          position: 'Reunião de Jovens e Menores',
+          position: MusicianPosition([Level.youthService]),
         ),
       );
     });
 
-    test('maps an invalid position to its raw SAM string', () {
-      final dto = studentSummary(
-        id: '2',
-        name: 'John Doe',
-        position: Positions.invalid('ALGO DESCONHECIDO'),
-        location: 'Somewhere',
-      );
+    final positions = {
+      Positions.candidate: const MusicianPosition([Level.candidate]),
+      Positions.practice: const MusicianPosition([Level.practice]),
+      Positions.youthService: const MusicianPosition([Level.youthService]),
+      Positions.officialService: const MusicianPosition([
+        Level.officialService,
+      ]),
+      Positions.officialized: const MusicianPosition([Level.officialized]),
+      Positions.halfHour: const MusicianPosition([Level.halfHour]),
+      Positions.youthServiceHalfHour: const MusicianPosition([
+        Level.youthService,
+        Level.halfHour,
+      ]),
+      Positions.youthServicePractice: const MusicianPosition([
+        Level.youthService,
+        Level.practice,
+      ]),
+      Positions.youthServiceOfficialService: const MusicianPosition([
+        Level.youthService,
+        Level.officialService,
+      ]),
+      Positions.youthServiceOfficialized: const MusicianPosition([
+        Level.youthService,
+        Level.officialized,
+      ]),
+      Positions.gemSecretary: const GemSecretaryPosition(),
+      Positions.musicSecretary: const MusicSecretaryPosition(),
+      Positions.invalid('ALGO DESCONHECIDO'): const UnrecognizedPosition(
+        'ALGO DESCONHECIDO',
+      ),
+    };
 
-      final viewModel = RosterMapper.toViewModel(dto);
+    for (final MapEntry(key: dto, value: expected) in positions.entries) {
+      test('maps the $dto position to $expected', () {
+        final viewModel = RosterMapper.toViewModel(
+          studentSummary(position: dto),
+        );
 
-      expect(viewModel.position, 'ALGO DESCONHECIDO');
-    });
+        expect(viewModel.position, expected);
+      });
+    }
 
     group('instrument', () {
       StudentListItem mapInstrument(String? instrumentName) =>
@@ -77,8 +108,11 @@ void main() {
         expect(mapInstrument('   ').instrument, isNull);
       });
 
-      test('does not change the position label', () {
-        expect(mapInstrument('VIOLINO').position, 'Ensaio');
+      test('does not change the position', () {
+        expect(
+          mapInstrument('VIOLINO').position,
+          const MusicianPosition([Level.practice]),
+        );
       });
     });
 
@@ -101,8 +135,8 @@ void main() {
       final result = RosterMapper.toViewModels(dtos);
 
       expect(result.map((s) => s.id).toList(), ['1', '2']);
-      expect(result[0].position, 'Candidato(a)');
-      expect(result[1].position, 'Secretário(a) do GEM');
+      expect(result[0].position, const MusicianPosition([Level.candidate]));
+      expect(result[1].position, const GemSecretaryPosition());
     });
   });
 }

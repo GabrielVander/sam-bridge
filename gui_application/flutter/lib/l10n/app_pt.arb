@@ -19,5 +19,7 @@
   "levelYouthService": "Reunião de Jovens e Menores",
   "levelOfficialService": "Culto Oficial",
   "levelOfficialized": "Oficialização",
-  "levelHalfHour": "Meia Hora"
+  "levelHalfHour": "Meia Hora",
+  "positionGemSecretary": "Secretário(a) do GEM",
+  "positionMusicSecretary": "Secretário(a) de Música"
 }

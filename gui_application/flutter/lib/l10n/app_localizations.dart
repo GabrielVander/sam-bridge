@@ -171,6 +171,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Meia Hora'**
   String get levelHalfHour;
+
+  /// No description provided for @positionGemSecretary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Secretário(a) do GEM'**
+  String get positionGemSecretary;
+
+  /// No description provided for @positionMusicSecretary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Secretário(a) de Música'**
+  String get positionMusicSecretary;
 }
 
 class _AppLocalizationsDelegate

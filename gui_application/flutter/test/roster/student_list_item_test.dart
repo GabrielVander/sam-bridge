@@ -1,4 +1,6 @@
 import 'package:flutter_application/roster/student_list_item.dart';
+import 'package:flutter_application/roster/student_position.dart';
+import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -7,7 +9,7 @@ void main() {
       id: '1',
       name: 'Jane Doe',
       location: 'Some Location',
-      position: 'Ensaio',
+      position: const MusicianPosition([Level.practice]),
       instrument: instrument,
     );
 

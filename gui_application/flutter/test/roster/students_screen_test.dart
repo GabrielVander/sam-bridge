@@ -5,6 +5,32 @@ import '../support/roster.dart';
 
 void main() {
   group('StudentsScreen row', () {
+    final positionNames = {
+      Positions.candidate: 'Candidato(a)',
+      Positions.practice: 'Ensaio',
+      Positions.youthService: 'Reunião de Jovens e Menores',
+      Positions.officialService: 'Culto Oficial',
+      Positions.officialized: 'Oficialização',
+      Positions.halfHour: 'Meia Hora',
+      Positions.youthServiceHalfHour: 'Reunião de Jovens e Menores / Meia Hora',
+      Positions.youthServicePractice: 'Reunião de Jovens e Menores / Ensaio',
+      Positions.youthServiceOfficialService:
+          'Reunião de Jovens e Menores / Culto Oficial',
+      Positions.youthServiceOfficialized:
+          'Reunião de Jovens e Menores / Oficialização',
+      Positions.gemSecretary: 'Secretário(a) do GEM',
+      Positions.musicSecretary: 'Secretário(a) de Música',
+      Positions.invalid('ALGO DESCONHECIDO'): 'ALGO DESCONHECIDO',
+    };
+
+    for (final MapEntry(key: position, value: name) in positionNames.entries) {
+      testWidgets('names the $position position "$name"', (tester) async {
+        await pumpRoster(tester, [studentSummary(position: position)]);
+
+        expect(find.text(name), findsOneWidget);
+      });
+    }
+
     testWidgets('shows the instrument with a music note icon', (tester) async {
       await pumpRoster(tester, [
         studentSummary(instrumentName: 'SAXOFONE TENOR'),

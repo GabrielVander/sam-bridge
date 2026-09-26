@@ -51,4 +51,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get levelHalfHour => 'Meia Hora';
+
+  @override
+  String get positionGemSecretary => 'Secretário(a) do GEM';
+
+  @override
+  String get positionMusicSecretary => 'Secretário(a) de Música';
 }

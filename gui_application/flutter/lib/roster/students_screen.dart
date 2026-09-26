@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/l10n/l10n.dart';
+import 'package:flutter_application/roster/position_name.dart';
 import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
@@ -333,7 +335,7 @@ final class _StudentsList extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          student.position,
+                          context.l10n.positionName(student.position),
                           style: Theme.of(context).textTheme.bodySmall,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

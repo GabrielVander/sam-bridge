@@ -1,5 +1,7 @@
 import 'package:flutter_application/roster/student_filter.dart';
 import 'package:flutter_application/roster/student_list_item.dart';
+import 'package:flutter_application/roster/student_position.dart';
+import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 StudentListItem _student(String name, {String location = 'Centro'}) =>
@@ -7,7 +9,7 @@ StudentListItem _student(String name, {String location = 'Centro'}) =>
       id: name,
       name: name,
       location: location,
-      position: 'Ensaio',
+      position: const MusicianPosition([Level.practice]),
     );
 
 List<String> _names(List<StudentListItem> students) =>
