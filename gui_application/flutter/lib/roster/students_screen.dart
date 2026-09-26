@@ -64,11 +64,11 @@ final class _StudentsScreenState extends State<StudentsScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
-          title: const Text('Filtrar por local'),
+          title: Text(context.l10n.rosterFilterByLocation),
           content: SizedBox(
             width: double.maxFinite,
             child: available.isEmpty
-                ? const Text('Nenhum local disponível.')
+                ? Text(context.l10n.rosterNoLocations)
                 : ListView(
                     shrinkWrap: true,
                     children: [
@@ -90,18 +90,18 @@ final class _StudentsScreenState extends State<StudentsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar'),
+              child: Text(context.l10n.cancel),
             ),
             TextButton(
               onPressed: () {
                 temp.clear();
                 setState(() {});
               },
-              child: const Text('Limpar'),
+              child: Text(context.l10n.clear),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(ctx, temp),
-              child: const Text('Aplicar'),
+              child: Text(context.l10n.apply),
             ),
           ],
         ),
@@ -132,7 +132,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
-                    hintText: 'Buscar por nome…',
+                    hintText: context.l10n.rosterSearchHint,
                     suffixIcon: nameQuery.isEmpty
                         ? null
                         : IconButton(
@@ -158,8 +158,10 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                         icon: const Icon(Icons.filter_list, size: 18),
                         label: Text(
                           selectedLocations.isEmpty
-                              ? 'Filtrar por local'
-                              : '${selectedLocations.length} ${selectedLocations.length == 1 ? 'local' : 'locais'}',
+                              ? context.l10n.rosterFilterByLocation
+                              : context.l10n.rosterSelectedLocations(
+                                  selectedLocations.length,
+                                ),
                         ),
                         onPressed: () => _showLocationPicker(
                           availableLocations,
@@ -172,7 +174,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
                       const SizedBox(width: 8),
                       TextButton(
                         onPressed: _clearFilters,
-                        child: const Text('Limpar'),
+                        child: Text(context.l10n.clear),
                       ),
                     ],
                   ],
@@ -240,7 +242,7 @@ final class _StudentsListContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (allStudents.isEmpty) {
-      return const Center(child: Text('Nenhum aluno disponível.'));
+      return Center(child: Text(context.l10n.rosterNoStudents));
     }
     if (students.isEmpty) {
       return Center(
@@ -253,15 +255,15 @@ final class _StudentsListContent extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 nameQuery.isNotEmpty
-                    ? 'Nenhum resultado para "$nameQuery"'
-                    : 'Nenhum resultado',
+                    ? context.l10n.rosterNoResultsFor(nameQuery)
+                    : context.l10n.rosterNoResults,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               if (selectedLocations.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(
-                  'em ${selectedLocations.join(', ')}',
+                  context.l10n.rosterInLocations(selectedLocations.join(', ')),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
@@ -269,7 +271,7 @@ final class _StudentsListContent extends StatelessWidget {
               const SizedBox(height: 16),
               FilledButton.tonal(
                 onPressed: onClearFilters,
-                child: const Text('Limpar filtros'),
+                child: Text(context.l10n.rosterClearFilters),
               ),
             ],
           ),

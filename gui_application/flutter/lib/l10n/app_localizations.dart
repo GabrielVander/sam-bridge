@@ -255,6 +255,78 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Usuário ou senha inválido(a)'**
   String get loginUnauthorized;
+
+  /// No description provided for @rosterFilterByLocation.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filtrar por local'**
+  String get rosterFilterByLocation;
+
+  /// No description provided for @rosterNoLocations.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum local disponível.'**
+  String get rosterNoLocations;
+
+  /// No description provided for @cancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar'**
+  String get cancel;
+
+  /// No description provided for @clear.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar'**
+  String get clear;
+
+  /// No description provided for @apply.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aplicar'**
+  String get apply;
+
+  /// No description provided for @rosterSearchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar por nome…'**
+  String get rosterSearchHint;
+
+  /// No description provided for @rosterSelectedLocations.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 local} other{{count} locais}}'**
+  String rosterSelectedLocations(int count);
+
+  /// No description provided for @rosterNoStudents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum aluno disponível.'**
+  String get rosterNoStudents;
+
+  /// No description provided for @rosterNoResultsFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum resultado para \"{query}\"'**
+  String rosterNoResultsFor(String query);
+
+  /// No description provided for @rosterNoResults.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum resultado'**
+  String get rosterNoResults;
+
+  /// No description provided for @rosterInLocations.
+  ///
+  /// In pt, this message translates to:
+  /// **'em {locations}'**
+  String rosterInLocations(String locations);
+
+  /// No description provided for @rosterClearFilters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar filtros'**
+  String get rosterClearFilters;
 }
 
 class _AppLocalizationsDelegate

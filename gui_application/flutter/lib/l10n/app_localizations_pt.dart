@@ -93,4 +93,52 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get loginUnauthorized => 'Usuário ou senha inválido(a)';
+
+  @override
+  String get rosterFilterByLocation => 'Filtrar por local';
+
+  @override
+  String get rosterNoLocations => 'Nenhum local disponível.';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get clear => 'Limpar';
+
+  @override
+  String get apply => 'Aplicar';
+
+  @override
+  String get rosterSearchHint => 'Buscar por nome…';
+
+  @override
+  String rosterSelectedLocations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count locais',
+      one: '1 local',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rosterNoStudents => 'Nenhum aluno disponível.';
+
+  @override
+  String rosterNoResultsFor(String query) {
+    return 'Nenhum resultado para \"$query\"';
+  }
+
+  @override
+  String get rosterNoResults => 'Nenhum resultado';
+
+  @override
+  String rosterInLocations(String locations) {
+    return 'em $locations';
+  }
+
+  @override
+  String get rosterClearFilters => 'Limpar filtros';
 }

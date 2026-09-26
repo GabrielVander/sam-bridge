@@ -33,5 +33,38 @@
   "loginHidePassword": "Ocultar senha",
   "loginSubmit": "Entrar",
   "loginMissingFields": "Informe usuário e senha",
-  "loginUnauthorized": "Usuário ou senha inválido(a)"
+  "loginUnauthorized": "Usuário ou senha inválido(a)",
+  "rosterFilterByLocation": "Filtrar por local",
+  "rosterNoLocations": "Nenhum local disponível.",
+  "cancel": "Cancelar",
+  "clear": "Limpar",
+  "apply": "Aplicar",
+  "rosterSearchHint": "Buscar por nome…",
+  "rosterSelectedLocations": "{count, plural, =1{1 local} other{{count} locais}}",
+  "@rosterSelectedLocations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rosterNoStudents": "Nenhum aluno disponível.",
+  "rosterNoResultsFor": "Nenhum resultado para \"{query}\"",
+  "@rosterNoResultsFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterNoResults": "Nenhum resultado",
+  "rosterInLocations": "em {locations}",
+  "@rosterInLocations": {
+    "placeholders": {
+      "locations": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterClearFilters": "Limpar filtros"
 }
