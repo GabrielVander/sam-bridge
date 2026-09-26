@@ -14,6 +14,7 @@ use student::application::gateways::{
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::sam_operations_for;
 

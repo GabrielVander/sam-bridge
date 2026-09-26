@@ -12,6 +12,7 @@ use student::domain::entities::{
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::{FakeSamClient, sam_operations_for, sam_student};
 
