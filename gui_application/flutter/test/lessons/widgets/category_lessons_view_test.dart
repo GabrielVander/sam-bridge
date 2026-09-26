@@ -24,8 +24,8 @@ void main() {
         tester,
         CategoryLessonsView(
           lessons: [
-            lessonItem(id: '1', date: '01/02/2024'),
-            lessonItem(id: '2', date: '08/02/2024'),
+            lessonItem(id: '1', date: (2024, 2, 1)),
+            lessonItem(id: '2', date: (2024, 2, 8)),
           ],
           emptyMessage: 'vazio',
         ),

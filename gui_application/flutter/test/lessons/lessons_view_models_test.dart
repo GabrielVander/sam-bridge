@@ -12,11 +12,11 @@ void main() {
       variants: {
         'kind': () => lessonItem(kind: LessonKind.method),
         'id': () => lessonItem(id: '2'),
-        'date': () => lessonItem(date: '02/02/2024'),
+        'date': () => lessonItem(date: (2024, 2, 2)),
         'phase': () => lessonItem(phase: '9'),
         'page': () => lessonItem(page: '99'),
         'lesson': () => lessonItem(lesson: '9'),
-        'clef': () => lessonItem(clef: 'Fá'),
+        'clef': () => lessonItem(clef: Clef.f),
         'description': () => lessonItem(description: 'Outra'),
         'instructor': () => lessonItem(instructor: 'Outro'),
         'method': () => lessonItem(method: 'Método B'),

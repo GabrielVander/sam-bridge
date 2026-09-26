@@ -19,8 +19,18 @@ void main() {
       expect(find.text('Maria Souza'), findsOneWidget);
     });
 
+    const clefNames = {Clef.g: 'Sol', Clef.c: 'Dó', Clef.f: 'Fá'};
+
+    for (final MapEntry(key: clef, value: name) in clefNames.entries) {
+      testWidgets('names the ${clef.name} clef', (tester) async {
+        await pumpInApp(tester, LessonCard(lessonItem(clef: clef)));
+
+        expect(find.text('Clave: $name'), findsOneWidget);
+      });
+    }
+
     testWidgets('shows a dash when the date is unknown', (tester) async {
-      await pumpInApp(tester, LessonCard(lessonItem(date: '')));
+      await pumpInApp(tester, LessonCard(lessonItem(date: null)));
 
       expect(find.text('—'), findsOneWidget);
     });
@@ -41,7 +51,7 @@ void main() {
       (tester) async {
         await pumpInApp(
           tester,
-          LessonCard(lessonItem(clef: '', description: '', instructor: '')),
+          LessonCard(lessonItem(clef: null, description: '', instructor: '')),
         );
 
         expect(find.textContaining('Clave'), findsNothing);
@@ -57,7 +67,7 @@ void main() {
       await pumpInApp(
         tester,
         LessonCard(
-          lessonItem(clef: '', description: 'Escalas', instructor: ''),
+          lessonItem(clef: null, description: 'Escalas', instructor: ''),
         ),
       );
 

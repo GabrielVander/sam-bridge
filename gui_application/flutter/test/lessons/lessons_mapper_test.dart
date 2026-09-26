@@ -29,11 +29,11 @@ void main() {
       final item = view.msa.single;
       expect(item.kind, LessonKind.msa);
       expect(item.id, '559783');
-      expect(item.date, '09/09/2025');
+      expect(item.date, DateTime(2025, 9, 9));
       expect(item.phase, '4.5');
       expect(item.page, '38');
       expect(item.lesson, '7 - 8');
-      expect(item.clef, 'Sol');
+      expect(item.clef, Clef.g);
       expect(item.description, 'Passou lições 7 e 8, estudar próximas lições.');
       expect(item.instructor, 'MARCOS ROGÉRIO COSME');
       expect(item.method, '');
@@ -61,25 +61,37 @@ void main() {
       expect(item.kind, LessonKind.method);
       expect(item.page, '00');
       expect(item.lesson, '00');
-      expect(item.clef, '');
+      expect(item.clef, isNull);
       expect(item.method, 'MÉTODO CCB - SCHIMOLL - VIOLINO');
     });
 
-    test('all-fields-absent lesson maps to empty strings, not nulls', () {
+    test('an all-fields-absent lesson has no date or clef and empty text', () {
       final dto = studentLessons(msa: [lesson()]);
 
       final view = LessonsMapper.toViewModel(dto);
 
       final item = view.msa.single;
       expect(item.id, '');
-      expect(item.date, '');
+      expect(item.date, isNull);
       expect(item.phase, '');
       expect(item.page, '');
       expect(item.lesson, '');
-      expect(item.clef, '');
+      expect(item.clef, isNull);
       expect(item.description, '');
       expect(item.instructor, '');
       expect(item.method, '');
     });
+
+    final clefs = {Clefs.g: Clef.g, Clefs.c: Clef.c, Clefs.f: Clef.f};
+
+    for (final MapEntry(key: dto, value: expected) in clefs.entries) {
+      test('maps the $dto clef', () {
+        final view = LessonsMapper.toViewModel(
+          studentLessons(msa: [lesson(clef: dto)]),
+        );
+
+        expect(view.msa.single.clef, expected);
+      });
+    }
   });
 }

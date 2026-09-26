@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/l10n/l10n.dart';
+import 'package:flutter_application/lessons/clef_name.dart';
 import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_application/widgets/info_chip.dart';
+import 'package:intl/intl.dart';
 
 final class LessonCard extends StatelessWidget {
   final LessonItem lesson;
@@ -9,6 +12,9 @@ final class LessonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final date = lesson.date;
+    final clef = lesson.clef;
+
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
@@ -38,7 +44,11 @@ final class LessonCard extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
-                        lesson.date.isEmpty ? '—' : lesson.date,
+                        date == null
+                            ? '—'
+                            : DateFormat.yMd(
+                                Localizations.localeOf(context).toString(),
+                              ).format(date),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       if (lesson.phase.isNotEmpty)
@@ -49,15 +59,15 @@ final class LessonCard extends StatelessWidget {
                         InfoChip(label: 'Lição ${lesson.lesson}'),
                     ],
                   ),
-                  if (lesson.clef.isNotEmpty ||
+                  if (clef != null ||
                       lesson.description.isNotEmpty ||
                       lesson.instructor.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (lesson.clef.isNotEmpty)
-                          Text('Clave: ${lesson.clef}'),
+                        if (clef != null)
+                          Text('Clave: ${context.l10n.clefName(clef)}'),
                         if (lesson.description.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(lesson.description),

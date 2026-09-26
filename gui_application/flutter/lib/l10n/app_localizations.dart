@@ -183,6 +183,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Secretário(a) de Música'**
   String get positionMusicSecretary;
+
+  /// No description provided for @clefG.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sol'**
+  String get clefG;
+
+  /// No description provided for @clefC.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dó'**
+  String get clefC;
+
+  /// No description provided for @clefF.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fá'**
+  String get clefF;
 }
 
 class _AppLocalizationsDelegate

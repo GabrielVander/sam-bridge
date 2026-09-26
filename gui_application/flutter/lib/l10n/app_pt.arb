@@ -21,5 +21,8 @@
   "levelOfficialized": "Oficialização",
   "levelHalfHour": "Meia Hora",
   "positionGemSecretary": "Secretário(a) do GEM",
-  "positionMusicSecretary": "Secretário(a) de Música"
+  "positionMusicSecretary": "Secretário(a) de Música",
+  "clefG": "Sol",
+  "clefC": "Dó",
+  "clefF": "Fá"
 }

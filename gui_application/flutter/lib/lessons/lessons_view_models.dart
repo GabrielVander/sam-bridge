@@ -3,14 +3,16 @@ import 'package:flutter_application/shared/level.dart';
 
 enum LessonKind { msa, method }
 
+enum Clef { g, c, f }
+
 class LessonItem extends Equatable {
   final LessonKind kind;
   final String id;
-  final String date;
+  final DateTime? date;
   final String phase;
   final String page;
   final String lesson;
-  final String clef;
+  final Clef? clef;
   final String description;
   final String instructor;
   final String method;
@@ -18,11 +20,11 @@ class LessonItem extends Equatable {
   const LessonItem({
     required this.kind,
     required this.id,
-    required this.date,
+    this.date,
     required this.phase,
     required this.page,
     required this.lesson,
-    required this.clef,
+    this.clef,
     required this.description,
     required this.instructor,
     required this.method,

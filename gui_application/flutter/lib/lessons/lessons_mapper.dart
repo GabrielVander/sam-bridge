@@ -11,21 +11,18 @@ class LessonsMapper {
   static LessonItem _toItem(LessonDto dto, LessonKind kind) => LessonItem(
     kind: kind,
     id: dto.id ?? '',
-    date: _formatDate(dto.date),
+    date: _date(dto.date),
     phase: _formatRange(dto.phase),
     page: _formatRange(dto.page),
     lesson: _formatRange(dto.lesson),
-    clef: _formatClef(dto.clef),
+    clef: _clef(dto.clef),
     description: dto.description ?? '',
     instructor: dto.instructor ?? '',
     method: dto.method ?? '',
   );
 
-  static String _formatDate(DateDto? date) {
-    if (date == null) return '';
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    return '${twoDigits(date.day)}/${twoDigits(date.month)}/${date.year}';
-  }
+  static DateTime? _date(DateDto? date) =>
+      date == null ? null : DateTime(date.year, date.month, date.day);
 
   static String _formatRange(RangeDto? range) {
     if (range == null) return '';
@@ -33,10 +30,10 @@ class LessonsMapper {
     return '${range.from} - ${range.to}';
   }
 
-  static String _formatClef(ClefDto? clef) => switch (clef) {
-    ClefDto.g => 'Sol',
-    ClefDto.c => 'Dó',
-    ClefDto.f => 'Fá',
-    null => '',
+  static Clef? _clef(ClefDto? clef) => switch (clef) {
+    ClefDto.g => Clef.g,
+    ClefDto.c => Clef.c,
+    ClefDto.f => Clef.f,
+    null => null,
   };
 }

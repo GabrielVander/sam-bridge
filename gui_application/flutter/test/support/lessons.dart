@@ -33,6 +33,8 @@ RangeDto? _range((String, String)? range) =>
 
 abstract final class Clefs {
   static const g = ClefDto.g;
+  static const c = ClefDto.c;
+  static const f = ClefDto.f;
 }
 
 StudentLessonsDto studentLessons({

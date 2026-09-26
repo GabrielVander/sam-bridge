@@ -57,4 +57,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get positionMusicSecretary => 'Secretário(a) de Música';
+
+  @override
+  String get clefG => 'Sol';
+
+  @override
+  String get clefC => 'Dó';
+
+  @override
+  String get clefF => 'Fá';
 }
