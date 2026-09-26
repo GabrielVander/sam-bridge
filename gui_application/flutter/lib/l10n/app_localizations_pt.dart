@@ -69,4 +69,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get logOut => 'Sair';
+
+  @override
+  String get loginTitle => 'Entre com seu usuário SAM';
+
+  @override
+  String get loginEmail => 'Email';
+
+  @override
+  String get loginPassword => 'Senha';
+
+  @override
+  String get loginShowPassword => 'Mostrar senha';
+
+  @override
+  String get loginHidePassword => 'Ocultar senha';
+
+  @override
+  String get loginSubmit => 'Entrar';
+
+  @override
+  String get loginMissingFields => 'Informe usuário e senha';
+
+  @override
+  String get loginUnauthorized => 'Usuário ou senha inválido(a)';
 }

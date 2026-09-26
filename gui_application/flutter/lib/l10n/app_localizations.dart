@@ -207,6 +207,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Sair'**
   String get logOut;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre com seu usuário SAM'**
+  String get loginTitle;
+
+  /// No description provided for @loginEmail.
+  ///
+  /// In pt, this message translates to:
+  /// **'Email'**
+  String get loginEmail;
+
+  /// No description provided for @loginPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha'**
+  String get loginPassword;
+
+  /// No description provided for @loginShowPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrar senha'**
+  String get loginShowPassword;
+
+  /// No description provided for @loginHidePassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ocultar senha'**
+  String get loginHidePassword;
+
+  /// No description provided for @loginSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar'**
+  String get loginSubmit;
+
+  /// No description provided for @loginMissingFields.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe usuário e senha'**
+  String get loginMissingFields;
+
+  /// No description provided for @loginUnauthorized.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usuário ou senha inválido(a)'**
+  String get loginUnauthorized;
 }
 
 class _AppLocalizationsDelegate

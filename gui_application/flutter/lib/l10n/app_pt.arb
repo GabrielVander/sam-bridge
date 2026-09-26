@@ -25,5 +25,13 @@
   "clefG": "Sol",
   "clefC": "Dó",
   "clefF": "Fá",
-  "logOut": "Sair"
+  "logOut": "Sair",
+  "loginTitle": "Entre com seu usuário SAM",
+  "loginEmail": "Email",
+  "loginPassword": "Senha",
+  "loginShowPassword": "Mostrar senha",
+  "loginHidePassword": "Ocultar senha",
+  "loginSubmit": "Entrar",
+  "loginMissingFields": "Informe usuário e senha",
+  "loginUnauthorized": "Usuário ou senha inválido(a)"
 }

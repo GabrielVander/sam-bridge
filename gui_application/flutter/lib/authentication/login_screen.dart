@@ -24,10 +24,10 @@ class LoginScreen extends StatelessWidget {
           AuthLoading() => const LoadingIndicator(),
           AuthSuccess() => const Center(child: Icon(Icons.check_rounded)),
           AuthMissingFields() => _LoginFormCard(
-            errorMessage: 'Informe usuário e senha',
+            errorMessage: context.l10n.loginMissingFields,
           ),
           AuthUnauthorized() => _LoginFormCard(
-            errorMessage: 'Usuário ou senha inválido(a)',
+            errorMessage: context.l10n.loginUnauthorized,
           ),
           AuthFailure(:final report) => _LoginFormCard(
             errorMessage: context.l10n.errorMessage(report.reason),
@@ -93,7 +93,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Entre com seu usuário SAM',
+                    context.l10n.loginTitle,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
@@ -123,9 +123,9 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                   const SizedBox(height: 28),
                   TextField(
                     controller: _username,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.person),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.loginEmail,
+                      prefixIcon: const Icon(Icons.person),
                     ),
                     textInputAction: TextInputAction.next,
                   ),
@@ -134,12 +134,12 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                     controller: _password,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
-                      labelText: 'Senha',
+                      labelText: context.l10n.loginPassword,
                       prefixIcon: const Icon(Icons.key),
                       suffixIcon: IconButton(
                         tooltip: _obscurePassword
-                            ? 'Mostrar senha'
-                            : 'Ocultar senha',
+                            ? context.l10n.loginShowPassword
+                            : context.l10n.loginHidePassword,
                         icon: Icon(
                           _obscurePassword
                               ? Icons.visibility_outlined
@@ -164,7 +164,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                         ),
                       ),
                       onPressed: () => _submit(context),
-                      child: const Text('Entrar'),
+                      child: Text(context.l10n.loginSubmit),
                     ),
                   ),
                 ],
