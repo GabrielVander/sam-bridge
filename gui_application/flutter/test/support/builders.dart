@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Builders keep tests independent of how many fields a model has: each test
-/// states only the values it cares about.
 LessonItem lessonItem({
   LessonKind kind = LessonKind.msa,
   String id = '1',
