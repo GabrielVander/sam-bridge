@@ -1,4 +1,3 @@
-/// How SAM identifies a student, shared by the roster and their lessons.
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub struct StudentId(String);
 
