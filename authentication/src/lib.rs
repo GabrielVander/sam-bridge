@@ -22,7 +22,3 @@ pub mod domain {
         pub use crate::shared::domain::entities::*;
     }
 }
-
-pub mod adapters {
-    pub use crate::remembered_credentials::adapters::*;
-}

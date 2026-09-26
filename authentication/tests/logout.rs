@@ -1,4 +1,3 @@
-use authentication::adapters::InMemoryCredentialStore;
 use authentication::application::gateways::{
     ClearCredentialGateway, ClearCredentialGatewayError, LoadCredentialGateway,
     SaveCredentialGateway,
@@ -7,6 +6,9 @@ use authentication::application::use_cases::{LogoutError, LogoutUseCase};
 use authentication::domain::entities::Credential;
 use pretty_assertions::assert_eq;
 use std::sync::Arc;
+
+mod support;
+use support::InMemoryCredentialStore;
 
 #[test]
 fn clears_the_store() {

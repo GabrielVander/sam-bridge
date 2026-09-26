@@ -1,4 +1,3 @@
-use authentication::adapters::InMemoryCredentialStore;
 use authentication::application::gateways::{
     AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, FailureKind,
     LoadCredentialGateway, SaveCredentialGateway, SaveCredentialGatewayError,
@@ -9,6 +8,9 @@ use authentication::application::use_cases::{
 use authentication::domain::entities::{Credential, Email, Password};
 use pretty_assertions::assert_eq;
 use std::sync::Arc;
+
+mod support;
+use support::InMemoryCredentialStore;
 
 #[test]
 fn successful_login_saves_the_credential() {

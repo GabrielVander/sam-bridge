@@ -1,4 +1,3 @@
-use authentication::adapters::InMemoryCredentialStore;
 use authentication::application::gateways::{
     AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, ClearCredentialGateway,
     ClearCredentialGatewayError, FailureKind, LoadCredentialGateway, SaveCredentialGateway,
@@ -9,6 +8,9 @@ use authentication::application::use_cases::{
 use authentication::domain::entities::Credential;
 use pretty_assertions::assert_eq;
 use std::sync::Arc;
+
+mod support;
+use support::InMemoryCredentialStore;
 
 #[test]
 fn use_case_without_stored_credentials_reports_no_stored_credentials() {

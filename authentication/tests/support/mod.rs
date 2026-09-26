@@ -1,6 +1,6 @@
 use std::sync::{Mutex, MutexGuard, PoisonError};
 
-use crate::{
+use authentication::{
     application::gateways::{
         ClearCredentialGateway, ClearCredentialGatewayError, LoadCredentialGateway,
         SaveCredentialGateway, SaveCredentialGatewayError,
