@@ -1,25 +1,25 @@
 import 'package:flutter_application/lessons/lessons_mapper.dart';
 import 'package:flutter_application/lessons/lessons_view_models.dart';
-import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/lessons.dart';
 
 void main() {
   group('LessonsMapper', () {
     test('maps a full MSA lesson', () {
-      const dto = StudentLessonsDto(
+      final dto = studentLessons(
         msa: [
-          LessonDto(
+          lesson(
             id: '559783',
-            date: DateDto(year: 2025, month: 9, day: 9),
-            phase: RangeDto(from: '4.5', to: '4.5'),
-            page: RangeDto(from: '38', to: '38'),
-            lesson: RangeDto(from: '7', to: '8'),
-            clef: ClefDto.g,
+            date: (2025, 9, 9),
+            phase: ('4.5', '4.5'),
+            page: ('38', '38'),
+            lesson: ('7', '8'),
+            clef: Clefs.g,
             description: 'Passou lições 7 e 8, estudar próximas lições.',
             instructor: 'MARCOS ROGÉRIO COSME',
           ),
         ],
-        method: [],
       );
 
       final view = LessonsMapper.toViewModel(dto);
@@ -40,14 +40,13 @@ void main() {
     });
 
     test('maps a full Método (instrument) lesson', () {
-      const dto = StudentLessonsDto(
-        msa: [],
+      final dto = studentLessons(
         method: [
-          LessonDto(
+          lesson(
             id: '214020',
-            date: DateDto(year: 2023, month: 12, day: 4),
-            page: RangeDto(from: '00', to: '00'),
-            lesson: RangeDto(from: '00', to: '00'),
+            date: (2023, 12, 4),
+            page: ('00', '00'),
+            lesson: ('00', '00'),
             description: 'Postura do violino',
             instructor: 'MURILO FAGNER CARDOSO',
             method: 'MÉTODO CCB - SCHIMOLL - VIOLINO',
@@ -67,7 +66,7 @@ void main() {
     });
 
     test('all-fields-absent lesson maps to empty strings, not nulls', () {
-      const dto = StudentLessonsDto(msa: [LessonDto()], method: []);
+      final dto = studentLessons(msa: [lesson()]);
 
       final view = LessonsMapper.toViewModel(dto);
 

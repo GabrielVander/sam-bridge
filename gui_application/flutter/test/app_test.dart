@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/app.dart';
 import 'package:flutter_application/main.dart' show formatVersion;
 import 'package:flutter_application/main_screen.dart';
-import 'package:flutter_application/rust/api/authentication.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import 'support/app.dart';
+import 'support/authentication.dart';
+import 'support/errors.dart';
 
 Future<void> pumpApp(WidgetTester tester, SamSiteApp app) async {
   await tester.pumpWidget(app);
@@ -42,9 +43,7 @@ void main() {
     ) async {
       await pumpApp(
         tester,
-        await composeFakeApp(
-          restoreSession: const RestoreSessionOutcome.restored(),
-        ),
+        await composeFakeApp(restoreSession: sessionRestored()),
       );
 
       expect(find.text('Jane Doe'), findsOneWidget);
@@ -81,12 +80,7 @@ void main() {
     testWidgets('stays on the form when the credentials are rejected', (
       tester,
     ) async {
-      await pumpApp(
-        tester,
-        await composeFakeApp(
-          login: const LoginOutcome.invalidEmailOrPassword(),
-        ),
-      );
+      await pumpApp(tester, await composeFakeApp(login: loginRejected()));
 
       await signIn(tester);
 
@@ -112,9 +106,7 @@ void main() {
     ) async {
       await pumpApp(
         tester,
-        await composeFakeApp(
-          restoreSession: const RestoreSessionOutcome.restored(),
-        ),
+        await composeFakeApp(restoreSession: sessionRestored()),
       );
 
       routerOf(tester).go('/login');
@@ -135,9 +127,7 @@ void main() {
     testWidgets('returns to the login form', (tester) async {
       await pumpApp(
         tester,
-        await composeFakeApp(
-          restoreSession: const RestoreSessionOutcome.restored(),
-        ),
+        await composeFakeApp(restoreSession: sessionRestored()),
       );
       expect(find.text('Jane Doe'), findsOneWidget);
 
@@ -154,10 +144,11 @@ void main() {
         await pumpApp(
           tester,
           await composeFakeApp(
-            restoreSession: const RestoreSessionOutcome.restored(),
-            logout: logoutUnableToClearStoredCredentials(
-              details:
-                  'Unable to remove the credential file: Permission denied',
+            restoreSession: sessionRestored(),
+            logout: logoutFailed(
+              localStorageFailure(
+                'Unable to remove the credential file: Permission denied',
+              ),
             ),
           ),
         );
@@ -186,9 +177,7 @@ void main() {
     testWidgets('shows their page and can return to the list', (tester) async {
       await pumpApp(
         tester,
-        await composeFakeApp(
-          restoreSession: const RestoreSessionOutcome.restored(),
-        ),
+        await composeFakeApp(restoreSession: sessionRestored()),
       );
 
       await tester.tap(find.text('Jane Doe'));

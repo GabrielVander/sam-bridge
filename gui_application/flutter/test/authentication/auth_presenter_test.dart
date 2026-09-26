@@ -1,30 +1,25 @@
-import 'dart:async';
-
 import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/authentication/ports/login_use_case.dart';
+import 'package:flutter_application/authentication/ports/logout_use_case.dart';
+import 'package:flutter_application/authentication/ports/restore_session_use_case.dart';
 import 'package:flutter_application/errors/error_report.dart';
-import 'package:flutter_application/rust/api/authentication.dart';
-import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/authentication.dart';
+import '../support/errors.dart';
+
 AuthPresenter buildPresenter({
-  Future<LoginOutcome> Function({
-    required String email,
-    required String password,
-  })?
-  loginUseCase,
-  Future<RestoreSessionOutcome> Function()? restoreSessionUseCase,
-  Future<LogoutOutcome> Function()? logoutUseCase,
+  LoginUseCase? loginUseCase,
+  RestoreSessionUseCase? restoreSessionUseCase,
+  LogoutUseCase? logoutUseCase,
 }) {
   return AuthPresenter(
     loginUseCase:
         loginUseCase ??
-        ({required email, required password}) async =>
-            const LoginOutcome.successful(),
+        ({required email, required password}) async => loggedIn(),
     restoreSessionUseCase:
-        restoreSessionUseCase ??
-        () async => const RestoreSessionOutcome.notAvailable(),
-    logoutUseCase:
-        logoutUseCase ?? () async => const LogoutOutcome.successful(),
+        restoreSessionUseCase ?? () async => noSavedSession(),
+    logoutUseCase: logoutUseCase ?? () async => loggedOut(),
   );
 }
 
@@ -39,15 +34,15 @@ void main() {
     test(
       'restoreSession() transitions Idle -> Loading -> Success when restored',
       () async {
-        final completer = Completer<RestoreSessionOutcome>();
+        final restore = pendingRestore();
         final presenter = buildPresenter(
-          restoreSessionUseCase: () => completer.future,
+          restoreSessionUseCase: () => restore.future,
         );
 
         final restoreFuture = presenter.restoreSession();
         expect(presenter.stateValue, isA<AuthLoading>());
 
-        completer.complete(const RestoreSessionOutcome.restored());
+        restore.complete(sessionRestored());
         await restoreFuture;
 
         expect(presenter.stateValue, isA<AuthSuccess>());
@@ -59,8 +54,7 @@ void main() {
       'restoreSession() transitions Loading -> Idle when not available',
       () async {
         final presenter = buildPresenter(
-          restoreSessionUseCase: () async =>
-              const RestoreSessionOutcome.notAvailable(),
+          restoreSessionUseCase: () async => noSavedSession(),
         );
 
         await presenter.restoreSession();
@@ -77,7 +71,7 @@ void main() {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async {
             called = true;
-            return const LoginOutcome.successful();
+            return loggedIn();
           },
         );
 
@@ -90,8 +84,7 @@ void main() {
 
     test('submitLogin() transitions to Success on successful login', () async {
       final presenter = buildPresenter(
-        loginUseCase: ({required email, required password}) async =>
-            const LoginOutcome.successful(),
+        loginUseCase: ({required email, required password}) async => loggedIn(),
       );
 
       await presenter.submitLogin('user@example.com', 'secret');
@@ -104,7 +97,7 @@ void main() {
       () async {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async =>
-              const LoginOutcome.invalidEmailOrPassword(),
+              loginRejected(),
         );
 
         await presenter.submitLogin('user@example.com', 'wrong');
@@ -118,11 +111,8 @@ void main() {
       () async {
         final presenter = buildPresenter(
           loginUseCase: ({required email, required password}) async =>
-              const LoginOutcome.failure(
-                report: ErrorReportDto(
-                  kind: ErrorKindDto.network,
-                  details: "Request failed for operation 'authentication'",
-                ),
+              loginFailed(
+                networkFailure("Request failed for operation 'authentication'"),
               ),
         );
 
@@ -176,11 +166,10 @@ void main() {
     test('signOut() clears the session and returns to Idle', () async {
       var called = false;
       final presenter = buildPresenter(
-        restoreSessionUseCase: () async =>
-            const RestoreSessionOutcome.restored(),
+        restoreSessionUseCase: () async => sessionRestored(),
         logoutUseCase: () async {
           called = true;
-          return const LogoutOutcome.successful();
+          return loggedOut();
         },
       );
       await presenter.restoreSession();
@@ -195,8 +184,7 @@ void main() {
 
     test('signOut() still returns to Idle when the use case throws', () async {
       final presenter = buildPresenter(
-        restoreSessionUseCase: () async =>
-            const RestoreSessionOutcome.restored(),
+        restoreSessionUseCase: () async => sessionRestored(),
         logoutUseCase: () async => throw StateError('bridge down'),
       );
       await presenter.restoreSession();

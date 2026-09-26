@@ -96,7 +96,7 @@ void main() {
     testWidgets('remembers the search when the screen is shown again', (
       tester,
     ) async {
-      final presenter = presenterAnswering([loaded(_everyone)]);
+      final presenter = presenterAnswering([rosterLoaded(_everyone)]);
       await presenter.load();
       presenter.filter(nameQuery: 'bruno');
 
@@ -260,8 +260,8 @@ void main() {
       tester,
     ) async {
       final presenter = presenterAnswering([
-        loaded(_everyone),
-        loaded([_bruno]),
+        rosterLoaded(_everyone),
+        rosterLoaded([_bruno]),
       ]);
       await pumpStudents(tester, presenter);
       await pickLocations(tester, ['Alfa']);

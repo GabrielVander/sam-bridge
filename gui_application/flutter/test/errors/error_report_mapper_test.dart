@@ -1,15 +1,13 @@
 import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/errors/error_report.dart';
-import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/errors.dart';
 
 void main() {
   group('ErrorReportMapper.toViewModel', () {
     test('maps a network failure to a connectivity message', () {
-      const dto = ErrorReportDto(
-        kind: ErrorKindDto.network,
-        details: 'Request failed for operation dashboard',
-      );
+      final dto = networkFailure('Request failed for operation dashboard');
 
       final report = ErrorReportMapper.toViewModel(dto);
 
@@ -25,10 +23,7 @@ void main() {
     });
 
     test('maps an unexpected response to a message blaming the site', () {
-      const dto = ErrorReportDto(
-        kind: ErrorKindDto.unexpectedResponse,
-        details: 'missing table',
-      );
+      final dto = unexpectedResponseFailure('missing table');
 
       final report = ErrorReportMapper.toViewModel(dto);
 
@@ -39,10 +34,7 @@ void main() {
     });
 
     test('maps an expired session to a message asking to sign in again', () {
-      const dto = ErrorReportDto(
-        kind: ErrorKindDto.sessionExpired,
-        details: 'Session expired',
-      );
+      final dto = sessionExpiredFailure('Session expired');
 
       final report = ErrorReportMapper.toViewModel(dto);
 
@@ -50,9 +42,8 @@ void main() {
     });
 
     test('maps a local storage failure to a message about this device', () {
-      const dto = ErrorReportDto(
-        kind: ErrorKindDto.localStorage,
-        details: 'Unable to remove the credential file: Permission denied',
+      final dto = localStorageFailure(
+        'Unable to remove the credential file: Permission denied',
       );
 
       final report = ErrorReportMapper.toViewModel(dto);
@@ -64,7 +55,7 @@ void main() {
     });
 
     test('maps an unknown failure to a generic message', () {
-      const dto = ErrorReportDto(kind: ErrorKindDto.unknown, details: 'boom');
+      final dto = unknownFailure('boom');
 
       final report = ErrorReportMapper.toViewModel(dto);
 
@@ -73,10 +64,7 @@ void main() {
 
     test('passes the technical details through untouched', () {
       const details = 'outer: inner\nsecond line';
-      const dto = ErrorReportDto(
-        kind: ErrorKindDto.unexpectedResponse,
-        details: details,
-      );
+      final dto = unexpectedResponseFailure(details);
 
       final report = ErrorReportMapper.toViewModel(dto);
 

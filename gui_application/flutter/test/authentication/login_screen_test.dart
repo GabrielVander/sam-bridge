@@ -2,11 +2,13 @@ import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/authentication/login_screen.dart';
-import 'package:flutter_application/rust/api/authentication.dart';
-import 'package:flutter_application/rust/api/error_report.dart';
+import 'package:flutter_application/authentication/ports/login_use_case.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+
+import '../support/authentication.dart';
+import '../support/errors.dart';
 
 const _details = "Request failed for operation 'authentication'";
 
@@ -15,17 +17,17 @@ Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
 
 Future<List<(String, String)>> pumpLoginForm(
   WidgetTester tester, {
-  LoginOutcome result = const LoginOutcome.invalidEmailOrPassword(),
+  LoginUseCase? login,
 }) async {
   final attempts = <(String, String)>[];
+  final LoginUseCase answer = login ?? loginAnswering(loginRejected());
   final presenter = AuthPresenter(
-    loginUseCase: ({required email, required password}) async {
+    loginUseCase: ({required email, required password}) {
       attempts.add((email, password));
-      return result;
+      return answer(email: email, password: password);
     },
-    restoreSessionUseCase: () async =>
-        const RestoreSessionOutcome.notAvailable(),
-    logoutUseCase: () async => const LogoutOutcome.successful(),
+    restoreSessionUseCase: () async => noSavedSession(),
+    logoutUseCase: () async => loggedOut(),
   );
   final router = GoRouter(
     initialLocation: '/login',
@@ -52,13 +54,12 @@ Future<List<(String, String)>> pumpLoginForm(
 
 Future<void> pumpLogin(
   WidgetTester tester, {
-  required LoginOutcome result,
+  required LoginUseCase login,
 }) async {
   final presenter = AuthPresenter(
-    loginUseCase: ({required email, required password}) async => result,
-    restoreSessionUseCase: () async =>
-        const RestoreSessionOutcome.notAvailable(),
-    logoutUseCase: () async => const LogoutOutcome.successful(),
+    loginUseCase: login,
+    restoreSessionUseCase: () async => noSavedSession(),
+    logoutUseCase: () async => loggedOut(),
   );
 
   await tester.pumpWidget(
@@ -85,9 +86,7 @@ void main() {
     ) async {
       await pumpLogin(
         tester,
-        result: const LoginOutcome.failure(
-          report: ErrorReportDto(kind: ErrorKindDto.network, details: _details),
-        ),
+        login: loginAnswering(loginFailed(networkFailure(_details))),
       );
 
       await tester.tap(find.text('Detalhes técnicos'));
@@ -109,7 +108,7 @@ void main() {
     ) async {
       final attempts = await pumpLoginForm(
         tester,
-        result: const LoginOutcome.successful(),
+        login: loginAnswering(loggedIn()),
       );
 
       await tester.enterText(_emailField, 'user@example.com');

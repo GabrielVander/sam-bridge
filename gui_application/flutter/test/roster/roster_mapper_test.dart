@@ -1,15 +1,16 @@
 import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:flutter_application/roster/roster_mapper.dart';
-import 'package:flutter_application/rust/api/roster.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/roster.dart';
 
 void main() {
   group('RosterMapper', () {
     test('maps a known position to its Portuguese label', () {
-      const dto = StudentSummaryDto(
+      final dto = studentSummary(
         id: '1',
         name: 'Jane Doe',
-        position: StudentPositionDto.youthService(),
+        position: Positions.youthService,
         location: 'Some Location',
       );
 
@@ -27,10 +28,10 @@ void main() {
     });
 
     test('maps an invalid position to its raw SAM string', () {
-      const dto = StudentSummaryDto(
+      final dto = studentSummary(
         id: '2',
         name: 'John Doe',
-        position: StudentPositionDto.invalid(raw: 'ALGO DESCONHECIDO'),
+        position: Positions.invalid('ALGO DESCONHECIDO'),
         location: 'Somewhere',
       );
 
@@ -42,10 +43,10 @@ void main() {
     group('instrument', () {
       StudentListItem mapInstrument(String? instrumentName) =>
           RosterMapper.toViewModel(
-            StudentSummaryDto(
+            studentSummary(
               id: '1',
               name: 'Jane Doe',
-              position: const StudentPositionDto.practice(),
+              position: Positions.practice,
               location: 'Some Location',
               instrumentName: instrumentName,
             ),
@@ -82,17 +83,17 @@ void main() {
     });
 
     test('maps a list of dtos preserving order', () {
-      const dtos = [
-        StudentSummaryDto(
+      final dtos = [
+        studentSummary(
           id: '1',
           name: 'A',
-          position: StudentPositionDto.candidate(),
+          position: Positions.candidate,
           location: 'L1',
         ),
-        StudentSummaryDto(
+        studentSummary(
           id: '2',
           name: 'B',
-          position: StudentPositionDto.gemSecretary(),
+          position: Positions.gemSecretary,
           location: 'L2',
         ),
       ];

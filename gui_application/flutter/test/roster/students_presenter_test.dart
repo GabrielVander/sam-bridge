@@ -1,46 +1,42 @@
-import 'dart:async';
-
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
-import 'package:flutter_application/rust/api/error_report.dart';
-import 'package:flutter_application/rust/api/roster.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/errors.dart';
+import '../support/roster.dart';
 
 void main() {
   group('StudentsPresenter', () {
     test('starts idle', () {
       final cubit = StudentsPresenter(
-        retrieveStudents: () async =>
-            const RetrieveAllAvailableStudentsOutcome.success(students: []),
+        retrieveStudents: () async => rosterLoaded([]),
       );
 
       expect(cubit.stateValue, isA<StudentsIdle>());
     });
 
     test('load() transitions Idle -> Loading -> Loaded on success', () async {
-      final completer = Completer<RetrieveAllAvailableStudentsOutcome>();
-      final cubit = StudentsPresenter(retrieveStudents: () => completer.future);
+      final roster = pendingRoster();
+      final cubit = StudentsPresenter(retrieveStudents: () => roster.future);
 
       final loadFuture = cubit.load();
       expect(cubit.stateValue, isA<StudentsLoading>());
 
-      completer.complete(
-        const RetrieveAllAvailableStudentsOutcome.success(
-          students: [
-            StudentSummaryDto(
-              id: '1',
-              name: 'Ana',
-              position: StudentPositionDto.candidate(),
-              location: 'Loc A',
-            ),
-            StudentSummaryDto(
-              id: '2',
-              name: 'Beto',
-              position: StudentPositionDto.youthService(),
-              location: 'Loc B',
-            ),
-          ],
-        ),
+      roster.complete(
+        rosterLoaded([
+          studentSummary(
+            id: '1',
+            name: 'Ana',
+            position: Positions.candidate,
+            location: 'Loc A',
+          ),
+          studentSummary(
+            id: '2',
+            name: 'Beto',
+            position: Positions.youthService,
+            location: 'Loc B',
+          ),
+        ]),
       );
       await loadFuture;
 
@@ -56,12 +52,7 @@ void main() {
       () async {
         final cubit = StudentsPresenter(
           retrieveStudents: () async =>
-              const RetrieveAllAvailableStudentsOutcome.failure(
-                report: ErrorReportDto(
-                  kind: ErrorKindDto.unexpectedResponse,
-                  details: 'missing table',
-                ),
-              ),
+              rosterFailed(unexpectedResponseFailure('missing table')),
         );
 
         await cubit.load();
@@ -99,23 +90,20 @@ void main() {
 
     test('filter() narrows students by name query', () async {
       final cubit = StudentsPresenter(
-        retrieveStudents: () async =>
-            const RetrieveAllAvailableStudentsOutcome.success(
-              students: [
-                StudentSummaryDto(
-                  id: '1',
-                  name: 'Ana Silva',
-                  position: StudentPositionDto.candidate(),
-                  location: 'Loc A',
-                ),
-                StudentSummaryDto(
-                  id: '2',
-                  name: 'Beto Souza',
-                  position: StudentPositionDto.candidate(),
-                  location: 'Loc B',
-                ),
-              ],
-            ),
+        retrieveStudents: () async => rosterLoaded([
+          studentSummary(
+            id: '1',
+            name: 'Ana Silva',
+            position: Positions.candidate,
+            location: 'Loc A',
+          ),
+          studentSummary(
+            id: '2',
+            name: 'Beto Souza',
+            position: Positions.candidate,
+            location: 'Loc B',
+          ),
+        ]),
       );
 
       await cubit.load();
@@ -128,23 +116,20 @@ void main() {
 
     test('filter() narrows students by selected locations', () async {
       final cubit = StudentsPresenter(
-        retrieveStudents: () async =>
-            const RetrieveAllAvailableStudentsOutcome.success(
-              students: [
-                StudentSummaryDto(
-                  id: '1',
-                  name: 'Ana',
-                  position: StudentPositionDto.candidate(),
-                  location: 'Loc A',
-                ),
-                StudentSummaryDto(
-                  id: '2',
-                  name: 'Beto',
-                  position: StudentPositionDto.candidate(),
-                  location: 'Loc B',
-                ),
-              ],
-            ),
+        retrieveStudents: () async => rosterLoaded([
+          studentSummary(
+            id: '1',
+            name: 'Ana',
+            position: Positions.candidate,
+            location: 'Loc A',
+          ),
+          studentSummary(
+            id: '2',
+            name: 'Beto',
+            position: Positions.candidate,
+            location: 'Loc B',
+          ),
+        ]),
       );
 
       await cubit.load();
@@ -156,17 +141,14 @@ void main() {
 
     test('clearFilters() resets query and locations', () async {
       final cubit = StudentsPresenter(
-        retrieveStudents: () async =>
-            const RetrieveAllAvailableStudentsOutcome.success(
-              students: [
-                StudentSummaryDto(
-                  id: '1',
-                  name: 'Ana',
-                  position: StudentPositionDto.candidate(),
-                  location: 'Loc A',
-                ),
-              ],
-            ),
+        retrieveStudents: () async => rosterLoaded([
+          studentSummary(
+            id: '1',
+            name: 'Ana',
+            position: Positions.candidate,
+            location: 'Loc A',
+          ),
+        ]),
       );
 
       await cubit.load();

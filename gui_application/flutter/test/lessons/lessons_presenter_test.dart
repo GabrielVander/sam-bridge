@@ -1,20 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter_application/lessons/ports/assess_student_progress_use_case.dart';
 import 'package:flutter_application/lessons/ports/retrieve_student_lessons_use_case.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/errors/error_report.dart';
-import 'package:flutter_application/rust/api/error_report.dart';
-import 'package:flutter_application/rust/api/lessons.dart';
-import 'package:flutter_application/rust/api/progress.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _emptyLessonsSuccess = RetrieveStudentLessonsOutcome.success(
-  lessons: StudentLessonsDto(msa: [], method: []),
-);
-
-const _noInstrumentProgress =
-    AssessStudentProgressOutcome.noInstrumentAssigned();
+import '../support/errors.dart';
+import '../support/lessons.dart';
 
 LessonsPresenter _buildCubit({
   RetrieveStudentLessonsUseCase? retrieveStudentLessons,
@@ -22,10 +13,10 @@ LessonsPresenter _buildCubit({
 }) => LessonsPresenter(
   retrieveStudentLessons:
       retrieveStudentLessons ??
-      ({required studentId}) async => _emptyLessonsSuccess,
+      ({required studentId}) async => lessonsRetrieved(),
   assessStudentProgress:
       assessStudentProgress ??
-      ({required studentId}) async => _noInstrumentProgress,
+      ({required studentId}) async => noInstrumentAssigned(),
 );
 
 void main() {
@@ -37,21 +28,21 @@ void main() {
     });
 
     test('load() transitions Idle -> Loading -> Loaded on success', () async {
-      final completer = Completer<RetrieveStudentLessonsOutcome>();
+      final lessons = pendingLessons();
       final cubit = _buildCubit(
-        retrieveStudentLessons: ({required studentId}) => completer.future,
+        retrieveStudentLessons: ({required studentId}) => lessons.future,
       );
 
       final loadFuture = cubit.load('500132');
       expect(cubit.stateValue, isA<LessonsLoading>());
 
-      completer.complete(
-        const RetrieveStudentLessonsOutcome.success(
-          lessons: StudentLessonsDto(
-            msa: [LessonDto(id: '1')],
+      lessons.complete(
+        lessonsRetrieved(
+          studentLessons(
+            msa: [lesson(id: '1')],
             method: [
-              LessonDto(id: '2'),
-              LessonDto(id: '3'),
+              lesson(id: '2'),
+              lesson(id: '3'),
             ],
           ),
         ),
@@ -69,13 +60,9 @@ void main() {
       'load() transitions Loading -> Failure carrying the mapped error report',
       () async {
         final cubit = _buildCubit(
-          retrieveStudentLessons: ({required studentId}) async =>
-              const RetrieveStudentLessonsOutcome.failure(
-                report: ErrorReportDto(
-                  kind: ErrorKindDto.network,
-                  details: "Request failed for operation 'student_lessons'",
-                ),
-              ),
+          retrieveStudentLessons: ({required studentId}) async => lessonsFailed(
+            networkFailure("Request failed for operation 'student_lessons'"),
+          ),
         );
 
         await cubit.load('500132');
@@ -118,11 +105,11 @@ void main() {
       final cubit = _buildCubit(
         retrieveStudentLessons: ({required studentId}) async {
           receivedLessonsId = studentId;
-          return _emptyLessonsSuccess;
+          return lessonsRetrieved();
         },
         assessStudentProgress: ({required studentId}) async {
           receivedProgressId = studentId;
-          return _noInstrumentProgress;
+          return noInstrumentAssigned();
         },
       );
 
@@ -134,17 +121,15 @@ void main() {
 
     test('a successful progress outcome maps to ProgressAvailable', () async {
       final cubit = _buildCubit(
-        assessStudentProgress: ({required studentId}) async =>
-            const AssessStudentProgressOutcome.success(
-              assessment: ProgressAssessmentDto(
-                checkpoints: [],
-                msaRelativePercent: 50,
-                methodRelativePercent: 25,
-                combinedPercent: 37.5,
-                overallCheckpointPercent: 60,
-                nextLevel: MusicianLevelDto.officialService(),
-              ),
-            ),
+        assessStudentProgress: ({required studentId}) async => progressAssessed(
+          progressAssessment(
+            msaRelativePercent: 50,
+            methodRelativePercent: 25,
+            combinedPercent: 37.5,
+            overallCheckpointPercent: 60,
+            nextLevel: Levels.officialService,
+          ),
+        ),
       );
 
       await cubit.load('500132');
@@ -161,9 +146,7 @@ void main() {
       () async {
         final cubit = _buildCubit(
           assessStudentProgress: ({required studentId}) async =>
-              const AssessStudentProgressOutcome.unknownLevel(
-                rawLevel: 'EXÓTICO',
-              ),
+              levelNotRecognized('EXÓTICO'),
         );
 
         await cubit.load('500132');
@@ -181,12 +164,7 @@ void main() {
       () async {
         final cubit = _buildCubit(
           assessStudentProgress: ({required studentId}) async =>
-              const AssessStudentProgressOutcome.failure(
-                report: ErrorReportDto(
-                  kind: ErrorKindDto.sessionExpired,
-                  details: 'Session expired',
-                ),
-              ),
+              progressFailed(sessionExpiredFailure('Session expired')),
         );
 
         await cubit.load('500132');
@@ -205,8 +183,7 @@ void main() {
 
     test('a non-musician maps to ProgressNotAMusician', () async {
       final cubit = _buildCubit(
-        assessStudentProgress: ({required studentId}) async =>
-            const AssessStudentProgressOutcome.notAMusician(),
+        assessStudentProgress: ({required studentId}) async => notAMusician(),
       );
 
       await cubit.load('500132');
