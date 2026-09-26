@@ -69,3 +69,24 @@ scripts/coverage.sh
 
 # Regenerate FRB bindings after changing anything under gui_application/src/api/
 cd gui_application/flutter && flutter_rust_bridge_codegen generate
+
+## Localization
+
+The UI speaks Brazilian Portuguese and English, chosen from the OS language:
+any Portuguese locale gets Portuguese, everything else gets English.
+Translations live in `gui_application/flutter/lib/l10n/app_<language>.arb`,
+with `app_pt.arb` as the template. Mappers hand widgets enums and dates, and
+widgets turn them into text through `context.l10n`.
+
+To add or change a message, edit every ARB file (a test checks they share the
+same keys) and regenerate the committed bindings:
+
+```sh
+cd gui_application/flutter && flutter gen-l10n
+```
+
+To add a language, add `app_<language>.arb`. When the OS language is not
+supported, Flutter falls back to the first entry of the generated
+`supportedLocales`, which gen-l10n sorts alphabetically, so a new language
+sorting before `en` must come with a `localeResolutionCallback` to keep English
+as the fallback.
