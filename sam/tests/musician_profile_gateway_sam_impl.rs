@@ -12,7 +12,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[path = "support/helpers.rs"]
 mod support;
-use support::{FakeSamClient, sam_operations_for, sam_student};
+use support::{FakeSamClient, UNREACHABLE_SITE, sam_operations_for, sam_student};
 
 #[test]
 fn returns_the_musicians_level_and_instrument() {
@@ -147,9 +147,8 @@ fn an_expired_session_is_reported_with_its_kind_and_details() {
 
 #[test]
 fn an_unreachable_site_is_a_network_error_naming_the_operation() {
-    // Port 1 is reserved and nothing listens on it, so the connection is refused.
     let gateway: MusicianProfileGatewaySamImpl =
-        build_gateway_for("http://127.0.0.1:1").expect("client should be built");
+        build_gateway_for(UNREACHABLE_SITE).expect("client should be built");
 
     let (kind, details) = failure_of(gateway.get_by_id(&StudentId::new("1".to_owned())))
         .expect("profile retrieval should have failed");

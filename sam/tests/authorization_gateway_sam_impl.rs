@@ -12,7 +12,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[path = "support/helpers.rs"]
 mod support;
-use support::sam_operations_for;
+use support::{UNREACHABLE_SITE, sam_operations_for};
 
 fn build_gateway(mock_server: &MockServer) -> Result<AuthorizationGatewaySamImpl, reqwest::Error> {
     let sam_operations: SamOperations = sam_operations_for(&mock_server.uri())?;
@@ -139,7 +139,7 @@ fn given_a_connection_failure_authorization_fails() {
 
         let sam_operations: SamOperations = SamOperations::new(
             client,
-            "http://127.0.0.1:1",
+            UNREACHABLE_SITE,
             "autenticar",
             "painel",
             "alunos/listagem",

@@ -13,7 +13,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[path = "support/helpers.rs"]
 mod support;
-use support::{FakeSamClient, sam_operations_for};
+use support::{FakeSamClient, UNREACHABLE_SITE, sam_operations_for};
 
 #[test]
 fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
@@ -133,9 +133,8 @@ fn given_an_unexpected_status_the_failure_names_it() {
 
 #[test]
 fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation() {
-    // Port 1 is reserved and nothing listens on it, so the connection is refused.
     let gateway: StudentLessonsGatewaySamImpl =
-        build_gateway_for("http://127.0.0.1:1").expect("gateway should be built");
+        build_gateway_for(UNREACHABLE_SITE).expect("gateway should be built");
 
     let (kind, details) =
         failure_of(gateway.get_all_for_student_with_id(&StudentId::new("500132".to_owned())))

@@ -14,7 +14,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[path = "support/helpers.rs"]
 mod support;
-use support::{FakeSamClient, sam_operations_for, sam_student};
+use support::{FakeSamClient, UNREACHABLE_SITE, sam_operations_for, sam_student};
 
 #[test]
 fn given_accessible_dashboard_students_should_be_retrieved_and_mapped() {
@@ -213,9 +213,8 @@ fn given_a_listing_that_is_not_json_the_details_explain_what_could_not_be_decode
 
 #[test]
 fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation() {
-    // Port 1 is reserved and nothing listens on it, so the connection is refused.
     let gateway: StudentGatewaySamImpl =
-        build_gateway_for("http://127.0.0.1:1").expect("client should be built");
+        build_gateway_for(UNREACHABLE_SITE).expect("client should be built");
 
     let (kind, details) =
         failure_of(gateway.get_available_records()).expect("students retrieval should have failed");

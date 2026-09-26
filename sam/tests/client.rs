@@ -7,7 +7,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 #[path = "support/helpers.rs"]
 mod support;
-use support::sam_client_for;
+use support::{UNREACHABLE_SITE, sam_client_for};
 
 #[test]
 fn given_student_lessons_page_should_parse_both_tables_from_a_single_fetch() {
@@ -198,7 +198,7 @@ fn given_connection_refused_should_fail() {
 
     let sam_operations: SamOperations = SamOperations::new(
         http_client,
-        "http://127.0.0.1:1",
+        UNREACHABLE_SITE,
         "autenticar",
         "painel",
         "alunos/listagem",
