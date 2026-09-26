@@ -6,6 +6,7 @@ use student::application::gateways::{FailureKind, StudentLessonsGatewayError};
 use student::application::use_cases::RetrieveStudentLessonsUseCase;
 use student::domain::entities::{Clef, Lesson, Range, StudentId, StudentLessons};
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::FakeStudentLessonsGateway;
 

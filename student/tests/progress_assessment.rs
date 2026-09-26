@@ -3,6 +3,7 @@ use student::domain::entities::{
     AssessError, CheckpointStatus, Instrument, Lesson, MusicianLevel, ProgressAssessment, assess,
 };
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::{checkpoint, method_lesson, method_phase_lesson, msa_lesson};
 

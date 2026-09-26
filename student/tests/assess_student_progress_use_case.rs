@@ -10,6 +10,7 @@ use student::domain::entities::{
     StudentId, StudentLessons,
 };
 
+#[path = "support/helpers.rs"]
 mod support;
 use support::{
     FakeMusicianProfileGateway, FakeStudentLessonsGateway, checkpoint, method_lesson, msa_lesson,
