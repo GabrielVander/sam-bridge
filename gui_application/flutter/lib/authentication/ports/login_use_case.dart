@@ -1,7 +1,7 @@
 import 'package:flutter_application/rust/api/authentication.dart';
 
 typedef LoginUseCase =
-    Future<LoginOutcome> Function({
+    Future<LoginOutcomeDto> Function({
       required String email,
       required String password,
     });

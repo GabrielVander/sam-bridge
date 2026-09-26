@@ -12,7 +12,7 @@ part of 'progress.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$AssessStudentProgressOutcome {
+mixin _$AssessStudentProgressOutcomeDto {
 
 
 
@@ -20,7 +20,7 @@ mixin _$AssessStudentProgressOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcome);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto);
 }
 
 
@@ -29,20 +29,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcome()';
+  return 'AssessStudentProgressOutcomeDto()';
 }
 
 
 }
 
 /// @nodoc
-class $AssessStudentProgressOutcomeCopyWith<$Res>  {
-$AssessStudentProgressOutcomeCopyWith(AssessStudentProgressOutcome _, $Res Function(AssessStudentProgressOutcome) __);
+class $AssessStudentProgressOutcomeDtoCopyWith<$Res>  {
+$AssessStudentProgressOutcomeDtoCopyWith(AssessStudentProgressOutcomeDto _, $Res Function(AssessStudentProgressOutcomeDto) __);
 }
 
 
-/// Adds pattern-matching-related methods to [AssessStudentProgressOutcome].
-extension AssessStudentProgressOutcomePatterns on AssessStudentProgressOutcome {
+/// Adds pattern-matching-related methods to [AssessStudentProgressOutcomeDto].
+extension AssessStudentProgressOutcomeDtoPatterns on AssessStudentProgressOutcomeDto {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -55,14 +55,14 @@ extension AssessStudentProgressOutcomePatterns on AssessStudentProgressOutcome {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AssessStudentProgressOutcome_Success value)?  success,TResult Function( AssessStudentProgressOutcome_NoInstrumentAssigned value)?  noInstrumentAssigned,TResult Function( AssessStudentProgressOutcome_UnknownLevel value)?  unknownLevel,TResult Function( AssessStudentProgressOutcome_NotAMusician value)?  notAMusician,TResult Function( AssessStudentProgressOutcome_Failure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AssessStudentProgressOutcomeDto_Success value)?  success,TResult Function( AssessStudentProgressOutcomeDto_NoInstrumentAssigned value)?  noInstrumentAssigned,TResult Function( AssessStudentProgressOutcomeDto_UnknownLevel value)?  unknownLevel,TResult Function( AssessStudentProgressOutcomeDto_NotAMusician value)?  notAMusician,TResult Function( AssessStudentProgressOutcomeDto_Failure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case AssessStudentProgressOutcome_Success() when success != null:
-return success(_that);case AssessStudentProgressOutcome_NoInstrumentAssigned() when noInstrumentAssigned != null:
-return noInstrumentAssigned(_that);case AssessStudentProgressOutcome_UnknownLevel() when unknownLevel != null:
-return unknownLevel(_that);case AssessStudentProgressOutcome_NotAMusician() when notAMusician != null:
-return notAMusician(_that);case AssessStudentProgressOutcome_Failure() when failure != null:
+case AssessStudentProgressOutcomeDto_Success() when success != null:
+return success(_that);case AssessStudentProgressOutcomeDto_NoInstrumentAssigned() when noInstrumentAssigned != null:
+return noInstrumentAssigned(_that);case AssessStudentProgressOutcomeDto_UnknownLevel() when unknownLevel != null:
+return unknownLevel(_that);case AssessStudentProgressOutcomeDto_NotAMusician() when notAMusician != null:
+return notAMusician(_that);case AssessStudentProgressOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return orElse();
 
@@ -81,14 +81,14 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AssessStudentProgressOutcome_Success value)  success,required TResult Function( AssessStudentProgressOutcome_NoInstrumentAssigned value)  noInstrumentAssigned,required TResult Function( AssessStudentProgressOutcome_UnknownLevel value)  unknownLevel,required TResult Function( AssessStudentProgressOutcome_NotAMusician value)  notAMusician,required TResult Function( AssessStudentProgressOutcome_Failure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AssessStudentProgressOutcomeDto_Success value)  success,required TResult Function( AssessStudentProgressOutcomeDto_NoInstrumentAssigned value)  noInstrumentAssigned,required TResult Function( AssessStudentProgressOutcomeDto_UnknownLevel value)  unknownLevel,required TResult Function( AssessStudentProgressOutcomeDto_NotAMusician value)  notAMusician,required TResult Function( AssessStudentProgressOutcomeDto_Failure value)  failure,}){
 final _that = this;
 switch (_that) {
-case AssessStudentProgressOutcome_Success():
-return success(_that);case AssessStudentProgressOutcome_NoInstrumentAssigned():
-return noInstrumentAssigned(_that);case AssessStudentProgressOutcome_UnknownLevel():
-return unknownLevel(_that);case AssessStudentProgressOutcome_NotAMusician():
-return notAMusician(_that);case AssessStudentProgressOutcome_Failure():
+case AssessStudentProgressOutcomeDto_Success():
+return success(_that);case AssessStudentProgressOutcomeDto_NoInstrumentAssigned():
+return noInstrumentAssigned(_that);case AssessStudentProgressOutcomeDto_UnknownLevel():
+return unknownLevel(_that);case AssessStudentProgressOutcomeDto_NotAMusician():
+return notAMusician(_that);case AssessStudentProgressOutcomeDto_Failure():
 return failure(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -103,14 +103,14 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AssessStudentProgressOutcome_Success value)?  success,TResult? Function( AssessStudentProgressOutcome_NoInstrumentAssigned value)?  noInstrumentAssigned,TResult? Function( AssessStudentProgressOutcome_UnknownLevel value)?  unknownLevel,TResult? Function( AssessStudentProgressOutcome_NotAMusician value)?  notAMusician,TResult? Function( AssessStudentProgressOutcome_Failure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AssessStudentProgressOutcomeDto_Success value)?  success,TResult? Function( AssessStudentProgressOutcomeDto_NoInstrumentAssigned value)?  noInstrumentAssigned,TResult? Function( AssessStudentProgressOutcomeDto_UnknownLevel value)?  unknownLevel,TResult? Function( AssessStudentProgressOutcomeDto_NotAMusician value)?  notAMusician,TResult? Function( AssessStudentProgressOutcomeDto_Failure value)?  failure,}){
 final _that = this;
 switch (_that) {
-case AssessStudentProgressOutcome_Success() when success != null:
-return success(_that);case AssessStudentProgressOutcome_NoInstrumentAssigned() when noInstrumentAssigned != null:
-return noInstrumentAssigned(_that);case AssessStudentProgressOutcome_UnknownLevel() when unknownLevel != null:
-return unknownLevel(_that);case AssessStudentProgressOutcome_NotAMusician() when notAMusician != null:
-return notAMusician(_that);case AssessStudentProgressOutcome_Failure() when failure != null:
+case AssessStudentProgressOutcomeDto_Success() when success != null:
+return success(_that);case AssessStudentProgressOutcomeDto_NoInstrumentAssigned() when noInstrumentAssigned != null:
+return noInstrumentAssigned(_that);case AssessStudentProgressOutcomeDto_UnknownLevel() when unknownLevel != null:
+return unknownLevel(_that);case AssessStudentProgressOutcomeDto_NotAMusician() when notAMusician != null:
+return notAMusician(_that);case AssessStudentProgressOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return null;
 
@@ -130,11 +130,11 @@ return failure(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( ProgressAssessmentDto assessment)?  success,TResult Function()?  noInstrumentAssigned,TResult Function( String rawLevel)?  unknownLevel,TResult Function()?  notAMusician,TResult Function( ErrorReportDto report)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case AssessStudentProgressOutcome_Success() when success != null:
-return success(_that.assessment);case AssessStudentProgressOutcome_NoInstrumentAssigned() when noInstrumentAssigned != null:
-return noInstrumentAssigned();case AssessStudentProgressOutcome_UnknownLevel() when unknownLevel != null:
-return unknownLevel(_that.rawLevel);case AssessStudentProgressOutcome_NotAMusician() when notAMusician != null:
-return notAMusician();case AssessStudentProgressOutcome_Failure() when failure != null:
+case AssessStudentProgressOutcomeDto_Success() when success != null:
+return success(_that.assessment);case AssessStudentProgressOutcomeDto_NoInstrumentAssigned() when noInstrumentAssigned != null:
+return noInstrumentAssigned();case AssessStudentProgressOutcomeDto_UnknownLevel() when unknownLevel != null:
+return unknownLevel(_that.rawLevel);case AssessStudentProgressOutcomeDto_NotAMusician() when notAMusician != null:
+return notAMusician();case AssessStudentProgressOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return orElse();
 
@@ -155,11 +155,11 @@ return failure(_that.report);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( ProgressAssessmentDto assessment)  success,required TResult Function()  noInstrumentAssigned,required TResult Function( String rawLevel)  unknownLevel,required TResult Function()  notAMusician,required TResult Function( ErrorReportDto report)  failure,}) {final _that = this;
 switch (_that) {
-case AssessStudentProgressOutcome_Success():
-return success(_that.assessment);case AssessStudentProgressOutcome_NoInstrumentAssigned():
-return noInstrumentAssigned();case AssessStudentProgressOutcome_UnknownLevel():
-return unknownLevel(_that.rawLevel);case AssessStudentProgressOutcome_NotAMusician():
-return notAMusician();case AssessStudentProgressOutcome_Failure():
+case AssessStudentProgressOutcomeDto_Success():
+return success(_that.assessment);case AssessStudentProgressOutcomeDto_NoInstrumentAssigned():
+return noInstrumentAssigned();case AssessStudentProgressOutcomeDto_UnknownLevel():
+return unknownLevel(_that.rawLevel);case AssessStudentProgressOutcomeDto_NotAMusician():
+return notAMusician();case AssessStudentProgressOutcomeDto_Failure():
 return failure(_that.report);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -176,11 +176,11 @@ return failure(_that.report);}
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( ProgressAssessmentDto assessment)?  success,TResult? Function()?  noInstrumentAssigned,TResult? Function( String rawLevel)?  unknownLevel,TResult? Function()?  notAMusician,TResult? Function( ErrorReportDto report)?  failure,}) {final _that = this;
 switch (_that) {
-case AssessStudentProgressOutcome_Success() when success != null:
-return success(_that.assessment);case AssessStudentProgressOutcome_NoInstrumentAssigned() when noInstrumentAssigned != null:
-return noInstrumentAssigned();case AssessStudentProgressOutcome_UnknownLevel() when unknownLevel != null:
-return unknownLevel(_that.rawLevel);case AssessStudentProgressOutcome_NotAMusician() when notAMusician != null:
-return notAMusician();case AssessStudentProgressOutcome_Failure() when failure != null:
+case AssessStudentProgressOutcomeDto_Success() when success != null:
+return success(_that.assessment);case AssessStudentProgressOutcomeDto_NoInstrumentAssigned() when noInstrumentAssigned != null:
+return noInstrumentAssigned();case AssessStudentProgressOutcomeDto_UnknownLevel() when unknownLevel != null:
+return unknownLevel(_that.rawLevel);case AssessStudentProgressOutcomeDto_NotAMusician() when notAMusician != null:
+return notAMusician();case AssessStudentProgressOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return null;
 
@@ -192,23 +192,23 @@ return failure(_that.report);case _:
 /// @nodoc
 
 
-class AssessStudentProgressOutcome_Success extends AssessStudentProgressOutcome {
-  const AssessStudentProgressOutcome_Success({required this.assessment}): super._();
+class AssessStudentProgressOutcomeDto_Success extends AssessStudentProgressOutcomeDto {
+  const AssessStudentProgressOutcomeDto_Success({required this.assessment}): super._();
   
 
  final  ProgressAssessmentDto assessment;
 
-/// Create a copy of AssessStudentProgressOutcome
+/// Create a copy of AssessStudentProgressOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$AssessStudentProgressOutcome_SuccessCopyWith<AssessStudentProgressOutcome_Success> get copyWith => _$AssessStudentProgressOutcome_SuccessCopyWithImpl<AssessStudentProgressOutcome_Success>(this, _$identity);
+$AssessStudentProgressOutcomeDto_SuccessCopyWith<AssessStudentProgressOutcomeDto_Success> get copyWith => _$AssessStudentProgressOutcomeDto_SuccessCopyWithImpl<AssessStudentProgressOutcomeDto_Success>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcome_Success&&(identical(other.assessment, assessment) || other.assessment == assessment));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_Success&&(identical(other.assessment, assessment) || other.assessment == assessment));
 }
 
 
@@ -217,15 +217,15 @@ int get hashCode => Object.hash(runtimeType,assessment);
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcome.success(assessment: $assessment)';
+  return 'AssessStudentProgressOutcomeDto.success(assessment: $assessment)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $AssessStudentProgressOutcome_SuccessCopyWith<$Res> implements $AssessStudentProgressOutcomeCopyWith<$Res> {
-  factory $AssessStudentProgressOutcome_SuccessCopyWith(AssessStudentProgressOutcome_Success value, $Res Function(AssessStudentProgressOutcome_Success) _then) = _$AssessStudentProgressOutcome_SuccessCopyWithImpl;
+abstract mixin class $AssessStudentProgressOutcomeDto_SuccessCopyWith<$Res> implements $AssessStudentProgressOutcomeDtoCopyWith<$Res> {
+  factory $AssessStudentProgressOutcomeDto_SuccessCopyWith(AssessStudentProgressOutcomeDto_Success value, $Res Function(AssessStudentProgressOutcomeDto_Success) _then) = _$AssessStudentProgressOutcomeDto_SuccessCopyWithImpl;
 @useResult
 $Res call({
  ProgressAssessmentDto assessment
@@ -236,17 +236,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$AssessStudentProgressOutcome_SuccessCopyWithImpl<$Res>
-    implements $AssessStudentProgressOutcome_SuccessCopyWith<$Res> {
-  _$AssessStudentProgressOutcome_SuccessCopyWithImpl(this._self, this._then);
+class _$AssessStudentProgressOutcomeDto_SuccessCopyWithImpl<$Res>
+    implements $AssessStudentProgressOutcomeDto_SuccessCopyWith<$Res> {
+  _$AssessStudentProgressOutcomeDto_SuccessCopyWithImpl(this._self, this._then);
 
-  final AssessStudentProgressOutcome_Success _self;
-  final $Res Function(AssessStudentProgressOutcome_Success) _then;
+  final AssessStudentProgressOutcomeDto_Success _self;
+  final $Res Function(AssessStudentProgressOutcomeDto_Success) _then;
 
-/// Create a copy of AssessStudentProgressOutcome
+/// Create a copy of AssessStudentProgressOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? assessment = null,}) {
-  return _then(AssessStudentProgressOutcome_Success(
+  return _then(AssessStudentProgressOutcomeDto_Success(
 assessment: null == assessment ? _self.assessment : assessment // ignore: cast_nullable_to_non_nullable
 as ProgressAssessmentDto,
   ));
@@ -258,8 +258,8 @@ as ProgressAssessmentDto,
 /// @nodoc
 
 
-class AssessStudentProgressOutcome_NoInstrumentAssigned extends AssessStudentProgressOutcome {
-  const AssessStudentProgressOutcome_NoInstrumentAssigned(): super._();
+class AssessStudentProgressOutcomeDto_NoInstrumentAssigned extends AssessStudentProgressOutcomeDto {
+  const AssessStudentProgressOutcomeDto_NoInstrumentAssigned(): super._();
   
 
 
@@ -269,7 +269,7 @@ class AssessStudentProgressOutcome_NoInstrumentAssigned extends AssessStudentPro
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcome_NoInstrumentAssigned);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_NoInstrumentAssigned);
 }
 
 
@@ -278,7 +278,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcome.noInstrumentAssigned()';
+  return 'AssessStudentProgressOutcomeDto.noInstrumentAssigned()';
 }
 
 
@@ -290,23 +290,23 @@ String toString() {
 /// @nodoc
 
 
-class AssessStudentProgressOutcome_UnknownLevel extends AssessStudentProgressOutcome {
-  const AssessStudentProgressOutcome_UnknownLevel({required this.rawLevel}): super._();
+class AssessStudentProgressOutcomeDto_UnknownLevel extends AssessStudentProgressOutcomeDto {
+  const AssessStudentProgressOutcomeDto_UnknownLevel({required this.rawLevel}): super._();
   
 
  final  String rawLevel;
 
-/// Create a copy of AssessStudentProgressOutcome
+/// Create a copy of AssessStudentProgressOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$AssessStudentProgressOutcome_UnknownLevelCopyWith<AssessStudentProgressOutcome_UnknownLevel> get copyWith => _$AssessStudentProgressOutcome_UnknownLevelCopyWithImpl<AssessStudentProgressOutcome_UnknownLevel>(this, _$identity);
+$AssessStudentProgressOutcomeDto_UnknownLevelCopyWith<AssessStudentProgressOutcomeDto_UnknownLevel> get copyWith => _$AssessStudentProgressOutcomeDto_UnknownLevelCopyWithImpl<AssessStudentProgressOutcomeDto_UnknownLevel>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcome_UnknownLevel&&(identical(other.rawLevel, rawLevel) || other.rawLevel == rawLevel));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_UnknownLevel&&(identical(other.rawLevel, rawLevel) || other.rawLevel == rawLevel));
 }
 
 
@@ -315,15 +315,15 @@ int get hashCode => Object.hash(runtimeType,rawLevel);
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcome.unknownLevel(rawLevel: $rawLevel)';
+  return 'AssessStudentProgressOutcomeDto.unknownLevel(rawLevel: $rawLevel)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $AssessStudentProgressOutcome_UnknownLevelCopyWith<$Res> implements $AssessStudentProgressOutcomeCopyWith<$Res> {
-  factory $AssessStudentProgressOutcome_UnknownLevelCopyWith(AssessStudentProgressOutcome_UnknownLevel value, $Res Function(AssessStudentProgressOutcome_UnknownLevel) _then) = _$AssessStudentProgressOutcome_UnknownLevelCopyWithImpl;
+abstract mixin class $AssessStudentProgressOutcomeDto_UnknownLevelCopyWith<$Res> implements $AssessStudentProgressOutcomeDtoCopyWith<$Res> {
+  factory $AssessStudentProgressOutcomeDto_UnknownLevelCopyWith(AssessStudentProgressOutcomeDto_UnknownLevel value, $Res Function(AssessStudentProgressOutcomeDto_UnknownLevel) _then) = _$AssessStudentProgressOutcomeDto_UnknownLevelCopyWithImpl;
 @useResult
 $Res call({
  String rawLevel
@@ -334,17 +334,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$AssessStudentProgressOutcome_UnknownLevelCopyWithImpl<$Res>
-    implements $AssessStudentProgressOutcome_UnknownLevelCopyWith<$Res> {
-  _$AssessStudentProgressOutcome_UnknownLevelCopyWithImpl(this._self, this._then);
+class _$AssessStudentProgressOutcomeDto_UnknownLevelCopyWithImpl<$Res>
+    implements $AssessStudentProgressOutcomeDto_UnknownLevelCopyWith<$Res> {
+  _$AssessStudentProgressOutcomeDto_UnknownLevelCopyWithImpl(this._self, this._then);
 
-  final AssessStudentProgressOutcome_UnknownLevel _self;
-  final $Res Function(AssessStudentProgressOutcome_UnknownLevel) _then;
+  final AssessStudentProgressOutcomeDto_UnknownLevel _self;
+  final $Res Function(AssessStudentProgressOutcomeDto_UnknownLevel) _then;
 
-/// Create a copy of AssessStudentProgressOutcome
+/// Create a copy of AssessStudentProgressOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? rawLevel = null,}) {
-  return _then(AssessStudentProgressOutcome_UnknownLevel(
+  return _then(AssessStudentProgressOutcomeDto_UnknownLevel(
 rawLevel: null == rawLevel ? _self.rawLevel : rawLevel // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -356,8 +356,8 @@ as String,
 /// @nodoc
 
 
-class AssessStudentProgressOutcome_NotAMusician extends AssessStudentProgressOutcome {
-  const AssessStudentProgressOutcome_NotAMusician(): super._();
+class AssessStudentProgressOutcomeDto_NotAMusician extends AssessStudentProgressOutcomeDto {
+  const AssessStudentProgressOutcomeDto_NotAMusician(): super._();
   
 
 
@@ -367,7 +367,7 @@ class AssessStudentProgressOutcome_NotAMusician extends AssessStudentProgressOut
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcome_NotAMusician);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_NotAMusician);
 }
 
 
@@ -376,7 +376,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcome.notAMusician()';
+  return 'AssessStudentProgressOutcomeDto.notAMusician()';
 }
 
 
@@ -388,23 +388,23 @@ String toString() {
 /// @nodoc
 
 
-class AssessStudentProgressOutcome_Failure extends AssessStudentProgressOutcome {
-  const AssessStudentProgressOutcome_Failure({required this.report}): super._();
+class AssessStudentProgressOutcomeDto_Failure extends AssessStudentProgressOutcomeDto {
+  const AssessStudentProgressOutcomeDto_Failure({required this.report}): super._();
   
 
  final  ErrorReportDto report;
 
-/// Create a copy of AssessStudentProgressOutcome
+/// Create a copy of AssessStudentProgressOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$AssessStudentProgressOutcome_FailureCopyWith<AssessStudentProgressOutcome_Failure> get copyWith => _$AssessStudentProgressOutcome_FailureCopyWithImpl<AssessStudentProgressOutcome_Failure>(this, _$identity);
+$AssessStudentProgressOutcomeDto_FailureCopyWith<AssessStudentProgressOutcomeDto_Failure> get copyWith => _$AssessStudentProgressOutcomeDto_FailureCopyWithImpl<AssessStudentProgressOutcomeDto_Failure>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcome_Failure&&(identical(other.report, report) || other.report == report));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
@@ -413,15 +413,15 @@ int get hashCode => Object.hash(runtimeType,report);
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcome.failure(report: $report)';
+  return 'AssessStudentProgressOutcomeDto.failure(report: $report)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $AssessStudentProgressOutcome_FailureCopyWith<$Res> implements $AssessStudentProgressOutcomeCopyWith<$Res> {
-  factory $AssessStudentProgressOutcome_FailureCopyWith(AssessStudentProgressOutcome_Failure value, $Res Function(AssessStudentProgressOutcome_Failure) _then) = _$AssessStudentProgressOutcome_FailureCopyWithImpl;
+abstract mixin class $AssessStudentProgressOutcomeDto_FailureCopyWith<$Res> implements $AssessStudentProgressOutcomeDtoCopyWith<$Res> {
+  factory $AssessStudentProgressOutcomeDto_FailureCopyWith(AssessStudentProgressOutcomeDto_Failure value, $Res Function(AssessStudentProgressOutcomeDto_Failure) _then) = _$AssessStudentProgressOutcomeDto_FailureCopyWithImpl;
 @useResult
 $Res call({
  ErrorReportDto report
@@ -432,17 +432,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$AssessStudentProgressOutcome_FailureCopyWithImpl<$Res>
-    implements $AssessStudentProgressOutcome_FailureCopyWith<$Res> {
-  _$AssessStudentProgressOutcome_FailureCopyWithImpl(this._self, this._then);
+class _$AssessStudentProgressOutcomeDto_FailureCopyWithImpl<$Res>
+    implements $AssessStudentProgressOutcomeDto_FailureCopyWith<$Res> {
+  _$AssessStudentProgressOutcomeDto_FailureCopyWithImpl(this._self, this._then);
 
-  final AssessStudentProgressOutcome_Failure _self;
-  final $Res Function(AssessStudentProgressOutcome_Failure) _then;
+  final AssessStudentProgressOutcomeDto_Failure _self;
+  final $Res Function(AssessStudentProgressOutcomeDto_Failure) _then;
 
-/// Create a copy of AssessStudentProgressOutcome
+/// Create a copy of AssessStudentProgressOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? report = null,}) {
-  return _then(AssessStudentProgressOutcome_Failure(
+  return _then(AssessStudentProgressOutcomeDto_Failure(
 report: null == report ? _self.report : report // ignore: cast_nullable_to_non_nullable
 as ErrorReportDto,
   ));

@@ -58,14 +58,14 @@ class AuthPresenter extends CubitSignal<AuthState> {
   Future<void> restoreSession() async {
     emit(const AuthLoading());
     try {
-      final RestoreSessionOutcome outcome = await restoreSessionUseCase();
+      final RestoreSessionOutcomeDto outcome = await restoreSessionUseCase();
 
       switch (outcome) {
-        case RestoreSessionOutcome_Restored():
+        case RestoreSessionOutcomeDto_Restored():
           emit(const AuthSuccess());
-        case RestoreSessionOutcome_NotAvailable():
+        case RestoreSessionOutcomeDto_NotAvailable():
           emit(const AuthIdle());
-        case RestoreSessionOutcome_Failure():
+        case RestoreSessionOutcomeDto_Failure():
           emit(const AuthIdle());
       }
     } catch (_) {
@@ -82,17 +82,17 @@ class AuthPresenter extends CubitSignal<AuthState> {
 
     emit(const AuthLoading());
     try {
-      final LoginOutcome outcome = await loginUseCase(
+      final LoginOutcomeDto outcome = await loginUseCase(
         email: username,
         password: password,
       );
 
       switch (outcome) {
-        case LoginOutcome_Successful():
+        case LoginOutcomeDto_Successful():
           emit(const AuthSuccess());
-        case LoginOutcome_InvalidEmailOrPassword():
+        case LoginOutcomeDto_InvalidEmailOrPassword():
           emit(const AuthUnauthorized());
-        case LoginOutcome_Failure(:final report):
+        case LoginOutcomeDto_Failure(:final report):
           emit(AuthFailure(ErrorReportMapper.toViewModel(report)));
       }
     } catch (e) {
@@ -104,12 +104,12 @@ class AuthPresenter extends CubitSignal<AuthState> {
     emit(const AuthLoading());
 
     try {
-      final LogoutOutcome outcome = await logoutUseCase();
+      final LogoutOutcomeDto outcome = await logoutUseCase();
 
       switch (outcome) {
-        case LogoutOutcome_Successful():
+        case LogoutOutcomeDto_Successful():
           emit(const AuthIdle());
-        case LogoutOutcome_Failure(:final ErrorReportDto report):
+        case LogoutOutcomeDto_Failure(:final ErrorReportDto report):
           emit(AuthFailure(ErrorReportMapper.toViewModel(report)));
       }
     } catch (_) {

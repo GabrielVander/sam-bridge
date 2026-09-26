@@ -78,14 +78,14 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
       final progressOutcome = await progressFuture;
 
       switch (lessonsOutcome) {
-        case RetrieveStudentLessonsOutcome_Success(:final lessons):
+        case RetrieveStudentLessonsOutcomeDto_Success(:final lessons):
           emit(
             LessonsLoaded(
               LessonsMapper.toViewModel(lessons),
               _toProgressStatus(progressOutcome),
             ),
           );
-        case RetrieveStudentLessonsOutcome_Failure(:final report):
+        case RetrieveStudentLessonsOutcomeDto_Failure(:final report):
           emit(LessonsFailure(ErrorReportMapper.toViewModel(report)));
       }
     } catch (e) {
@@ -93,17 +93,17 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
     }
   }
 
-  ProgressStatus _toProgressStatus(AssessStudentProgressOutcome outcome) =>
+  ProgressStatus _toProgressStatus(AssessStudentProgressOutcomeDto outcome) =>
       switch (outcome) {
-        AssessStudentProgressOutcome_Success(:final assessment) =>
+        AssessStudentProgressOutcomeDto_Success(:final assessment) =>
           ProgressAvailable(ProgressMapper.toViewModel(assessment)),
-        AssessStudentProgressOutcome_NoInstrumentAssigned() =>
+        AssessStudentProgressOutcomeDto_NoInstrumentAssigned() =>
           const ProgressNoInstrumentAssigned(),
-        AssessStudentProgressOutcome_UnknownLevel(:final rawLevel) =>
+        AssessStudentProgressOutcomeDto_UnknownLevel(:final rawLevel) =>
           ProgressUnknownLevel(rawLevel),
-        AssessStudentProgressOutcome_NotAMusician() =>
+        AssessStudentProgressOutcomeDto_NotAMusician() =>
           const ProgressNotAMusician(),
-        AssessStudentProgressOutcome_Failure(:final report) =>
+        AssessStudentProgressOutcomeDto_Failure(:final report) =>
           ProgressUnavailable(ErrorReportMapper.toViewModel(report)),
       };
 }

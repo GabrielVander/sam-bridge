@@ -39,7 +39,7 @@ pub struct ProgressAssessmentDto {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum AssessStudentProgressOutcome {
+pub enum AssessStudentProgressOutcomeDto {
     Success { assessment: ProgressAssessmentDto },
     NoInstrumentAssigned,
     UnknownLevel { raw_level: String },
@@ -48,7 +48,7 @@ pub enum AssessStudentProgressOutcome {
 }
 
 impl From<Result<student_entities::ProgressAssessment, AssessStudentProgressError>>
-    for AssessStudentProgressOutcome
+    for AssessStudentProgressOutcomeDto
 {
     fn from(
         result: Result<student_entities::ProgressAssessment, AssessStudentProgressError>,

@@ -3,7 +3,6 @@ import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/rust/api/authentication.dart';
-import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_application/rust/api/progress.dart';
 import 'package:flutter_application/rust/api/roster.dart';
@@ -11,10 +10,10 @@ import 'package:flutter_application/rust/api/roster.dart';
 import 'roster.dart';
 
 Future<SamSiteApp> composeFakeApp({
-  RestoreSessionOutcome restoreSession =
-      const RestoreSessionOutcome.notAvailable(),
-  LoginOutcome login = const LoginOutcome.successful(),
-  LogoutOutcome logout = const LogoutOutcome.successful(),
+  RestoreSessionOutcomeDto restoreSession =
+      const RestoreSessionOutcomeDto.notAvailable(),
+  LoginOutcomeDto login = const LoginOutcomeDto.successful(),
+  LogoutOutcomeDto logout = const LogoutOutcomeDto.successful(),
   List<StudentSummaryDto>? students,
   String versionDisplay = 'v1.0.0+1',
 }) async {
@@ -24,17 +23,19 @@ Future<SamSiteApp> composeFakeApp({
     logoutUseCase: () async => logout,
   );
   final StudentsPresenter studentsPresenter = StudentsPresenter(
-    retrieveStudents: () async => RetrieveAllAvailableStudentsOutcome.success(
-      students: students ?? [studentSummary(id: '500132', name: 'Jane Doe')],
-    ),
+    retrieveStudents: () async =>
+        RetrieveAllAvailableStudentsOutcomeDto.success(
+          students:
+              students ?? [studentSummary(id: '500132', name: 'Jane Doe')],
+        ),
   );
   final LessonsPresenter lessonsPresenter = LessonsPresenter(
     retrieveStudentLessons: ({required studentId}) async =>
-        const RetrieveStudentLessonsOutcome.success(
+        const RetrieveStudentLessonsOutcomeDto.success(
           lessons: StudentLessonsDto(msa: [], method: []),
         ),
     assessStudentProgress: ({required studentId}) async =>
-        const AssessStudentProgressOutcome.noInstrumentAssigned(),
+        const AssessStudentProgressOutcomeDto.noInstrumentAssigned(),
   );
 
   await authPresenter.restoreSession();
@@ -46,8 +47,3 @@ Future<SamSiteApp> composeFakeApp({
     lessonsPresenter: lessonsPresenter,
   );
 }
-
-LogoutOutcome logoutUnableToClearStoredCredentials({required String details}) =>
-    LogoutOutcome.failure(
-      report: ErrorReportDto(kind: ErrorKindDto.localStorage, details: details),
-    );

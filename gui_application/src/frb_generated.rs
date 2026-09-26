@@ -435,7 +435,7 @@ impl SseDecode for String {
     }
 }
 
-impl SseDecode for crate::api::progress::AssessStudentProgressOutcome {
+impl SseDecode for crate::api::progress::AssessStudentProgressOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut tag_ = <i32>::sse_decode(deserializer);
@@ -443,26 +443,26 @@ impl SseDecode for crate::api::progress::AssessStudentProgressOutcome {
             0 => {
                 let mut var_assessment =
                     <crate::api::progress::ProgressAssessmentDto>::sse_decode(deserializer);
-                return crate::api::progress::AssessStudentProgressOutcome::Success {
+                return crate::api::progress::AssessStudentProgressOutcomeDto::Success {
                     assessment: var_assessment,
                 };
             }
             1 => {
-                return crate::api::progress::AssessStudentProgressOutcome::NoInstrumentAssigned;
+                return crate::api::progress::AssessStudentProgressOutcomeDto::NoInstrumentAssigned;
             }
             2 => {
                 let mut var_rawLevel = <String>::sse_decode(deserializer);
-                return crate::api::progress::AssessStudentProgressOutcome::UnknownLevel {
+                return crate::api::progress::AssessStudentProgressOutcomeDto::UnknownLevel {
                     raw_level: var_rawLevel,
                 };
             }
             3 => {
-                return crate::api::progress::AssessStudentProgressOutcome::NotAMusician;
+                return crate::api::progress::AssessStudentProgressOutcomeDto::NotAMusician;
             }
             4 => {
                 let mut var_report =
                     <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
-                return crate::api::progress::AssessStudentProgressOutcome::Failure {
+                return crate::api::progress::AssessStudentProgressOutcomeDto::Failure {
                     report: var_report,
                 };
             }
@@ -643,21 +643,21 @@ impl SseDecode for Vec<crate::api::roster::StudentSummaryDto> {
     }
 }
 
-impl SseDecode for crate::api::authentication::LoginOutcome {
+impl SseDecode for crate::api::authentication::LoginOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut tag_ = <i32>::sse_decode(deserializer);
         match tag_ {
             0 => {
-                return crate::api::authentication::LoginOutcome::Successful;
+                return crate::api::authentication::LoginOutcomeDto::Successful;
             }
             1 => {
-                return crate::api::authentication::LoginOutcome::InvalidEmailOrPassword;
+                return crate::api::authentication::LoginOutcomeDto::InvalidEmailOrPassword;
             }
             2 => {
                 let mut var_report =
                     <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
-                return crate::api::authentication::LoginOutcome::Failure { report: var_report };
+                return crate::api::authentication::LoginOutcomeDto::Failure { report: var_report };
             }
             _ => {
                 unimplemented!("");
@@ -666,18 +666,20 @@ impl SseDecode for crate::api::authentication::LoginOutcome {
     }
 }
 
-impl SseDecode for crate::api::authentication::LogoutOutcome {
+impl SseDecode for crate::api::authentication::LogoutOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut tag_ = <i32>::sse_decode(deserializer);
         match tag_ {
             0 => {
-                return crate::api::authentication::LogoutOutcome::Successful;
+                return crate::api::authentication::LogoutOutcomeDto::Successful;
             }
             1 => {
                 let mut var_report =
                     <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
-                return crate::api::authentication::LogoutOutcome::Failure { report: var_report };
+                return crate::api::authentication::LogoutOutcomeDto::Failure {
+                    report: var_report,
+                };
             }
             _ => {
                 unimplemented!("");
@@ -820,21 +822,21 @@ impl SseDecode for crate::api::progress::RequirementStatusDto {
     }
 }
 
-impl SseDecode for crate::api::authentication::RestoreSessionOutcome {
+impl SseDecode for crate::api::authentication::RestoreSessionOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut tag_ = <i32>::sse_decode(deserializer);
         match tag_ {
             0 => {
-                return crate::api::authentication::RestoreSessionOutcome::Restored;
+                return crate::api::authentication::RestoreSessionOutcomeDto::Restored;
             }
             1 => {
-                return crate::api::authentication::RestoreSessionOutcome::NotAvailable;
+                return crate::api::authentication::RestoreSessionOutcomeDto::NotAvailable;
             }
             2 => {
                 let mut var_report =
                     <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
-                return crate::api::authentication::RestoreSessionOutcome::Failure {
+                return crate::api::authentication::RestoreSessionOutcomeDto::Failure {
                     report: var_report,
                 };
             }
@@ -845,7 +847,7 @@ impl SseDecode for crate::api::authentication::RestoreSessionOutcome {
     }
 }
 
-impl SseDecode for crate::api::roster::RetrieveAllAvailableStudentsOutcome {
+impl SseDecode for crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut tag_ = <i32>::sse_decode(deserializer);
@@ -853,14 +855,14 @@ impl SseDecode for crate::api::roster::RetrieveAllAvailableStudentsOutcome {
             0 => {
                 let mut var_students =
                     <Vec<crate::api::roster::StudentSummaryDto>>::sse_decode(deserializer);
-                return crate::api::roster::RetrieveAllAvailableStudentsOutcome::Success {
+                return crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto::Success {
                     students: var_students,
                 };
             }
             1 => {
                 let mut var_report =
                     <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
-                return crate::api::roster::RetrieveAllAvailableStudentsOutcome::Failure {
+                return crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto::Failure {
                     report: var_report,
                 };
             }
@@ -871,7 +873,7 @@ impl SseDecode for crate::api::roster::RetrieveAllAvailableStudentsOutcome {
     }
 }
 
-impl SseDecode for crate::api::lessons::RetrieveStudentLessonsOutcome {
+impl SseDecode for crate::api::lessons::RetrieveStudentLessonsOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut tag_ = <i32>::sse_decode(deserializer);
@@ -879,14 +881,14 @@ impl SseDecode for crate::api::lessons::RetrieveStudentLessonsOutcome {
             0 => {
                 let mut var_lessons =
                     <crate::api::lessons::StudentLessonsDto>::sse_decode(deserializer);
-                return crate::api::lessons::RetrieveStudentLessonsOutcome::Success {
+                return crate::api::lessons::RetrieveStudentLessonsOutcomeDto::Success {
                     lessons: var_lessons,
                 };
             }
             1 => {
                 let mut var_report =
                     <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
-                return crate::api::lessons::RetrieveStudentLessonsOutcome::Failure {
+                return crate::api::lessons::RetrieveStudentLessonsOutcomeDto::Failure {
                     report: var_report,
                 };
             }
@@ -1075,22 +1077,22 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<ApplicationFacade>> for Applic
 }
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::progress::AssessStudentProgressOutcome {
+impl flutter_rust_bridge::IntoDart for crate::api::progress::AssessStudentProgressOutcomeDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::api::progress::AssessStudentProgressOutcome::Success { assessment } => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::Success { assessment } => {
                 [0.into_dart(), assessment.into_into_dart().into_dart()].into_dart()
             }
-            crate::api::progress::AssessStudentProgressOutcome::NoInstrumentAssigned => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::NoInstrumentAssigned => {
                 [1.into_dart()].into_dart()
             }
-            crate::api::progress::AssessStudentProgressOutcome::UnknownLevel { raw_level } => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::UnknownLevel { raw_level } => {
                 [2.into_dart(), raw_level.into_into_dart().into_dart()].into_dart()
             }
-            crate::api::progress::AssessStudentProgressOutcome::NotAMusician => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::NotAMusician => {
                 [3.into_dart()].into_dart()
             }
-            crate::api::progress::AssessStudentProgressOutcome::Failure { report } => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::Failure { report } => {
                 [4.into_dart(), report.into_into_dart().into_dart()].into_dart()
             }
             _ => {
@@ -1100,13 +1102,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::progress::AssessStudentProgre
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::progress::AssessStudentProgressOutcome
+    for crate::api::progress::AssessStudentProgressOutcomeDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::progress::AssessStudentProgressOutcome>
-    for crate::api::progress::AssessStudentProgressOutcome
+impl flutter_rust_bridge::IntoIntoDart<crate::api::progress::AssessStudentProgressOutcomeDto>
+    for crate::api::progress::AssessStudentProgressOutcomeDto
 {
-    fn into_into_dart(self) -> crate::api::progress::AssessStudentProgressOutcome {
+    fn into_into_dart(self) -> crate::api::progress::AssessStudentProgressOutcomeDto {
         self
     }
 }
@@ -1245,14 +1247,14 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::lessons::LessonDto>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::authentication::LoginOutcome {
+impl flutter_rust_bridge::IntoDart for crate::api::authentication::LoginOutcomeDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::api::authentication::LoginOutcome::Successful => [0.into_dart()].into_dart(),
-            crate::api::authentication::LoginOutcome::InvalidEmailOrPassword => {
+            crate::api::authentication::LoginOutcomeDto::Successful => [0.into_dart()].into_dart(),
+            crate::api::authentication::LoginOutcomeDto::InvalidEmailOrPassword => {
                 [1.into_dart()].into_dart()
             }
-            crate::api::authentication::LoginOutcome::Failure { report } => {
+            crate::api::authentication::LoginOutcomeDto::Failure { report } => {
                 [2.into_dart(), report.into_into_dart().into_dart()].into_dart()
             }
             _ => {
@@ -1262,22 +1264,22 @@ impl flutter_rust_bridge::IntoDart for crate::api::authentication::LoginOutcome 
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::authentication::LoginOutcome
+    for crate::api::authentication::LoginOutcomeDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::authentication::LoginOutcome>
-    for crate::api::authentication::LoginOutcome
+impl flutter_rust_bridge::IntoIntoDart<crate::api::authentication::LoginOutcomeDto>
+    for crate::api::authentication::LoginOutcomeDto
 {
-    fn into_into_dart(self) -> crate::api::authentication::LoginOutcome {
+    fn into_into_dart(self) -> crate::api::authentication::LoginOutcomeDto {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::authentication::LogoutOutcome {
+impl flutter_rust_bridge::IntoDart for crate::api::authentication::LogoutOutcomeDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::api::authentication::LogoutOutcome::Successful => [0.into_dart()].into_dart(),
-            crate::api::authentication::LogoutOutcome::Failure { report } => {
+            crate::api::authentication::LogoutOutcomeDto::Successful => [0.into_dart()].into_dart(),
+            crate::api::authentication::LogoutOutcomeDto::Failure { report } => {
                 [1.into_dart(), report.into_into_dart().into_dart()].into_dart()
             }
             _ => {
@@ -1287,13 +1289,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::authentication::LogoutOutcome
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::authentication::LogoutOutcome
+    for crate::api::authentication::LogoutOutcomeDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::authentication::LogoutOutcome>
-    for crate::api::authentication::LogoutOutcome
+impl flutter_rust_bridge::IntoIntoDart<crate::api::authentication::LogoutOutcomeDto>
+    for crate::api::authentication::LogoutOutcomeDto
 {
-    fn into_into_dart(self) -> crate::api::authentication::LogoutOutcome {
+    fn into_into_dart(self) -> crate::api::authentication::LogoutOutcomeDto {
         self
     }
 }
@@ -1391,16 +1393,16 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::progress::RequirementStatusDt
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::authentication::RestoreSessionOutcome {
+impl flutter_rust_bridge::IntoDart for crate::api::authentication::RestoreSessionOutcomeDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::api::authentication::RestoreSessionOutcome::Restored => {
+            crate::api::authentication::RestoreSessionOutcomeDto::Restored => {
                 [0.into_dart()].into_dart()
             }
-            crate::api::authentication::RestoreSessionOutcome::NotAvailable => {
+            crate::api::authentication::RestoreSessionOutcomeDto::NotAvailable => {
                 [1.into_dart()].into_dart()
             }
-            crate::api::authentication::RestoreSessionOutcome::Failure { report } => {
+            crate::api::authentication::RestoreSessionOutcomeDto::Failure { report } => {
                 [2.into_dart(), report.into_into_dart().into_dart()].into_dart()
             }
             _ => {
@@ -1410,24 +1412,24 @@ impl flutter_rust_bridge::IntoDart for crate::api::authentication::RestoreSessio
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::authentication::RestoreSessionOutcome
+    for crate::api::authentication::RestoreSessionOutcomeDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::authentication::RestoreSessionOutcome>
-    for crate::api::authentication::RestoreSessionOutcome
+impl flutter_rust_bridge::IntoIntoDart<crate::api::authentication::RestoreSessionOutcomeDto>
+    for crate::api::authentication::RestoreSessionOutcomeDto
 {
-    fn into_into_dart(self) -> crate::api::authentication::RestoreSessionOutcome {
+    fn into_into_dart(self) -> crate::api::authentication::RestoreSessionOutcomeDto {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::roster::RetrieveAllAvailableStudentsOutcome {
+impl flutter_rust_bridge::IntoDart for crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::api::roster::RetrieveAllAvailableStudentsOutcome::Success { students } => {
+            crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto::Success { students } => {
                 [0.into_dart(), students.into_into_dart().into_dart()].into_dart()
             }
-            crate::api::roster::RetrieveAllAvailableStudentsOutcome::Failure { report } => {
+            crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto::Failure { report } => {
                 [1.into_dart(), report.into_into_dart().into_dart()].into_dart()
             }
             _ => {
@@ -1437,24 +1439,24 @@ impl flutter_rust_bridge::IntoDart for crate::api::roster::RetrieveAllAvailableS
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::roster::RetrieveAllAvailableStudentsOutcome
+    for crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::roster::RetrieveAllAvailableStudentsOutcome>
-    for crate::api::roster::RetrieveAllAvailableStudentsOutcome
+impl flutter_rust_bridge::IntoIntoDart<crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto>
+    for crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto
 {
-    fn into_into_dart(self) -> crate::api::roster::RetrieveAllAvailableStudentsOutcome {
+    fn into_into_dart(self) -> crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::lessons::RetrieveStudentLessonsOutcome {
+impl flutter_rust_bridge::IntoDart for crate::api::lessons::RetrieveStudentLessonsOutcomeDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::api::lessons::RetrieveStudentLessonsOutcome::Success { lessons } => {
+            crate::api::lessons::RetrieveStudentLessonsOutcomeDto::Success { lessons } => {
                 [0.into_dart(), lessons.into_into_dart().into_dart()].into_dart()
             }
-            crate::api::lessons::RetrieveStudentLessonsOutcome::Failure { report } => {
+            crate::api::lessons::RetrieveStudentLessonsOutcomeDto::Failure { report } => {
                 [1.into_dart(), report.into_into_dart().into_dart()].into_dart()
             }
             _ => {
@@ -1464,13 +1466,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::lessons::RetrieveStudentLesso
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::lessons::RetrieveStudentLessonsOutcome
+    for crate::api::lessons::RetrieveStudentLessonsOutcomeDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::lessons::RetrieveStudentLessonsOutcome>
-    for crate::api::lessons::RetrieveStudentLessonsOutcome
+impl flutter_rust_bridge::IntoIntoDart<crate::api::lessons::RetrieveStudentLessonsOutcomeDto>
+    for crate::api::lessons::RetrieveStudentLessonsOutcomeDto
 {
-    fn into_into_dart(self) -> crate::api::lessons::RetrieveStudentLessonsOutcome {
+    fn into_into_dart(self) -> crate::api::lessons::RetrieveStudentLessonsOutcomeDto {
         self
     }
 }
@@ -1589,25 +1591,25 @@ impl SseEncode for String {
     }
 }
 
-impl SseEncode for crate::api::progress::AssessStudentProgressOutcome {
+impl SseEncode for crate::api::progress::AssessStudentProgressOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::api::progress::AssessStudentProgressOutcome::Success { assessment } => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::Success { assessment } => {
                 <i32>::sse_encode(0, serializer);
                 <crate::api::progress::ProgressAssessmentDto>::sse_encode(assessment, serializer);
             }
-            crate::api::progress::AssessStudentProgressOutcome::NoInstrumentAssigned => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::NoInstrumentAssigned => {
                 <i32>::sse_encode(1, serializer);
             }
-            crate::api::progress::AssessStudentProgressOutcome::UnknownLevel { raw_level } => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::UnknownLevel { raw_level } => {
                 <i32>::sse_encode(2, serializer);
                 <String>::sse_encode(raw_level, serializer);
             }
-            crate::api::progress::AssessStudentProgressOutcome::NotAMusician => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::NotAMusician => {
                 <i32>::sse_encode(3, serializer);
             }
-            crate::api::progress::AssessStudentProgressOutcome::Failure { report } => {
+            crate::api::progress::AssessStudentProgressOutcomeDto::Failure { report } => {
                 <i32>::sse_encode(4, serializer);
                 <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
             }
@@ -1757,17 +1759,17 @@ impl SseEncode for Vec<crate::api::roster::StudentSummaryDto> {
     }
 }
 
-impl SseEncode for crate::api::authentication::LoginOutcome {
+impl SseEncode for crate::api::authentication::LoginOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::api::authentication::LoginOutcome::Successful => {
+            crate::api::authentication::LoginOutcomeDto::Successful => {
                 <i32>::sse_encode(0, serializer);
             }
-            crate::api::authentication::LoginOutcome::InvalidEmailOrPassword => {
+            crate::api::authentication::LoginOutcomeDto::InvalidEmailOrPassword => {
                 <i32>::sse_encode(1, serializer);
             }
-            crate::api::authentication::LoginOutcome::Failure { report } => {
+            crate::api::authentication::LoginOutcomeDto::Failure { report } => {
                 <i32>::sse_encode(2, serializer);
                 <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
             }
@@ -1778,14 +1780,14 @@ impl SseEncode for crate::api::authentication::LoginOutcome {
     }
 }
 
-impl SseEncode for crate::api::authentication::LogoutOutcome {
+impl SseEncode for crate::api::authentication::LogoutOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::api::authentication::LogoutOutcome::Successful => {
+            crate::api::authentication::LogoutOutcomeDto::Successful => {
                 <i32>::sse_encode(0, serializer);
             }
-            crate::api::authentication::LogoutOutcome::Failure { report } => {
+            crate::api::authentication::LogoutOutcomeDto::Failure { report } => {
                 <i32>::sse_encode(1, serializer);
                 <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
             }
@@ -1904,17 +1906,17 @@ impl SseEncode for crate::api::progress::RequirementStatusDto {
     }
 }
 
-impl SseEncode for crate::api::authentication::RestoreSessionOutcome {
+impl SseEncode for crate::api::authentication::RestoreSessionOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::api::authentication::RestoreSessionOutcome::Restored => {
+            crate::api::authentication::RestoreSessionOutcomeDto::Restored => {
                 <i32>::sse_encode(0, serializer);
             }
-            crate::api::authentication::RestoreSessionOutcome::NotAvailable => {
+            crate::api::authentication::RestoreSessionOutcomeDto::NotAvailable => {
                 <i32>::sse_encode(1, serializer);
             }
-            crate::api::authentication::RestoreSessionOutcome::Failure { report } => {
+            crate::api::authentication::RestoreSessionOutcomeDto::Failure { report } => {
                 <i32>::sse_encode(2, serializer);
                 <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
             }
@@ -1925,15 +1927,15 @@ impl SseEncode for crate::api::authentication::RestoreSessionOutcome {
     }
 }
 
-impl SseEncode for crate::api::roster::RetrieveAllAvailableStudentsOutcome {
+impl SseEncode for crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::api::roster::RetrieveAllAvailableStudentsOutcome::Success { students } => {
+            crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto::Success { students } => {
                 <i32>::sse_encode(0, serializer);
                 <Vec<crate::api::roster::StudentSummaryDto>>::sse_encode(students, serializer);
             }
-            crate::api::roster::RetrieveAllAvailableStudentsOutcome::Failure { report } => {
+            crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto::Failure { report } => {
                 <i32>::sse_encode(1, serializer);
                 <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
             }
@@ -1944,15 +1946,15 @@ impl SseEncode for crate::api::roster::RetrieveAllAvailableStudentsOutcome {
     }
 }
 
-impl SseEncode for crate::api::lessons::RetrieveStudentLessonsOutcome {
+impl SseEncode for crate::api::lessons::RetrieveStudentLessonsOutcomeDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::api::lessons::RetrieveStudentLessonsOutcome::Success { lessons } => {
+            crate::api::lessons::RetrieveStudentLessonsOutcomeDto::Success { lessons } => {
                 <i32>::sse_encode(0, serializer);
                 <crate::api::lessons::StudentLessonsDto>::sse_encode(lessons, serializer);
             }
-            crate::api::lessons::RetrieveStudentLessonsOutcome::Failure { report } => {
+            crate::api::lessons::RetrieveStudentLessonsOutcomeDto::Failure { report } => {
                 <i32>::sse_encode(1, serializer);
                 <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
             }

@@ -1,6 +1,6 @@
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use gui_application::api::progress::{
-    AssessStudentProgressOutcome, CheckpointStatusDto, MusicianLevelDto, ProgressAssessmentDto,
+    AssessStudentProgressOutcomeDto, CheckpointStatusDto, MusicianLevelDto, ProgressAssessmentDto,
     RequirementStatusDto,
 };
 use pretty_assertions::assert_eq;
@@ -34,7 +34,7 @@ fn an_assessment_carries_every_checkpoint_and_percentage() {
 
     assert_eq!(
         result,
-        AssessStudentProgressOutcome::Success {
+        AssessStudentProgressOutcomeDto::Success {
             assessment: ProgressAssessmentDto {
                 checkpoints: vec![
                     checkpoint(MusicianLevelDto::Candidate, true, true),
@@ -60,7 +60,7 @@ fn an_officialized_musician_has_no_next_level() {
         Some(Instrument::Violin),
     )));
 
-    let AssessStudentProgressOutcome::Success { assessment } = result else {
+    let AssessStudentProgressOutcomeDto::Success { assessment } = result else {
         panic!("the progress should be assessed, got {result:?}");
     };
     assert_eq!(assessment.next_level, None);
@@ -70,7 +70,10 @@ fn an_officialized_musician_has_no_next_level() {
 fn a_student_without_an_instrument_is_reported_as_such() {
     let result = assessment_of(Ok(musician(MusicianLevel::Candidate, None)));
 
-    assert_eq!(result, AssessStudentProgressOutcome::NoInstrumentAssigned);
+    assert_eq!(
+        result,
+        AssessStudentProgressOutcomeDto::NoInstrumentAssigned
+    );
 }
 
 #[test]
@@ -82,7 +85,7 @@ fn an_unknown_level_is_reported_with_what_sam_wrote() {
 
     assert_eq!(
         result,
-        AssessStudentProgressOutcome::UnknownLevel {
+        AssessStudentProgressOutcomeDto::UnknownLevel {
             raw_level: "EXÓTICO".to_owned()
         }
     );
@@ -92,7 +95,7 @@ fn an_unknown_level_is_reported_with_what_sam_wrote() {
 fn a_non_musician_is_reported_without_calling_it_a_failure() {
     let result = assessment_of(Err(MusicianProfileGatewayError::NotAMusician));
 
-    assert_eq!(result, AssessStudentProgressOutcome::NotAMusician);
+    assert_eq!(result, AssessStudentProgressOutcomeDto::NotAMusician);
 }
 
 #[test]
@@ -101,7 +104,7 @@ fn a_student_sam_does_not_list_is_an_unexpected_response() {
 
     assert_eq!(
         result,
-        AssessStudentProgressOutcome::Failure {
+        AssessStudentProgressOutcomeDto::Failure {
             report: ErrorReportDto {
                 kind: ErrorKindDto::UnexpectedResponse,
                 details: "no student found with the given id".to_owned(),
@@ -119,7 +122,7 @@ fn an_instrument_without_published_requirements_is_an_unknown_failure_with_the_r
 
     assert_eq!(
         result,
-        AssessStudentProgressOutcome::Failure {
+        AssessStudentProgressOutcomeDto::Failure {
             report: ErrorReportDto {
                 kind: ErrorKindDto::Unknown,
                 details: "no published test requirements for AltoClarinet".to_owned(),
@@ -137,7 +140,7 @@ fn a_profile_failure_is_reported_with_its_kind_and_details() {
 
     assert_eq!(
         result,
-        AssessStudentProgressOutcome::Failure {
+        AssessStudentProgressOutcomeDto::Failure {
             report: ErrorReportDto {
                 kind: ErrorKindDto::SessionExpired,
                 details: "Session expired".to_owned(),
@@ -163,7 +166,7 @@ fn a_lessons_failure_is_reported_with_its_kind_and_details() {
 
     assert_eq!(
         result,
-        AssessStudentProgressOutcome::Failure {
+        AssessStudentProgressOutcomeDto::Failure {
             report: ErrorReportDto {
                 kind: ErrorKindDto::Network,
                 details: "connection refused".to_owned(),
@@ -174,7 +177,7 @@ fn a_lessons_failure_is_reported_with_its_kind_and_details() {
 
 fn assessment_of(
     musician_profile: Result<MusicianProfile, MusicianProfileGatewayError>,
-) -> AssessStudentProgressOutcome {
+) -> AssessStudentProgressOutcomeDto {
     FakeSam::default()
         .profiling(musician_profile)
         .build()
@@ -200,4 +203,3 @@ const fn checkpoint(
         },
     }
 }
-

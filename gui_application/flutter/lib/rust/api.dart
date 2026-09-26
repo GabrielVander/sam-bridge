@@ -18,19 +18,22 @@ Future<ApplicationFacade> buildMainApplication() =>
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>
 abstract class ApplicationFacade implements RustOpaqueInterface {
-  Future<AssessStudentProgressOutcome> assessStudentProgress({
+  Future<AssessStudentProgressOutcomeDto> assessStudentProgress({
     required String studentId,
   });
 
-  Future<LoginOutcome> login({required String email, required String password});
+  Future<LoginOutcomeDto> login({
+    required String email,
+    required String password,
+  });
 
-  Future<LogoutOutcome> logout();
+  Future<LogoutOutcomeDto> logout();
 
-  Future<RestoreSessionOutcome> restoreSession();
+  Future<RestoreSessionOutcomeDto> restoreSession();
 
-  Future<RetrieveAllAvailableStudentsOutcome> retrieveAllAvailableStudents();
+  Future<RetrieveAllAvailableStudentsOutcomeDto> retrieveAllAvailableStudents();
 
-  Future<RetrieveStudentLessonsOutcome> retrieveStudentLessons({
+  Future<RetrieveStudentLessonsOutcomeDto> retrieveStudentLessons({
     required String studentId,
   });
 }

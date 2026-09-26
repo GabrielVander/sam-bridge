@@ -1,9 +1,9 @@
 use std::time::Duration;
 
 use credential_store::{FileCredentialStore, NoDataDirectory};
-use gui_application::api::authentication::LoginOutcome;
+use gui_application::api::authentication::LoginOutcomeDto;
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
-use gui_application::api::roster::RetrieveAllAvailableStudentsOutcome;
+use gui_application::api::roster::RetrieveAllAvailableStudentsOutcomeDto;
 use gui_application::api::ApplicationFacade;
 use gui_application::composition::{
     build_application_with, http_client_builder, Config, REQUEST_TIMEOUT,
@@ -60,7 +60,7 @@ fn a_login_redirect_is_read_as_success_instead_of_being_followed() {
 
         let result = facade.login("user@example.com".to_owned(), "hunter2".to_owned());
 
-        assert_eq!(result, LoginOutcome::Successful);
+        assert_eq!(result, LoginOutcomeDto::Successful);
     });
 }
 
@@ -90,14 +90,14 @@ fn the_session_cookie_from_login_is_sent_on_later_requests() {
         let (facade, _credential_dir) = facade_talking_to(&mock_server, REQUEST_TIMEOUT).unwrap();
         assert_eq!(
             facade.login("user@example.com".to_owned(), "hunter2".to_owned()),
-            LoginOutcome::Successful
+            LoginOutcomeDto::Successful
         );
 
         let result = facade.retrieve_all_available_students();
 
         assert_eq!(
             result,
-            RetrieveAllAvailableStudentsOutcome::Success {
+            RetrieveAllAvailableStudentsOutcomeDto::Success {
                 students: Vec::new()
             }
         );
@@ -148,7 +148,7 @@ fn a_sam_slower_than_the_request_timeout_fails_as_a_network_error() {
 
         let result = facade.login("user@example.com".to_owned(), "hunter2".to_owned());
 
-        let LoginOutcome::Failure { report } = result else {
+        let LoginOutcomeDto::Failure { report } = result else {
             panic!("the login should have been abandoned, got {result:?}");
         };
         assert_eq!(report.kind, ErrorKindDto::Network);

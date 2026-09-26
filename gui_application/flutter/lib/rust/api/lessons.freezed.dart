@@ -12,7 +12,7 @@ part of 'lessons.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$RetrieveStudentLessonsOutcome {
+mixin _$RetrieveStudentLessonsOutcomeDto {
 
 
 
@@ -20,7 +20,7 @@ mixin _$RetrieveStudentLessonsOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcome);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto);
 }
 
 
@@ -29,20 +29,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RetrieveStudentLessonsOutcome()';
+  return 'RetrieveStudentLessonsOutcomeDto()';
 }
 
 
 }
 
 /// @nodoc
-class $RetrieveStudentLessonsOutcomeCopyWith<$Res>  {
-$RetrieveStudentLessonsOutcomeCopyWith(RetrieveStudentLessonsOutcome _, $Res Function(RetrieveStudentLessonsOutcome) __);
+class $RetrieveStudentLessonsOutcomeDtoCopyWith<$Res>  {
+$RetrieveStudentLessonsOutcomeDtoCopyWith(RetrieveStudentLessonsOutcomeDto _, $Res Function(RetrieveStudentLessonsOutcomeDto) __);
 }
 
 
-/// Adds pattern-matching-related methods to [RetrieveStudentLessonsOutcome].
-extension RetrieveStudentLessonsOutcomePatterns on RetrieveStudentLessonsOutcome {
+/// Adds pattern-matching-related methods to [RetrieveStudentLessonsOutcomeDto].
+extension RetrieveStudentLessonsOutcomeDtoPatterns on RetrieveStudentLessonsOutcomeDto {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -55,11 +55,11 @@ extension RetrieveStudentLessonsOutcomePatterns on RetrieveStudentLessonsOutcome
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( RetrieveStudentLessonsOutcome_Success value)?  success,TResult Function( RetrieveStudentLessonsOutcome_Failure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( RetrieveStudentLessonsOutcomeDto_Success value)?  success,TResult Function( RetrieveStudentLessonsOutcomeDto_Failure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case RetrieveStudentLessonsOutcome_Success() when success != null:
-return success(_that);case RetrieveStudentLessonsOutcome_Failure() when failure != null:
+case RetrieveStudentLessonsOutcomeDto_Success() when success != null:
+return success(_that);case RetrieveStudentLessonsOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return orElse();
 
@@ -78,11 +78,11 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( RetrieveStudentLessonsOutcome_Success value)  success,required TResult Function( RetrieveStudentLessonsOutcome_Failure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( RetrieveStudentLessonsOutcomeDto_Success value)  success,required TResult Function( RetrieveStudentLessonsOutcomeDto_Failure value)  failure,}){
 final _that = this;
 switch (_that) {
-case RetrieveStudentLessonsOutcome_Success():
-return success(_that);case RetrieveStudentLessonsOutcome_Failure():
+case RetrieveStudentLessonsOutcomeDto_Success():
+return success(_that);case RetrieveStudentLessonsOutcomeDto_Failure():
 return failure(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -97,11 +97,11 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( RetrieveStudentLessonsOutcome_Success value)?  success,TResult? Function( RetrieveStudentLessonsOutcome_Failure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( RetrieveStudentLessonsOutcomeDto_Success value)?  success,TResult? Function( RetrieveStudentLessonsOutcomeDto_Failure value)?  failure,}){
 final _that = this;
 switch (_that) {
-case RetrieveStudentLessonsOutcome_Success() when success != null:
-return success(_that);case RetrieveStudentLessonsOutcome_Failure() when failure != null:
+case RetrieveStudentLessonsOutcomeDto_Success() when success != null:
+return success(_that);case RetrieveStudentLessonsOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return null;
 
@@ -121,8 +121,8 @@ return failure(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( StudentLessonsDto lessons)?  success,TResult Function( ErrorReportDto report)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case RetrieveStudentLessonsOutcome_Success() when success != null:
-return success(_that.lessons);case RetrieveStudentLessonsOutcome_Failure() when failure != null:
+case RetrieveStudentLessonsOutcomeDto_Success() when success != null:
+return success(_that.lessons);case RetrieveStudentLessonsOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return orElse();
 
@@ -143,8 +143,8 @@ return failure(_that.report);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( StudentLessonsDto lessons)  success,required TResult Function( ErrorReportDto report)  failure,}) {final _that = this;
 switch (_that) {
-case RetrieveStudentLessonsOutcome_Success():
-return success(_that.lessons);case RetrieveStudentLessonsOutcome_Failure():
+case RetrieveStudentLessonsOutcomeDto_Success():
+return success(_that.lessons);case RetrieveStudentLessonsOutcomeDto_Failure():
 return failure(_that.report);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -161,8 +161,8 @@ return failure(_that.report);}
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( StudentLessonsDto lessons)?  success,TResult? Function( ErrorReportDto report)?  failure,}) {final _that = this;
 switch (_that) {
-case RetrieveStudentLessonsOutcome_Success() when success != null:
-return success(_that.lessons);case RetrieveStudentLessonsOutcome_Failure() when failure != null:
+case RetrieveStudentLessonsOutcomeDto_Success() when success != null:
+return success(_that.lessons);case RetrieveStudentLessonsOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return null;
 
@@ -174,23 +174,23 @@ return failure(_that.report);case _:
 /// @nodoc
 
 
-class RetrieveStudentLessonsOutcome_Success extends RetrieveStudentLessonsOutcome {
-  const RetrieveStudentLessonsOutcome_Success({required this.lessons}): super._();
+class RetrieveStudentLessonsOutcomeDto_Success extends RetrieveStudentLessonsOutcomeDto {
+  const RetrieveStudentLessonsOutcomeDto_Success({required this.lessons}): super._();
   
 
  final  StudentLessonsDto lessons;
 
-/// Create a copy of RetrieveStudentLessonsOutcome
+/// Create a copy of RetrieveStudentLessonsOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$RetrieveStudentLessonsOutcome_SuccessCopyWith<RetrieveStudentLessonsOutcome_Success> get copyWith => _$RetrieveStudentLessonsOutcome_SuccessCopyWithImpl<RetrieveStudentLessonsOutcome_Success>(this, _$identity);
+$RetrieveStudentLessonsOutcomeDto_SuccessCopyWith<RetrieveStudentLessonsOutcomeDto_Success> get copyWith => _$RetrieveStudentLessonsOutcomeDto_SuccessCopyWithImpl<RetrieveStudentLessonsOutcomeDto_Success>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcome_Success&&(identical(other.lessons, lessons) || other.lessons == lessons));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto_Success&&(identical(other.lessons, lessons) || other.lessons == lessons));
 }
 
 
@@ -199,15 +199,15 @@ int get hashCode => Object.hash(runtimeType,lessons);
 
 @override
 String toString() {
-  return 'RetrieveStudentLessonsOutcome.success(lessons: $lessons)';
+  return 'RetrieveStudentLessonsOutcomeDto.success(lessons: $lessons)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $RetrieveStudentLessonsOutcome_SuccessCopyWith<$Res> implements $RetrieveStudentLessonsOutcomeCopyWith<$Res> {
-  factory $RetrieveStudentLessonsOutcome_SuccessCopyWith(RetrieveStudentLessonsOutcome_Success value, $Res Function(RetrieveStudentLessonsOutcome_Success) _then) = _$RetrieveStudentLessonsOutcome_SuccessCopyWithImpl;
+abstract mixin class $RetrieveStudentLessonsOutcomeDto_SuccessCopyWith<$Res> implements $RetrieveStudentLessonsOutcomeDtoCopyWith<$Res> {
+  factory $RetrieveStudentLessonsOutcomeDto_SuccessCopyWith(RetrieveStudentLessonsOutcomeDto_Success value, $Res Function(RetrieveStudentLessonsOutcomeDto_Success) _then) = _$RetrieveStudentLessonsOutcomeDto_SuccessCopyWithImpl;
 @useResult
 $Res call({
  StudentLessonsDto lessons
@@ -218,17 +218,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$RetrieveStudentLessonsOutcome_SuccessCopyWithImpl<$Res>
-    implements $RetrieveStudentLessonsOutcome_SuccessCopyWith<$Res> {
-  _$RetrieveStudentLessonsOutcome_SuccessCopyWithImpl(this._self, this._then);
+class _$RetrieveStudentLessonsOutcomeDto_SuccessCopyWithImpl<$Res>
+    implements $RetrieveStudentLessonsOutcomeDto_SuccessCopyWith<$Res> {
+  _$RetrieveStudentLessonsOutcomeDto_SuccessCopyWithImpl(this._self, this._then);
 
-  final RetrieveStudentLessonsOutcome_Success _self;
-  final $Res Function(RetrieveStudentLessonsOutcome_Success) _then;
+  final RetrieveStudentLessonsOutcomeDto_Success _self;
+  final $Res Function(RetrieveStudentLessonsOutcomeDto_Success) _then;
 
-/// Create a copy of RetrieveStudentLessonsOutcome
+/// Create a copy of RetrieveStudentLessonsOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? lessons = null,}) {
-  return _then(RetrieveStudentLessonsOutcome_Success(
+  return _then(RetrieveStudentLessonsOutcomeDto_Success(
 lessons: null == lessons ? _self.lessons : lessons // ignore: cast_nullable_to_non_nullable
 as StudentLessonsDto,
   ));
@@ -240,23 +240,23 @@ as StudentLessonsDto,
 /// @nodoc
 
 
-class RetrieveStudentLessonsOutcome_Failure extends RetrieveStudentLessonsOutcome {
-  const RetrieveStudentLessonsOutcome_Failure({required this.report}): super._();
+class RetrieveStudentLessonsOutcomeDto_Failure extends RetrieveStudentLessonsOutcomeDto {
+  const RetrieveStudentLessonsOutcomeDto_Failure({required this.report}): super._();
   
 
  final  ErrorReportDto report;
 
-/// Create a copy of RetrieveStudentLessonsOutcome
+/// Create a copy of RetrieveStudentLessonsOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$RetrieveStudentLessonsOutcome_FailureCopyWith<RetrieveStudentLessonsOutcome_Failure> get copyWith => _$RetrieveStudentLessonsOutcome_FailureCopyWithImpl<RetrieveStudentLessonsOutcome_Failure>(this, _$identity);
+$RetrieveStudentLessonsOutcomeDto_FailureCopyWith<RetrieveStudentLessonsOutcomeDto_Failure> get copyWith => _$RetrieveStudentLessonsOutcomeDto_FailureCopyWithImpl<RetrieveStudentLessonsOutcomeDto_Failure>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcome_Failure&&(identical(other.report, report) || other.report == report));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
@@ -265,15 +265,15 @@ int get hashCode => Object.hash(runtimeType,report);
 
 @override
 String toString() {
-  return 'RetrieveStudentLessonsOutcome.failure(report: $report)';
+  return 'RetrieveStudentLessonsOutcomeDto.failure(report: $report)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $RetrieveStudentLessonsOutcome_FailureCopyWith<$Res> implements $RetrieveStudentLessonsOutcomeCopyWith<$Res> {
-  factory $RetrieveStudentLessonsOutcome_FailureCopyWith(RetrieveStudentLessonsOutcome_Failure value, $Res Function(RetrieveStudentLessonsOutcome_Failure) _then) = _$RetrieveStudentLessonsOutcome_FailureCopyWithImpl;
+abstract mixin class $RetrieveStudentLessonsOutcomeDto_FailureCopyWith<$Res> implements $RetrieveStudentLessonsOutcomeDtoCopyWith<$Res> {
+  factory $RetrieveStudentLessonsOutcomeDto_FailureCopyWith(RetrieveStudentLessonsOutcomeDto_Failure value, $Res Function(RetrieveStudentLessonsOutcomeDto_Failure) _then) = _$RetrieveStudentLessonsOutcomeDto_FailureCopyWithImpl;
 @useResult
 $Res call({
  ErrorReportDto report
@@ -284,17 +284,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$RetrieveStudentLessonsOutcome_FailureCopyWithImpl<$Res>
-    implements $RetrieveStudentLessonsOutcome_FailureCopyWith<$Res> {
-  _$RetrieveStudentLessonsOutcome_FailureCopyWithImpl(this._self, this._then);
+class _$RetrieveStudentLessonsOutcomeDto_FailureCopyWithImpl<$Res>
+    implements $RetrieveStudentLessonsOutcomeDto_FailureCopyWith<$Res> {
+  _$RetrieveStudentLessonsOutcomeDto_FailureCopyWithImpl(this._self, this._then);
 
-  final RetrieveStudentLessonsOutcome_Failure _self;
-  final $Res Function(RetrieveStudentLessonsOutcome_Failure) _then;
+  final RetrieveStudentLessonsOutcomeDto_Failure _self;
+  final $Res Function(RetrieveStudentLessonsOutcomeDto_Failure) _then;
 
-/// Create a copy of RetrieveStudentLessonsOutcome
+/// Create a copy of RetrieveStudentLessonsOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? report = null,}) {
-  return _then(RetrieveStudentLessonsOutcome_Failure(
+  return _then(RetrieveStudentLessonsOutcomeDto_Failure(
 report: null == report ? _self.report : report // ignore: cast_nullable_to_non_nullable
 as ErrorReportDto,
   ));

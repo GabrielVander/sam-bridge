@@ -15,7 +15,7 @@ pub struct StudentSummaryDto {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RetrieveAllAvailableStudentsOutcome {
+pub enum RetrieveAllAvailableStudentsOutcomeDto {
     Success { students: Vec<StudentSummaryDto> },
     Failure { report: ErrorReportDto },
 }
@@ -37,7 +37,7 @@ pub enum StudentPositionDto {
     Invalid { raw: String },
 }
 
-impl From<Result<Vec<Student>, StudentGatewayError>> for RetrieveAllAvailableStudentsOutcome {
+impl From<Result<Vec<Student>, StudentGatewayError>> for RetrieveAllAvailableStudentsOutcomeDto {
     fn from(result: Result<Vec<Student>, StudentGatewayError>) -> Self {
         match result {
             Ok(students) => Self::Success {

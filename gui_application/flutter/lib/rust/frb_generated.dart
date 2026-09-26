@@ -81,32 +81,32 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<AssessStudentProgressOutcome>
+  Future<AssessStudentProgressOutcomeDto>
   crateApiApplicationFacadeAssessStudentProgress({
     required ApplicationFacade that,
     required String studentId,
   });
 
-  Future<LoginOutcome> crateApiApplicationFacadeLogin({
+  Future<LoginOutcomeDto> crateApiApplicationFacadeLogin({
     required ApplicationFacade that,
     required String email,
     required String password,
   });
 
-  Future<LogoutOutcome> crateApiApplicationFacadeLogout({
+  Future<LogoutOutcomeDto> crateApiApplicationFacadeLogout({
     required ApplicationFacade that,
   });
 
-  Future<RestoreSessionOutcome> crateApiApplicationFacadeRestoreSession({
+  Future<RestoreSessionOutcomeDto> crateApiApplicationFacadeRestoreSession({
     required ApplicationFacade that,
   });
 
-  Future<RetrieveAllAvailableStudentsOutcome>
+  Future<RetrieveAllAvailableStudentsOutcomeDto>
   crateApiApplicationFacadeRetrieveAllAvailableStudents({
     required ApplicationFacade that,
   });
 
-  Future<RetrieveStudentLessonsOutcome>
+  Future<RetrieveStudentLessonsOutcomeDto>
   crateApiApplicationFacadeRetrieveStudentLessons({
     required ApplicationFacade that,
     required String studentId,
@@ -133,7 +133,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<AssessStudentProgressOutcome>
+  Future<AssessStudentProgressOutcomeDto>
   crateApiApplicationFacadeAssessStudentProgress({
     required ApplicationFacade that,
     required String studentId,
@@ -155,7 +155,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_assess_student_progress_outcome,
+          decodeSuccessData: sse_decode_assess_student_progress_outcome_dto,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiApplicationFacadeAssessStudentProgressConstMeta,
@@ -172,7 +172,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<LoginOutcome> crateApiApplicationFacadeLogin({
+  Future<LoginOutcomeDto> crateApiApplicationFacadeLogin({
     required ApplicationFacade that,
     required String email,
     required String password,
@@ -195,7 +195,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_login_outcome,
+          decodeSuccessData: sse_decode_login_outcome_dto,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiApplicationFacadeLoginConstMeta,
@@ -212,7 +212,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<LogoutOutcome> crateApiApplicationFacadeLogout({
+  Future<LogoutOutcomeDto> crateApiApplicationFacadeLogout({
     required ApplicationFacade that,
   }) {
     return handler.executeNormal(
@@ -231,7 +231,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_logout_outcome,
+          decodeSuccessData: sse_decode_logout_outcome_dto,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiApplicationFacadeLogoutConstMeta,
@@ -248,7 +248,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<RestoreSessionOutcome> crateApiApplicationFacadeRestoreSession({
+  Future<RestoreSessionOutcomeDto> crateApiApplicationFacadeRestoreSession({
     required ApplicationFacade that,
   }) {
     return handler.executeNormal(
@@ -267,7 +267,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_restore_session_outcome,
+          decodeSuccessData: sse_decode_restore_session_outcome_dto,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiApplicationFacadeRestoreSessionConstMeta,
@@ -284,7 +284,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<RetrieveAllAvailableStudentsOutcome>
+  Future<RetrieveAllAvailableStudentsOutcomeDto>
   crateApiApplicationFacadeRetrieveAllAvailableStudents({
     required ApplicationFacade that,
   }) {
@@ -304,7 +304,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_retrieve_all_available_students_outcome,
+          decodeSuccessData:
+              sse_decode_retrieve_all_available_students_outcome_dto,
           decodeErrorData: null,
         ),
         constMeta:
@@ -323,7 +324,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<RetrieveStudentLessonsOutcome>
+  Future<RetrieveStudentLessonsOutcomeDto>
   crateApiApplicationFacadeRetrieveStudentLessons({
     required ApplicationFacade that,
     required String studentId,
@@ -345,7 +346,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_retrieve_student_lessons_outcome,
+          decodeSuccessData: sse_decode_retrieve_student_lessons_outcome_dto,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiApplicationFacadeRetrieveStudentLessonsConstMeta,
@@ -431,26 +432,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  AssessStudentProgressOutcome dco_decode_assess_student_progress_outcome(
-    dynamic raw,
-  ) {
+  AssessStudentProgressOutcomeDto
+  dco_decode_assess_student_progress_outcome_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = dcoDecodeList(raw);
     switch (dcoDecodePrimitiveInt(arr[0])) {
       case 0:
-        return AssessStudentProgressOutcome_Success(
+        return AssessStudentProgressOutcomeDto_Success(
           assessment: dco_decode_box_autoadd_progress_assessment_dto(arr[1]),
         );
       case 1:
-        return AssessStudentProgressOutcome_NoInstrumentAssigned();
+        return AssessStudentProgressOutcomeDto_NoInstrumentAssigned();
       case 2:
-        return AssessStudentProgressOutcome_UnknownLevel(
+        return AssessStudentProgressOutcomeDto_UnknownLevel(
           rawLevel: dco_decode_String(arr[1]),
         );
       case 3:
-        return AssessStudentProgressOutcome_NotAMusician();
+        return AssessStudentProgressOutcomeDto_NotAMusician();
       case 4:
-        return AssessStudentProgressOutcome_Failure(
+        return AssessStudentProgressOutcomeDto_Failure(
           report: dco_decode_box_autoadd_error_report_dto(arr[1]),
         );
       default:
@@ -615,16 +615,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  LoginOutcome dco_decode_login_outcome(dynamic raw) {
+  LoginOutcomeDto dco_decode_login_outcome_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = dcoDecodeList(raw);
     switch (dcoDecodePrimitiveInt(arr[0])) {
       case 0:
-        return LoginOutcome_Successful();
+        return LoginOutcomeDto_Successful();
       case 1:
-        return LoginOutcome_InvalidEmailOrPassword();
+        return LoginOutcomeDto_InvalidEmailOrPassword();
       case 2:
-        return LoginOutcome_Failure(
+        return LoginOutcomeDto_Failure(
           report: dco_decode_box_autoadd_error_report_dto(arr[1]),
         );
       default:
@@ -633,14 +633,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  LogoutOutcome dco_decode_logout_outcome(dynamic raw) {
+  LogoutOutcomeDto dco_decode_logout_outcome_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = dcoDecodeList(raw);
     switch (dcoDecodePrimitiveInt(arr[0])) {
       case 0:
-        return LogoutOutcome_Successful();
+        return LogoutOutcomeDto_Successful();
       case 1:
-        return LogoutOutcome_Failure(
+        return LogoutOutcomeDto_Failure(
           report: dco_decode_box_autoadd_error_report_dto(arr[1]),
         );
       default:
@@ -741,16 +741,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RestoreSessionOutcome dco_decode_restore_session_outcome(dynamic raw) {
+  RestoreSessionOutcomeDto dco_decode_restore_session_outcome_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = dcoDecodeList(raw);
     switch (dcoDecodePrimitiveInt(arr[0])) {
       case 0:
-        return RestoreSessionOutcome_Restored();
+        return RestoreSessionOutcomeDto_Restored();
       case 1:
-        return RestoreSessionOutcome_NotAvailable();
+        return RestoreSessionOutcomeDto_NotAvailable();
       case 2:
-        return RestoreSessionOutcome_Failure(
+        return RestoreSessionOutcomeDto_Failure(
           report: dco_decode_box_autoadd_error_report_dto(arr[1]),
         );
       default:
@@ -759,17 +759,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RetrieveAllAvailableStudentsOutcome
-  dco_decode_retrieve_all_available_students_outcome(dynamic raw) {
+  RetrieveAllAvailableStudentsOutcomeDto
+  dco_decode_retrieve_all_available_students_outcome_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = dcoDecodeList(raw);
     switch (dcoDecodePrimitiveInt(arr[0])) {
       case 0:
-        return RetrieveAllAvailableStudentsOutcome_Success(
+        return RetrieveAllAvailableStudentsOutcomeDto_Success(
           students: dco_decode_list_student_summary_dto(arr[1]),
         );
       case 1:
-        return RetrieveAllAvailableStudentsOutcome_Failure(
+        return RetrieveAllAvailableStudentsOutcomeDto_Failure(
           report: dco_decode_box_autoadd_error_report_dto(arr[1]),
         );
       default:
@@ -778,18 +778,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RetrieveStudentLessonsOutcome dco_decode_retrieve_student_lessons_outcome(
-    dynamic raw,
-  ) {
+  RetrieveStudentLessonsOutcomeDto
+  dco_decode_retrieve_student_lessons_outcome_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = dcoDecodeList(raw);
     switch (dcoDecodePrimitiveInt(arr[0])) {
       case 0:
-        return RetrieveStudentLessonsOutcome_Success(
+        return RetrieveStudentLessonsOutcomeDto_Success(
           lessons: dco_decode_box_autoadd_student_lessons_dto(arr[1]),
         );
       case 1:
-        return RetrieveStudentLessonsOutcome_Failure(
+        return RetrieveStudentLessonsOutcomeDto_Failure(
           report: dco_decode_box_autoadd_error_report_dto(arr[1]),
         );
       default:
@@ -928,9 +927,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  AssessStudentProgressOutcome sse_decode_assess_student_progress_outcome(
-    SseDeserializer deserializer,
-  ) {
+  AssessStudentProgressOutcomeDto
+  sse_decode_assess_student_progress_outcome_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
@@ -939,19 +937,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_assessment = sse_decode_box_autoadd_progress_assessment_dto(
           deserializer,
         );
-        return AssessStudentProgressOutcome_Success(assessment: var_assessment);
+        return AssessStudentProgressOutcomeDto_Success(
+          assessment: var_assessment,
+        );
       case 1:
-        return AssessStudentProgressOutcome_NoInstrumentAssigned();
+        return AssessStudentProgressOutcomeDto_NoInstrumentAssigned();
       case 2:
         var var_rawLevel = sse_decode_String(deserializer);
-        return AssessStudentProgressOutcome_UnknownLevel(
+        return AssessStudentProgressOutcomeDto_UnknownLevel(
           rawLevel: var_rawLevel,
         );
       case 3:
-        return AssessStudentProgressOutcome_NotAMusician();
+        return AssessStudentProgressOutcomeDto_NotAMusician();
       case 4:
         var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
-        return AssessStudentProgressOutcome_Failure(report: var_report);
+        return AssessStudentProgressOutcomeDto_Failure(report: var_report);
       default:
         throw UnimplementedError('');
     }
@@ -1146,34 +1146,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  LoginOutcome sse_decode_login_outcome(SseDeserializer deserializer) {
+  LoginOutcomeDto sse_decode_login_outcome_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        return LoginOutcome_Successful();
+        return LoginOutcomeDto_Successful();
       case 1:
-        return LoginOutcome_InvalidEmailOrPassword();
+        return LoginOutcomeDto_InvalidEmailOrPassword();
       case 2:
         var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
-        return LoginOutcome_Failure(report: var_report);
+        return LoginOutcomeDto_Failure(report: var_report);
       default:
         throw UnimplementedError('');
     }
   }
 
   @protected
-  LogoutOutcome sse_decode_logout_outcome(SseDeserializer deserializer) {
+  LogoutOutcomeDto sse_decode_logout_outcome_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        return LogoutOutcome_Successful();
+        return LogoutOutcomeDto_Successful();
       case 1:
         var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
-        return LogoutOutcome_Failure(report: var_report);
+        return LogoutOutcomeDto_Failure(report: var_report);
       default:
         throw UnimplementedError('');
     }
@@ -1302,7 +1302,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RestoreSessionOutcome sse_decode_restore_session_outcome(
+  RestoreSessionOutcomeDto sse_decode_restore_session_outcome_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -1310,20 +1310,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        return RestoreSessionOutcome_Restored();
+        return RestoreSessionOutcomeDto_Restored();
       case 1:
-        return RestoreSessionOutcome_NotAvailable();
+        return RestoreSessionOutcomeDto_NotAvailable();
       case 2:
         var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
-        return RestoreSessionOutcome_Failure(report: var_report);
+        return RestoreSessionOutcomeDto_Failure(report: var_report);
       default:
         throw UnimplementedError('');
     }
   }
 
   @protected
-  RetrieveAllAvailableStudentsOutcome
-  sse_decode_retrieve_all_available_students_outcome(
+  RetrieveAllAvailableStudentsOutcomeDto
+  sse_decode_retrieve_all_available_students_outcome_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -1332,19 +1332,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     switch (tag_) {
       case 0:
         var var_students = sse_decode_list_student_summary_dto(deserializer);
-        return RetrieveAllAvailableStudentsOutcome_Success(
+        return RetrieveAllAvailableStudentsOutcomeDto_Success(
           students: var_students,
         );
       case 1:
         var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
-        return RetrieveAllAvailableStudentsOutcome_Failure(report: var_report);
+        return RetrieveAllAvailableStudentsOutcomeDto_Failure(
+          report: var_report,
+        );
       default:
         throw UnimplementedError('');
     }
   }
 
   @protected
-  RetrieveStudentLessonsOutcome sse_decode_retrieve_student_lessons_outcome(
+  RetrieveStudentLessonsOutcomeDto
+  sse_decode_retrieve_student_lessons_outcome_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -1355,10 +1358,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_lessons = sse_decode_box_autoadd_student_lessons_dto(
           deserializer,
         );
-        return RetrieveStudentLessonsOutcome_Success(lessons: var_lessons);
+        return RetrieveStudentLessonsOutcomeDto_Success(lessons: var_lessons);
       case 1:
         var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
-        return RetrieveStudentLessonsOutcome_Failure(report: var_report);
+        return RetrieveStudentLessonsOutcomeDto_Failure(report: var_report);
       default:
         throw UnimplementedError('');
     }
@@ -1502,23 +1505,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_assess_student_progress_outcome(
-    AssessStudentProgressOutcome self,
+  void sse_encode_assess_student_progress_outcome_dto(
+    AssessStudentProgressOutcomeDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case AssessStudentProgressOutcome_Success(assessment: final assessment):
+      case AssessStudentProgressOutcomeDto_Success(
+        assessment: final assessment,
+      ):
         sse_encode_i_32(0, serializer);
         sse_encode_box_autoadd_progress_assessment_dto(assessment, serializer);
-      case AssessStudentProgressOutcome_NoInstrumentAssigned():
+      case AssessStudentProgressOutcomeDto_NoInstrumentAssigned():
         sse_encode_i_32(1, serializer);
-      case AssessStudentProgressOutcome_UnknownLevel(rawLevel: final rawLevel):
+      case AssessStudentProgressOutcomeDto_UnknownLevel(
+        rawLevel: final rawLevel,
+      ):
         sse_encode_i_32(2, serializer);
         sse_encode_String(rawLevel, serializer);
-      case AssessStudentProgressOutcome_NotAMusician():
+      case AssessStudentProgressOutcomeDto_NotAMusician():
         sse_encode_i_32(3, serializer);
-      case AssessStudentProgressOutcome_Failure(report: final report):
+      case AssessStudentProgressOutcomeDto_Failure(report: final report):
         sse_encode_i_32(4, serializer);
         sse_encode_box_autoadd_error_report_dto(report, serializer);
     }
@@ -1702,26 +1709,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_login_outcome(LoginOutcome self, SseSerializer serializer) {
+  void sse_encode_login_outcome_dto(
+    LoginOutcomeDto self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case LoginOutcome_Successful():
+      case LoginOutcomeDto_Successful():
         sse_encode_i_32(0, serializer);
-      case LoginOutcome_InvalidEmailOrPassword():
+      case LoginOutcomeDto_InvalidEmailOrPassword():
         sse_encode_i_32(1, serializer);
-      case LoginOutcome_Failure(report: final report):
+      case LoginOutcomeDto_Failure(report: final report):
         sse_encode_i_32(2, serializer);
         sse_encode_box_autoadd_error_report_dto(report, serializer);
     }
   }
 
   @protected
-  void sse_encode_logout_outcome(LogoutOutcome self, SseSerializer serializer) {
+  void sse_encode_logout_outcome_dto(
+    LogoutOutcomeDto self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case LogoutOutcome_Successful():
+      case LogoutOutcomeDto_Successful():
         sse_encode_i_32(0, serializer);
-      case LogoutOutcome_Failure(report: final report):
+      case LogoutOutcomeDto_Failure(report: final report):
         sse_encode_i_32(1, serializer);
         sse_encode_box_autoadd_error_report_dto(report, serializer);
     }
@@ -1844,51 +1857,51 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_restore_session_outcome(
-    RestoreSessionOutcome self,
+  void sse_encode_restore_session_outcome_dto(
+    RestoreSessionOutcomeDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case RestoreSessionOutcome_Restored():
+      case RestoreSessionOutcomeDto_Restored():
         sse_encode_i_32(0, serializer);
-      case RestoreSessionOutcome_NotAvailable():
+      case RestoreSessionOutcomeDto_NotAvailable():
         sse_encode_i_32(1, serializer);
-      case RestoreSessionOutcome_Failure(report: final report):
+      case RestoreSessionOutcomeDto_Failure(report: final report):
         sse_encode_i_32(2, serializer);
         sse_encode_box_autoadd_error_report_dto(report, serializer);
     }
   }
 
   @protected
-  void sse_encode_retrieve_all_available_students_outcome(
-    RetrieveAllAvailableStudentsOutcome self,
+  void sse_encode_retrieve_all_available_students_outcome_dto(
+    RetrieveAllAvailableStudentsOutcomeDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case RetrieveAllAvailableStudentsOutcome_Success(
+      case RetrieveAllAvailableStudentsOutcomeDto_Success(
         students: final students,
       ):
         sse_encode_i_32(0, serializer);
         sse_encode_list_student_summary_dto(students, serializer);
-      case RetrieveAllAvailableStudentsOutcome_Failure(report: final report):
+      case RetrieveAllAvailableStudentsOutcomeDto_Failure(report: final report):
         sse_encode_i_32(1, serializer);
         sse_encode_box_autoadd_error_report_dto(report, serializer);
     }
   }
 
   @protected
-  void sse_encode_retrieve_student_lessons_outcome(
-    RetrieveStudentLessonsOutcome self,
+  void sse_encode_retrieve_student_lessons_outcome_dto(
+    RetrieveStudentLessonsOutcomeDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case RetrieveStudentLessonsOutcome_Success(lessons: final lessons):
+      case RetrieveStudentLessonsOutcomeDto_Success(lessons: final lessons):
         sse_encode_i_32(0, serializer);
         sse_encode_box_autoadd_student_lessons_dto(lessons, serializer);
-      case RetrieveStudentLessonsOutcome_Failure(report: final report):
+      case RetrieveStudentLessonsOutcomeDto_Failure(report: final report):
         sse_encode_i_32(1, serializer);
         sse_encode_box_autoadd_error_report_dto(report, serializer);
     }
@@ -2001,14 +2014,14 @@ class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
         .rust_arc_decrement_strong_count_ApplicationFacadePtr,
   );
 
-  Future<AssessStudentProgressOutcome> assessStudentProgress({
+  Future<AssessStudentProgressOutcomeDto> assessStudentProgress({
     required String studentId,
   }) => RustLib.instance.api.crateApiApplicationFacadeAssessStudentProgress(
     that: this,
     studentId: studentId,
   );
 
-  Future<LoginOutcome> login({
+  Future<LoginOutcomeDto> login({
     required String email,
     required String password,
   }) => RustLib.instance.api.crateApiApplicationFacadeLogin(
@@ -2017,17 +2030,17 @@ class ApplicationFacadeImpl extends RustOpaque implements ApplicationFacade {
     password: password,
   );
 
-  Future<LogoutOutcome> logout() =>
+  Future<LogoutOutcomeDto> logout() =>
       RustLib.instance.api.crateApiApplicationFacadeLogout(that: this);
 
-  Future<RestoreSessionOutcome> restoreSession() =>
+  Future<RestoreSessionOutcomeDto> restoreSession() =>
       RustLib.instance.api.crateApiApplicationFacadeRestoreSession(that: this);
 
-  Future<RetrieveAllAvailableStudentsOutcome> retrieveAllAvailableStudents() =>
-      RustLib.instance.api
-          .crateApiApplicationFacadeRetrieveAllAvailableStudents(that: this);
+  Future<RetrieveAllAvailableStudentsOutcomeDto>
+  retrieveAllAvailableStudents() => RustLib.instance.api
+      .crateApiApplicationFacadeRetrieveAllAvailableStudents(that: this);
 
-  Future<RetrieveStudentLessonsOutcome> retrieveStudentLessons({
+  Future<RetrieveStudentLessonsOutcomeDto> retrieveStudentLessons({
     required String studentId,
   }) => RustLib.instance.api.crateApiApplicationFacadeRetrieveStudentLessons(
     that: this,

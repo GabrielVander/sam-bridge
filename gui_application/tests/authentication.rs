@@ -1,5 +1,7 @@
 use authentication::application::gateways::{AuthorizationError, AuthorizationResult, FailureKind};
-use gui_application::api::authentication::{LoginOutcome, LogoutOutcome, RestoreSessionOutcome};
+use gui_application::api::authentication::{
+    LoginOutcomeDto, LogoutOutcomeDto, RestoreSessionOutcomeDto,
+};
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use pretty_assertions::assert_eq;
 
@@ -28,7 +30,7 @@ fn an_authorized_login_is_successful() {
 
     let result = facade.login("e".to_owned(), "p".to_owned());
 
-    assert_eq!(result, LoginOutcome::Successful);
+    assert_eq!(result, LoginOutcomeDto::Successful);
 }
 
 #[test]
@@ -39,7 +41,7 @@ fn a_login_sam_rejects_is_an_invalid_email_or_password() {
 
     let result = facade.login("e".to_owned(), "p".to_owned());
 
-    assert_eq!(result, LoginOutcome::InvalidEmailOrPassword);
+    assert_eq!(result, LoginOutcomeDto::InvalidEmailOrPassword);
 }
 
 #[test]
@@ -52,7 +54,7 @@ fn a_login_that_cannot_reach_sam_is_reported_with_its_kind_and_details() {
 
     assert_eq!(
         result,
-        LoginOutcome::Failure {
+        LoginOutcomeDto::Failure {
             report: network_report()
         }
     );
@@ -64,7 +66,7 @@ fn a_session_with_valid_stored_credentials_is_restored() {
 
     let result = facade.restore_session();
 
-    assert_eq!(result, RestoreSessionOutcome::Restored);
+    assert_eq!(result, RestoreSessionOutcomeDto::Restored);
 }
 
 #[test]
@@ -73,7 +75,7 @@ fn a_session_without_stored_credentials_is_not_available() {
 
     let result = facade.restore_session();
 
-    assert_eq!(result, RestoreSessionOutcome::NotAvailable);
+    assert_eq!(result, RestoreSessionOutcomeDto::NotAvailable);
 }
 
 #[test]
@@ -87,7 +89,7 @@ fn a_session_that_cannot_reach_sam_is_reported_with_its_kind_and_details() {
 
     assert_eq!(
         result,
-        RestoreSessionOutcome::Failure {
+        RestoreSessionOutcomeDto::Failure {
             report: network_report()
         }
     );
@@ -103,7 +105,7 @@ fn a_rejected_credential_that_cannot_be_cleared_still_routes_to_the_login_form()
 
     let result = facade.restore_session();
 
-    assert_eq!(result, RestoreSessionOutcome::NotAvailable);
+    assert_eq!(result, RestoreSessionOutcomeDto::NotAvailable);
 }
 
 #[test]
@@ -112,10 +114,10 @@ fn logging_out_clears_the_stored_credential_so_no_session_can_be_restored() {
 
     let result = facade.logout();
 
-    assert_eq!(result, LogoutOutcome::Successful);
+    assert_eq!(result, LogoutOutcomeDto::Successful);
     assert_eq!(
         facade.restore_session(),
-        RestoreSessionOutcome::NotAvailable
+        RestoreSessionOutcomeDto::NotAvailable
     );
 }
 
@@ -130,7 +132,7 @@ fn a_logout_that_cannot_clear_the_credential_is_a_local_storage_failure_with_its
 
     assert_eq!(
         result,
-        LogoutOutcome::Failure {
+        LogoutOutcomeDto::Failure {
             report: ErrorReportDto {
                 kind: ErrorKindDto::LocalStorage,
                 details: "Unable to clear credentials: \

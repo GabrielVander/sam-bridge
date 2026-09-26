@@ -12,11 +12,11 @@ use student::application::use_cases::{
     RetrieveStudentLessonsUseCase,
 };
 
-use crate::api::authentication::{LoginOutcome, LogoutOutcome, RestoreSessionOutcome};
+use crate::api::authentication::{LoginOutcomeDto, LogoutOutcomeDto, RestoreSessionOutcomeDto};
 use crate::api::error_report::ErrorReportDto;
-use crate::api::lessons::RetrieveStudentLessonsOutcome;
-use crate::api::progress::AssessStudentProgressOutcome;
-use crate::api::roster::RetrieveAllAvailableStudentsOutcome;
+use crate::api::lessons::RetrieveStudentLessonsOutcomeDto;
+use crate::api::progress::AssessStudentProgressOutcomeDto;
+use crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto;
 use crate::composition::{self, Config};
 use flutter_rust_bridge::frb;
 
@@ -55,38 +55,38 @@ impl ApplicationFacade {
     }
 
     #[must_use]
-    pub fn login(&self, email: String, password: String) -> LoginOutcome {
+    pub fn login(&self, email: String, password: String) -> LoginOutcomeDto {
         self.login_and_remember_credentials
             .execute(email, password)
             .into()
     }
 
     #[must_use]
-    pub fn restore_session(&self) -> RestoreSessionOutcome {
+    pub fn restore_session(&self) -> RestoreSessionOutcomeDto {
         self.restore_session.execute().into()
     }
 
     #[must_use]
-    pub fn logout(&self) -> LogoutOutcome {
+    pub fn logout(&self) -> LogoutOutcomeDto {
         self.logout.execute().into()
     }
 
     #[must_use]
-    pub fn retrieve_all_available_students(&self) -> RetrieveAllAvailableStudentsOutcome {
+    pub fn retrieve_all_available_students(&self) -> RetrieveAllAvailableStudentsOutcomeDto {
         self.retrieve_all_available_students.execute().into()
     }
 
     #[must_use]
     // FRB bridges owned values, so the id cannot be taken as `&str`.
     #[allow(clippy::needless_pass_by_value)]
-    pub fn retrieve_student_lessons(&self, student_id: String) -> RetrieveStudentLessonsOutcome {
+    pub fn retrieve_student_lessons(&self, student_id: String) -> RetrieveStudentLessonsOutcomeDto {
         self.retrieve_student_lessons.execute(&student_id).into()
     }
 
     #[must_use]
     // FRB bridges owned values, so the id cannot be taken as `&str`.
     #[allow(clippy::needless_pass_by_value)]
-    pub fn assess_student_progress(&self, student_id: String) -> AssessStudentProgressOutcome {
+    pub fn assess_student_progress(&self, student_id: String) -> AssessStudentProgressOutcomeDto {
         self.assess_student_progress.execute(&student_id).into()
     }
 }

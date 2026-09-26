@@ -1,6 +1,6 @@
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use gui_application::api::lessons::{
-    ClefDto, DateDto, LessonDto, RangeDto, RetrieveStudentLessonsOutcome, StudentLessonsDto,
+    ClefDto, DateDto, LessonDto, RangeDto, RetrieveStudentLessonsOutcomeDto, StudentLessonsDto,
 };
 use pretty_assertions::assert_eq;
 use student::application::gateways::{FailureKind, StudentLessonsGatewayError};
@@ -9,7 +9,7 @@ use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
 mod support;
 use support::FakeSam;
 
-fn lessons_of(lessons: StudentLessons) -> RetrieveStudentLessonsOutcome {
+fn lessons_of(lessons: StudentLessons) -> RetrieveStudentLessonsOutcomeDto {
     FakeSam::default()
         .teaching(Ok(lessons))
         .build()
@@ -42,7 +42,7 @@ fn every_field_of_a_lesson_is_carried() {
 
     assert_eq!(
         result,
-        RetrieveStudentLessonsOutcome::Success {
+        RetrieveStudentLessonsOutcomeDto::Success {
             lessons: StudentLessonsDto {
                 msa: vec![LessonDto {
                     id: Some("1".to_owned()),
@@ -95,7 +95,7 @@ fn every_clef_is_carried() {
         method: Vec::new(),
     });
 
-    let RetrieveStudentLessonsOutcome::Success { lessons } = result else {
+    let RetrieveStudentLessonsOutcomeDto::Success { lessons } = result else {
         panic!("the lessons should be retrieved, got {result:?}");
     };
     let clefs: Vec<Option<ClefDto>> = lessons.msa.into_iter().map(|l| l.clef).collect();
@@ -118,7 +118,7 @@ fn a_lessons_failure_is_reported_with_its_kind_and_details() {
 
     assert_eq!(
         result,
-        RetrieveStudentLessonsOutcome::Failure {
+        RetrieveStudentLessonsOutcomeDto::Failure {
             report: ErrorReportDto {
                 kind: ErrorKindDto::Network,
                 details: "Request failed for operation 'student_lessons'".to_owned(),

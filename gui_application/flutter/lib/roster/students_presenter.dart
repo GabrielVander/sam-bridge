@@ -52,10 +52,10 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     try {
       final outcome = await _retrieveStudents();
       switch (outcome) {
-        case RetrieveAllAvailableStudentsOutcome_Success(:final students):
+        case RetrieveAllAvailableStudentsOutcomeDto_Success(:final students):
           _all = List.unmodifiable(RosterMapper.toViewModels(students));
           emit(_filteredState());
-        case RetrieveAllAvailableStudentsOutcome_Failure(:final report):
+        case RetrieveAllAvailableStudentsOutcomeDto_Failure(:final report):
           emit(StudentsFailure(ErrorReportMapper.toViewModel(report)));
       }
     } catch (e) {

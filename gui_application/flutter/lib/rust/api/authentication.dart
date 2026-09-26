@@ -12,34 +12,34 @@ part 'authentication.freezed.dart';
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
 
 @freezed
-sealed class LoginOutcome with _$LoginOutcome {
-  const LoginOutcome._();
+sealed class LoginOutcomeDto with _$LoginOutcomeDto {
+  const LoginOutcomeDto._();
 
-  const factory LoginOutcome.successful() = LoginOutcome_Successful;
-  const factory LoginOutcome.invalidEmailOrPassword() =
-      LoginOutcome_InvalidEmailOrPassword;
-  const factory LoginOutcome.failure({required ErrorReportDto report}) =
-      LoginOutcome_Failure;
+  const factory LoginOutcomeDto.successful() = LoginOutcomeDto_Successful;
+  const factory LoginOutcomeDto.invalidEmailOrPassword() =
+      LoginOutcomeDto_InvalidEmailOrPassword;
+  const factory LoginOutcomeDto.failure({required ErrorReportDto report}) =
+      LoginOutcomeDto_Failure;
 }
 
 @freezed
-sealed class LogoutOutcome with _$LogoutOutcome {
-  const LogoutOutcome._();
+sealed class LogoutOutcomeDto with _$LogoutOutcomeDto {
+  const LogoutOutcomeDto._();
 
-  const factory LogoutOutcome.successful() = LogoutOutcome_Successful;
-  const factory LogoutOutcome.failure({required ErrorReportDto report}) =
-      LogoutOutcome_Failure;
+  const factory LogoutOutcomeDto.successful() = LogoutOutcomeDto_Successful;
+  const factory LogoutOutcomeDto.failure({required ErrorReportDto report}) =
+      LogoutOutcomeDto_Failure;
 }
 
 @freezed
-sealed class RestoreSessionOutcome with _$RestoreSessionOutcome {
-  const RestoreSessionOutcome._();
+sealed class RestoreSessionOutcomeDto with _$RestoreSessionOutcomeDto {
+  const RestoreSessionOutcomeDto._();
 
-  const factory RestoreSessionOutcome.restored() =
-      RestoreSessionOutcome_Restored;
-  const factory RestoreSessionOutcome.notAvailable() =
-      RestoreSessionOutcome_NotAvailable;
-  const factory RestoreSessionOutcome.failure({
+  const factory RestoreSessionOutcomeDto.restored() =
+      RestoreSessionOutcomeDto_Restored;
+  const factory RestoreSessionOutcomeDto.notAvailable() =
+      RestoreSessionOutcomeDto_NotAvailable;
+  const factory RestoreSessionOutcomeDto.failure({
     required ErrorReportDto report,
-  }) = RestoreSessionOutcome_Failure;
+  }) = RestoreSessionOutcomeDto_Failure;
 }

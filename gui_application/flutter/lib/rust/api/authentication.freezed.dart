@@ -12,7 +12,7 @@ part of 'authentication.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$LoginOutcome {
+mixin _$LoginOutcomeDto {
 
 
 
@@ -20,7 +20,7 @@ mixin _$LoginOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcome);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto);
 }
 
 
@@ -29,20 +29,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginOutcome()';
+  return 'LoginOutcomeDto()';
 }
 
 
 }
 
 /// @nodoc
-class $LoginOutcomeCopyWith<$Res>  {
-$LoginOutcomeCopyWith(LoginOutcome _, $Res Function(LoginOutcome) __);
+class $LoginOutcomeDtoCopyWith<$Res>  {
+$LoginOutcomeDtoCopyWith(LoginOutcomeDto _, $Res Function(LoginOutcomeDto) __);
 }
 
 
-/// Adds pattern-matching-related methods to [LoginOutcome].
-extension LoginOutcomePatterns on LoginOutcome {
+/// Adds pattern-matching-related methods to [LoginOutcomeDto].
+extension LoginOutcomeDtoPatterns on LoginOutcomeDto {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -55,12 +55,12 @@ extension LoginOutcomePatterns on LoginOutcome {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoginOutcome_Successful value)?  successful,TResult Function( LoginOutcome_InvalidEmailOrPassword value)?  invalidEmailOrPassword,TResult Function( LoginOutcome_Failure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoginOutcomeDto_Successful value)?  successful,TResult Function( LoginOutcomeDto_InvalidEmailOrPassword value)?  invalidEmailOrPassword,TResult Function( LoginOutcomeDto_Failure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case LoginOutcome_Successful() when successful != null:
-return successful(_that);case LoginOutcome_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
-return invalidEmailOrPassword(_that);case LoginOutcome_Failure() when failure != null:
+case LoginOutcomeDto_Successful() when successful != null:
+return successful(_that);case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
+return invalidEmailOrPassword(_that);case LoginOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return orElse();
 
@@ -79,12 +79,12 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoginOutcome_Successful value)  successful,required TResult Function( LoginOutcome_InvalidEmailOrPassword value)  invalidEmailOrPassword,required TResult Function( LoginOutcome_Failure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoginOutcomeDto_Successful value)  successful,required TResult Function( LoginOutcomeDto_InvalidEmailOrPassword value)  invalidEmailOrPassword,required TResult Function( LoginOutcomeDto_Failure value)  failure,}){
 final _that = this;
 switch (_that) {
-case LoginOutcome_Successful():
-return successful(_that);case LoginOutcome_InvalidEmailOrPassword():
-return invalidEmailOrPassword(_that);case LoginOutcome_Failure():
+case LoginOutcomeDto_Successful():
+return successful(_that);case LoginOutcomeDto_InvalidEmailOrPassword():
+return invalidEmailOrPassword(_that);case LoginOutcomeDto_Failure():
 return failure(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -99,12 +99,12 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoginOutcome_Successful value)?  successful,TResult? Function( LoginOutcome_InvalidEmailOrPassword value)?  invalidEmailOrPassword,TResult? Function( LoginOutcome_Failure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoginOutcomeDto_Successful value)?  successful,TResult? Function( LoginOutcomeDto_InvalidEmailOrPassword value)?  invalidEmailOrPassword,TResult? Function( LoginOutcomeDto_Failure value)?  failure,}){
 final _that = this;
 switch (_that) {
-case LoginOutcome_Successful() when successful != null:
-return successful(_that);case LoginOutcome_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
-return invalidEmailOrPassword(_that);case LoginOutcome_Failure() when failure != null:
+case LoginOutcomeDto_Successful() when successful != null:
+return successful(_that);case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
+return invalidEmailOrPassword(_that);case LoginOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return null;
 
@@ -124,9 +124,9 @@ return failure(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  successful,TResult Function()?  invalidEmailOrPassword,TResult Function( ErrorReportDto report)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case LoginOutcome_Successful() when successful != null:
-return successful();case LoginOutcome_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
-return invalidEmailOrPassword();case LoginOutcome_Failure() when failure != null:
+case LoginOutcomeDto_Successful() when successful != null:
+return successful();case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
+return invalidEmailOrPassword();case LoginOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return orElse();
 
@@ -147,9 +147,9 @@ return failure(_that.report);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  successful,required TResult Function()  invalidEmailOrPassword,required TResult Function( ErrorReportDto report)  failure,}) {final _that = this;
 switch (_that) {
-case LoginOutcome_Successful():
-return successful();case LoginOutcome_InvalidEmailOrPassword():
-return invalidEmailOrPassword();case LoginOutcome_Failure():
+case LoginOutcomeDto_Successful():
+return successful();case LoginOutcomeDto_InvalidEmailOrPassword():
+return invalidEmailOrPassword();case LoginOutcomeDto_Failure():
 return failure(_that.report);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -166,9 +166,9 @@ return failure(_that.report);}
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  successful,TResult? Function()?  invalidEmailOrPassword,TResult? Function( ErrorReportDto report)?  failure,}) {final _that = this;
 switch (_that) {
-case LoginOutcome_Successful() when successful != null:
-return successful();case LoginOutcome_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
-return invalidEmailOrPassword();case LoginOutcome_Failure() when failure != null:
+case LoginOutcomeDto_Successful() when successful != null:
+return successful();case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
+return invalidEmailOrPassword();case LoginOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return null;
 
@@ -180,8 +180,8 @@ return failure(_that.report);case _:
 /// @nodoc
 
 
-class LoginOutcome_Successful extends LoginOutcome {
-  const LoginOutcome_Successful(): super._();
+class LoginOutcomeDto_Successful extends LoginOutcomeDto {
+  const LoginOutcomeDto_Successful(): super._();
   
 
 
@@ -191,7 +191,7 @@ class LoginOutcome_Successful extends LoginOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcome_Successful);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_Successful);
 }
 
 
@@ -200,7 +200,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginOutcome.successful()';
+  return 'LoginOutcomeDto.successful()';
 }
 
 
@@ -212,8 +212,8 @@ String toString() {
 /// @nodoc
 
 
-class LoginOutcome_InvalidEmailOrPassword extends LoginOutcome {
-  const LoginOutcome_InvalidEmailOrPassword(): super._();
+class LoginOutcomeDto_InvalidEmailOrPassword extends LoginOutcomeDto {
+  const LoginOutcomeDto_InvalidEmailOrPassword(): super._();
   
 
 
@@ -223,7 +223,7 @@ class LoginOutcome_InvalidEmailOrPassword extends LoginOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcome_InvalidEmailOrPassword);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_InvalidEmailOrPassword);
 }
 
 
@@ -232,7 +232,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginOutcome.invalidEmailOrPassword()';
+  return 'LoginOutcomeDto.invalidEmailOrPassword()';
 }
 
 
@@ -244,23 +244,23 @@ String toString() {
 /// @nodoc
 
 
-class LoginOutcome_Failure extends LoginOutcome {
-  const LoginOutcome_Failure({required this.report}): super._();
+class LoginOutcomeDto_Failure extends LoginOutcomeDto {
+  const LoginOutcomeDto_Failure({required this.report}): super._();
   
 
  final  ErrorReportDto report;
 
-/// Create a copy of LoginOutcome
+/// Create a copy of LoginOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$LoginOutcome_FailureCopyWith<LoginOutcome_Failure> get copyWith => _$LoginOutcome_FailureCopyWithImpl<LoginOutcome_Failure>(this, _$identity);
+$LoginOutcomeDto_FailureCopyWith<LoginOutcomeDto_Failure> get copyWith => _$LoginOutcomeDto_FailureCopyWithImpl<LoginOutcomeDto_Failure>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcome_Failure&&(identical(other.report, report) || other.report == report));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
@@ -269,15 +269,15 @@ int get hashCode => Object.hash(runtimeType,report);
 
 @override
 String toString() {
-  return 'LoginOutcome.failure(report: $report)';
+  return 'LoginOutcomeDto.failure(report: $report)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $LoginOutcome_FailureCopyWith<$Res> implements $LoginOutcomeCopyWith<$Res> {
-  factory $LoginOutcome_FailureCopyWith(LoginOutcome_Failure value, $Res Function(LoginOutcome_Failure) _then) = _$LoginOutcome_FailureCopyWithImpl;
+abstract mixin class $LoginOutcomeDto_FailureCopyWith<$Res> implements $LoginOutcomeDtoCopyWith<$Res> {
+  factory $LoginOutcomeDto_FailureCopyWith(LoginOutcomeDto_Failure value, $Res Function(LoginOutcomeDto_Failure) _then) = _$LoginOutcomeDto_FailureCopyWithImpl;
 @useResult
 $Res call({
  ErrorReportDto report
@@ -288,17 +288,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$LoginOutcome_FailureCopyWithImpl<$Res>
-    implements $LoginOutcome_FailureCopyWith<$Res> {
-  _$LoginOutcome_FailureCopyWithImpl(this._self, this._then);
+class _$LoginOutcomeDto_FailureCopyWithImpl<$Res>
+    implements $LoginOutcomeDto_FailureCopyWith<$Res> {
+  _$LoginOutcomeDto_FailureCopyWithImpl(this._self, this._then);
 
-  final LoginOutcome_Failure _self;
-  final $Res Function(LoginOutcome_Failure) _then;
+  final LoginOutcomeDto_Failure _self;
+  final $Res Function(LoginOutcomeDto_Failure) _then;
 
-/// Create a copy of LoginOutcome
+/// Create a copy of LoginOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? report = null,}) {
-  return _then(LoginOutcome_Failure(
+  return _then(LoginOutcomeDto_Failure(
 report: null == report ? _self.report : report // ignore: cast_nullable_to_non_nullable
 as ErrorReportDto,
   ));
@@ -308,7 +308,7 @@ as ErrorReportDto,
 }
 
 /// @nodoc
-mixin _$LogoutOutcome {
+mixin _$LogoutOutcomeDto {
 
 
 
@@ -316,7 +316,7 @@ mixin _$LogoutOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcome);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto);
 }
 
 
@@ -325,20 +325,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LogoutOutcome()';
+  return 'LogoutOutcomeDto()';
 }
 
 
 }
 
 /// @nodoc
-class $LogoutOutcomeCopyWith<$Res>  {
-$LogoutOutcomeCopyWith(LogoutOutcome _, $Res Function(LogoutOutcome) __);
+class $LogoutOutcomeDtoCopyWith<$Res>  {
+$LogoutOutcomeDtoCopyWith(LogoutOutcomeDto _, $Res Function(LogoutOutcomeDto) __);
 }
 
 
-/// Adds pattern-matching-related methods to [LogoutOutcome].
-extension LogoutOutcomePatterns on LogoutOutcome {
+/// Adds pattern-matching-related methods to [LogoutOutcomeDto].
+extension LogoutOutcomeDtoPatterns on LogoutOutcomeDto {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -351,11 +351,11 @@ extension LogoutOutcomePatterns on LogoutOutcome {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LogoutOutcome_Successful value)?  successful,TResult Function( LogoutOutcome_Failure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LogoutOutcomeDto_Successful value)?  successful,TResult Function( LogoutOutcomeDto_Failure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case LogoutOutcome_Successful() when successful != null:
-return successful(_that);case LogoutOutcome_Failure() when failure != null:
+case LogoutOutcomeDto_Successful() when successful != null:
+return successful(_that);case LogoutOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return orElse();
 
@@ -374,11 +374,11 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LogoutOutcome_Successful value)  successful,required TResult Function( LogoutOutcome_Failure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LogoutOutcomeDto_Successful value)  successful,required TResult Function( LogoutOutcomeDto_Failure value)  failure,}){
 final _that = this;
 switch (_that) {
-case LogoutOutcome_Successful():
-return successful(_that);case LogoutOutcome_Failure():
+case LogoutOutcomeDto_Successful():
+return successful(_that);case LogoutOutcomeDto_Failure():
 return failure(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -393,11 +393,11 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LogoutOutcome_Successful value)?  successful,TResult? Function( LogoutOutcome_Failure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LogoutOutcomeDto_Successful value)?  successful,TResult? Function( LogoutOutcomeDto_Failure value)?  failure,}){
 final _that = this;
 switch (_that) {
-case LogoutOutcome_Successful() when successful != null:
-return successful(_that);case LogoutOutcome_Failure() when failure != null:
+case LogoutOutcomeDto_Successful() when successful != null:
+return successful(_that);case LogoutOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return null;
 
@@ -417,8 +417,8 @@ return failure(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  successful,TResult Function( ErrorReportDto report)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case LogoutOutcome_Successful() when successful != null:
-return successful();case LogoutOutcome_Failure() when failure != null:
+case LogoutOutcomeDto_Successful() when successful != null:
+return successful();case LogoutOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return orElse();
 
@@ -439,8 +439,8 @@ return failure(_that.report);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  successful,required TResult Function( ErrorReportDto report)  failure,}) {final _that = this;
 switch (_that) {
-case LogoutOutcome_Successful():
-return successful();case LogoutOutcome_Failure():
+case LogoutOutcomeDto_Successful():
+return successful();case LogoutOutcomeDto_Failure():
 return failure(_that.report);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -457,8 +457,8 @@ return failure(_that.report);}
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  successful,TResult? Function( ErrorReportDto report)?  failure,}) {final _that = this;
 switch (_that) {
-case LogoutOutcome_Successful() when successful != null:
-return successful();case LogoutOutcome_Failure() when failure != null:
+case LogoutOutcomeDto_Successful() when successful != null:
+return successful();case LogoutOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return null;
 
@@ -470,8 +470,8 @@ return failure(_that.report);case _:
 /// @nodoc
 
 
-class LogoutOutcome_Successful extends LogoutOutcome {
-  const LogoutOutcome_Successful(): super._();
+class LogoutOutcomeDto_Successful extends LogoutOutcomeDto {
+  const LogoutOutcomeDto_Successful(): super._();
   
 
 
@@ -481,7 +481,7 @@ class LogoutOutcome_Successful extends LogoutOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcome_Successful);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto_Successful);
 }
 
 
@@ -490,7 +490,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LogoutOutcome.successful()';
+  return 'LogoutOutcomeDto.successful()';
 }
 
 
@@ -502,23 +502,23 @@ String toString() {
 /// @nodoc
 
 
-class LogoutOutcome_Failure extends LogoutOutcome {
-  const LogoutOutcome_Failure({required this.report}): super._();
+class LogoutOutcomeDto_Failure extends LogoutOutcomeDto {
+  const LogoutOutcomeDto_Failure({required this.report}): super._();
   
 
  final  ErrorReportDto report;
 
-/// Create a copy of LogoutOutcome
+/// Create a copy of LogoutOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$LogoutOutcome_FailureCopyWith<LogoutOutcome_Failure> get copyWith => _$LogoutOutcome_FailureCopyWithImpl<LogoutOutcome_Failure>(this, _$identity);
+$LogoutOutcomeDto_FailureCopyWith<LogoutOutcomeDto_Failure> get copyWith => _$LogoutOutcomeDto_FailureCopyWithImpl<LogoutOutcomeDto_Failure>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcome_Failure&&(identical(other.report, report) || other.report == report));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
@@ -527,15 +527,15 @@ int get hashCode => Object.hash(runtimeType,report);
 
 @override
 String toString() {
-  return 'LogoutOutcome.failure(report: $report)';
+  return 'LogoutOutcomeDto.failure(report: $report)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $LogoutOutcome_FailureCopyWith<$Res> implements $LogoutOutcomeCopyWith<$Res> {
-  factory $LogoutOutcome_FailureCopyWith(LogoutOutcome_Failure value, $Res Function(LogoutOutcome_Failure) _then) = _$LogoutOutcome_FailureCopyWithImpl;
+abstract mixin class $LogoutOutcomeDto_FailureCopyWith<$Res> implements $LogoutOutcomeDtoCopyWith<$Res> {
+  factory $LogoutOutcomeDto_FailureCopyWith(LogoutOutcomeDto_Failure value, $Res Function(LogoutOutcomeDto_Failure) _then) = _$LogoutOutcomeDto_FailureCopyWithImpl;
 @useResult
 $Res call({
  ErrorReportDto report
@@ -546,17 +546,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$LogoutOutcome_FailureCopyWithImpl<$Res>
-    implements $LogoutOutcome_FailureCopyWith<$Res> {
-  _$LogoutOutcome_FailureCopyWithImpl(this._self, this._then);
+class _$LogoutOutcomeDto_FailureCopyWithImpl<$Res>
+    implements $LogoutOutcomeDto_FailureCopyWith<$Res> {
+  _$LogoutOutcomeDto_FailureCopyWithImpl(this._self, this._then);
 
-  final LogoutOutcome_Failure _self;
-  final $Res Function(LogoutOutcome_Failure) _then;
+  final LogoutOutcomeDto_Failure _self;
+  final $Res Function(LogoutOutcomeDto_Failure) _then;
 
-/// Create a copy of LogoutOutcome
+/// Create a copy of LogoutOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? report = null,}) {
-  return _then(LogoutOutcome_Failure(
+  return _then(LogoutOutcomeDto_Failure(
 report: null == report ? _self.report : report // ignore: cast_nullable_to_non_nullable
 as ErrorReportDto,
   ));
@@ -566,7 +566,7 @@ as ErrorReportDto,
 }
 
 /// @nodoc
-mixin _$RestoreSessionOutcome {
+mixin _$RestoreSessionOutcomeDto {
 
 
 
@@ -574,7 +574,7 @@ mixin _$RestoreSessionOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcome);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto);
 }
 
 
@@ -583,20 +583,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RestoreSessionOutcome()';
+  return 'RestoreSessionOutcomeDto()';
 }
 
 
 }
 
 /// @nodoc
-class $RestoreSessionOutcomeCopyWith<$Res>  {
-$RestoreSessionOutcomeCopyWith(RestoreSessionOutcome _, $Res Function(RestoreSessionOutcome) __);
+class $RestoreSessionOutcomeDtoCopyWith<$Res>  {
+$RestoreSessionOutcomeDtoCopyWith(RestoreSessionOutcomeDto _, $Res Function(RestoreSessionOutcomeDto) __);
 }
 
 
-/// Adds pattern-matching-related methods to [RestoreSessionOutcome].
-extension RestoreSessionOutcomePatterns on RestoreSessionOutcome {
+/// Adds pattern-matching-related methods to [RestoreSessionOutcomeDto].
+extension RestoreSessionOutcomeDtoPatterns on RestoreSessionOutcomeDto {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -609,12 +609,12 @@ extension RestoreSessionOutcomePatterns on RestoreSessionOutcome {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( RestoreSessionOutcome_Restored value)?  restored,TResult Function( RestoreSessionOutcome_NotAvailable value)?  notAvailable,TResult Function( RestoreSessionOutcome_Failure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( RestoreSessionOutcomeDto_Restored value)?  restored,TResult Function( RestoreSessionOutcomeDto_NotAvailable value)?  notAvailable,TResult Function( RestoreSessionOutcomeDto_Failure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case RestoreSessionOutcome_Restored() when restored != null:
-return restored(_that);case RestoreSessionOutcome_NotAvailable() when notAvailable != null:
-return notAvailable(_that);case RestoreSessionOutcome_Failure() when failure != null:
+case RestoreSessionOutcomeDto_Restored() when restored != null:
+return restored(_that);case RestoreSessionOutcomeDto_NotAvailable() when notAvailable != null:
+return notAvailable(_that);case RestoreSessionOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return orElse();
 
@@ -633,12 +633,12 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( RestoreSessionOutcome_Restored value)  restored,required TResult Function( RestoreSessionOutcome_NotAvailable value)  notAvailable,required TResult Function( RestoreSessionOutcome_Failure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( RestoreSessionOutcomeDto_Restored value)  restored,required TResult Function( RestoreSessionOutcomeDto_NotAvailable value)  notAvailable,required TResult Function( RestoreSessionOutcomeDto_Failure value)  failure,}){
 final _that = this;
 switch (_that) {
-case RestoreSessionOutcome_Restored():
-return restored(_that);case RestoreSessionOutcome_NotAvailable():
-return notAvailable(_that);case RestoreSessionOutcome_Failure():
+case RestoreSessionOutcomeDto_Restored():
+return restored(_that);case RestoreSessionOutcomeDto_NotAvailable():
+return notAvailable(_that);case RestoreSessionOutcomeDto_Failure():
 return failure(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -653,12 +653,12 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( RestoreSessionOutcome_Restored value)?  restored,TResult? Function( RestoreSessionOutcome_NotAvailable value)?  notAvailable,TResult? Function( RestoreSessionOutcome_Failure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( RestoreSessionOutcomeDto_Restored value)?  restored,TResult? Function( RestoreSessionOutcomeDto_NotAvailable value)?  notAvailable,TResult? Function( RestoreSessionOutcomeDto_Failure value)?  failure,}){
 final _that = this;
 switch (_that) {
-case RestoreSessionOutcome_Restored() when restored != null:
-return restored(_that);case RestoreSessionOutcome_NotAvailable() when notAvailable != null:
-return notAvailable(_that);case RestoreSessionOutcome_Failure() when failure != null:
+case RestoreSessionOutcomeDto_Restored() when restored != null:
+return restored(_that);case RestoreSessionOutcomeDto_NotAvailable() when notAvailable != null:
+return notAvailable(_that);case RestoreSessionOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return null;
 
@@ -678,9 +678,9 @@ return failure(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  restored,TResult Function()?  notAvailable,TResult Function( ErrorReportDto report)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case RestoreSessionOutcome_Restored() when restored != null:
-return restored();case RestoreSessionOutcome_NotAvailable() when notAvailable != null:
-return notAvailable();case RestoreSessionOutcome_Failure() when failure != null:
+case RestoreSessionOutcomeDto_Restored() when restored != null:
+return restored();case RestoreSessionOutcomeDto_NotAvailable() when notAvailable != null:
+return notAvailable();case RestoreSessionOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return orElse();
 
@@ -701,9 +701,9 @@ return failure(_that.report);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  restored,required TResult Function()  notAvailable,required TResult Function( ErrorReportDto report)  failure,}) {final _that = this;
 switch (_that) {
-case RestoreSessionOutcome_Restored():
-return restored();case RestoreSessionOutcome_NotAvailable():
-return notAvailable();case RestoreSessionOutcome_Failure():
+case RestoreSessionOutcomeDto_Restored():
+return restored();case RestoreSessionOutcomeDto_NotAvailable():
+return notAvailable();case RestoreSessionOutcomeDto_Failure():
 return failure(_that.report);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -720,9 +720,9 @@ return failure(_that.report);}
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  restored,TResult? Function()?  notAvailable,TResult? Function( ErrorReportDto report)?  failure,}) {final _that = this;
 switch (_that) {
-case RestoreSessionOutcome_Restored() when restored != null:
-return restored();case RestoreSessionOutcome_NotAvailable() when notAvailable != null:
-return notAvailable();case RestoreSessionOutcome_Failure() when failure != null:
+case RestoreSessionOutcomeDto_Restored() when restored != null:
+return restored();case RestoreSessionOutcomeDto_NotAvailable() when notAvailable != null:
+return notAvailable();case RestoreSessionOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return null;
 
@@ -734,8 +734,8 @@ return failure(_that.report);case _:
 /// @nodoc
 
 
-class RestoreSessionOutcome_Restored extends RestoreSessionOutcome {
-  const RestoreSessionOutcome_Restored(): super._();
+class RestoreSessionOutcomeDto_Restored extends RestoreSessionOutcomeDto {
+  const RestoreSessionOutcomeDto_Restored(): super._();
   
 
 
@@ -745,7 +745,7 @@ class RestoreSessionOutcome_Restored extends RestoreSessionOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcome_Restored);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_Restored);
 }
 
 
@@ -754,7 +754,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RestoreSessionOutcome.restored()';
+  return 'RestoreSessionOutcomeDto.restored()';
 }
 
 
@@ -766,8 +766,8 @@ String toString() {
 /// @nodoc
 
 
-class RestoreSessionOutcome_NotAvailable extends RestoreSessionOutcome {
-  const RestoreSessionOutcome_NotAvailable(): super._();
+class RestoreSessionOutcomeDto_NotAvailable extends RestoreSessionOutcomeDto {
+  const RestoreSessionOutcomeDto_NotAvailable(): super._();
   
 
 
@@ -777,7 +777,7 @@ class RestoreSessionOutcome_NotAvailable extends RestoreSessionOutcome {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcome_NotAvailable);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_NotAvailable);
 }
 
 
@@ -786,7 +786,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RestoreSessionOutcome.notAvailable()';
+  return 'RestoreSessionOutcomeDto.notAvailable()';
 }
 
 
@@ -798,23 +798,23 @@ String toString() {
 /// @nodoc
 
 
-class RestoreSessionOutcome_Failure extends RestoreSessionOutcome {
-  const RestoreSessionOutcome_Failure({required this.report}): super._();
+class RestoreSessionOutcomeDto_Failure extends RestoreSessionOutcomeDto {
+  const RestoreSessionOutcomeDto_Failure({required this.report}): super._();
   
 
  final  ErrorReportDto report;
 
-/// Create a copy of RestoreSessionOutcome
+/// Create a copy of RestoreSessionOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$RestoreSessionOutcome_FailureCopyWith<RestoreSessionOutcome_Failure> get copyWith => _$RestoreSessionOutcome_FailureCopyWithImpl<RestoreSessionOutcome_Failure>(this, _$identity);
+$RestoreSessionOutcomeDto_FailureCopyWith<RestoreSessionOutcomeDto_Failure> get copyWith => _$RestoreSessionOutcomeDto_FailureCopyWithImpl<RestoreSessionOutcomeDto_Failure>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcome_Failure&&(identical(other.report, report) || other.report == report));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
@@ -823,15 +823,15 @@ int get hashCode => Object.hash(runtimeType,report);
 
 @override
 String toString() {
-  return 'RestoreSessionOutcome.failure(report: $report)';
+  return 'RestoreSessionOutcomeDto.failure(report: $report)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $RestoreSessionOutcome_FailureCopyWith<$Res> implements $RestoreSessionOutcomeCopyWith<$Res> {
-  factory $RestoreSessionOutcome_FailureCopyWith(RestoreSessionOutcome_Failure value, $Res Function(RestoreSessionOutcome_Failure) _then) = _$RestoreSessionOutcome_FailureCopyWithImpl;
+abstract mixin class $RestoreSessionOutcomeDto_FailureCopyWith<$Res> implements $RestoreSessionOutcomeDtoCopyWith<$Res> {
+  factory $RestoreSessionOutcomeDto_FailureCopyWith(RestoreSessionOutcomeDto_Failure value, $Res Function(RestoreSessionOutcomeDto_Failure) _then) = _$RestoreSessionOutcomeDto_FailureCopyWithImpl;
 @useResult
 $Res call({
  ErrorReportDto report
@@ -842,17 +842,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$RestoreSessionOutcome_FailureCopyWithImpl<$Res>
-    implements $RestoreSessionOutcome_FailureCopyWith<$Res> {
-  _$RestoreSessionOutcome_FailureCopyWithImpl(this._self, this._then);
+class _$RestoreSessionOutcomeDto_FailureCopyWithImpl<$Res>
+    implements $RestoreSessionOutcomeDto_FailureCopyWith<$Res> {
+  _$RestoreSessionOutcomeDto_FailureCopyWithImpl(this._self, this._then);
 
-  final RestoreSessionOutcome_Failure _self;
-  final $Res Function(RestoreSessionOutcome_Failure) _then;
+  final RestoreSessionOutcomeDto_Failure _self;
+  final $Res Function(RestoreSessionOutcomeDto_Failure) _then;
 
-/// Create a copy of RestoreSessionOutcome
+/// Create a copy of RestoreSessionOutcomeDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? report = null,}) {
-  return _then(RestoreSessionOutcome_Failure(
+  return _then(RestoreSessionOutcomeDto_Failure(
 report: null == report ? _self.report : report // ignore: cast_nullable_to_non_nullable
 as ErrorReportDto,
   ));

@@ -12,22 +12,23 @@ part 'progress.freezed.dart';
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
 
 @freezed
-sealed class AssessStudentProgressOutcome with _$AssessStudentProgressOutcome {
-  const AssessStudentProgressOutcome._();
+sealed class AssessStudentProgressOutcomeDto
+    with _$AssessStudentProgressOutcomeDto {
+  const AssessStudentProgressOutcomeDto._();
 
-  const factory AssessStudentProgressOutcome.success({
+  const factory AssessStudentProgressOutcomeDto.success({
     required ProgressAssessmentDto assessment,
-  }) = AssessStudentProgressOutcome_Success;
-  const factory AssessStudentProgressOutcome.noInstrumentAssigned() =
-      AssessStudentProgressOutcome_NoInstrumentAssigned;
-  const factory AssessStudentProgressOutcome.unknownLevel({
+  }) = AssessStudentProgressOutcomeDto_Success;
+  const factory AssessStudentProgressOutcomeDto.noInstrumentAssigned() =
+      AssessStudentProgressOutcomeDto_NoInstrumentAssigned;
+  const factory AssessStudentProgressOutcomeDto.unknownLevel({
     required String rawLevel,
-  }) = AssessStudentProgressOutcome_UnknownLevel;
-  const factory AssessStudentProgressOutcome.notAMusician() =
-      AssessStudentProgressOutcome_NotAMusician;
-  const factory AssessStudentProgressOutcome.failure({
+  }) = AssessStudentProgressOutcomeDto_UnknownLevel;
+  const factory AssessStudentProgressOutcomeDto.notAMusician() =
+      AssessStudentProgressOutcomeDto_NotAMusician;
+  const factory AssessStudentProgressOutcomeDto.failure({
     required ErrorReportDto report,
-  }) = AssessStudentProgressOutcome_Failure;
+  }) = AssessStudentProgressOutcomeDto_Failure;
 }
 
 class CheckpointStatusDto {

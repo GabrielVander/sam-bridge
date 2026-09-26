@@ -49,9 +49,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
-  AssessStudentProgressOutcome dco_decode_assess_student_progress_outcome(
-    dynamic raw,
-  );
+  AssessStudentProgressOutcomeDto
+  dco_decode_assess_student_progress_outcome_dto(dynamic raw);
 
   @protected
   bool dco_decode_bool(dynamic raw);
@@ -116,10 +115,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<StudentSummaryDto> dco_decode_list_student_summary_dto(dynamic raw);
 
   @protected
-  LoginOutcome dco_decode_login_outcome(dynamic raw);
+  LoginOutcomeDto dco_decode_login_outcome_dto(dynamic raw);
 
   @protected
-  LogoutOutcome dco_decode_logout_outcome(dynamic raw);
+  LogoutOutcomeDto dco_decode_logout_outcome_dto(dynamic raw);
 
   @protected
   MusicianLevelDto dco_decode_musician_level_dto(dynamic raw);
@@ -149,16 +148,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RequirementStatusDto dco_decode_requirement_status_dto(dynamic raw);
 
   @protected
-  RestoreSessionOutcome dco_decode_restore_session_outcome(dynamic raw);
+  RestoreSessionOutcomeDto dco_decode_restore_session_outcome_dto(dynamic raw);
 
   @protected
-  RetrieveAllAvailableStudentsOutcome
-  dco_decode_retrieve_all_available_students_outcome(dynamic raw);
+  RetrieveAllAvailableStudentsOutcomeDto
+  dco_decode_retrieve_all_available_students_outcome_dto(dynamic raw);
 
   @protected
-  RetrieveStudentLessonsOutcome dco_decode_retrieve_student_lessons_outcome(
-    dynamic raw,
-  );
+  RetrieveStudentLessonsOutcomeDto
+  dco_decode_retrieve_student_lessons_outcome_dto(dynamic raw);
 
   @protected
   StudentLessonsDto dco_decode_student_lessons_dto(dynamic raw);
@@ -203,9 +201,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
-  AssessStudentProgressOutcome sse_decode_assess_student_progress_outcome(
-    SseDeserializer deserializer,
-  );
+  AssessStudentProgressOutcomeDto
+  sse_decode_assess_student_progress_outcome_dto(SseDeserializer deserializer);
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
@@ -282,10 +279,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  LoginOutcome sse_decode_login_outcome(SseDeserializer deserializer);
+  LoginOutcomeDto sse_decode_login_outcome_dto(SseDeserializer deserializer);
 
   @protected
-  LogoutOutcome sse_decode_logout_outcome(SseDeserializer deserializer);
+  LogoutOutcomeDto sse_decode_logout_outcome_dto(SseDeserializer deserializer);
 
   @protected
   MusicianLevelDto sse_decode_musician_level_dto(SseDeserializer deserializer);
@@ -321,20 +318,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  RestoreSessionOutcome sse_decode_restore_session_outcome(
+  RestoreSessionOutcomeDto sse_decode_restore_session_outcome_dto(
     SseDeserializer deserializer,
   );
 
   @protected
-  RetrieveAllAvailableStudentsOutcome
-  sse_decode_retrieve_all_available_students_outcome(
+  RetrieveAllAvailableStudentsOutcomeDto
+  sse_decode_retrieve_all_available_students_outcome_dto(
     SseDeserializer deserializer,
   );
 
   @protected
-  RetrieveStudentLessonsOutcome sse_decode_retrieve_student_lessons_outcome(
-    SseDeserializer deserializer,
-  );
+  RetrieveStudentLessonsOutcomeDto
+  sse_decode_retrieve_student_lessons_outcome_dto(SseDeserializer deserializer);
 
   @protected
   StudentLessonsDto sse_decode_student_lessons_dto(
@@ -388,8 +384,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
-  void sse_encode_assess_student_progress_outcome(
-    AssessStudentProgressOutcome self,
+  void sse_encode_assess_student_progress_outcome_dto(
+    AssessStudentProgressOutcomeDto self,
     SseSerializer serializer,
   );
 
@@ -487,10 +483,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_login_outcome(LoginOutcome self, SseSerializer serializer);
+  void sse_encode_login_outcome_dto(
+    LoginOutcomeDto self,
+    SseSerializer serializer,
+  );
 
   @protected
-  void sse_encode_logout_outcome(LogoutOutcome self, SseSerializer serializer);
+  void sse_encode_logout_outcome_dto(
+    LogoutOutcomeDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_musician_level_dto(
@@ -541,20 +543,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_restore_session_outcome(
-    RestoreSessionOutcome self,
+  void sse_encode_restore_session_outcome_dto(
+    RestoreSessionOutcomeDto self,
     SseSerializer serializer,
   );
 
   @protected
-  void sse_encode_retrieve_all_available_students_outcome(
-    RetrieveAllAvailableStudentsOutcome self,
+  void sse_encode_retrieve_all_available_students_outcome_dto(
+    RetrieveAllAvailableStudentsOutcomeDto self,
     SseSerializer serializer,
   );
 
   @protected
-  void sse_encode_retrieve_student_lessons_outcome(
-    RetrieveStudentLessonsOutcome self,
+  void sse_encode_retrieve_student_lessons_outcome_dto(
+    RetrieveStudentLessonsOutcomeDto self,
     SseSerializer serializer,
   );
 

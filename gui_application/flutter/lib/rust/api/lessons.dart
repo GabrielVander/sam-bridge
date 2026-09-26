@@ -13,7 +13,6 @@ part 'lessons.freezed.dart';
 
 enum ClefDto { g, c, f }
 
-/// A calendar date; Flutter decides how to write it.
 class DateDto {
   final int year;
   final int month;
@@ -104,16 +103,16 @@ class RangeDto {
 }
 
 @freezed
-sealed class RetrieveStudentLessonsOutcome
-    with _$RetrieveStudentLessonsOutcome {
-  const RetrieveStudentLessonsOutcome._();
+sealed class RetrieveStudentLessonsOutcomeDto
+    with _$RetrieveStudentLessonsOutcomeDto {
+  const RetrieveStudentLessonsOutcomeDto._();
 
-  const factory RetrieveStudentLessonsOutcome.success({
+  const factory RetrieveStudentLessonsOutcomeDto.success({
     required StudentLessonsDto lessons,
-  }) = RetrieveStudentLessonsOutcome_Success;
-  const factory RetrieveStudentLessonsOutcome.failure({
+  }) = RetrieveStudentLessonsOutcomeDto_Success;
+  const factory RetrieveStudentLessonsOutcomeDto.failure({
     required ErrorReportDto report,
-  }) = RetrieveStudentLessonsOutcome_Failure;
+  }) = RetrieveStudentLessonsOutcomeDto_Failure;
 }
 
 class StudentLessonsDto {

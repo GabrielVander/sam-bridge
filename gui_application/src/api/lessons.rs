@@ -44,12 +44,12 @@ pub struct StudentLessonsDto {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RetrieveStudentLessonsOutcome {
+pub enum RetrieveStudentLessonsOutcomeDto {
     Success { lessons: StudentLessonsDto },
     Failure { report: ErrorReportDto },
 }
 
-impl From<Result<StudentLessons, StudentLessonsGatewayError>> for RetrieveStudentLessonsOutcome {
+impl From<Result<StudentLessons, StudentLessonsGatewayError>> for RetrieveStudentLessonsOutcomeDto {
     fn from(result: Result<StudentLessons, StudentLessonsGatewayError>) -> Self {
         match result {
             Ok(lessons) => Self::Success {
