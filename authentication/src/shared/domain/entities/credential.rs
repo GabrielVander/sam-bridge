@@ -14,5 +14,11 @@ impl Credential {
 #[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct Email(pub String);
 
-#[derive(Debug, PartialEq, Eq, Clone, Default)]
+#[derive(PartialEq, Eq, Clone, Default)]
 pub struct Password(pub String);
+
+impl std::fmt::Debug for Password {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str("Password(***)")
+    }
+}
