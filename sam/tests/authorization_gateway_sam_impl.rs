@@ -108,6 +108,27 @@ fn given_an_unexpected_response_authorization_fails() {
 }
 
 #[test]
+fn given_a_server_error_authorization_fails_instead_of_rejecting_the_credential() {
+    smol::block_on(async {
+        let mock_server: MockServer = MockServer::start().await;
+
+        Mock::given(method("POST"))
+            .and(path("/autenticar"))
+            .respond_with(ResponseTemplate::new(500))
+            .mount(&mock_server)
+            .await;
+
+        let gateway: AuthorizationGatewaySamImpl =
+            build_gateway(&mock_server).expect("client should be built");
+
+        let (kind, _) =
+            failure_of(gateway.authorize(&credential())).expect("authorization should have failed");
+
+        assert_eq!(kind, FailureKind::Unexpected);
+    });
+}
+
+#[test]
 fn given_a_connection_failure_authorization_fails() {
     smol::block_on(async {
         let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
