@@ -6,7 +6,7 @@ use sam::lessons::adapters::gateways::MusicianProfileGatewaySamImpl;
 use student::application::gateways::{
     FailureKind, MusicianProfileGateway, MusicianProfileGatewayError,
 };
-use student::domain::entities::{Instrument, MusicianLevel, MusicianProfile};
+use student::domain::entities::{Instrument, MusicianLevel, MusicianProfile, StudentId};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -27,7 +27,9 @@ fn returns_the_musicians_level_and_instrument() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let profile: MusicianProfile = gateway.get_by_id("1").expect("should succeed");
+        let profile: MusicianProfile = gateway
+            .get_by_id(&StudentId::new("1".to_owned()))
+            .expect("should succeed");
 
         assert_eq!(profile.level, MusicianLevel::YouthService);
         assert_eq!(profile.instrument, Some(Instrument::Violin));
@@ -48,7 +50,9 @@ fn student_without_an_assigned_instrument_has_none() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let profile: MusicianProfile = gateway.get_by_id("1").expect("should succeed");
+        let profile: MusicianProfile = gateway
+            .get_by_id(&StudentId::new("1".to_owned()))
+            .expect("should succeed");
 
         assert_eq!(profile.instrument, None);
     });
@@ -68,7 +72,9 @@ fn student_with_a_blank_instrument_column_has_none() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let profile: MusicianProfile = gateway.get_by_id("1").expect("should succeed");
+        let profile: MusicianProfile = gateway
+            .get_by_id(&StudentId::new("1".to_owned()))
+            .expect("should succeed");
 
         assert_eq!(profile.instrument, None);
     });
@@ -89,7 +95,7 @@ fn unknown_id_is_not_found() {
             build_gateway(&mock_server).expect("client should be built");
 
         let result: Result<MusicianProfile, MusicianProfileGatewayError> =
-            gateway.get_by_id("does-not-exist");
+            gateway.get_by_id(&StudentId::new("does-not-exist".to_owned()));
 
         assert_eq!(result, Err(MusicianProfileGatewayError::NotFound));
     });
@@ -109,7 +115,8 @@ fn non_musician_is_reported_as_not_a_musician() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let result: Result<MusicianProfile, MusicianProfileGatewayError> = gateway.get_by_id("1");
+        let result: Result<MusicianProfile, MusicianProfileGatewayError> =
+            gateway.get_by_id(&StudentId::new("1".to_owned()));
 
         assert_eq!(result, Err(MusicianProfileGatewayError::NotAMusician));
     });
@@ -129,8 +136,8 @@ fn an_expired_session_is_reported_with_its_kind_and_details() {
         let gateway: MusicianProfileGatewaySamImpl =
             build_gateway(&mock_server).expect("client should be built");
 
-        let (kind, details) =
-            failure_of(gateway.get_by_id("1")).expect("profile retrieval should have failed");
+        let (kind, details) = failure_of(gateway.get_by_id(&StudentId::new("1".to_owned())))
+            .expect("profile retrieval should have failed");
 
         assert_eq!(kind, FailureKind::SessionExpired);
         assert!(details.contains("Session expired"), "got: {details}");
@@ -143,8 +150,8 @@ fn an_unreachable_site_is_a_network_error_naming_the_operation() {
     let gateway: MusicianProfileGatewaySamImpl =
         build_gateway_for("http://127.0.0.1:1").expect("client should be built");
 
-    let (kind, details) =
-        failure_of(gateway.get_by_id("1")).expect("profile retrieval should have failed");
+    let (kind, details) = failure_of(gateway.get_by_id(&StudentId::new("1".to_owned())))
+        .expect("profile retrieval should have failed");
 
     assert_eq!(kind, FailureKind::Transient);
     assert!(details.contains("dashboard"), "got: {details}");
@@ -261,5 +268,5 @@ fn profile_of(
         FakeSamClient::listing(vec![sam_student(role, level, instrument, "SOMEWHERE")]),
     ));
 
-    gateway.get_by_id("99999")
+    gateway.get_by_id(&StudentId::new("99999".to_owned()))
 }

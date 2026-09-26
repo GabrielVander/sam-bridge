@@ -46,7 +46,7 @@ fn given_accessible_dashboard_students_should_be_retrieved_and_mapped() {
         let students: Vec<Student> = result.expect("students retrieval should succeed");
 
         assert_eq!(students.len(), 1);
-        assert_eq!(students[0].id, "99998");
+        assert_eq!(students[0].id.as_str(), "99998");
         assert_eq!(students[0].name, "PEDRO ÁLVARES CABRAL");
         assert_eq!(
             students[0].location,
@@ -238,7 +238,7 @@ fn a_client_reporting_invalid_credentials_for_a_data_fetch_fails_with_an_unknown
 fn a_student_keeps_the_id_and_name_sam_lists() {
     let student: Student = student_listed_as("MÚSICO", "CANDIDATO(A)", "A DEFINIR").unwrap();
 
-    assert_eq!(student.id, "99999");
+    assert_eq!(student.id.as_str(), "99999");
     assert_eq!(student.name, "CARLOS ALBERTO DE NOBREGA");
 }
 

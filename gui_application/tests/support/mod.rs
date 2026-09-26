@@ -24,7 +24,7 @@ use student::application::use_cases::{
     AssessStudentProgressUseCase, RetrieveAllAvailableStudentsUseCase,
     RetrieveStudentLessonsUseCase,
 };
-use student::domain::entities::{MusicianProfile, Student, StudentLessons};
+use student::domain::entities::{MusicianProfile, Student, StudentId, StudentLessons};
 
 pub struct FakeSam {
     authorization: Result<AuthorizationResult, AuthorizationError>,
@@ -141,7 +141,7 @@ impl StudentGateway for Answering<Result<Vec<Student>, StudentGatewayError>> {
 }
 
 impl MusicianProfileGateway for Answering<Result<MusicianProfile, MusicianProfileGatewayError>> {
-    fn get_by_id(&self, _id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+    fn get_by_id(&self, _id: &StudentId) -> Result<MusicianProfile, MusicianProfileGatewayError> {
         self.0.clone()
     }
 }
@@ -149,7 +149,7 @@ impl MusicianProfileGateway for Answering<Result<MusicianProfile, MusicianProfil
 impl StudentLessonsGateway for Answering<Result<StudentLessons, StudentLessonsGatewayError>> {
     fn get_all_for_student_with_id(
         &self,
-        _id: &str,
+        _id: &StudentId,
     ) -> Result<StudentLessons, StudentLessonsGatewayError> {
         self.0.clone()
     }

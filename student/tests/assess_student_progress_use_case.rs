@@ -7,7 +7,7 @@ use student::application::gateways::{
 use student::application::use_cases::{AssessStudentProgressError, AssessStudentProgressUseCase};
 use student::domain::entities::{
     AssessError, CheckpointStatus, Instrument, MusicianLevel, MusicianProfile, ProgressAssessment,
-    StudentLessons,
+    StudentId, StudentLessons,
 };
 
 mod support;
@@ -25,7 +25,9 @@ fn assesses_progress_from_the_gateways_profile_and_lessons() {
         }),
     );
 
-    let assessment: ProgressAssessment = use_case.execute("500132").expect("should succeed");
+    let assessment: ProgressAssessment = use_case
+        .execute(&StudentId::new("500132".to_owned()))
+        .expect("should succeed");
 
     let youth_service: &CheckpointStatus =
         checkpoint(&assessment, &MusicianLevel::YouthService).expect("youth service checkpoint");
@@ -40,7 +42,8 @@ fn propagates_profile_gateway_errors() {
         Ok(StudentLessons::default()),
     );
 
-    let result: Result<ProgressAssessment, AssessStudentProgressError> = use_case.execute("500132");
+    let result: Result<ProgressAssessment, AssessStudentProgressError> =
+        use_case.execute(&StudentId::new("500132".to_owned()));
 
     assert_eq!(
         result,
@@ -61,7 +64,8 @@ fn propagates_profile_gateway_failures_with_their_kind_and_details() {
     let use_case: AssessStudentProgressUseCase =
         use_case(Err(failure.clone()), Ok(StudentLessons::default()));
 
-    let result: Result<ProgressAssessment, AssessStudentProgressError> = use_case.execute("500132");
+    let result: Result<ProgressAssessment, AssessStudentProgressError> =
+        use_case.execute(&StudentId::new("500132".to_owned()));
 
     assert_eq!(result, Err(AssessStudentProgressError::Profile(failure)));
 }
@@ -73,7 +77,8 @@ fn student_with_no_instrument_assigned_is_reported_without_fetching_lessons() {
         Err(lessons_failure()),
     );
 
-    let result: Result<ProgressAssessment, AssessStudentProgressError> = use_case.execute("500132");
+    let result: Result<ProgressAssessment, AssessStudentProgressError> =
+        use_case.execute(&StudentId::new("500132".to_owned()));
 
     assert_eq!(
         result,
@@ -88,7 +93,8 @@ fn propagates_lessons_gateway_errors() {
         Err(lessons_failure()),
     );
 
-    let result: Result<ProgressAssessment, AssessStudentProgressError> = use_case.execute("500132");
+    let result: Result<ProgressAssessment, AssessStudentProgressError> =
+        use_case.execute(&StudentId::new("500132".to_owned()));
 
     assert_eq!(
         result,
@@ -106,7 +112,8 @@ fn propagates_unknown_level_assessment_errors() {
         Ok(StudentLessons::default()),
     );
 
-    let result: Result<ProgressAssessment, AssessStudentProgressError> = use_case.execute("500132");
+    let result: Result<ProgressAssessment, AssessStudentProgressError> =
+        use_case.execute(&StudentId::new("500132".to_owned()));
 
     assert_eq!(
         result,
@@ -126,7 +133,8 @@ fn propagates_unpublished_requirements_assessment_errors() {
         Ok(StudentLessons::default()),
     );
 
-    let result: Result<ProgressAssessment, AssessStudentProgressError> = use_case.execute("500132");
+    let result: Result<ProgressAssessment, AssessStudentProgressError> =
+        use_case.execute(&StudentId::new("500132".to_owned()));
 
     assert_eq!(
         result,

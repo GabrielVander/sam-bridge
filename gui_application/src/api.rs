@@ -11,6 +11,7 @@ use student::application::use_cases::{
     AssessStudentProgressUseCase, RetrieveAllAvailableStudentsUseCase,
     RetrieveStudentLessonsUseCase,
 };
+use student::domain::entities::StudentId;
 
 use crate::api::authentication::{LoginOutcomeDto, LogoutOutcomeDto, RestoreSessionOutcomeDto};
 use crate::api::error_report::ErrorReportDto;
@@ -77,16 +78,16 @@ impl ApplicationFacade {
     }
 
     #[must_use]
-    // FRB bridges owned values, so the id cannot be taken as `&str`.
-    #[allow(clippy::needless_pass_by_value)]
     pub fn retrieve_student_lessons(&self, student_id: String) -> RetrieveStudentLessonsOutcomeDto {
-        self.retrieve_student_lessons.execute(&student_id).into()
+        self.retrieve_student_lessons
+            .execute(&StudentId::new(student_id))
+            .into()
     }
 
     #[must_use]
-    // FRB bridges owned values, so the id cannot be taken as `&str`.
-    #[allow(clippy::needless_pass_by_value)]
     pub fn assess_student_progress(&self, student_id: String) -> AssessStudentProgressOutcomeDto {
-        self.assess_student_progress.execute(&student_id).into()
+        self.assess_student_progress
+            .execute(&StudentId::new(student_id))
+            .into()
     }
 }

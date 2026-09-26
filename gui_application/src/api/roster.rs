@@ -62,7 +62,7 @@ impl From<Student> for StudentSummaryDto {
         };
 
         Self {
-            id: student.id,
+            id: student.id.as_str().to_owned(),
             name: student.name,
             position: student.position.into(),
             location: student.location,

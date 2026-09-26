@@ -2,7 +2,7 @@ use std::sync::Arc;
 use student::{
     application::gateways::{StudentGateway, StudentGatewayError},
     domain::entities::{
-        Instrument, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
+        Instrument, OrganistLevel, Region, SecretaryType, Student, StudentId, StudentPosition,
     },
 };
 
@@ -43,7 +43,7 @@ impl From<SamStudent> for Student {
         let location: String = clean_location(&sam_student.location);
 
         Self {
-            id: sam_student.id,
+            id: StudentId::new(sam_student.id),
             name: sam_student.name,
             position,
             location,

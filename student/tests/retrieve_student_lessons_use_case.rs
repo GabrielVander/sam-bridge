@@ -4,7 +4,7 @@ use chrono::NaiveDate;
 use pretty_assertions::assert_eq;
 use student::application::gateways::{FailureKind, StudentLessonsGatewayError};
 use student::application::use_cases::RetrieveStudentLessonsUseCase;
-use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
+use student::domain::entities::{Clef, Lesson, Range, StudentId, StudentLessons};
 
 mod support;
 use support::FakeStudentLessonsGateway;
@@ -30,7 +30,8 @@ fn returns_the_lessons_from_the_gateway() {
         FakeStudentLessonsGateway::returning(Ok(lessons.clone())),
     ));
 
-    let result: Result<StudentLessons, StudentLessonsGatewayError> = use_case.execute("500132");
+    let result: Result<StudentLessons, StudentLessonsGatewayError> =
+        use_case.execute(&StudentId::new("500132".to_owned()));
 
     assert_eq!(result, Ok(lessons));
 }
@@ -47,7 +48,8 @@ fn propagates_gateway_errors_with_their_kind_and_details() {
         FakeStudentLessonsGateway::returning(Err(failure.clone())),
     ));
 
-    let result: Result<StudentLessons, StudentLessonsGatewayError> = use_case.execute("500132");
+    let result: Result<StudentLessons, StudentLessonsGatewayError> =
+        use_case.execute(&StudentId::new("500132".to_owned()));
 
     assert_eq!(result, Err(failure));
 }

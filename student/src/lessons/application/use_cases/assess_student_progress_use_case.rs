@@ -7,6 +7,7 @@ use crate::lessons::{
     },
     domain::entities::{AssessError, ProgressAssessment, assess},
 };
+use crate::shared::domain::entities::StudentId;
 use thiserror::Error;
 
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
@@ -40,7 +41,7 @@ impl AssessStudentProgressUseCase {
 
     pub fn execute(
         &self,
-        student_id: &str,
+        student_id: &StudentId,
     ) -> Result<ProgressAssessment, AssessStudentProgressError> {
         let profile = self.profile_gateway.get_by_id(student_id)?;
         let Some(instrument) = profile.instrument else {

@@ -7,7 +7,7 @@ use sam::lessons::adapters::gateways::StudentLessonsGatewaySamImpl;
 use student::application::gateways::{
     FailureKind, StudentLessonsGateway, StudentLessonsGatewayError,
 };
-use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
+use student::domain::entities::{Clef, Lesson, Range, StudentId, StudentLessons};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -33,7 +33,7 @@ fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
             build_gateway(&mock_server).expect("gateway should be built");
 
         let result: StudentLessons = gateway
-            .get_all_for_student_with_id("500132")
+            .get_all_for_student_with_id(&StudentId::new("500132".to_owned()))
             .expect("Lessons retrieval should succeed");
 
         assert_eq!(
@@ -100,7 +100,7 @@ fn given_page_with_no_lessons_should_return_empty_bundle() {
             build_gateway(&mock_server).expect("gateway should be built");
 
         let result: StudentLessons = gateway
-            .get_all_for_student_with_id("999999")
+            .get_all_for_student_with_id(&StudentId::new("999999".to_owned()))
             .expect("Lessons retrieval should succeed");
 
         assert_eq!(result, StudentLessons::default());
@@ -121,8 +121,9 @@ fn given_an_unexpected_status_the_failure_names_it() {
         let gateway: StudentLessonsGatewaySamImpl =
             build_gateway(&mock_server).expect("gateway should be built");
 
-        let (kind, details) = failure_of(gateway.get_all_for_student_with_id("500132"))
-            .expect("lessons retrieval should have failed");
+        let (kind, details) =
+            failure_of(gateway.get_all_for_student_with_id(&StudentId::new("500132".to_owned())))
+                .expect("lessons retrieval should have failed");
 
         assert_eq!(kind, FailureKind::Unexpected);
         assert!(details.contains("500"), "got: {details}");
@@ -135,8 +136,9 @@ fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation
     let gateway: StudentLessonsGatewaySamImpl =
         build_gateway_for("http://127.0.0.1:1").expect("gateway should be built");
 
-    let (kind, details) = failure_of(gateway.get_all_for_student_with_id("500132"))
-        .expect("lessons retrieval should have failed");
+    let (kind, details) =
+        failure_of(gateway.get_all_for_student_with_id(&StudentId::new("500132".to_owned())))
+            .expect("lessons retrieval should have failed");
 
     assert_eq!(kind, FailureKind::Transient);
     assert!(details.contains("student_lessons"), "got: {details}");
@@ -265,7 +267,7 @@ fn msa_lesson_read_from(row: MsaLesson) -> Option<Lesson> {
     ));
 
     gateway
-        .get_all_for_student_with_id("500132")
+        .get_all_for_student_with_id(&StudentId::new("500132".to_owned()))
         .ok()?
         .msa
         .pop()

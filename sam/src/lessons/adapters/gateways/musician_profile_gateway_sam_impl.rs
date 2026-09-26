@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use student::application::gateways::{MusicianProfileGateway, MusicianProfileGatewayError};
-use student::domain::entities::MusicianProfile;
+use student::domain::entities::{MusicianProfile, StudentId};
 
 use crate::client::{SamClient, SamStudent};
 use crate::diagnostics::{error_chain, failure_kind};
@@ -16,7 +16,7 @@ impl MusicianProfileGatewaySamImpl {
     }
 }
 impl MusicianProfileGateway for MusicianProfileGatewaySamImpl {
-    fn get_by_id(&self, id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+    fn get_by_id(&self, id: &StudentId) -> Result<MusicianProfile, MusicianProfileGatewayError> {
         let sam_students: Vec<SamStudent> = self.client.students().map_err(|error| {
             MusicianProfileGatewayError::UnableToPerformOperation {
                 kind: failure_kind(&error),
@@ -26,7 +26,7 @@ impl MusicianProfileGateway for MusicianProfileGatewaySamImpl {
 
         let sam_student: SamStudent = sam_students
             .into_iter()
-            .find(|student| student.id == id)
+            .find(|student| student.id == id.as_str())
             .ok_or(MusicianProfileGatewayError::NotFound)?;
 
         if sam_student.role != MUSICIAN_ROLE {

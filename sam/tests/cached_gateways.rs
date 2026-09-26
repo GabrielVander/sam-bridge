@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use std::time::Duration;
+use student::domain::entities::StudentId;
 
 use sam::client::{CacheTtl, SamClient, SamClientCacheDecorator, SamClientImpl, SystemClock};
 use sam::http::SamOperations;
@@ -29,7 +30,9 @@ fn the_student_and_musician_profile_gateways_share_a_single_listing_fetch() {
         students
             .get_available_records()
             .expect("listing should succeed");
-        profiles.get_by_id("1").expect("profile should be found");
+        profiles
+            .get_by_id(&StudentId::new("1".to_owned()))
+            .expect("profile should be found");
         students
             .get_available_records()
             .expect("listing should succeed");
@@ -59,10 +62,10 @@ fn repeated_lessons_requests_for_the_same_student_hit_the_site_once() {
         );
 
         lessons
-            .get_all_for_student_with_id("500132")
+            .get_all_for_student_with_id(&StudentId::new("500132".to_owned()))
             .expect("lessons should be retrieved");
         lessons
-            .get_all_for_student_with_id("500132")
+            .get_all_for_student_with_id(&StudentId::new("500132".to_owned()))
             .expect("lessons should be retrieved");
 
         assert_eq!(requests_to(&mock_server, "/licoes/index/500132").await, 1);

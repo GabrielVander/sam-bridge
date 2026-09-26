@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use student::application::gateways::{StudentLessonsGateway, StudentLessonsGatewayError};
-use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
+use student::domain::entities::{Clef, Lesson, Range, StudentId, StudentLessons};
 
 use crate::client::{MsaLesson, MtdLesson, SamClient, StudentLessonsPage};
 use crate::diagnostics::{error_chain, failure_kind};
@@ -17,14 +17,15 @@ impl StudentLessonsGatewaySamImpl {
 impl StudentLessonsGateway for StudentLessonsGatewaySamImpl {
     fn get_all_for_student_with_id(
         &self,
-        id: &str,
+        id: &StudentId,
     ) -> Result<StudentLessons, StudentLessonsGatewayError> {
-        let page: StudentLessonsPage = self.client.student_lessons(id).map_err(|error| {
-            StudentLessonsGatewayError::UnableToPerformOperation {
-                kind: failure_kind(&error),
-                details: error_chain(&error),
-            }
-        })?;
+        let page: StudentLessonsPage =
+            self.client.student_lessons(id.as_str()).map_err(|error| {
+                StudentLessonsGatewayError::UnableToPerformOperation {
+                    kind: failure_kind(&error),
+                    details: error_chain(&error),
+                }
+            })?;
 
         Ok(StudentLessons {
             msa: page.msa.into_iter().map(Lesson::from).collect(),

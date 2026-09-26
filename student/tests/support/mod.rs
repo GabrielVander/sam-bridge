@@ -5,7 +5,7 @@ use student::application::gateways::{
     StudentLessonsGatewayError,
 };
 use student::domain::entities::{
-    CheckpointStatus, Lesson, MusicianLevel, MusicianProfile, ProgressAssessment, Range,
+    CheckpointStatus, Lesson, MusicianLevel, MusicianProfile, ProgressAssessment, Range, StudentId,
     StudentLessons,
 };
 
@@ -22,7 +22,7 @@ impl FakeStudentLessonsGateway {
 impl StudentLessonsGateway for FakeStudentLessonsGateway {
     fn get_all_for_student_with_id(
         &self,
-        _id: &str,
+        _id: &StudentId,
     ) -> Result<StudentLessons, StudentLessonsGatewayError> {
         self.result.clone()
     }
@@ -39,7 +39,7 @@ impl FakeMusicianProfileGateway {
 }
 
 impl MusicianProfileGateway for FakeMusicianProfileGateway {
-    fn get_by_id(&self, _id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+    fn get_by_id(&self, _id: &StudentId) -> Result<MusicianProfile, MusicianProfileGatewayError> {
         self.result.clone()
     }
 }

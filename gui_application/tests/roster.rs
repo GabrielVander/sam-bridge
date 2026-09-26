@@ -5,7 +5,8 @@ use gui_application::api::roster::{
 use pretty_assertions::assert_eq;
 use student::application::gateways::{FailureKind, StudentGatewayError};
 use student::domain::entities::{
-    Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
+    Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentId,
+    StudentPosition,
 };
 
 mod support;
@@ -13,7 +14,7 @@ use support::FakeSam;
 
 fn student(position: StudentPosition) -> Student {
     Student {
-        id: "1".to_owned(),
+        id: StudentId::new("1".to_owned()),
         name: "Someone".to_owned(),
         position,
         location: "Somewhere".to_owned(),

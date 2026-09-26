@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use student::domain::entities::StudentId;
 use student::{
     application::{
         gateways::{FailureKind, StudentGateway, StudentGatewayError},
@@ -31,7 +32,7 @@ impl StudentGateway for FakeStudentGateway {
 fn returns_every_available_student() {
     let students: [Student; 3] = [
         Student {
-            id: "1".to_string(),
+            id: StudentId::new("1".to_owned()),
             name: "Student A".to_string(),
             position: StudentPosition::Musician {
                 level: MusicianLevel::Candidate,
@@ -42,7 +43,7 @@ fn returns_every_available_student() {
             region: Region::AraraquaraSaoCarlos,
         },
         Student {
-            id: "2".to_string(),
+            id: StudentId::new("2".to_owned()),
             name: "Student B".to_string(),
             position: StudentPosition::Secretary {
                 r#type: SecretaryType::Music,
@@ -51,7 +52,7 @@ fn returns_every_available_student() {
             region: Region::AraraquaraSaoCarlos,
         },
         Student {
-            id: "3".to_string(),
+            id: StudentId::new("3".to_owned()),
             name: "Student C".to_string(),
             position: StudentPosition::Organist {
                 level: OrganistLevel::YouthServiceHalfHour,

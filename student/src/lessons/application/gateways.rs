@@ -1,11 +1,12 @@
 use thiserror::Error;
 
 use crate::lessons::domain::entities::{MusicianProfile, StudentLessons};
+use crate::shared::domain::entities::StudentId;
 use shared_kernel::failure_kind::FailureKind;
 pub trait StudentLessonsGateway: Send + Sync {
     fn get_all_for_student_with_id(
         &self,
-        id: &str,
+        id: &StudentId,
     ) -> Result<StudentLessons, StudentLessonsGatewayError>;
 }
 
@@ -15,7 +16,7 @@ pub enum StudentLessonsGatewayError {
     UnableToPerformOperation { kind: FailureKind, details: String },
 }
 pub trait MusicianProfileGateway: Send + Sync {
-    fn get_by_id(&self, id: &str) -> Result<MusicianProfile, MusicianProfileGatewayError>;
+    fn get_by_id(&self, id: &StudentId) -> Result<MusicianProfile, MusicianProfileGatewayError>;
 }
 
 #[derive(Error, Debug, Clone, PartialEq, Eq)]
