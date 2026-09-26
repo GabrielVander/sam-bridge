@@ -1,6 +1,8 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/l10n/app_localizations.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/router.dart';
@@ -30,7 +32,9 @@ class SamSiteApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           return MaterialApp.router(
-            title: 'SAM Bridge',
+            onGenerateTitle: (context) => context.l10n.appTitle,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             routerConfig: buildRouter(
               appVersion: versionDisplay,
               authPresenter: authPresenter,

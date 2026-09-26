@@ -4,6 +4,8 @@ import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/localization.dart';
+
 const _details = 'Request failed for operation dashboard: connection refused';
 
 const _report = ErrorReport(
@@ -17,7 +19,7 @@ Future<void> pumpPanel(
   VoidCallback? onRetry,
 }) async {
   await tester.pumpWidget(
-    MaterialApp(
+    localizedApp(
       home: Scaffold(
         body: ErrorPanel(report: report, onRetry: onRetry ?? () {}),
       ),

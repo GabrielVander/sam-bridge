@@ -1,6 +1,7 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 
 class MainScreen extends StatelessWidget {
   final String versionDisplay;
@@ -16,7 +17,7 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SAM Bridge'),
+        title: Text(context.l10n.appTitle),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         actions: [

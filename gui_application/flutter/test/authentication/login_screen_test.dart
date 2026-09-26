@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../support/authentication.dart';
 import '../support/errors.dart';
+import '../support/localization.dart';
 
 const _details = "Request failed for operation 'authentication'";
 
@@ -46,7 +47,7 @@ Future<List<(String, String)>> pumpLoginForm(
   await tester.pumpWidget(
     BlocSignalProvider<AuthPresenter>.value(
       value: presenter,
-      child: MaterialApp.router(routerConfig: router),
+      child: localizedRouterApp(router),
     ),
   );
   return attempts;
@@ -63,7 +64,7 @@ Future<void> pumpLogin(
   );
 
   await tester.pumpWidget(
-    MaterialApp(
+    localizedApp(
       home: Scaffold(
         body: BlocSignalProvider<AuthPresenter>.value(
           value: presenter,

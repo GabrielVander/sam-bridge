@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/widgets/loading_indicator.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/localization.dart';
+
 const _slowNotice = 'O SAM está demorando para responder';
 
 Future<void> pumpIndicator(WidgetTester tester) => tester.pumpWidget(
-  const MaterialApp(home: Scaffold(body: LoadingIndicator())),
+  localizedApp(home: const Scaffold(body: LoadingIndicator())),
 );
 
 void main() {

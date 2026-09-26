@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'localization.dart';
+
 LessonItem lessonItem({
   LessonKind kind = LessonKind.msa,
   String id = '1',
@@ -57,4 +59,4 @@ ProgressView progressView({
 );
 
 Future<void> pumpInApp(WidgetTester tester, Widget child) =>
-    tester.pumpWidget(MaterialApp(home: Scaffold(body: child)));
+    tester.pumpWidget(localizedApp(home: Scaffold(body: child)));

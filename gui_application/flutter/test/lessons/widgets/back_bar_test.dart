@@ -3,6 +3,8 @@ import 'package:flutter_application/lessons/widgets/back_bar.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../support/localization.dart';
+
 Future<void> pumpBackBar(WidgetTester tester, {String? studentName}) {
   final router = GoRouter(
     initialLocation: '/student',
@@ -17,7 +19,7 @@ Future<void> pumpBackBar(WidgetTester tester, {String? studentName}) {
       ),
     ],
   );
-  return tester.pumpWidget(MaterialApp.router(routerConfig: router));
+  return tester.pumpWidget(localizedRouterApp(router));
 }
 
 void main() {

@@ -7,6 +7,7 @@ import 'package:flutter_application/rust/api/roster.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+import 'localization.dart';
 import 'pending.dart';
 
 StudentSummaryDto studentSummary({
@@ -80,7 +81,7 @@ Future<void> pumpStudents(
   await tester.pumpWidget(
     BlocSignalProvider<StudentsPresenter>.value(
       value: presenter,
-      child: MaterialApp.router(routerConfig: router),
+      child: localizedRouterApp(router),
     ),
   );
   await tester.pumpAndSettle();
