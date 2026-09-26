@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use chrono::NaiveDate;
-use sam::client::{SamClient, SamClientImpl};
+use sam::client::{MsaLesson, SamClient, SamClientImpl, StudentLessonsPage};
 use sam::http::SamOperations;
 use sam::lessons::adapters::gateways::StudentLessonsGatewaySamImpl;
 use student::application::gateways::{
@@ -12,7 +12,7 @@ use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 mod support;
-use support::sam_operations_for;
+use support::{FakeSamClient, sam_operations_for};
 
 #[test]
 fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
@@ -191,4 +191,103 @@ fn student_lessons_page() -> String {
 </tbody></table>
 </body></html>"#
         .to_string()
+}
+
+#[test]
+fn a_date_is_read_day_first() {
+    let lesson: Lesson = msa_lesson_with_date("09/09/2025").unwrap();
+
+    assert_eq!(lesson.date, NaiveDate::from_ymd_opt(2025, 9, 9));
+}
+
+#[test]
+fn an_unreadable_date_is_left_out() {
+    let lesson: Lesson = msa_lesson_with_date("not-a-date").unwrap();
+
+    assert_eq!(lesson.date, None);
+}
+
+#[test]
+fn a_range_is_read_from_its_two_ends() {
+    let lesson: Lesson = msa_lesson_with_phases("7 - 8").unwrap();
+
+    assert_eq!(
+        lesson.phase,
+        Some(Range::new("7".to_owned(), "8".to_owned()))
+    );
+}
+
+#[test]
+fn a_single_value_is_a_range_that_starts_and_ends_there() {
+    let lesson: Lesson = msa_lesson_with_phases("00").unwrap();
+
+    assert_eq!(
+        lesson.phase,
+        Some(Range::new("00".to_owned(), "00".to_owned()))
+    );
+}
+
+#[test]
+fn a_blank_range_is_left_out() {
+    for blank in ["", "   "] {
+        assert_eq!(msa_lesson_with_phases(blank).unwrap().phase, None);
+    }
+}
+
+#[test]
+fn every_clef_sam_writes_is_recognized() {
+    for (raw, clef) in [
+        ("Sol", Clef::G),
+        ("Dó", Clef::C),
+        ("Do", Clef::C),
+        ("Fá", Clef::F),
+        ("Fa", Clef::F),
+    ] {
+        assert_eq!(
+            msa_lesson_with_clef(raw).unwrap().clef,
+            Some(clef),
+            "clef {raw:?}"
+        );
+    }
+}
+
+#[test]
+fn an_unknown_clef_is_left_out() {
+    assert_eq!(msa_lesson_with_clef("Xyz").unwrap().clef, None);
+}
+
+fn msa_lesson_read_from(row: MsaLesson) -> Option<Lesson> {
+    let gateway: StudentLessonsGatewaySamImpl = StudentLessonsGatewaySamImpl::new(Arc::new(
+        FakeSamClient::showing_lessons(StudentLessonsPage {
+            msa: vec![row],
+            method: Vec::new(),
+        }),
+    ));
+
+    gateway
+        .get_all_for_student_with_id("500132")
+        .ok()?
+        .msa
+        .pop()
+}
+
+fn msa_lesson_with_date(date: &str) -> Option<Lesson> {
+    msa_lesson_read_from(MsaLesson {
+        date: Some(date.to_owned()),
+        ..MsaLesson::default()
+    })
+}
+
+fn msa_lesson_with_phases(phases: &str) -> Option<Lesson> {
+    msa_lesson_read_from(MsaLesson {
+        phases: Some(phases.to_owned()),
+        ..MsaLesson::default()
+    })
+}
+
+fn msa_lesson_with_clef(clefs: &str) -> Option<Lesson> {
+    msa_lesson_read_from(MsaLesson {
+        clefs: Some(clefs.to_owned()),
+        ..MsaLesson::default()
+    })
 }

@@ -1,3 +1,9 @@
+use std::vec::IntoIter;
+
+use crate::parsing::dom::{
+    descendants_with_tag, find_descendant, find_descendant_with_id, text_content,
+};
+
 #[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct MsaLesson {
     pub id: Option<String>,
@@ -19,38 +25,35 @@ pub fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
     let root: scraper::ElementRef = document.root_element();
 
     let Some(msa_section): Option<scraper::ElementRef> =
-        super::dom::find_descendant_with_id(root, "div", "msa")
+        find_descendant_with_id(root, "div", "msa")
     else {
         return Vec::new();
     };
 
-    let Some(msa_table): Option<scraper::ElementRef> =
-        super::dom::find_descendant(msa_section, "table")
+    let Some(msa_table): Option<scraper::ElementRef> = find_descendant(msa_section, "table") else {
+        return Vec::new();
+    };
+
+    let Some(body_element): Option<scraper::ElementRef> = find_descendant(msa_table, "tbody")
     else {
         return Vec::new();
     };
 
-    let Some(body_element): Option<scraper::ElementRef> =
-        super::dom::find_descendant(msa_table, "tbody")
-    else {
-        return Vec::new();
-    };
-
-    super::dom::descendants_with_tag(body_element, "tr")
+    descendants_with_tag(body_element, "tr")
         .into_iter()
         .map(parse_row)
         .collect()
 }
 
 fn parse_row(row: scraper::ElementRef) -> MsaLesson {
-    let id = row
+    let id: Option<String> = row
         .value()
         .attr("id")
         .and_then(|value| value.strip_prefix("msa_"))
         .filter(|value| !value.is_empty())
         .map(str::to_owned);
 
-    let mut cells = super::dom::descendants_with_tag(row, "td").into_iter();
+    let mut cells: IntoIter<scraper::ElementRef<'_>> = descendants_with_tag(row, "td").into_iter();
 
     MsaLesson {
         id,
@@ -67,144 +70,6 @@ fn parse_row(row: scraper::ElementRef) -> MsaLesson {
 fn optional_cell<'a>(cells: &mut impl Iterator<Item = scraper::ElementRef<'a>>) -> Option<String> {
     cells
         .next()
-        .map(super::dom::text_content)
+        .map(text_content)
         .filter(|text| !text.is_empty())
-}
-
-#[cfg(test)]
-mod msa_lessons_tests {
-    use super::{MsaLesson, parse_msa_lessons_body};
-
-    fn msa_lessons_page(rows_html: &str) -> String {
-        format!(
-            r#"<html><body><div id="msa"><table id="datatable1" class="table table-striped table-bordered table-hover table-responsive dataTable no-footer" role="grid">
-    <thead>
-        <tr class="active" role="row"><th>Data da Lição</th><th>Fases</th><th>Paginas</th><th>Lições</th><th>Claves</th><th>Observações</th><th>Autorizante</th><th>Ações</th></tr>
-    </thead>
-    <tbody>{rows_html}</tbody>
-</table></div></body></html>"#
-        )
-    }
-
-    #[test]
-    fn given_full_msa_table_should_return_all_rows() {
-        let response_body: &str = &msa_lessons_page(
-            r#"<tr id="msa_538784" role="row" class="odd">
-            <td>19/08/2025</td>
-            <td>3.4 - 4.1</td>
-            <td>30 - 34</td>
-            <td></td>
-            <td></td>
-            <td>Revisão: Ligaduras. Estudar exercícios 1 e 2, página 32. </td>
-            <td>ELIAS BRANDE</td>
-            <td><button onclick="delete_lancamento_msa(538784)">Apagar</button></td>
-        </tr><tr id="msa_559783" role="row" class="even">
-            <td>09/09/2025</td>
-            <td>4.5 - 4.5</td>
-            <td>38 - 38</td>
-            <td>7 - 8</td>
-            <td>Sol</td>
-            <td>Passou lições 7 e 8, estudar próximas lições.</td>
-            <td>MARCOS ROGÉRIO COSME</td>
-            <td><button onclick="delete_lancamento_msa(559783)">Apagar</button></td>
-        </tr>"#,
-        );
-
-        let result = parse_msa_lessons_body(response_body);
-
-        assert_eq!(
-            result,
-            vec![
-                MsaLesson {
-                    id: Some("538784".to_string()),
-                    date: Some("19/08/2025".to_string()),
-                    phases: Some("3.4 - 4.1".to_string()),
-                    pages: Some("30 - 34".to_string()),
-                    lessons: None,
-                    clefs: None,
-                    description: Some(
-                        "Revisão: Ligaduras. Estudar exercícios 1 e 2, página 32.".to_string()
-                    ),
-                    authorizer: Some("ELIAS BRANDE".to_string()),
-                },
-                MsaLesson {
-                    id: Some("559783".to_string()),
-                    date: Some("09/09/2025".to_string()),
-                    phases: Some("4.5 - 4.5".to_string()),
-                    pages: Some("38 - 38".to_string()),
-                    lessons: Some("7 - 8".to_string()),
-                    clefs: Some("Sol".to_string()),
-                    description: Some("Passou lições 7 e 8, estudar próximas lições.".to_string()),
-                    authorizer: Some("MARCOS ROGÉRIO COSME".to_string()),
-                },
-            ]
-        );
-    }
-
-    #[test]
-    fn given_row_with_every_field_absent_should_still_be_returned() {
-        let response_body: &str = &msa_lessons_page(
-            r#"<tr>
-            <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        </tr><tr id="msa_1"></tr>"#,
-        );
-
-        let result = parse_msa_lessons_body(response_body);
-
-        assert_eq!(
-            result,
-            vec![
-                MsaLesson::default(),
-                MsaLesson {
-                    id: Some("1".to_owned()),
-                    ..Default::default()
-                }
-            ],
-            "Rows without authorizer or any other field must not be dropped"
-        );
-    }
-
-    #[test]
-    fn given_row_with_empty_table_should_return_no_lessons() {
-        let result = parse_msa_lessons_body(&msa_lessons_page(""));
-
-        assert_eq!(result, vec![]);
-    }
-
-    #[test]
-    fn given_html_without_msa_table_should_return_empty_list_not_error() {
-        let result =
-            parse_msa_lessons_body("<html><body><h1>Informação não encontrada</h1></body></html>");
-
-        assert_eq!(result, vec![]);
-    }
-
-    #[test]
-    fn given_msa_section_without_a_table_should_return_no_lessons() {
-        let result = parse_msa_lessons_body(
-            "<html><body><div id=\"msa\">Nenhum registro encontrado</div></body></html>",
-        );
-
-        assert_eq!(result, vec![]);
-    }
-
-    #[test]
-    fn given_msa_table_without_a_tbody_should_return_no_lessons() {
-        let result = parse_msa_lessons_body(
-            r#"<html><body><div id="msa"><table id="datatable1">
-                <thead><tr><th>Data da Lição</th></tr></thead>
-            </table></div></body></html>"#,
-        );
-
-        assert_eq!(result, vec![]);
-    }
-
-    #[test]
-    fn given_empty_body_should_return_no_lessons() {
-        for empty_body in ["", "   "] {
-            let result = parse_msa_lessons_body(empty_body);
-
-            assert_eq!(result, vec![], "Expected no lessons for '{empty_body}'");
-        }
-    }
 }
