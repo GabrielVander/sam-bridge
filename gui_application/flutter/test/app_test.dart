@@ -121,7 +121,7 @@ void main() {
     testWidgets('is not offered on the login form', (tester) async {
       await pumpApp(tester, await composeFakeApp());
 
-      expect(find.byTooltip('Log out'), findsNothing);
+      expect(find.byTooltip('Sair'), findsNothing);
     });
 
     testWidgets('returns to the login form', (tester) async {
@@ -131,7 +131,7 @@ void main() {
       );
       expect(find.text('Jane Doe'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Log out'));
+      await tester.tap(find.byTooltip('Sair'));
       await tester.pumpAndSettle();
 
       expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
@@ -153,7 +153,7 @@ void main() {
           ),
         );
 
-        await tester.tap(find.byTooltip('Log out'));
+        await tester.tap(find.byTooltip('Sair'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Detalhes técnicos'));
         await tester.pumpAndSettle();

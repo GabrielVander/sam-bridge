@@ -201,6 +201,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Fá'**
   String get clefF;
+
+  /// No description provided for @logOut.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair'**
+  String get logOut;
 }
 
 class _AppLocalizationsDelegate

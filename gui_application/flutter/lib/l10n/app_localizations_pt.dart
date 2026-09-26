@@ -66,4 +66,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get clefF => 'Fá';
+
+  @override
+  String get logOut => 'Sair';
 }

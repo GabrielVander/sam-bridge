@@ -25,7 +25,7 @@ class MainScreen extends StatelessWidget {
             builder: (context, state) => state is AuthSuccess
                 ? IconButton(
                     icon: const Icon(Icons.logout),
-                    tooltip: 'Log out',
+                    tooltip: context.l10n.logOut,
                     onPressed: () => context.read<AuthPresenter>().signOut(),
                   )
                 : const SizedBox.shrink(),
