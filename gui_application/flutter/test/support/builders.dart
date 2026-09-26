@@ -59,5 +59,13 @@ ProgressView progressView({
   nextLevel: nextLevel,
 );
 
-Future<void> pumpInApp(WidgetTester tester, Widget child) =>
-    tester.pumpWidget(localizedApp(home: Scaffold(body: child)));
+Future<void> pumpInApp(
+  WidgetTester tester,
+  Widget child, {
+  Locale locale = portuguese,
+}) => tester.pumpWidget(
+  localizedApp(
+    locale: locale,
+    home: Scaffold(body: child),
+  ),
+);

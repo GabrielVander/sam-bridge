@@ -26,13 +26,17 @@ Future<void> openLocationPicker(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> pickLocations(WidgetTester tester, List<String> locations) async {
+Future<void> pickLocations(
+  WidgetTester tester,
+  List<String> locations, {
+  String apply = 'Aplicar',
+}) async {
   await openLocationPicker(tester);
   for (final location in locations) {
     await tester.tap(find.widgetWithText(CheckboxListTile, location));
     await tester.pumpAndSettle();
   }
-  await tester.tap(find.text('Aplicar'));
+  await tester.tap(find.text(apply));
   await tester.pumpAndSettle();
 }
 
@@ -144,6 +148,19 @@ void main() {
 
       await pickLocations(tester, ['Beta']);
       expect(find.text('2 locais'), findsOneWidget);
+    });
+
+    testWidgets('the button counts the selected locations in English', (
+      tester,
+    ) async {
+      await pumpRoster(tester, _everyone, locale: const Locale('en'));
+      expect(find.text('Filter by location'), findsOneWidget);
+
+      await pickLocations(tester, ['Alfa'], apply: 'Apply');
+      expect(find.text('1 location'), findsOneWidget);
+
+      await pickLocations(tester, ['Beta'], apply: 'Apply');
+      expect(find.text('2 locations'), findsOneWidget);
     });
 
     testWidgets('cancelling leaves the filter as it was', (tester) async {

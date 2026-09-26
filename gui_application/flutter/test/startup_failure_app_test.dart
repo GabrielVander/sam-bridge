@@ -1,7 +1,10 @@
 import 'package:flutter_application/errors/error_reason.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/startup_failure_app.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support/localization.dart';
 
 void main() {
   const ErrorReport report = ErrorReport(
@@ -10,6 +13,7 @@ void main() {
   );
 
   testWidgets('explains why the app could not start', (tester) async {
+    setOsLocale(tester, brazilianPortuguese);
     await tester.pumpWidget(StartupFailureApp(report: report, onRetry: () {}));
     await tester.tap(find.text('Detalhes técnicos'));
     await tester.pumpAndSettle();
@@ -26,6 +30,7 @@ void main() {
 
   testWidgets('lets the user try to start again', (tester) async {
     var retries = 0;
+    setOsLocale(tester, brazilianPortuguese);
     await tester.pumpWidget(
       StartupFailureApp(report: report, onRetry: () => retries++),
     );
@@ -33,5 +38,18 @@ void main() {
     await tester.tap(find.text('Tentar novamente'));
 
     expect(retries, 1);
+  });
+
+  testWidgets('explains the failure in English when the OS is in English', (
+    tester,
+  ) async {
+    setOsLocale(tester, const Locale('en', 'US'));
+    await tester.pumpWidget(StartupFailureApp(report: report, onRetry: () {}));
+
+    expect(
+      find.text('Could not access the data saved on this device.'),
+      findsOneWidget,
+    );
+    expect(find.text('Try again'), findsOneWidget);
   });
 }

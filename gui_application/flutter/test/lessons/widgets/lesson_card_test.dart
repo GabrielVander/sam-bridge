@@ -29,6 +29,20 @@ void main() {
       });
     }
 
+    testWidgets('shows a lesson in English', (tester) async {
+      await pumpInApp(
+        tester,
+        LessonCard(lessonItem()),
+        locale: const Locale('en'),
+      );
+
+      expect(find.text('2/1/2024'), findsOneWidget);
+      expect(find.text('Phase 2'), findsOneWidget);
+      expect(find.text('p. 10'), findsOneWidget);
+      expect(find.text('Lesson 3'), findsOneWidget);
+      expect(find.text('G clef'), findsOneWidget);
+    });
+
     testWidgets('shows a dash when the date is unknown', (tester) async {
       await pumpInApp(tester, LessonCard(lessonItem(date: null)));
 

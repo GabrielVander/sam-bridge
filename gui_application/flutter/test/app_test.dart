@@ -8,8 +8,14 @@ import 'package:go_router/go_router.dart';
 import 'support/app.dart';
 import 'support/authentication.dart';
 import 'support/errors.dart';
+import 'support/localization.dart';
 
-Future<void> pumpApp(WidgetTester tester, SamSiteApp app) async {
+Future<void> pumpApp(
+  WidgetTester tester,
+  SamSiteApp app, {
+  Locale osLocale = brazilianPortuguese,
+}) async {
+  setOsLocale(tester, osLocale);
   await tester.pumpWidget(app);
   await tester.pumpAndSettle();
 }
@@ -64,6 +70,50 @@ void main() {
 
       final theme = Theme.of(tester.element(find.byType(MainScreen)));
       expect(theme.brightness, Brightness.dark);
+    });
+  });
+
+  group('language', () {
+    testWidgets('speaks Portuguese when the OS is in Brazilian Portuguese', (
+      tester,
+    ) async {
+      await pumpApp(tester, await composeFakeApp());
+
+      expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
+    });
+
+    testWidgets('speaks English when the OS is in English', (tester) async {
+      await pumpApp(
+        tester,
+        await composeFakeApp(),
+        osLocale: const Locale('en', 'US'),
+      );
+
+      expect(find.text('Sign in with your SAM account'), findsOneWidget);
+    });
+
+    testWidgets('speaks Portuguese for any Portuguese-speaking OS', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        await composeFakeApp(),
+        osLocale: const Locale('pt', 'PT'),
+      );
+
+      expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
+    });
+
+    testWidgets('falls back to English for a language it does not speak', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        await composeFakeApp(),
+        osLocale: const Locale('fr', 'FR'),
+      );
+
+      expect(find.text('Sign in with your SAM account'), findsOneWidget);
     });
   });
 

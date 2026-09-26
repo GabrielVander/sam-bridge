@@ -70,8 +70,9 @@ abstract final class Positions {
 
 Future<void> pumpStudents(
   WidgetTester tester,
-  StudentsPresenter presenter,
-) async {
+  StudentsPresenter presenter, {
+  Locale locale = portuguese,
+}) async {
   final router = GoRouter(
     initialLocation: '/students',
     routes: [
@@ -96,7 +97,7 @@ Future<void> pumpStudents(
   await tester.pumpWidget(
     BlocSignalProvider<StudentsPresenter>.value(
       value: presenter,
-      child: localizedRouterApp(router),
+      child: localizedRouterApp(router, locale: locale),
     ),
   );
   await tester.pumpAndSettle();
@@ -104,13 +105,14 @@ Future<void> pumpStudents(
 
 Future<StudentsPresenter> pumpRoster(
   WidgetTester tester,
-  List<StudentSummaryDto> students,
-) async {
+  List<StudentSummaryDto> students, {
+  Locale locale = portuguese,
+}) async {
   final StudentsPresenter presenter = presenterAnswering([
     rosterLoaded(students),
   ]);
 
-  await pumpStudents(tester, presenter);
+  await pumpStudents(tester, presenter, locale: locale);
 
   return presenter;
 }

@@ -15,9 +15,11 @@ Future<void> pumpPanel(
   WidgetTester tester, {
   ErrorReport report = _report,
   VoidCallback? onRetry,
+  Locale locale = portuguese,
 }) async {
   await tester.pumpWidget(
     localizedApp(
+      locale: locale,
       home: Scaffold(
         body: ErrorPanel(report: report, onRetry: onRetry ?? () {}),
       ),
@@ -50,6 +52,20 @@ void main() {
         expect(find.text(message), findsOneWidget);
       });
     }
+
+    testWidgets('explains the failure in English', (tester) async {
+      await pumpPanel(tester, locale: const Locale('en'));
+
+      expect(
+        find.text(
+          'Could not reach SAM. '
+          'Check your internet connection and try again.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Try again'), findsOneWidget);
+      expect(find.text('Technical details'), findsOneWidget);
+    });
 
     testWidgets('keeps the technical details hidden until expanded', (
       tester,

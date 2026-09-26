@@ -191,6 +191,31 @@ void main() {
       expect(find.text('Todos os níveis alcançados'), findsNothing);
     });
 
+    testWidgets('names the levels in English', (tester) async {
+      await pumpInApp(
+        tester,
+        CheckpointTimeline(
+          progress: progressView(
+            checkpoints: [
+              checkpoint(
+                level: const KnownLevel(Level.youthService),
+                readyToAdvance: true,
+              ),
+            ],
+          ),
+        ),
+        locale: const Locale('en'),
+      );
+
+      expect(find.text('Progress'), findsOneWidget);
+      expect(find.text('Youth Meeting'), findsOneWidget);
+      expect(
+        find.byTooltip('Youth Meeting - ready for the exam'),
+        findsOneWidget,
+      );
+      expect(find.text('Next: Official Service'), findsOneWidget);
+    });
+
     testWidgets('celebrates once every level has been reached', (tester) async {
       await pumpInApp(
         tester,
