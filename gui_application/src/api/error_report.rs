@@ -1,3 +1,4 @@
+use authentication::application::gateways::AuthorizationError;
 use authentication::application::use_cases::LogoutError;
 use sam::diagnostics::error_chain;
 use shared_kernel::failure_kind::FailureKind;
@@ -24,7 +25,7 @@ pub enum ErrorKindDto {
 }
 
 impl ErrorReportDto {
-    pub(crate) fn from_failure(kind: FailureKind, details: String) -> Self {
+    fn from_failure(kind: FailureKind, details: String) -> Self {
         Self {
             kind: kind.into(),
             details,
@@ -53,6 +54,16 @@ impl From<StartupError> for ErrorReportDto {
         Self {
             kind,
             details: error_chain(&error),
+        }
+    }
+}
+
+impl From<AuthorizationError> for ErrorReportDto {
+    fn from(error: AuthorizationError) -> Self {
+        match error {
+            AuthorizationError::UnableToPerformOperation { kind, details } => {
+                Self::from_failure(kind, details)
+            }
         }
     }
 }
