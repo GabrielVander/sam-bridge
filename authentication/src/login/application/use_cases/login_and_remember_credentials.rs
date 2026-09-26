@@ -2,8 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     application::gateways::{
-        AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, FailureKind,
-        SaveCredentialGateway,
+        AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, SaveCredentialGateway,
     },
     domain::entities::{Credential, Email, Password},
 };
@@ -35,9 +34,7 @@ impl LoginAndRememberCredentialsUseCase {
                 Ok(())
             }
             Ok(AuthorizationResult::Unauthorized) => Err(LoginUseCaseError::InvalidEmailOrPassword),
-            Err(AuthorizationError::UnableToPerformOperation { kind, details }) => {
-                Err(LoginUseCaseError::UnableToPerformAuthorization { kind, details })
-            }
+            Err(error) => Err(LoginUseCaseError::UnableToPerformAuthorization(error)),
         }
     }
 }
@@ -45,5 +42,5 @@ impl LoginAndRememberCredentialsUseCase {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LoginUseCaseError {
     InvalidEmailOrPassword,
-    UnableToPerformAuthorization { kind: FailureKind, details: String },
+    UnableToPerformAuthorization(AuthorizationError),
 }

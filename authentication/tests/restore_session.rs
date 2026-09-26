@@ -134,10 +134,12 @@ fn use_case_when_authorization_gateway_fails_leaves_the_store_untouched() {
 
     assert_eq!(
         result,
-        Err(RestoreSessionError::UnableToPerformOperation {
-            kind: FailureKind::Transient,
-            details: "connection refused".to_owned(),
-        })
+        Err(RestoreSessionError::UnableToPerformOperation(
+            AuthorizationError::UnableToPerformOperation {
+                kind: FailureKind::Transient,
+                details: "connection refused".to_owned(),
+            }
+        ))
     );
     assert_eq!(
         in_memory_credential_store.load(),

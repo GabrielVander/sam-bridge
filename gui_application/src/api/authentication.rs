@@ -1,3 +1,4 @@
+use authentication::application::gateways::AuthorizationError;
 use authentication::application::use_cases::{
     LoginUseCaseError, LogoutError, RestoreSessionError, RestoreSessionOutcome,
 };
@@ -29,11 +30,11 @@ impl From<Result<(), LoginUseCaseError>> for LoginOutcomeDto {
         match result {
             Ok(()) => Self::Successful,
             Err(LoginUseCaseError::InvalidEmailOrPassword) => Self::InvalidEmailOrPassword,
-            Err(LoginUseCaseError::UnableToPerformAuthorization { kind, details }) => {
-                Self::Failure {
-                    report: ErrorReportDto::from_failure(kind, details),
-                }
-            }
+            Err(LoginUseCaseError::UnableToPerformAuthorization(
+                AuthorizationError::UnableToPerformOperation { kind, details },
+            )) => Self::Failure {
+                report: ErrorReportDto::from_failure(kind, details),
+            },
         }
     }
 }
@@ -47,7 +48,9 @@ impl From<Result<RestoreSessionOutcome, RestoreSessionError>> for RestoreSession
                 | RestoreSessionOutcome::CredentialsRejected,
             )
             | Err(RestoreSessionError::UnableToClearRejectedCredentials) => Self::NotAvailable,
-            Err(RestoreSessionError::UnableToPerformOperation { kind, details }) => Self::Failure {
+            Err(RestoreSessionError::UnableToPerformOperation(
+                AuthorizationError::UnableToPerformOperation { kind, details },
+            )) => Self::Failure {
                 report: ErrorReportDto::from_failure(kind, details),
             },
         }

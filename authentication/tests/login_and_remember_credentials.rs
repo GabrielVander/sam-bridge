@@ -92,10 +92,12 @@ fn authorization_gateway_failure_is_reported_with_its_kind_and_details() {
 
     assert_eq!(
         result,
-        Err(LoginUseCaseError::UnableToPerformAuthorization {
-            kind: FailureKind::Transient,
-            details: "connection refused".to_owned(),
-        })
+        Err(LoginUseCaseError::UnableToPerformAuthorization(
+            AuthorizationError::UnableToPerformOperation {
+                kind: FailureKind::Transient,
+                details: "connection refused".to_owned(),
+            }
+        ))
     );
 }
 
