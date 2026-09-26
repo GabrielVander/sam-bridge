@@ -1,6 +1,8 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
+import 'package:flutter_application/errors/error_message.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_application/widgets/loading_indicator.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +30,7 @@ class LoginScreen extends StatelessWidget {
             errorMessage: 'Usuário ou senha inválido(a)',
           ),
           AuthFailure(:final report) => _LoginFormCard(
-            errorMessage: report.userMessage,
+            errorMessage: context.l10n.errorMessage(report.reason),
             errorDetails: report.details,
           ),
         },

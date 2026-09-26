@@ -1,10 +1,11 @@
+import 'package:flutter_application/errors/error_reason.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/startup_failure_app.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const ErrorReport report = ErrorReport(
-    userMessage: 'Não foi possível acessar os dados salvos neste dispositivo.',
+    reason: ErrorReason.localStorage,
     details: 'Unable to set up the credential storage: no data directory',
   );
 

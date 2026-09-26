@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application/errors/error_message.dart';
 import 'package:flutter_application/errors/error_report.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 
 class ErrorPanel extends StatelessWidget {
   final ErrorReport report;
@@ -24,7 +26,10 @@ class ErrorPanel extends StatelessWidget {
                 color: Theme.of(context).colorScheme.error,
               ),
               const SizedBox(height: 16),
-              Text(report.userMessage, textAlign: TextAlign.center),
+              Text(
+                context.l10n.errorMessage(report.reason),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 16),
               FilledButton.tonal(
                 onPressed: onRetry,

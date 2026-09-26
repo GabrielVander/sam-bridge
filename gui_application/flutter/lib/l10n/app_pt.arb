@@ -1,4 +1,14 @@
 {
   "@@locale": "pt",
-  "appTitle": "SAM Bridge"
+  "appTitle": "SAM Bridge",
+
+  "errorNetwork": "Não foi possível conectar ao SAM. Verifique sua conexão com a internet e tente novamente.",
+  "errorUnexpectedResponse": "O SAM respondeu de forma inesperada. Tente novamente em instantes.",
+  "errorSessionExpired": "Sua sessão expirou. Entre novamente.",
+  "errorLocalStorage": "Não foi possível acessar os dados salvos neste dispositivo.",
+  "errorGeneric": "Algo deu errado. Tente novamente.",
+  "progressUnavailable": "Progresso indisponível. {reason}",
+  "@progressUnavailable": {
+    "placeholders": { "reason": { "type": "String" } }
+  }
 }

@@ -10,4 +10,27 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get appTitle => 'SAM Bridge';
+
+  @override
+  String get errorNetwork =>
+      'Não foi possível conectar ao SAM. Verifique sua conexão com a internet e tente novamente.';
+
+  @override
+  String get errorUnexpectedResponse =>
+      'O SAM respondeu de forma inesperada. Tente novamente em instantes.';
+
+  @override
+  String get errorSessionExpired => 'Sua sessão expirou. Entre novamente.';
+
+  @override
+  String get errorLocalStorage =>
+      'Não foi possível acessar os dados salvos neste dispositivo.';
+
+  @override
+  String get errorGeneric => 'Algo deu errado. Tente novamente.';
+
+  @override
+  String progressUnavailable(String reason) {
+    return 'Progresso indisponível. $reason';
+  }
 }

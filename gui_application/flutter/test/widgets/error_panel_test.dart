@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application/errors/error_reason.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,10 +9,7 @@ import '../support/localization.dart';
 
 const _details = 'Request failed for operation dashboard: connection refused';
 
-const _report = ErrorReport(
-  userMessage: 'Não foi possível conectar ao SAM.',
-  details: _details,
-);
+const _report = ErrorReport(reason: ErrorReason.network, details: _details);
 
 Future<void> pumpPanel(
   WidgetTester tester, {
@@ -29,11 +27,29 @@ Future<void> pumpPanel(
 
 void main() {
   group('ErrorPanel', () {
-    testWidgets('shows the friendly message', (tester) async {
-      await pumpPanel(tester);
+    const messages = {
+      ErrorReason.network:
+          'Não foi possível conectar ao SAM. '
+          'Verifique sua conexão com a internet e tente novamente.',
+      ErrorReason.unexpectedResponse:
+          'O SAM respondeu de forma inesperada. '
+          'Tente novamente em instantes.',
+      ErrorReason.sessionExpired: 'Sua sessão expirou. Entre novamente.',
+      ErrorReason.localStorage:
+          'Não foi possível acessar os dados salvos neste dispositivo.',
+      ErrorReason.generic: 'Algo deu errado. Tente novamente.',
+    };
 
-      expect(find.text('Não foi possível conectar ao SAM.'), findsOneWidget);
-    });
+    for (final MapEntry(key: reason, value: message) in messages.entries) {
+      testWidgets('explains a ${reason.name} failure', (tester) async {
+        await pumpPanel(
+          tester,
+          report: ErrorReport(reason: reason, details: _details),
+        );
+
+        expect(find.text(message), findsOneWidget);
+      });
+    }
 
     testWidgets('keeps the technical details hidden until expanded', (
       tester,
@@ -93,10 +109,10 @@ void main() {
     testWidgets('shows no expander when there are no details', (tester) async {
       await pumpPanel(
         tester,
-        report: const ErrorReport(userMessage: 'Algo deu errado.', details: ''),
+        report: const ErrorReport(reason: ErrorReason.generic, details: ''),
       );
 
-      expect(find.text('Algo deu errado.'), findsOneWidget);
+      expect(find.text('Algo deu errado. Tente novamente.'), findsOneWidget);
       expect(find.text('Detalhes técnicos'), findsNothing);
     });
   });

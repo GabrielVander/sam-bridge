@@ -99,6 +99,42 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'SAM Bridge'**
   String get appTitle;
+
+  /// No description provided for @errorNetwork.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível conectar ao SAM. Verifique sua conexão com a internet e tente novamente.'**
+  String get errorNetwork;
+
+  /// No description provided for @errorUnexpectedResponse.
+  ///
+  /// In pt, this message translates to:
+  /// **'O SAM respondeu de forma inesperada. Tente novamente em instantes.'**
+  String get errorUnexpectedResponse;
+
+  /// No description provided for @errorSessionExpired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua sessão expirou. Entre novamente.'**
+  String get errorSessionExpired;
+
+  /// No description provided for @errorLocalStorage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível acessar os dados salvos neste dispositivo.'**
+  String get errorLocalStorage;
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In pt, this message translates to:
+  /// **'Algo deu errado. Tente novamente.'**
+  String get errorGeneric;
+
+  /// No description provided for @progressUnavailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Progresso indisponível. {reason}'**
+  String progressUnavailable(String reason);
 }
 
 class _AppLocalizationsDelegate

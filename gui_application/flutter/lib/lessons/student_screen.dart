@@ -1,5 +1,7 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/errors/error_message.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/lessons/widgets/back_bar.dart';
 import 'package:flutter_application/lessons/widgets/category_lessons_view.dart';
@@ -104,7 +106,9 @@ final class _ProgressSection extends StatelessWidget {
       ),
       ProgressUnavailable(:final report) => _ProgressNotice(
         icon: Icons.info_outline,
-        message: 'Progresso indisponível. ${report.userMessage}',
+        message: context.l10n.progressUnavailable(
+          context.l10n.errorMessage(report.reason),
+        ),
         details: report.details,
       ),
     };

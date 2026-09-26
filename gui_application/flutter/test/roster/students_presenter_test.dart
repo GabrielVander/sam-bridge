@@ -1,3 +1,4 @@
+import 'package:flutter_application/errors/error_reason.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -62,9 +63,7 @@ void main() {
         expect(
           (state as StudentsFailure).report,
           const ErrorReport(
-            userMessage:
-                'O SAM respondeu de forma inesperada. '
-                'Tente novamente em instantes.',
+            reason: ErrorReason.unexpectedResponse,
             details: 'missing table',
           ),
         );
@@ -83,7 +82,7 @@ void main() {
         final state = cubit.stateValue;
         expect(state, isA<StudentsFailure>());
         final report = (state as StudentsFailure).report;
-        expect(report.userMessage, 'Algo deu errado. Tente novamente.');
+        expect(report.reason, ErrorReason.generic);
         expect(report.details, contains('bridge down'));
       },
     );

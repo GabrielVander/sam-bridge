@@ -2,6 +2,7 @@ import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/authentication/ports/login_use_case.dart';
 import 'package:flutter_application/authentication/ports/logout_use_case.dart';
 import 'package:flutter_application/authentication/ports/restore_session_use_case.dart';
+import 'package:flutter_application/errors/error_reason.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -123,9 +124,7 @@ void main() {
         expect(
           (state as AuthFailure).report,
           const ErrorReport(
-            userMessage:
-                'Não foi possível conectar ao SAM. '
-                'Verifique sua conexão com a internet e tente novamente.',
+            reason: ErrorReason.network,
             details: "Request failed for operation 'authentication'",
           ),
         );
@@ -145,7 +144,7 @@ void main() {
         final state = presenter.stateValue;
         expect(state, isA<AuthFailure>());
         final report = (state as AuthFailure).report;
-        expect(report.userMessage, 'Algo deu errado. Tente novamente.');
+        expect(report.reason, ErrorReason.generic);
         expect(report.details, contains('bridge down'));
       },
     );

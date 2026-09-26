@@ -1,6 +1,7 @@
 import 'package:flutter_application/lessons/ports/assess_student_progress_use_case.dart';
 import 'package:flutter_application/lessons/ports/retrieve_student_lessons_use_case.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
+import 'package:flutter_application/errors/error_reason.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -72,9 +73,7 @@ void main() {
         expect(
           (state as LessonsFailure).report,
           const ErrorReport(
-            userMessage:
-                'Não foi possível conectar ao SAM. '
-                'Verifique sua conexão com a internet e tente novamente.',
+            reason: ErrorReason.network,
             details: "Request failed for operation 'student_lessons'",
           ),
         );
@@ -94,7 +93,7 @@ void main() {
         final state = cubit.stateValue;
         expect(state, isA<LessonsFailure>());
         final report = (state as LessonsFailure).report;
-        expect(report.userMessage, 'Algo deu errado. Tente novamente.');
+        expect(report.reason, ErrorReason.generic);
         expect(report.details, contains('bridge down'));
       },
     );
@@ -174,7 +173,7 @@ void main() {
         expect(
           (loaded.progress as ProgressUnavailable).report,
           const ErrorReport(
-            userMessage: 'Sua sessão expirou. Entre novamente.',
+            reason: ErrorReason.sessionExpired,
             details: 'Session expired',
           ),
         );
