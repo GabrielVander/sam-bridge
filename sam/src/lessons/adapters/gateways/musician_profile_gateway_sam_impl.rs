@@ -1,9 +1,10 @@
 use std::sync::Arc;
 use student::application::gateways::{MusicianProfileGateway, MusicianProfileGatewayError};
-use student::domain::entities::{MusicianProfile, Student, StudentPosition};
+use student::domain::entities::MusicianProfile;
 
 use crate::client::{SamClient, SamStudent};
 use crate::diagnostics::{error_chain, failure_kind};
+use crate::shared::musicians::{MUSICIAN_ROLE, parse_instrument, parse_musician_level};
 
 pub struct MusicianProfileGatewaySamImpl {
     client: Arc<dyn SamClient + Send + Sync>,
@@ -23,18 +24,18 @@ impl MusicianProfileGateway for MusicianProfileGatewaySamImpl {
             }
         })?;
 
-        let sam_student = sam_students
+        let sam_student: SamStudent = sam_students
             .into_iter()
             .find(|student| student.id == id)
             .ok_or(MusicianProfileGatewayError::NotFound)?;
 
-        match Student::from(sam_student).position {
-            StudentPosition::Musician {
-                level, instrument, ..
-            } => Ok(MusicianProfile { level, instrument }),
-            StudentPosition::Organist { .. }
-            | StudentPosition::Secretary { .. }
-            | StudentPosition::Unknown(_) => Err(MusicianProfileGatewayError::NotAMusician),
+        if sam_student.role != MUSICIAN_ROLE {
+            return Err(MusicianProfileGatewayError::NotAMusician);
         }
+
+        Ok(MusicianProfile {
+            level: parse_musician_level(&sam_student.level),
+            instrument: parse_instrument(&sam_student.instrument),
+        })
     }
 }

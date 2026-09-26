@@ -2,12 +2,13 @@ use std::sync::Arc;
 use student::{
     application::gateways::{StudentGateway, StudentGatewayError},
     domain::entities::{
-        Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
+        Instrument, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
     },
 };
 
 use crate::client::{SamClient, SamStudent};
 use crate::diagnostics::{error_chain, failure_kind};
+use crate::shared::musicians::{MUSICIAN_ROLE, parse_instrument, parse_musician_level};
 
 pub struct StudentGatewaySamImpl {
     client: Arc<dyn SamClient + Send + Sync>,
@@ -72,7 +73,7 @@ fn clean_location(raw: &str) -> String {
 
 fn parse_position(role: &str, level: &str, instrument: &str) -> StudentPosition {
     match role {
-        "MÚSICO" => {
+        MUSICIAN_ROLE => {
             let (instrument, instrument_name) = parse_musician_instrument(instrument);
 
             StudentPosition::Musician {
@@ -91,16 +92,6 @@ fn parse_position(role: &str, level: &str, instrument: &str) -> StudentPosition 
     }
 }
 
-fn parse_musician_level(level: &str) -> MusicianLevel {
-    match level {
-        "CANDIDATO(A)" => MusicianLevel::Candidate,
-        "ENSAIO" => MusicianLevel::Practice,
-        "RJM" => MusicianLevel::YouthService,
-        "CULTO OFICIAL" => MusicianLevel::OfficialService,
-        other => MusicianLevel::Unknown(other.to_owned()),
-    }
-}
-
 fn parse_organist_level(level: &str) -> OrganistLevel {
     match level {
         "CANDIDATO(A)" => OrganistLevel::Candidate,
@@ -112,38 +103,11 @@ fn parse_organist_level(level: &str) -> OrganistLevel {
     }
 }
 
-/// Both values come from the same trimmed text, so they are always both present or both absent.
 fn parse_musician_instrument(raw: &str) -> (Option<Instrument>, Option<String>) {
     let instrument: Option<Instrument> = parse_instrument(raw);
     let instrument_name: Option<String> = instrument.as_ref().map(|_| raw.trim().to_owned());
 
     (instrument, instrument_name)
-}
-
-fn parse_instrument(instrument: &str) -> Option<Instrument> {
-    match instrument.trim() {
-        "" | "A DEFINIR" => None,
-        "VIOLINO" => Some(Instrument::Violin),
-        "VIOLA" => Some(Instrument::Viola),
-        "VIOLONCELO" => Some(Instrument::Cello),
-        "FLAUTA" => Some(Instrument::Flute),
-        "OBOÉ" => Some(Instrument::Oboe),
-        "FAGOTE" => Some(Instrument::Bassoon),
-        "CLARINETE" => Some(Instrument::Clarinet),
-        "CLARINETE ALTO" => Some(Instrument::AltoClarinet),
-        "CLARINETE BAIXO" => Some(Instrument::BassClarinet),
-        "SAXOFONE ALTO" | "SAXOFONE SOPRANO CUR" | "SAXOFONE SOPRANO RET" | "SAXOFONE TENOR" => {
-            Some(Instrument::Saxophone)
-        }
-        "TROMPETE" | "CORNET" | "FLUGELHORN" => Some(Instrument::Trumpet),
-        "TROMPA" => Some(Instrument::FrenchHorn),
-        "TROMBONE" => Some(Instrument::Trombone),
-        "EUPHONIUM" => Some(Instrument::Euphonium),
-        "TUBA" => Some(Instrument::Tuba),
-        "CORNE INGLÊS" => Some(Instrument::EnglishHorn),
-        "VIOLINO CONTRALTO" => Some(Instrument::ContraltoViolin),
-        other => Some(Instrument::Unknown(other.to_owned())),
-    }
 }
 
 fn parse_region(location: &str) -> Region {

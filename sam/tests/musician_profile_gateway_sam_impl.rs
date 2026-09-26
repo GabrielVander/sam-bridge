@@ -11,57 +11,13 @@ use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 mod support;
-use support::sam_operations_for;
-
-fn build_gateway(
-    mock_server: &MockServer,
-) -> Result<MusicianProfileGatewaySamImpl, reqwest::Error> {
-    build_gateway_for(&mock_server.uri())
-}
-
-fn build_gateway_for(base_url: &str) -> Result<MusicianProfileGatewaySamImpl, reqwest::Error> {
-    let sam_operations: SamOperations = sam_operations_for(base_url)?;
-
-    let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
-
-    Ok(MusicianProfileGatewaySamImpl::new(sam_client))
-}
-
-fn failure_of(
-    result: Result<MusicianProfile, MusicianProfileGatewayError>,
-) -> Option<(FailureKind, String)> {
-    match result {
-        Err(MusicianProfileGatewayError::UnableToPerformOperation { kind, details }) => {
-            Some((kind, details))
-        }
-        Ok(_) | Err(_) => None,
-    }
-}
-
-async fn mount_listing(mock_server: &MockServer, row_json: &str) {
-    Mock::given(method("GET"))
-        .and(path("/painel"))
-        .respond_with(ResponseTemplate::new(200))
-        .mount(mock_server)
-        .await;
-
-    Mock::given(method("GET"))
-        .and(path("/alunos/listagem"))
-        .respond_with(
-            ResponseTemplate::new(200)
-                .set_body_string(format!(
-                    r#"{{"draw":"1","recordsTotal":1,"recordsFiltered":1,"data":[{row_json}]}}"#
-                ))
-                .insert_header("Content-Type", "application/json"),
-        )
-        .mount(mock_server)
-        .await;
-}
+use support::{FakeSamClient, sam_operations_for, sam_student};
 
 #[test]
 fn returns_the_musicians_level_and_instrument() {
     smol::block_on(async {
         let mock_server: MockServer = MockServer::start().await;
+
         mount_listing(
             &mock_server,
             r#"["1","PEDRO ÁLVARES CABRAL","SOMEWHERE","MÚSICO","VIOLINO","RJM","1","0"]"#,
@@ -82,6 +38,7 @@ fn returns_the_musicians_level_and_instrument() {
 fn student_without_an_assigned_instrument_has_none() {
     smol::block_on(async {
         let mock_server: MockServer = MockServer::start().await;
+
         mount_listing(
             &mock_server,
             r#"["1","PEDRO ÁLVARES CABRAL","SOMEWHERE","MÚSICO","A DEFINIR","CANDIDATO(A)","1","0"]"#,
@@ -101,6 +58,7 @@ fn student_without_an_assigned_instrument_has_none() {
 fn student_with_a_blank_instrument_column_has_none() {
     smol::block_on(async {
         let mock_server: MockServer = MockServer::start().await;
+
         mount_listing(
             &mock_server,
             r#"["1","PEDRO ÁLVARES CABRAL","SOMEWHERE","MÚSICO","  ","CANDIDATO(A)","1","0"]"#,
@@ -120,6 +78,7 @@ fn student_with_a_blank_instrument_column_has_none() {
 fn unknown_id_is_not_found() {
     smol::block_on(async {
         let mock_server: MockServer = MockServer::start().await;
+
         mount_listing(
             &mock_server,
             r#"["1","PEDRO ÁLVARES CABRAL","SOMEWHERE","MÚSICO","VIOLINO","RJM","1","0"]"#,
@@ -140,6 +99,7 @@ fn unknown_id_is_not_found() {
 fn non_musician_is_reported_as_not_a_musician() {
     smol::block_on(async {
         let mock_server: MockServer = MockServer::start().await;
+
         mount_listing(
             &mock_server,
             r#"["1","PEDRO ÁLVARES CABRAL","SOMEWHERE","ORGANISTA","A DEFINIR","RJM","1","0"]"#,
@@ -188,4 +148,118 @@ fn an_unreachable_site_is_a_network_error_naming_the_operation() {
 
     assert_eq!(kind, FailureKind::Transient);
     assert!(details.contains("dashboard"), "got: {details}");
+}
+
+#[test]
+fn every_role_other_than_musician_is_not_a_musician() {
+    for role in ["ORGANISTA", "SECRETÁRIO DO GEM", "BATERISTA"] {
+        let result: Result<MusicianProfile, MusicianProfileGatewayError> =
+            profile_of(role, "RJM", "VIOLINO");
+
+        assert_eq!(
+            result,
+            Err(MusicianProfileGatewayError::NotAMusician),
+            "role {role:?}"
+        );
+    }
+}
+
+#[test]
+fn every_known_musician_level_is_recognized() {
+    for (raw, level) in [
+        ("CANDIDATO(A)", MusicianLevel::Candidate),
+        ("ENSAIO", MusicianLevel::Practice),
+        ("RJM", MusicianLevel::YouthService),
+        ("CULTO OFICIAL", MusicianLevel::OfficialService),
+        (
+            "RJM / ENSAIO",
+            MusicianLevel::Unknown("RJM / ENSAIO".to_owned()),
+        ),
+    ] {
+        let result: Result<MusicianProfile, MusicianProfileGatewayError> =
+            profile_of("MÚSICO", raw, "VIOLINO");
+
+        assert_eq!(
+            result,
+            Ok(MusicianProfile {
+                level,
+                instrument: Some(Instrument::Violin),
+            }),
+            "level {raw:?}"
+        );
+    }
+}
+
+#[test]
+fn instrument_subtypes_and_aliases_count_as_the_instrument_they_belong_to() {
+    for (raw, instrument) in [
+        ("  SAXOFONE TENOR ", Instrument::Saxophone),
+        ("FLUGELHORN", Instrument::Trumpet),
+        ("BANDOLIM", Instrument::Unknown("BANDOLIM".to_owned())),
+    ] {
+        let result: Result<MusicianProfile, MusicianProfileGatewayError> =
+            profile_of("MÚSICO", "RJM", raw);
+
+        assert_eq!(
+            result.map(|profile| profile.instrument),
+            Ok(Some(instrument)),
+            "instrument {raw:?}"
+        );
+    }
+}
+
+fn build_gateway(
+    mock_server: &MockServer,
+) -> Result<MusicianProfileGatewaySamImpl, reqwest::Error> {
+    build_gateway_for(&mock_server.uri())
+}
+
+fn build_gateway_for(base_url: &str) -> Result<MusicianProfileGatewaySamImpl, reqwest::Error> {
+    let sam_operations: SamOperations = sam_operations_for(base_url)?;
+    let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
+
+    Ok(MusicianProfileGatewaySamImpl::new(sam_client))
+}
+
+fn failure_of(
+    result: Result<MusicianProfile, MusicianProfileGatewayError>,
+) -> Option<(FailureKind, String)> {
+    match result {
+        Err(MusicianProfileGatewayError::UnableToPerformOperation { kind, details }) => {
+            Some((kind, details))
+        }
+        Ok(_) | Err(_) => None,
+    }
+}
+
+async fn mount_listing(mock_server: &MockServer, row_json: &str) {
+    Mock::given(method("GET"))
+        .and(path("/painel"))
+        .respond_with(ResponseTemplate::new(200))
+        .mount(mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/alunos/listagem"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_string(format!(
+                    r#"{{"draw":"1","recordsTotal":1,"recordsFiltered":1,"data":[{row_json}]}}"#
+                ))
+                .insert_header("Content-Type", "application/json"),
+        )
+        .mount(mock_server)
+        .await;
+}
+
+fn profile_of(
+    role: &str,
+    level: &str,
+    instrument: &str,
+) -> Result<MusicianProfile, MusicianProfileGatewayError> {
+    let gateway: MusicianProfileGatewaySamImpl = MusicianProfileGatewaySamImpl::new(Arc::new(
+        FakeSamClient::listing(vec![sam_student(role, level, instrument, "SOMEWHERE")]),
+    ));
+
+    gateway.get_by_id("99999")
 }
