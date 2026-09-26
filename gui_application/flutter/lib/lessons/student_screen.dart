@@ -91,18 +91,14 @@ final class _ProgressSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (progress) {
       ProgressAvailable(:final view) => CheckpointTimeline(progress: view),
-      ProgressNoInstrumentAssigned() => const _ProgressNotice(
+      ProgressNoInstrumentAssigned() => _ProgressNotice(
         icon: Icons.music_off_outlined,
-        message:
-            'Instrumento ainda não definido para este aluno no SAM. '
-            'O progresso não pode ser calculado.',
+        message: context.l10n.progressNoInstrument,
       ),
       ProgressUnknownLevel(:final raw) => UnknownLevelBanner(raw: raw),
-      ProgressNotAMusician() => const _ProgressNotice(
+      ProgressNotAMusician() => _ProgressNotice(
         icon: Icons.info_outline,
-        message:
-            'O progresso só é calculado para músicos; '
-            'este aluno tem outra função no SAM.',
+        message: context.l10n.progressNotAMusician,
       ),
       ProgressUnavailable(:final report) => _ProgressNotice(
         icon: Icons.info_outline,
@@ -166,8 +162,8 @@ final class _LessonsTabs extends StatelessWidget {
         children: [
           TabBar(
             tabs: [
-              Tab(text: 'MSA (${view.msa.length})'),
-              Tab(text: 'Método (${view.method.length})'),
+              Tab(text: context.l10n.lessonsMsaTab(view.msa.length)),
+              Tab(text: context.l10n.lessonsMethodTab(view.method.length)),
             ],
           ),
           Expanded(
@@ -175,11 +171,11 @@ final class _LessonsTabs extends StatelessWidget {
               children: [
                 CategoryLessonsView(
                   lessons: view.msa,
-                  emptyMessage: 'Nenhuma lição aprovada registrada.',
+                  emptyMessage: context.l10n.lessonsNoMsa,
                 ),
                 CategoryLessonsView(
                   lessons: view.method,
-                  emptyMessage: 'Nenhuma lição de método registrada.',
+                  emptyMessage: context.l10n.lessonsNoMethod,
                 ),
               ],
             ),

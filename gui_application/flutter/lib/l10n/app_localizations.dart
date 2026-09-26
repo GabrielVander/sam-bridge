@@ -327,6 +327,132 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Limpar filtros'**
   String get rosterClearFilters;
+
+  /// No description provided for @progressNoInstrument.
+  ///
+  /// In pt, this message translates to:
+  /// **'Instrumento ainda não definido para este aluno no SAM. O progresso não pode ser calculado.'**
+  String get progressNoInstrument;
+
+  /// No description provided for @progressNotAMusician.
+  ///
+  /// In pt, this message translates to:
+  /// **'O progresso só é calculado para músicos; este aluno tem outra função no SAM.'**
+  String get progressNotAMusician;
+
+  /// No description provided for @lessonsMsaTab.
+  ///
+  /// In pt, this message translates to:
+  /// **'MSA ({count})'**
+  String lessonsMsaTab(int count);
+
+  /// No description provided for @lessonsMethodTab.
+  ///
+  /// In pt, this message translates to:
+  /// **'Método ({count})'**
+  String lessonsMethodTab(int count);
+
+  /// No description provided for @lessonsNoMsa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma lição aprovada registrada.'**
+  String get lessonsNoMsa;
+
+  /// No description provided for @lessonsNoMethod.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma lição de método registrada.'**
+  String get lessonsNoMethod;
+
+  /// No description provided for @backToStudents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voltar'**
+  String get backToStudents;
+
+  /// No description provided for @studentList.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lista de alunos'**
+  String get studentList;
+
+  /// No description provided for @progressTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Progresso'**
+  String get progressTitle;
+
+  /// No description provided for @progressTowards.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rumo a: {level}'**
+  String progressTowards(String level);
+
+  /// No description provided for @msa.
+  ///
+  /// In pt, this message translates to:
+  /// **'MSA'**
+  String get msa;
+
+  /// No description provided for @method.
+  ///
+  /// In pt, this message translates to:
+  /// **'Método'**
+  String get method;
+
+  /// No description provided for @progressAllLevelsReached.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os níveis alcançados'**
+  String get progressAllLevelsReached;
+
+  /// No description provided for @checkpointReady.
+  ///
+  /// In pt, this message translates to:
+  /// **'{level} - pronto para a prova'**
+  String checkpointReady(String level);
+
+  /// No description provided for @lessonPhase.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fase {phase}'**
+  String lessonPhase(String phase);
+
+  /// No description provided for @lessonPage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pág. {page}'**
+  String lessonPage(String page);
+
+  /// No description provided for @lessonNumber.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lição {lesson}'**
+  String lessonNumber(String lesson);
+
+  /// No description provided for @lessonClef.
+  ///
+  /// In pt, this message translates to:
+  /// **'Clave: {clef}'**
+  String lessonClef(String clef);
+
+  /// No description provided for @unknownLevelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'nível não reconhecido'**
+  String get unknownLevelTitle;
+
+  /// No description provided for @unknownLevelValue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Valor: {raw}'**
+  String unknownLevelValue(String raw);
+
+  /// No description provided for @unknownLevelExplanation.
+  ///
+  /// In pt, this message translates to:
+  /// **'O progresso não pode ser calculado para este nível.'**
+  String get unknownLevelExplanation;
 }
 
 class _AppLocalizationsDelegate

@@ -141,4 +141,88 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get rosterClearFilters => 'Limpar filtros';
+
+  @override
+  String get progressNoInstrument =>
+      'Instrumento ainda não definido para este aluno no SAM. O progresso não pode ser calculado.';
+
+  @override
+  String get progressNotAMusician =>
+      'O progresso só é calculado para músicos; este aluno tem outra função no SAM.';
+
+  @override
+  String lessonsMsaTab(int count) {
+    return 'MSA ($count)';
+  }
+
+  @override
+  String lessonsMethodTab(int count) {
+    return 'Método ($count)';
+  }
+
+  @override
+  String get lessonsNoMsa => 'Nenhuma lição aprovada registrada.';
+
+  @override
+  String get lessonsNoMethod => 'Nenhuma lição de método registrada.';
+
+  @override
+  String get backToStudents => 'Voltar';
+
+  @override
+  String get studentList => 'Lista de alunos';
+
+  @override
+  String get progressTitle => 'Progresso';
+
+  @override
+  String progressTowards(String level) {
+    return 'Rumo a: $level';
+  }
+
+  @override
+  String get msa => 'MSA';
+
+  @override
+  String get method => 'Método';
+
+  @override
+  String get progressAllLevelsReached => 'Todos os níveis alcançados';
+
+  @override
+  String checkpointReady(String level) {
+    return '$level - pronto para a prova';
+  }
+
+  @override
+  String lessonPhase(String phase) {
+    return 'Fase $phase';
+  }
+
+  @override
+  String lessonPage(String page) {
+    return 'Pág. $page';
+  }
+
+  @override
+  String lessonNumber(String lesson) {
+    return 'Lição $lesson';
+  }
+
+  @override
+  String lessonClef(String clef) {
+    return 'Clave: $clef';
+  }
+
+  @override
+  String get unknownLevelTitle => 'nível não reconhecido';
+
+  @override
+  String unknownLevelValue(String raw) {
+    return 'Valor: $raw';
+  }
+
+  @override
+  String get unknownLevelExplanation =>
+      'O progresso não pode ser calculado para este nível.';
 }

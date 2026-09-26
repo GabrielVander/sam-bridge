@@ -52,11 +52,13 @@ final class LessonCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       if (lesson.phase.isNotEmpty)
-                        InfoChip(label: 'Fase ${lesson.phase}'),
+                        InfoChip(label: context.l10n.lessonPhase(lesson.phase)),
                       if (lesson.page.isNotEmpty)
-                        InfoChip(label: 'Pág. ${lesson.page}'),
+                        InfoChip(label: context.l10n.lessonPage(lesson.page)),
                       if (lesson.lesson.isNotEmpty)
-                        InfoChip(label: 'Lição ${lesson.lesson}'),
+                        InfoChip(
+                          label: context.l10n.lessonNumber(lesson.lesson),
+                        ),
                     ],
                   ),
                   if (clef != null ||
@@ -67,7 +69,11 @@ final class LessonCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (clef != null)
-                          Text('Clave: ${context.l10n.clefName(clef)}'),
+                          Text(
+                            context.l10n.lessonClef(
+                              context.l10n.clefName(clef),
+                            ),
+                          ),
                         if (lesson.description.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(lesson.description),

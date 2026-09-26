@@ -20,20 +20,28 @@ final class CheckpointTimeline extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Progresso', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              context.l10n.progressTitle,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 16),
             _Timeline(checkpoints: progress.checkpoints),
             const SizedBox(height: 20),
             if (nextLevel != null) ...[
               Text(
-                'Rumo a: ${context.l10n.reportedLevelName(nextLevel)}',
+                context.l10n.progressTowards(
+                  context.l10n.reportedLevelName(nextLevel),
+                ),
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               const SizedBox(height: 10),
-              ProgressBar(label: 'MSA', percent: progress.msaRelativePercent),
+              ProgressBar(
+                label: context.l10n.msa,
+                percent: progress.msaRelativePercent,
+              ),
               const SizedBox(height: 6),
               ProgressBar(
-                label: 'Método',
+                label: context.l10n.method,
                 percent: progress.methodRelativePercent,
               ),
             ] else
@@ -46,7 +54,7 @@ final class CheckpointTimeline extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Todos os níveis alcançados',
+                    context.l10n.progressAllLevelsReached,
                     style: Theme.of(context).textTheme.labelLarge,
                   ),
                 ],
@@ -122,7 +130,7 @@ final class _CheckpointDot extends StatelessWidget {
 
     return Tooltip(
       message: checkpoint.readyToAdvance
-          ? '$label - pronto para a prova'
+          ? context.l10n.checkpointReady(label)
           : label,
       child: Column(
         mainAxisSize: MainAxisSize.min,

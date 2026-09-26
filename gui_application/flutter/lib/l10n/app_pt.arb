@@ -66,5 +66,89 @@
       }
     }
   },
-  "rosterClearFilters": "Limpar filtros"
+  "rosterClearFilters": "Limpar filtros",
+  "progressNoInstrument": "Instrumento ainda não definido para este aluno no SAM. O progresso não pode ser calculado.",
+  "progressNotAMusician": "O progresso só é calculado para músicos; este aluno tem outra função no SAM.",
+  "lessonsMsaTab": "MSA ({count})",
+  "@lessonsMsaTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonsMethodTab": "Método ({count})",
+  "@lessonsMethodTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonsNoMsa": "Nenhuma lição aprovada registrada.",
+  "lessonsNoMethod": "Nenhuma lição de método registrada.",
+  "backToStudents": "Voltar",
+  "studentList": "Lista de alunos",
+  "progressTitle": "Progresso",
+  "progressTowards": "Rumo a: {level}",
+  "@progressTowards": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "msa": "MSA",
+  "method": "Método",
+  "progressAllLevelsReached": "Todos os níveis alcançados",
+  "checkpointReady": "{level} - pronto para a prova",
+  "@checkpointReady": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonPhase": "Fase {phase}",
+  "@lessonPhase": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonPage": "Pág. {page}",
+  "@lessonPage": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonNumber": "Lição {lesson}",
+  "@lessonNumber": {
+    "placeholders": {
+      "lesson": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonClef": "Clave: {clef}",
+  "@lessonClef": {
+    "placeholders": {
+      "clef": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownLevelTitle": "nível não reconhecido",
+  "unknownLevelValue": "Valor: {raw}",
+  "@unknownLevelValue": {
+    "placeholders": {
+      "raw": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownLevelExplanation": "O progresso não pode ser calculado para este nível."
 }

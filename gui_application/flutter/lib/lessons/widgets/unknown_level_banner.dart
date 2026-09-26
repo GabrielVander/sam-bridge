@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 
 class UnknownLevelBanner extends StatelessWidget {
   final String raw;
@@ -15,22 +16,22 @@ class UnknownLevelBanner extends StatelessWidget {
           children: [
             const Icon(Icons.help_outline, size: 48, color: Colors.orange),
             const SizedBox(height: 12),
-            const Text(
-              'nível não reconhecido',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              context.l10n.unknownLevelTitle,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             if (raw.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
-                'Valor: $raw',
+                context.l10n.unknownLevelValue(raw),
                 style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
             ],
             const SizedBox(height: 8),
             Text(
-              'O progresso não pode ser calculado para este nível.',
+              context.l10n.unknownLevelExplanation,
               style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
