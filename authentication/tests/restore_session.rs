@@ -10,7 +10,7 @@ use pretty_assertions::assert_eq;
 use std::sync::Arc;
 
 mod support;
-use support::InMemoryCredentialStore;
+use support::{InMemoryCredentialStore, credential};
 
 #[test]
 fn use_case_without_stored_credentials_reports_no_stored_credentials() {
@@ -44,9 +44,7 @@ fn use_case_with_valid_stored_credentials_is_restored() {
         fake_authorization_gateway,
     );
 
-    in_memory_credential_store
-        .save(&Credential::default())
-        .unwrap();
+    in_memory_credential_store.save(&credential()).unwrap();
 
     let result: Result<RestoreSessionOutcome, RestoreSessionError> = use_case.execute();
 
@@ -67,9 +65,7 @@ fn use_case_with_rejected_credentials_clears_the_store_and_reports_rejected() {
         fake_authorization_gateway,
     );
 
-    in_memory_credential_store
-        .save(&Credential::default())
-        .unwrap();
+    in_memory_credential_store.save(&credential()).unwrap();
 
     let result: Result<RestoreSessionOutcome, RestoreSessionError> = use_case.execute();
 
@@ -97,9 +93,7 @@ fn use_case_when_rejected_credentials_cannot_be_cleared_surfaces_the_failure() {
         fake_authorization_gateway,
     );
 
-    in_memory_credential_store
-        .save(&Credential::default())
-        .unwrap();
+    in_memory_credential_store.save(&credential()).unwrap();
 
     let result: Result<RestoreSessionOutcome, RestoreSessionError> = use_case.execute();
 
@@ -127,7 +121,7 @@ fn use_case_when_authorization_gateway_fails_leaves_the_store_untouched() {
         authorizer,
     );
 
-    let credential: Credential = Credential::default();
+    let credential: Credential = credential();
     in_memory_credential_store.save(&credential).unwrap();
 
     let result: Result<RestoreSessionOutcome, RestoreSessionError> = use_case.execute();

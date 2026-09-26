@@ -8,7 +8,7 @@ use pretty_assertions::assert_eq;
 use std::sync::Arc;
 
 mod support;
-use support::InMemoryCredentialStore;
+use support::{InMemoryCredentialStore, credential};
 
 #[test]
 fn clears_the_store() {
@@ -17,7 +17,7 @@ fn clears_the_store() {
 
     let use_case: LogoutUseCase = LogoutUseCase::new(in_memory_credential_store.clone());
 
-    let credential: Credential = Credential::default();
+    let credential: Credential = credential();
     in_memory_credential_store.save(&credential).unwrap();
     assert_eq!(in_memory_credential_store.load(), Some(credential));
 

@@ -64,8 +64,8 @@ impl FakeSam {
     pub fn with_a_stored_credential(self) -> Self {
         Self {
             stored_credential: Some(Credential::new(
-                Email("someone@example.com".to_owned()),
-                Password("hunter2".to_owned()),
+                Email::new("someone@example.com".to_owned()),
+                Password::new("hunter2".to_owned()),
             )),
             ..self
         }

@@ -34,8 +34,8 @@ fn failure_of(
 
 fn credential() -> Credential {
     Credential::new(
-        Email("someone@example.com".to_owned()),
-        Password("hunter2".to_owned()),
+        Email::new("someone@example.com".to_owned()),
+        Password::new("hunter2".to_owned()),
     )
 }
 

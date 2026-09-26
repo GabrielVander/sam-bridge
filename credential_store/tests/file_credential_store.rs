@@ -19,16 +19,16 @@ fn saving_again_replaces_the_previous_credential() {
     store.save(&credential()).expect("first save");
 
     let second: Credential = Credential::new(
-        Email("someone_else@example.com".to_owned()),
-        Password("different_pass".to_owned()),
+        Email::new("someone_else@example.com".to_owned()),
+        Password::new("different_pass".to_owned()),
     );
 
     store.save(&second).expect("second save");
 
     let loaded: Credential = store.load().expect("load should return Some");
 
-    assert_eq!(loaded.email.0, "someone_else@example.com");
-    assert_eq!(loaded.password.0, "different_pass");
+    assert_eq!(loaded.email().as_str(), "someone_else@example.com");
+    assert_eq!(loaded.password().as_str(), "different_pass");
 }
 
 #[test]
@@ -96,8 +96,8 @@ fn a_second_store_pointed_at_the_same_dir_reads_what_the_first_wrote() {
 
     let loaded: Credential = store2.load().expect("load via store2");
 
-    assert_eq!(loaded.email.0, "test_user@example.com");
-    assert_eq!(loaded.password.0, "test_pass");
+    assert_eq!(loaded.email().as_str(), "test_user@example.com");
+    assert_eq!(loaded.password().as_str(), "test_pass");
 }
 
 #[test]
@@ -300,7 +300,7 @@ fn a_store_under_a_base_directory_keeps_its_credentials_there() {
     assert!(base.path().join("sam_bridge").join("session.enc").is_file());
 
     let loaded: Credential = store.load().expect("load should return Some");
-    assert_eq!(loaded.email.0, "test_user@example.com");
+    assert_eq!(loaded.email().as_str(), "test_user@example.com");
 }
 
 #[cfg(unix)]
@@ -357,7 +357,7 @@ fn temp_store() -> std::io::Result<(FileCredentialStore, tempfile::TempDir)> {
 
 fn credential() -> Credential {
     Credential::new(
-        Email("test_user@example.com".to_owned()),
-        Password("test_pass".to_owned()),
+        Email::new("test_user@example.com".to_owned()),
+        Password::new("test_pass".to_owned()),
     )
 }

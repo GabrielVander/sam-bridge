@@ -184,8 +184,8 @@ impl FileCredentialStore {
 impl SaveCredentialGateway for FileCredentialStore {
     fn save(&self, credential: &Credential) -> Result<(), SaveCredentialGatewayError> {
         let stored: StoredCredential = StoredCredential {
-            email: credential.email.0.clone(),
-            password: credential.password.0.clone(),
+            email: credential.email().as_str().to_owned(),
+            password: credential.password().as_str().to_owned(),
         };
 
         self.save_sync(&stored)
@@ -197,8 +197,8 @@ impl LoadCredentialGateway for FileCredentialStore {
     fn load(&self) -> Option<Credential> {
         self.load_sync().map(|stored| {
             Credential::new(
-                Email(stored.email.clone()),
-                Password(stored.password.clone()),
+                Email::new(stored.email.clone()),
+                Password::new(stored.password.clone()),
             )
         })
     }

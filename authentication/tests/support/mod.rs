@@ -1,3 +1,9 @@
+//! Test doubles shared by the `authentication` crate's tests.
+//!
+//! Not every item here is used by every test binary that includes this
+//! module, since each `tests/*.rs` file is compiled separately.
+#![allow(dead_code)]
+
 use std::sync::{Mutex, MutexGuard, PoisonError};
 
 use authentication::{
@@ -24,13 +30,16 @@ impl InMemoryCredentialStore {
     }
 
     fn store_credential(&self, credential: &Credential) {
-        *self.saved() = Some((credential.email.0.clone(), credential.password.0.clone()));
+        *self.saved() = Some((
+            credential.email().as_str().to_owned(),
+            credential.password().as_str().to_owned(),
+        ));
     }
 
     fn retrieve_credential(&self) -> Option<Credential> {
         self.saved()
             .clone()
-            .map(|(email, password)| Credential::new(Email(email), Password(password)))
+            .map(|(email, password)| Credential::new(Email::new(email), Password::new(password)))
     }
 
     fn clear_credential(&self) {
@@ -56,4 +65,12 @@ impl ClearCredentialGateway for InMemoryCredentialStore {
         self.clear_credential();
         Ok(())
     }
+}
+
+#[must_use]
+pub fn credential() -> Credential {
+    Credential::new(
+        Email::new("someone@example.com".to_owned()),
+        Password::new("hunter2".to_owned()),
+    )
 }

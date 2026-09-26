@@ -31,8 +31,8 @@ fn successful_login_saves_the_credential() {
     assert_eq!(
         in_memory_credential_store.load(),
         Some(Credential::new(
-            Email("Some email".to_string()),
-            Password("secretpassword123".to_string())
+            Email::new("Some email".to_string()),
+            Password::new("secretpassword123".to_string())
         ))
     );
 }

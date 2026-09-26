@@ -51,8 +51,8 @@ impl AuthorizeCredentialGateway for AuthorizationGatewaySamImpl {
 impl From<&Credential> for SamCredentials {
     fn from(val: &Credential) -> Self {
         Self {
-            login: val.email.0.clone(),
-            password: val.password.0.clone(),
+            login: val.email().as_str().to_owned(),
+            password: val.password().as_str().to_owned(),
         }
     }
 }

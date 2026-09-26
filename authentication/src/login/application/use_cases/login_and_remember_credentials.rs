@@ -26,7 +26,7 @@ impl LoginAndRememberCredentialsUseCase {
     }
 
     pub fn execute(&self, email: String, password: String) -> Result<(), LoginUseCaseError> {
-        let credential: Credential = Credential::new(Email(email), Password(password));
+        let credential: Credential = Credential::new(Email::new(email), Password::new(password));
 
         match self.authorizer.authorize(&credential) {
             Ok(AuthorizationResult::Authorized) => {
