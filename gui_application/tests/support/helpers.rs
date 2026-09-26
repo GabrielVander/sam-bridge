@@ -1,5 +1,3 @@
-//! A facade wired to fake gateways, for tests of what crosses the bridge.
-//!
 //! Not every item here is used by every test binary that includes this
 //! module, since each `tests/*.rs` file is compiled separately.
 #![allow(dead_code)]

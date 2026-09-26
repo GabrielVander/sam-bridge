@@ -24,8 +24,6 @@ fn config_for(base_url: &str) -> Config {
     }
 }
 
-/// A facade talking to `mock_server`, with its credentials kept in a temporary directory
-/// that lives as long as the returned guard.
 fn facade_talking_to(
     mock_server: &MockServer,
     timeout: Duration,
