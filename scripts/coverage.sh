@@ -4,7 +4,8 @@
 #
 # Exclusions:
 # - Rust: generated FRB code and each crate's tests/support/ helpers.
-# - Flutter: generated code (lib/rust/**, *.freezed.dart, *.g.dart) and lib/main.dart.
+# - Flutter: generated code (lib/rust/**, lib/l10n/app_localizations*.dart, *.freezed.dart, *.g.dart)
+#   and lib/main.dart.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -23,7 +24,7 @@ echo "== Flutter"
   package=$(sed -n 's/^name: *//p' pubspec.yaml | head -1)
   {
     find lib -name '*.dart' \
-      ! -path 'lib/rust/*' ! -path 'lib/main.dart' ! -name '*.freezed.dart' ! -name '*.g.dart' | sort |
+      ! -path 'lib/rust/*' ! -path 'lib/l10n/app_localizations*' ! -path 'lib/main.dart' ! -name '*.freezed.dart' ! -name '*.g.dart' | sort |
       awk -v pkg="$package" '{ sub(/^lib\//, ""); printf "import '\''package:%s/%s'\'' as i%d;\n", pkg, $0, NR }'
     echo "void main() {}"
   } >"$helper"
@@ -54,7 +55,7 @@ def totals(path, *, exclude=None):
     return hit, total
 
 def flutter_excluded(path):
-    return path.startswith("lib/rust/") or path.endswith((".freezed.dart", ".g.dart"))
+    return path.startswith(("lib/rust/", "lib/l10n/app_localizations")) or path.endswith((".freezed.dart", ".g.dart"))
 
 rust_hit, rust_total = totals(sys.argv[1])
 flutter_hit, flutter_total = totals(sys.argv[2], exclude=flutter_excluded)
