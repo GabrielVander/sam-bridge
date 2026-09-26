@@ -7,11 +7,11 @@ use crate::roster::{
 
 #[derive(Clone)]
 pub struct RetrieveAllAvailableStudentsUseCase {
-    student_gateway: Arc<dyn StudentGateway + Send + Sync>,
+    student_gateway: Arc<dyn StudentGateway>,
 }
 
 impl RetrieveAllAvailableStudentsUseCase {
-    pub fn new(gateway: Arc<dyn StudentGateway + Send + Sync>) -> Self {
+    pub fn new(gateway: Arc<dyn StudentGateway>) -> Self {
         Self {
             student_gateway: gateway,
         }

@@ -8,11 +8,11 @@ use crate::shared::domain::entities::StudentId;
 
 #[derive(Clone)]
 pub struct RetrieveStudentLessonsUseCase {
-    gateway: Arc<dyn StudentLessonsGateway + Send + Sync>,
+    gateway: Arc<dyn StudentLessonsGateway>,
 }
 
 impl RetrieveStudentLessonsUseCase {
-    pub fn new(gateway: Arc<dyn StudentLessonsGateway + Send + Sync>) -> Self {
+    pub fn new(gateway: Arc<dyn StudentLessonsGateway>) -> Self {
         Self { gateway }
     }
 

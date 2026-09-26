@@ -24,14 +24,14 @@ pub enum AssessStudentProgressError {
 
 #[derive(Clone)]
 pub struct AssessStudentProgressUseCase {
-    profile_gateway: Arc<dyn MusicianProfileGateway + Send + Sync>,
-    lessons_gateway: Arc<dyn StudentLessonsGateway + Send + Sync>,
+    profile_gateway: Arc<dyn MusicianProfileGateway>,
+    lessons_gateway: Arc<dyn StudentLessonsGateway>,
 }
 
 impl AssessStudentProgressUseCase {
     pub fn new(
-        profile_gateway: Arc<dyn MusicianProfileGateway + Send + Sync>,
-        lessons_gateway: Arc<dyn StudentLessonsGateway + Send + Sync>,
+        profile_gateway: Arc<dyn MusicianProfileGateway>,
+        lessons_gateway: Arc<dyn StudentLessonsGateway>,
     ) -> Self {
         Self {
             profile_gateway,
