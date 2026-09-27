@@ -1,5 +1,3 @@
-import 'package:equatable/equatable.dart';
-
 enum Instrument {
   violin,
   viola,
@@ -25,7 +23,7 @@ enum Instrument {
   contraltoViolin,
 }
 
-sealed class ReportedInstrument extends Equatable {
+sealed class ReportedInstrument {
   const ReportedInstrument();
 }
 
@@ -33,16 +31,10 @@ final class KnownInstrument extends ReportedInstrument {
   final Instrument instrument;
 
   const KnownInstrument(this.instrument);
-
-  @override
-  List<Object?> get props => [instrument];
 }
 
 final class UnrecognizedInstrument extends ReportedInstrument {
   final String raw;
 
   const UnrecognizedInstrument(this.raw);
-
-  @override
-  List<Object?> get props => [raw];
 }
