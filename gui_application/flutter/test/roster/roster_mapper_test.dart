@@ -24,33 +24,31 @@ void main() {
           id: '1',
           name: 'Jane Doe',
           location: 'Some Location',
-          position: MusicianPosition([Level.youthService]),
+          position: LeveledPosition([Level.youthService]),
         ),
       );
     });
 
     final positions = {
-      Positions.candidate: const MusicianPosition([Level.candidate]),
-      Positions.practice: const MusicianPosition([Level.practice]),
-      Positions.youthService: const MusicianPosition([Level.youthService]),
-      Positions.officialService: const MusicianPosition([
-        Level.officialService,
-      ]),
-      Positions.officialized: const MusicianPosition([Level.officialized]),
-      Positions.halfHour: const MusicianPosition([Level.halfHour]),
-      Positions.youthServiceHalfHour: const MusicianPosition([
+      Positions.candidate: const LeveledPosition([Level.candidate]),
+      Positions.practice: const LeveledPosition([Level.practice]),
+      Positions.youthService: const LeveledPosition([Level.youthService]),
+      Positions.officialService: const LeveledPosition([Level.officialService]),
+      Positions.officialized: const LeveledPosition([Level.officialized]),
+      Positions.halfHour: const LeveledPosition([Level.halfHour]),
+      Positions.youthServiceHalfHour: const LeveledPosition([
         Level.youthService,
         Level.halfHour,
       ]),
-      Positions.youthServicePractice: const MusicianPosition([
+      Positions.youthServicePractice: const LeveledPosition([
         Level.youthService,
         Level.practice,
       ]),
-      Positions.youthServiceOfficialService: const MusicianPosition([
+      Positions.youthServiceOfficialService: const LeveledPosition([
         Level.youthService,
         Level.officialService,
       ]),
-      Positions.youthServiceOfficialized: const MusicianPosition([
+      Positions.youthServiceOfficialized: const LeveledPosition([
         Level.youthService,
         Level.officialized,
       ]),
@@ -90,7 +88,7 @@ void main() {
       final result = RosterMapper.toViewModels(dtos);
 
       expect(result.map((s) => s.id).toList(), ['1', '2']);
-      expect(result[0].position, const MusicianPosition([Level.candidate]));
+      expect(result[0].position, const LeveledPosition([Level.candidate]));
       expect(result[1].position, const GemSecretaryPosition());
     });
   });

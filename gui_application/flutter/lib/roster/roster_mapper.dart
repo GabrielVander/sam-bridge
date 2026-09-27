@@ -19,31 +19,31 @@ class RosterMapper {
   static StudentPosition _position(
     StudentPositionDto position,
   ) => switch (position) {
-    StudentPositionDto_Candidate() => const MusicianPosition([Level.candidate]),
-    StudentPositionDto_Practice() => const MusicianPosition([Level.practice]),
-    StudentPositionDto_YouthService() => const MusicianPosition([
+    StudentPositionDto_Candidate() => const LeveledPosition([Level.candidate]),
+    StudentPositionDto_Practice() => const LeveledPosition([Level.practice]),
+    StudentPositionDto_YouthService() => const LeveledPosition([
       Level.youthService,
     ]),
-    StudentPositionDto_OfficialService() => const MusicianPosition([
+    StudentPositionDto_OfficialService() => const LeveledPosition([
       Level.officialService,
     ]),
-    StudentPositionDto_Officialized() => const MusicianPosition([
+    StudentPositionDto_Officialized() => const LeveledPosition([
       Level.officialized,
     ]),
-    StudentPositionDto_HalfHour() => const MusicianPosition([Level.halfHour]),
-    StudentPositionDto_YouthServiceHalfHour() => const MusicianPosition([
+    StudentPositionDto_HalfHour() => const LeveledPosition([Level.halfHour]),
+    StudentPositionDto_YouthServiceHalfHour() => const LeveledPosition([
       Level.youthService,
       Level.halfHour,
     ]),
-    StudentPositionDto_YouthServicePractice() => const MusicianPosition([
+    StudentPositionDto_YouthServicePractice() => const LeveledPosition([
       Level.youthService,
       Level.practice,
     ]),
-    StudentPositionDto_YouthServiceOfficialService() => const MusicianPosition([
+    StudentPositionDto_YouthServiceOfficialService() => const LeveledPosition([
       Level.youthService,
       Level.officialService,
     ]),
-    StudentPositionDto_YouthServiceOfficialized() => const MusicianPosition([
+    StudentPositionDto_YouthServiceOfficialized() => const LeveledPosition([
       Level.youthService,
       Level.officialized,
     ]),

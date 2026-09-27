@@ -8,10 +8,10 @@ sealed class StudentPosition extends Equatable {
   List<Object?> get props => [];
 }
 
-final class MusicianPosition extends StudentPosition {
+final class LeveledPosition extends StudentPosition {
   final List<Level> levels;
 
-  const MusicianPosition(this.levels);
+  const LeveledPosition(this.levels);
 
   @override
   List<Object?> get props => [levels];

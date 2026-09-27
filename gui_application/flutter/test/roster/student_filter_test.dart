@@ -9,7 +9,7 @@ StudentListItem _student(String name, {String location = 'Centro'}) =>
       id: name,
       name: name,
       location: location,
-      position: const MusicianPosition([Level.practice]),
+      position: const LeveledPosition([Level.practice]),
     );
 
 List<String> _names(List<StudentListItem> students) =>
