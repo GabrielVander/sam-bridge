@@ -7,7 +7,7 @@ use sam::http::SamOperations;
 use sam::roster::adapters::gateways::StudentGatewaySamImpl;
 use student::application::gateways::{FailureKind, StudentGateway, StudentGatewayError};
 use student::domain::entities::{
-    Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
+    Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentPosition,
 };
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -362,28 +362,6 @@ fn positions_other_than_musician_ignore_the_instrument_column() {
             .unwrap()
             .position,
         StudentPosition::Unknown("BATERISTA".to_owned())
-    );
-}
-
-#[test]
-fn the_region_is_read_from_the_location() {
-    assert_eq!(
-        student_located_at(LOCATION).unwrap().region,
-        Region::AraraquaraSaoCarlos
-    );
-    assert_eq!(
-        student_located_at("JARDIM SÃO PAULO | BR-SP-ARARAQUARA-ITIRAPINA")
-            .unwrap()
-            .region,
-        Region::AraraquaraItirapina
-    );
-}
-
-#[test]
-fn an_unrecognized_region_keeps_the_location_sam_wrote() {
-    assert_eq!(
-        student_located_at("SOME OTHER LOCATION").unwrap().region,
-        Region::Other("SOME OTHER LOCATION".to_owned())
     );
 }
 

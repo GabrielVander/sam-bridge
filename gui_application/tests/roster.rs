@@ -5,8 +5,7 @@ use gui_application::api::roster::{
 use pretty_assertions::assert_eq;
 use student::application::gateways::{FailureKind, StudentGatewayError};
 use student::domain::entities::{
-    Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentId,
-    StudentPosition,
+    Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentId, StudentPosition,
 };
 
 #[path = "support/helpers.rs"]
@@ -19,7 +18,6 @@ fn student(position: StudentPosition) -> Student {
         name: "Someone".to_owned(),
         position,
         location: "Somewhere".to_owned(),
-        region: Region::AraraquaraSaoCarlos,
     }
 }
 

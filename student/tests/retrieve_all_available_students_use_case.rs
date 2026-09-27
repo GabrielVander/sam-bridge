@@ -6,7 +6,7 @@ use student::{
         use_cases::RetrieveAllAvailableStudentsUseCase,
     },
     domain::entities::{
-        Instrument, MusicianLevel, OrganistLevel, Region, SecretaryType, Student, StudentPosition,
+        Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentPosition,
     },
 };
 
@@ -39,7 +39,6 @@ fn returns_every_available_student() {
                 instrument: Some(Instrument::Violin),
             },
             location: "Location A".to_string(),
-            region: Region::AraraquaraSaoCarlos,
         },
         Student {
             id: StudentId::new("2".to_owned()),
@@ -48,7 +47,6 @@ fn returns_every_available_student() {
                 r#type: SecretaryType::Music,
             },
             location: "Location B".to_string(),
-            region: Region::AraraquaraSaoCarlos,
         },
         Student {
             id: StudentId::new("3".to_owned()),
@@ -57,7 +55,6 @@ fn returns_every_available_student() {
                 level: OrganistLevel::YouthServiceHalfHour,
             },
             location: "Location A".to_string(),
-            region: Region::AraraquaraSaoCarlos,
         },
     ];
 

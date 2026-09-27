@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use student::{
     application::gateways::{StudentGateway, StudentGatewayError},
-    domain::entities::{OrganistLevel, Region, SecretaryType, Student, StudentId, StudentPosition},
+    domain::entities::{OrganistLevel, SecretaryType, Student, StudentId, StudentPosition},
 };
 
 use crate::client::{SamClient, SamStudent};
@@ -37,7 +37,6 @@ impl From<SamStudent> for Student {
             &sam_student.level,
             &sam_student.instrument,
         );
-        let region: Region = parse_region(&sam_student.location);
         let location: String = clean_location(&sam_student.location);
 
         Self {
@@ -45,7 +44,6 @@ impl From<SamStudent> for Student {
             name: sam_student.name,
             position,
             location,
-            region,
         }
     }
 }
@@ -93,15 +91,5 @@ fn parse_organist_level(level: &str) -> OrganistLevel {
         "CULTO OFICIAL" => OrganistLevel::OfficialService,
         "RJM / MEIA HORA" => OrganistLevel::YouthServiceHalfHour,
         other => OrganistLevel::Unknown(other.to_owned()),
-    }
-}
-
-fn parse_region(location: &str) -> Region {
-    if location.contains("ARARAQUARA-SÃO CARLOS") {
-        Region::AraraquaraSaoCarlos
-    } else if location.contains("ARARAQUARA-ITIRAPINA") {
-        Region::AraraquaraItirapina
-    } else {
-        Region::Other(location.to_owned())
     }
 }
