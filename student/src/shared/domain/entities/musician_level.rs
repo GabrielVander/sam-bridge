@@ -9,6 +9,14 @@ pub enum MusicianLevel {
 }
 
 impl MusicianLevel {
+    pub const ASCENDING: [Self; 5] = [
+        Self::Candidate,
+        Self::Practice,
+        Self::YouthService,
+        Self::OfficialService,
+        Self::Officialized,
+    ];
+
     #[must_use]
     pub const fn rank(&self) -> u8 {
         match self {
