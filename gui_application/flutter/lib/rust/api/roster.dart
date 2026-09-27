@@ -9,7 +9,39 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'roster.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+
+@freezed
+sealed class InstrumentDto with _$InstrumentDto {
+  const InstrumentDto._();
+
+  const factory InstrumentDto.violin() = InstrumentDto_Violin;
+  const factory InstrumentDto.viola() = InstrumentDto_Viola;
+  const factory InstrumentDto.cello() = InstrumentDto_Cello;
+  const factory InstrumentDto.flute() = InstrumentDto_Flute;
+  const factory InstrumentDto.oboe() = InstrumentDto_Oboe;
+  const factory InstrumentDto.bassoon() = InstrumentDto_Bassoon;
+  const factory InstrumentDto.clarinet() = InstrumentDto_Clarinet;
+  const factory InstrumentDto.altoClarinet() = InstrumentDto_AltoClarinet;
+  const factory InstrumentDto.bassClarinet() = InstrumentDto_BassClarinet;
+  const factory InstrumentDto.altoSaxophone() = InstrumentDto_AltoSaxophone;
+  const factory InstrumentDto.curvedSopranoSaxophone() =
+      InstrumentDto_CurvedSopranoSaxophone;
+  const factory InstrumentDto.straightSopranoSaxophone() =
+      InstrumentDto_StraightSopranoSaxophone;
+  const factory InstrumentDto.tenorSaxophone() = InstrumentDto_TenorSaxophone;
+  const factory InstrumentDto.trumpet() = InstrumentDto_Trumpet;
+  const factory InstrumentDto.cornet() = InstrumentDto_Cornet;
+  const factory InstrumentDto.flugelhorn() = InstrumentDto_Flugelhorn;
+  const factory InstrumentDto.frenchHorn() = InstrumentDto_FrenchHorn;
+  const factory InstrumentDto.trombone() = InstrumentDto_Trombone;
+  const factory InstrumentDto.euphonium() = InstrumentDto_Euphonium;
+  const factory InstrumentDto.tuba() = InstrumentDto_Tuba;
+  const factory InstrumentDto.englishHorn() = InstrumentDto_EnglishHorn;
+  const factory InstrumentDto.contraltoViolin() = InstrumentDto_ContraltoViolin;
+  const factory InstrumentDto.unknown({required String raw}) =
+      InstrumentDto_Unknown;
+}
 
 @freezed
 sealed class RetrieveAllAvailableStudentsOutcomeDto
@@ -58,14 +90,14 @@ class StudentSummaryDto {
   final String name;
   final StudentPositionDto position;
   final String location;
-  final String? instrumentName;
+  final InstrumentDto? instrument;
 
   const StudentSummaryDto({
     required this.id,
     required this.name,
     required this.position,
     required this.location,
-    this.instrumentName,
+    this.instrument,
   });
 
   @override
@@ -74,7 +106,7 @@ class StudentSummaryDto {
       name.hashCode ^
       position.hashCode ^
       location.hashCode ^
-      instrumentName.hashCode;
+      instrument.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -85,5 +117,5 @@ class StudentSummaryDto {
           name == other.name &&
           position == other.position &&
           location == other.location &&
-          instrumentName == other.instrumentName;
+          instrument == other.instrument;
 }

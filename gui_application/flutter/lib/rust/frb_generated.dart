@@ -483,6 +483,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  InstrumentDto dco_decode_box_autoadd_instrument_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_instrument_dto(raw);
+  }
+
+  @protected
   MusicianLevelDto dco_decode_box_autoadd_musician_level_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_musician_level_dto(raw);
@@ -569,6 +575,62 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int dco_decode_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dcoDecodePrimitiveInt(raw);
+  }
+
+  @protected
+  InstrumentDto dco_decode_instrument_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = dcoDecodeList(raw);
+    switch (dcoDecodePrimitiveInt(arr[0])) {
+      case 0:
+        return InstrumentDto_Violin();
+      case 1:
+        return InstrumentDto_Viola();
+      case 2:
+        return InstrumentDto_Cello();
+      case 3:
+        return InstrumentDto_Flute();
+      case 4:
+        return InstrumentDto_Oboe();
+      case 5:
+        return InstrumentDto_Bassoon();
+      case 6:
+        return InstrumentDto_Clarinet();
+      case 7:
+        return InstrumentDto_AltoClarinet();
+      case 8:
+        return InstrumentDto_BassClarinet();
+      case 9:
+        return InstrumentDto_AltoSaxophone();
+      case 10:
+        return InstrumentDto_CurvedSopranoSaxophone();
+      case 11:
+        return InstrumentDto_StraightSopranoSaxophone();
+      case 12:
+        return InstrumentDto_TenorSaxophone();
+      case 13:
+        return InstrumentDto_Trumpet();
+      case 14:
+        return InstrumentDto_Cornet();
+      case 15:
+        return InstrumentDto_Flugelhorn();
+      case 16:
+        return InstrumentDto_FrenchHorn();
+      case 17:
+        return InstrumentDto_Trombone();
+      case 18:
+        return InstrumentDto_Euphonium();
+      case 19:
+        return InstrumentDto_Tuba();
+      case 20:
+        return InstrumentDto_EnglishHorn();
+      case 21:
+        return InstrumentDto_ContraltoViolin();
+      case 22:
+        return InstrumentDto_Unknown(raw: dco_decode_String(arr[1]));
+      default:
+        throw Exception("unreachable");
+    }
   }
 
   @protected
@@ -686,6 +748,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   DateDto? dco_decode_opt_box_autoadd_date_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_date_dto(raw);
+  }
+
+  @protected
+  InstrumentDto? dco_decode_opt_box_autoadd_instrument_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_instrument_dto(raw);
   }
 
   @protected
@@ -855,7 +923,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       name: dco_decode_String(arr[1]),
       position: dco_decode_student_position_dto(arr[2]),
       location: dco_decode_String(arr[3]),
-      instrumentName: dco_decode_opt_String(arr[4]),
+      instrument: dco_decode_opt_box_autoadd_instrument_dto(arr[4]),
     );
   }
 
@@ -984,6 +1052,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  InstrumentDto sse_decode_box_autoadd_instrument_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_instrument_dto(deserializer));
+  }
+
+  @protected
   MusicianLevelDto sse_decode_box_autoadd_musician_level_dto(
     SseDeserializer deserializer,
   ) {
@@ -1071,6 +1147,64 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  InstrumentDto sse_decode_instrument_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        return InstrumentDto_Violin();
+      case 1:
+        return InstrumentDto_Viola();
+      case 2:
+        return InstrumentDto_Cello();
+      case 3:
+        return InstrumentDto_Flute();
+      case 4:
+        return InstrumentDto_Oboe();
+      case 5:
+        return InstrumentDto_Bassoon();
+      case 6:
+        return InstrumentDto_Clarinet();
+      case 7:
+        return InstrumentDto_AltoClarinet();
+      case 8:
+        return InstrumentDto_BassClarinet();
+      case 9:
+        return InstrumentDto_AltoSaxophone();
+      case 10:
+        return InstrumentDto_CurvedSopranoSaxophone();
+      case 11:
+        return InstrumentDto_StraightSopranoSaxophone();
+      case 12:
+        return InstrumentDto_TenorSaxophone();
+      case 13:
+        return InstrumentDto_Trumpet();
+      case 14:
+        return InstrumentDto_Cornet();
+      case 15:
+        return InstrumentDto_Flugelhorn();
+      case 16:
+        return InstrumentDto_FrenchHorn();
+      case 17:
+        return InstrumentDto_Trombone();
+      case 18:
+        return InstrumentDto_Euphonium();
+      case 19:
+        return InstrumentDto_Tuba();
+      case 20:
+        return InstrumentDto_EnglishHorn();
+      case 21:
+        return InstrumentDto_ContraltoViolin();
+      case 22:
+        var var_raw = sse_decode_String(deserializer);
+        return InstrumentDto_Unknown(raw: var_raw);
+      default:
+        throw UnimplementedError('');
+    }
   }
 
   @protected
@@ -1231,6 +1365,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_date_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  InstrumentDto? sse_decode_opt_box_autoadd_instrument_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_instrument_dto(deserializer));
     } else {
       return null;
     }
@@ -1426,13 +1573,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_name = sse_decode_String(deserializer);
     var var_position = sse_decode_student_position_dto(deserializer);
     var var_location = sse_decode_String(deserializer);
-    var var_instrumentName = sse_decode_opt_String(deserializer);
+    var var_instrument = sse_decode_opt_box_autoadd_instrument_dto(
+      deserializer,
+    );
     return StudentSummaryDto(
       id: var_id,
       name: var_name,
       position: var_position,
       location: var_location,
-      instrumentName: var_instrumentName,
+      instrument: var_instrument,
     );
   }
 
@@ -1559,6 +1708,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_instrument_dto(
+    InstrumentDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_instrument_dto(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_musician_level_dto(
     MusicianLevelDto self,
     SseSerializer serializer,
@@ -1646,6 +1804,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_instrument_dto(InstrumentDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case InstrumentDto_Violin():
+        sse_encode_i_32(0, serializer);
+      case InstrumentDto_Viola():
+        sse_encode_i_32(1, serializer);
+      case InstrumentDto_Cello():
+        sse_encode_i_32(2, serializer);
+      case InstrumentDto_Flute():
+        sse_encode_i_32(3, serializer);
+      case InstrumentDto_Oboe():
+        sse_encode_i_32(4, serializer);
+      case InstrumentDto_Bassoon():
+        sse_encode_i_32(5, serializer);
+      case InstrumentDto_Clarinet():
+        sse_encode_i_32(6, serializer);
+      case InstrumentDto_AltoClarinet():
+        sse_encode_i_32(7, serializer);
+      case InstrumentDto_BassClarinet():
+        sse_encode_i_32(8, serializer);
+      case InstrumentDto_AltoSaxophone():
+        sse_encode_i_32(9, serializer);
+      case InstrumentDto_CurvedSopranoSaxophone():
+        sse_encode_i_32(10, serializer);
+      case InstrumentDto_StraightSopranoSaxophone():
+        sse_encode_i_32(11, serializer);
+      case InstrumentDto_TenorSaxophone():
+        sse_encode_i_32(12, serializer);
+      case InstrumentDto_Trumpet():
+        sse_encode_i_32(13, serializer);
+      case InstrumentDto_Cornet():
+        sse_encode_i_32(14, serializer);
+      case InstrumentDto_Flugelhorn():
+        sse_encode_i_32(15, serializer);
+      case InstrumentDto_FrenchHorn():
+        sse_encode_i_32(16, serializer);
+      case InstrumentDto_Trombone():
+        sse_encode_i_32(17, serializer);
+      case InstrumentDto_Euphonium():
+        sse_encode_i_32(18, serializer);
+      case InstrumentDto_Tuba():
+        sse_encode_i_32(19, serializer);
+      case InstrumentDto_EnglishHorn():
+        sse_encode_i_32(20, serializer);
+      case InstrumentDto_ContraltoViolin():
+        sse_encode_i_32(21, serializer);
+      case InstrumentDto_Unknown(raw: final raw):
+        sse_encode_i_32(22, serializer);
+        sse_encode_String(raw, serializer);
+    }
   }
 
   @protected
@@ -1796,6 +2008,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_date_dto(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_instrument_dto(
+    InstrumentDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_instrument_dto(self, serializer);
     }
   }
 
@@ -1964,7 +2189,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.name, serializer);
     sse_encode_student_position_dto(self.position, serializer);
     sse_encode_String(self.location, serializer);
-    sse_encode_opt_String(self.instrumentName, serializer);
+    sse_encode_opt_box_autoadd_instrument_dto(self.instrument, serializer);
   }
 
   @protected

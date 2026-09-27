@@ -14,14 +14,14 @@ StudentSummaryDto studentSummary({
   String id = '1',
   String name = 'Jane Doe',
   String location = 'Some Location',
-  String? instrumentName,
+  InstrumentDto? instrument,
   StudentPositionDto position = const StudentPositionDto.practice(),
 }) => StudentSummaryDto(
   id: id,
   name: name,
   position: position,
   location: location,
-  instrumentName: instrumentName,
+  instrument: instrument,
 );
 
 StudentsPresenter presenterAnswering(
@@ -115,4 +115,33 @@ Future<StudentsPresenter> pumpRoster(
   await pumpStudents(tester, presenter, locale: locale);
 
   return presenter;
+}
+
+abstract final class Instruments {
+  static const InstrumentDto violin = InstrumentDto.violin();
+  static const InstrumentDto viola = InstrumentDto.viola();
+  static const InstrumentDto cello = InstrumentDto.cello();
+  static const InstrumentDto flute = InstrumentDto.flute();
+  static const InstrumentDto oboe = InstrumentDto.oboe();
+  static const InstrumentDto bassoon = InstrumentDto.bassoon();
+  static const InstrumentDto clarinet = InstrumentDto.clarinet();
+  static const InstrumentDto altoClarinet = InstrumentDto.altoClarinet();
+  static const InstrumentDto bassClarinet = InstrumentDto.bassClarinet();
+  static const InstrumentDto altoSaxophone = InstrumentDto.altoSaxophone();
+  static const InstrumentDto curvedSopranoSaxophone =
+      InstrumentDto.curvedSopranoSaxophone();
+  static const InstrumentDto straightSopranoSaxophone =
+      InstrumentDto.straightSopranoSaxophone();
+  static const InstrumentDto tenorSaxophone = InstrumentDto.tenorSaxophone();
+  static const InstrumentDto trumpet = InstrumentDto.trumpet();
+  static const InstrumentDto cornet = InstrumentDto.cornet();
+  static const InstrumentDto flugelhorn = InstrumentDto.flugelhorn();
+  static const InstrumentDto frenchHorn = InstrumentDto.frenchHorn();
+  static const InstrumentDto trombone = InstrumentDto.trombone();
+  static const InstrumentDto euphonium = InstrumentDto.euphonium();
+  static const InstrumentDto tuba = InstrumentDto.tuba();
+  static const InstrumentDto englishHorn = InstrumentDto.englishHorn();
+  static const InstrumentDto contraltoViolin = InstrumentDto.contraltoViolin();
+
+  static InstrumentDto unknown(String raw) => InstrumentDto.unknown(raw: raw);
 }

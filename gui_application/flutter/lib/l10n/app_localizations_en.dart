@@ -60,6 +60,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String get positionMusicSecretary => 'Music Secretary';
 
   @override
+  String get instrumentViolin => 'Violin';
+
+  @override
+  String get instrumentViola => 'Viola';
+
+  @override
+  String get instrumentCello => 'Cello';
+
+  @override
+  String get instrumentFlute => 'Flute';
+
+  @override
+  String get instrumentOboe => 'Oboe';
+
+  @override
+  String get instrumentBassoon => 'Bassoon';
+
+  @override
+  String get instrumentClarinet => 'Clarinet';
+
+  @override
+  String get instrumentAltoClarinet => 'Alto clarinet';
+
+  @override
+  String get instrumentBassClarinet => 'Bass clarinet';
+
+  @override
+  String get instrumentAltoSaxophone => 'Alto saxophone';
+
+  @override
+  String get instrumentCurvedSopranoSaxophone => 'Curved soprano saxophone';
+
+  @override
+  String get instrumentStraightSopranoSaxophone => 'Straight soprano saxophone';
+
+  @override
+  String get instrumentTenorSaxophone => 'Tenor saxophone';
+
+  @override
+  String get instrumentTrumpet => 'Trumpet';
+
+  @override
+  String get instrumentCornet => 'Cornet';
+
+  @override
+  String get instrumentFlugelhorn => 'Flugelhorn';
+
+  @override
+  String get instrumentFrenchHorn => 'French horn';
+
+  @override
+  String get instrumentTrombone => 'Trombone';
+
+  @override
+  String get instrumentEuphonium => 'Euphonium';
+
+  @override
+  String get instrumentTuba => 'Tuba';
+
+  @override
+  String get instrumentEnglishHorn => 'English horn';
+
+  @override
+  String get instrumentContraltoViolin => 'Contralto violin';
+
+  @override
   String get clefG => 'G';
 
   @override

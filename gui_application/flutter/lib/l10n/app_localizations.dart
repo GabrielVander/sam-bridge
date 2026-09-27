@@ -188,6 +188,138 @@ abstract class AppLocalizations {
   /// **'Secretário(a) de Música'**
   String get positionMusicSecretary;
 
+  /// No description provided for @instrumentViolin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Violino'**
+  String get instrumentViolin;
+
+  /// No description provided for @instrumentViola.
+  ///
+  /// In pt, this message translates to:
+  /// **'Viola'**
+  String get instrumentViola;
+
+  /// No description provided for @instrumentCello.
+  ///
+  /// In pt, this message translates to:
+  /// **'Violoncelo'**
+  String get instrumentCello;
+
+  /// No description provided for @instrumentFlute.
+  ///
+  /// In pt, this message translates to:
+  /// **'Flauta'**
+  String get instrumentFlute;
+
+  /// No description provided for @instrumentOboe.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oboé'**
+  String get instrumentOboe;
+
+  /// No description provided for @instrumentBassoon.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fagote'**
+  String get instrumentBassoon;
+
+  /// No description provided for @instrumentClarinet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Clarinete'**
+  String get instrumentClarinet;
+
+  /// No description provided for @instrumentAltoClarinet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Clarinete alto'**
+  String get instrumentAltoClarinet;
+
+  /// No description provided for @instrumentBassClarinet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Clarinete baixo'**
+  String get instrumentBassClarinet;
+
+  /// No description provided for @instrumentAltoSaxophone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Saxofone alto'**
+  String get instrumentAltoSaxophone;
+
+  /// No description provided for @instrumentCurvedSopranoSaxophone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Saxofone soprano curvo'**
+  String get instrumentCurvedSopranoSaxophone;
+
+  /// No description provided for @instrumentStraightSopranoSaxophone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Saxofone soprano reto'**
+  String get instrumentStraightSopranoSaxophone;
+
+  /// No description provided for @instrumentTenorSaxophone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Saxofone tenor'**
+  String get instrumentTenorSaxophone;
+
+  /// No description provided for @instrumentTrumpet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trompete'**
+  String get instrumentTrumpet;
+
+  /// No description provided for @instrumentCornet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cornet'**
+  String get instrumentCornet;
+
+  /// No description provided for @instrumentFlugelhorn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Flugelhorn'**
+  String get instrumentFlugelhorn;
+
+  /// No description provided for @instrumentFrenchHorn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trompa'**
+  String get instrumentFrenchHorn;
+
+  /// No description provided for @instrumentTrombone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trombone'**
+  String get instrumentTrombone;
+
+  /// No description provided for @instrumentEuphonium.
+  ///
+  /// In pt, this message translates to:
+  /// **'Eufônio'**
+  String get instrumentEuphonium;
+
+  /// No description provided for @instrumentTuba.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tuba'**
+  String get instrumentTuba;
+
+  /// No description provided for @instrumentEnglishHorn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Corne inglês'**
+  String get instrumentEnglishHorn;
+
+  /// No description provided for @instrumentContraltoViolin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Violino contralto'**
+  String get instrumentContraltoViolin;
+
   /// No description provided for @clefG.
   ///
   /// In pt, this message translates to:

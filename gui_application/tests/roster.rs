@@ -1,6 +1,6 @@
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use gui_application::api::roster::{
-    RetrieveAllAvailableStudentsOutcomeDto, StudentPositionDto, StudentSummaryDto,
+    InstrumentDto, RetrieveAllAvailableStudentsOutcomeDto, StudentPositionDto, StudentSummaryDto,
 };
 use pretty_assertions::assert_eq;
 use student::application::gateways::{FailureKind, StudentGatewayError};
@@ -27,7 +27,13 @@ const fn musician(level: MusicianLevel) -> StudentPosition {
     StudentPosition::Musician {
         level,
         instrument: None,
-        instrument_name: None,
+    }
+}
+
+const fn musician_playing(instrument: Instrument) -> StudentPosition {
+    StudentPosition::Musician {
+        level: MusicianLevel::YouthService,
+        instrument: Some(instrument),
     }
 }
 
@@ -50,13 +56,21 @@ fn listed_positions(positions: Vec<StudentPosition>) -> Option<Vec<StudentPositi
     }
 }
 
+fn listed_instruments(positions: Vec<StudentPosition>) -> Option<Vec<Option<InstrumentDto>>> {
+    match summaries_of(positions) {
+        RetrieveAllAvailableStudentsOutcomeDto::Success { students } => Some(
+            students
+                .into_iter()
+                .map(|summary| summary.instrument)
+                .collect(),
+        ),
+        RetrieveAllAvailableStudentsOutcomeDto::Failure { .. } => None,
+    }
+}
+
 #[test]
-fn available_students_are_summarized_with_the_instrument_name_of_musicians() {
-    let result = summaries_of(vec![StudentPosition::Musician {
-        level: MusicianLevel::YouthService,
-        instrument: Some(Instrument::TenorSaxophone),
-        instrument_name: Some("SAXOFONE TENOR".to_owned()),
-    }]);
+fn available_students_are_summarized_with_the_instrument_of_musicians() {
+    let result = summaries_of(vec![musician_playing(Instrument::TenorSaxophone)]);
 
     assert_eq!(
         result,
@@ -66,15 +80,68 @@ fn available_students_are_summarized_with_the_instrument_name_of_musicians() {
                 name: "Someone".to_owned(),
                 position: StudentPositionDto::YouthService,
                 location: "Somewhere".to_owned(),
-                instrument_name: Some("SAXOFONE TENOR".to_owned()),
+                instrument: Some(InstrumentDto::TenorSaxophone),
             }]
         }
     );
 }
 
 #[test]
-fn only_musicians_have_an_instrument_name() {
-    let result = summaries_of(vec![
+fn every_instrument_crosses_the_bridge() {
+    let instruments = [
+        (Instrument::Violin, InstrumentDto::Violin),
+        (Instrument::Viola, InstrumentDto::Viola),
+        (Instrument::Cello, InstrumentDto::Cello),
+        (Instrument::Flute, InstrumentDto::Flute),
+        (Instrument::Oboe, InstrumentDto::Oboe),
+        (Instrument::Bassoon, InstrumentDto::Bassoon),
+        (Instrument::Clarinet, InstrumentDto::Clarinet),
+        (Instrument::AltoClarinet, InstrumentDto::AltoClarinet),
+        (Instrument::BassClarinet, InstrumentDto::BassClarinet),
+        (Instrument::AltoSaxophone, InstrumentDto::AltoSaxophone),
+        (
+            Instrument::CurvedSopranoSaxophone,
+            InstrumentDto::CurvedSopranoSaxophone,
+        ),
+        (
+            Instrument::StraightSopranoSaxophone,
+            InstrumentDto::StraightSopranoSaxophone,
+        ),
+        (Instrument::TenorSaxophone, InstrumentDto::TenorSaxophone),
+        (Instrument::Trumpet, InstrumentDto::Trumpet),
+        (Instrument::Cornet, InstrumentDto::Cornet),
+        (Instrument::Flugelhorn, InstrumentDto::Flugelhorn),
+        (Instrument::FrenchHorn, InstrumentDto::FrenchHorn),
+        (Instrument::Trombone, InstrumentDto::Trombone),
+        (Instrument::Euphonium, InstrumentDto::Euphonium),
+        (Instrument::Tuba, InstrumentDto::Tuba),
+        (Instrument::EnglishHorn, InstrumentDto::EnglishHorn),
+        (Instrument::ContraltoViolin, InstrumentDto::ContraltoViolin),
+        (
+            Instrument::Unknown("BANDOLIM".to_owned()),
+            InstrumentDto::Unknown {
+                raw: "BANDOLIM".to_owned(),
+            },
+        ),
+    ];
+
+    let summarized = listed_instruments(
+        instruments
+            .iter()
+            .map(|(instrument, _)| musician_playing(instrument.clone()))
+            .collect(),
+    );
+
+    assert_eq!(
+        summarized,
+        Some(instruments.into_iter().map(|(_, dto)| Some(dto)).collect())
+    );
+}
+
+#[test]
+fn only_musicians_have_an_instrument() {
+    let instruments = listed_instruments(vec![
+        musician(MusicianLevel::Practice),
         StudentPosition::Organist {
             level: OrganistLevel::Practice,
         },
@@ -84,10 +151,7 @@ fn only_musicians_have_an_instrument_name() {
         StudentPosition::Unknown("Avocado".to_owned()),
     ]);
 
-    let RetrieveAllAvailableStudentsOutcomeDto::Success { students } = result else {
-        panic!("the students should be listed, got {result:?}");
-    };
-    assert!(students.iter().all(|s| s.instrument_name.is_none()));
+    assert_eq!(instruments, Some(vec![None, None, None, None]));
 }
 
 #[test]

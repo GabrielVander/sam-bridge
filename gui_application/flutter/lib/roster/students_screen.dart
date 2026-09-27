@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/l10n/l10n.dart';
+import 'package:flutter_application/roster/instrument_name.dart';
 import 'package:flutter_application/roster/position_name.dart';
 import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
@@ -346,7 +347,9 @@ final class _StudentsList extends StatelessWidget {
                           const SizedBox(height: 2),
                           _IconLine(
                             icon: Icons.music_note_outlined,
-                            text: instrument,
+                            text: context.l10n.reportedInstrumentName(
+                              instrument,
+                            ),
                           ),
                         ],
                         const SizedBox(height: 2),

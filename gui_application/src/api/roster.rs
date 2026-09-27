@@ -1,6 +1,6 @@
 use student::application::gateways::StudentGatewayError;
 use student::domain::entities::{
-    MusicianLevel, OrganistLevel, SecretaryType, Student, StudentPosition,
+    Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentPosition,
 };
 
 use crate::api::error_report::ErrorReportDto;
@@ -11,7 +11,34 @@ pub struct StudentSummaryDto {
     pub name: String,
     pub position: StudentPositionDto,
     pub location: String,
-    pub instrument_name: Option<String>,
+    pub instrument: Option<InstrumentDto>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum InstrumentDto {
+    Violin,
+    Viola,
+    Cello,
+    Flute,
+    Oboe,
+    Bassoon,
+    Clarinet,
+    AltoClarinet,
+    BassClarinet,
+    AltoSaxophone,
+    CurvedSopranoSaxophone,
+    StraightSopranoSaxophone,
+    TenorSaxophone,
+    Trumpet,
+    Cornet,
+    Flugelhorn,
+    FrenchHorn,
+    Trombone,
+    Euphonium,
+    Tuba,
+    EnglishHorn,
+    ContraltoViolin,
+    Unknown { raw: String },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -52,10 +79,10 @@ impl From<Result<Vec<Student>, StudentGatewayError>> for RetrieveAllAvailableStu
 
 impl From<Student> for StudentSummaryDto {
     fn from(student: Student) -> Self {
-        let instrument_name = match &student.position {
-            StudentPosition::Musician {
-                instrument_name, ..
-            } => instrument_name.clone(),
+        let instrument: Option<InstrumentDto> = match &student.position {
+            StudentPosition::Musician { instrument, .. } => {
+                instrument.clone().map(InstrumentDto::from)
+            }
             StudentPosition::Organist { .. }
             | StudentPosition::Secretary { .. }
             | StudentPosition::Unknown(_) => None,
@@ -66,7 +93,37 @@ impl From<Student> for StudentSummaryDto {
             name: student.name,
             position: student.position.into(),
             location: student.location,
-            instrument_name,
+            instrument,
+        }
+    }
+}
+
+impl From<Instrument> for InstrumentDto {
+    fn from(instrument: Instrument) -> Self {
+        match instrument {
+            Instrument::Violin => Self::Violin,
+            Instrument::Viola => Self::Viola,
+            Instrument::Cello => Self::Cello,
+            Instrument::Flute => Self::Flute,
+            Instrument::Oboe => Self::Oboe,
+            Instrument::Bassoon => Self::Bassoon,
+            Instrument::Clarinet => Self::Clarinet,
+            Instrument::AltoClarinet => Self::AltoClarinet,
+            Instrument::BassClarinet => Self::BassClarinet,
+            Instrument::AltoSaxophone => Self::AltoSaxophone,
+            Instrument::CurvedSopranoSaxophone => Self::CurvedSopranoSaxophone,
+            Instrument::StraightSopranoSaxophone => Self::StraightSopranoSaxophone,
+            Instrument::TenorSaxophone => Self::TenorSaxophone,
+            Instrument::Trumpet => Self::Trumpet,
+            Instrument::Cornet => Self::Cornet,
+            Instrument::Flugelhorn => Self::Flugelhorn,
+            Instrument::FrenchHorn => Self::FrenchHorn,
+            Instrument::Trombone => Self::Trombone,
+            Instrument::Euphonium => Self::Euphonium,
+            Instrument::Tuba => Self::Tuba,
+            Instrument::EnglishHorn => Self::EnglishHorn,
+            Instrument::ContraltoViolin => Self::ContraltoViolin,
+            Instrument::Unknown(raw) => Self::Unknown { raw },
         }
     }
 }

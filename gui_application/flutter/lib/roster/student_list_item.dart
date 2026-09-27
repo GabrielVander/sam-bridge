@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_application/roster/instrument.dart';
 import 'package:flutter_application/roster/student_position.dart';
 
 class StudentListItem extends Equatable {
@@ -6,7 +7,7 @@ class StudentListItem extends Equatable {
   final String name;
   final String location;
   final StudentPosition position;
-  final String? instrument;
+  final ReportedInstrument? instrument;
 
   const StudentListItem({
     required this.id,

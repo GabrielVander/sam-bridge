@@ -58,7 +58,6 @@ fn given_accessible_dashboard_students_should_be_retrieved_and_mapped() {
             StudentPosition::Musician {
                 level: MusicianLevel::Candidate,
                 instrument: Some(Instrument::Violin),
-                instrument_name: Some("VIOLINO".to_owned()),
             }
         );
 
@@ -79,50 +78,6 @@ fn given_accessible_dashboard_students_should_be_retrieved_and_mapped() {
             dashboard_index < listing_index,
             "dashboard should be visited before the students listing"
         );
-    });
-}
-
-#[test]
-fn given_musicians_without_a_real_instrument_no_instrument_name_is_carried() {
-    smol::block_on(async {
-        let mock_server: MockServer = MockServer::start().await;
-
-        Mock::given(method("GET"))
-            .and(path("/painel"))
-            .respond_with(ResponseTemplate::new(200))
-            .mount(&mock_server)
-            .await;
-
-        Mock::given(method("GET"))
-            .and(path("/alunos/listagem"))
-            .respond_with(
-                ResponseTemplate::new(200)
-                    .set_body_string(
-                        r#"{"draw":"1","recordsTotal":3,"recordsFiltered":3,"data":[["1","A","SOMEWHERE","MÚSICO","A DEFINIR","CANDIDATO(A)","1","0"],["2","B","SOMEWHERE","MÚSICO","","CANDIDATO(A)","2","0"],["3","C","SOMEWHERE","ORGANISTA","VIOLINO","RJM","3","0"]]}"#,
-                    )
-                    .insert_header("Content-Type", "application/json"),
-            )
-            .mount(&mock_server)
-            .await;
-
-        let gateway: StudentGatewaySamImpl =
-            build_gateway(&mock_server).expect("client should be built");
-
-        let students: Vec<Student> = gateway
-            .get_available_records()
-            .expect("students retrieval should succeed");
-
-        let names: Vec<Option<&str>> = students
-            .iter()
-            .map(|student| match &student.position {
-                StudentPosition::Musician {
-                    instrument_name, ..
-                } => instrument_name.as_deref(),
-                _ => None,
-            })
-            .collect();
-
-        assert_eq!(names, vec![None, None, None]);
     });
 }
 
@@ -273,33 +228,17 @@ fn a_musician_level_sam_has_not_confirmed_keeps_what_sam_wrote() {
 }
 
 #[test]
-fn a_musician_keeps_the_exact_site_instrument_text_as_its_name() {
-    assert_eq!(
-        student_listed_as("MÚSICO", "RJM", "SAXOFONE TENOR")
-            .unwrap()
-            .position,
-        musician(
-            MusicianLevel::YouthService,
-            Some((Instrument::TenorSaxophone, "SAXOFONE TENOR"))
-        )
-    );
-}
-
-#[test]
-fn the_instrument_name_is_trimmed() {
+fn the_instrument_column_is_trimmed() {
     assert_eq!(
         student_listed_as("MÚSICO", "RJM", "  OBOÉ \t")
             .unwrap()
             .position,
-        musician(
-            MusicianLevel::YouthService,
-            Some((Instrument::Oboe, "OBOÉ"))
-        )
+        musician(MusicianLevel::YouthService, Some(Instrument::Oboe))
     );
 }
 
 #[test]
-fn a_musician_without_an_assigned_instrument_has_no_instrument_and_no_name() {
+fn a_musician_without_an_assigned_instrument_has_no_instrument() {
     for raw in ["A DEFINIR", " A DEFINIR ", "", "   "] {
         assert_eq!(
             student_listed_as("MÚSICO", "CANDIDATO(A)", raw)
@@ -339,7 +278,7 @@ fn every_instrument_sam_lists_is_recognized() {
     ] {
         assert_eq!(
             student_listed_as("MÚSICO", "RJM", raw).unwrap().position,
-            musician(MusicianLevel::YouthService, Some((instrument, raw))),
+            musician(MusicianLevel::YouthService, Some(instrument)),
             "instrument {raw:?}"
         );
     }
@@ -353,7 +292,7 @@ fn an_unrecognized_instrument_keeps_its_text() {
             .position,
         musician(
             MusicianLevel::Practice,
-            Some((Instrument::Unknown("BANDOLIM".to_owned()), "BANDOLIM"))
+            Some(Instrument::Unknown("BANDOLIM".to_owned()))
         )
     );
 }
@@ -481,16 +420,8 @@ fn student_listed(row: SamStudent) -> Option<Student> {
     gateway.get_available_records().ok()?.pop()
 }
 
-fn musician(level: MusicianLevel, instrument: Option<(Instrument, &str)>) -> StudentPosition {
-    let (instrument, instrument_name) = instrument.map_or((None, None), |(instrument, name)| {
-        (Some(instrument), Some(name.to_owned()))
-    });
-
-    StudentPosition::Musician {
-        level,
-        instrument,
-        instrument_name,
-    }
+const fn musician(level: MusicianLevel, instrument: Option<Instrument>) -> StudentPosition {
+    StudentPosition::Musician { level, instrument }
 }
 
 fn build_gateway(mock_server: &MockServer) -> Result<StudentGatewaySamImpl, reqwest::Error> {

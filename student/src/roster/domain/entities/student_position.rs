@@ -5,7 +5,6 @@ pub enum StudentPosition {
     Musician {
         level: MusicianLevel,
         instrument: Option<Instrument>,
-        instrument_name: Option<String>,
     },
     Organist {
         level: OrganistLevel,

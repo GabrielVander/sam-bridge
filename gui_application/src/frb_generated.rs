@@ -565,6 +565,88 @@ impl SseDecode for i32 {
     }
 }
 
+impl SseDecode for crate::api::roster::InstrumentDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                return crate::api::roster::InstrumentDto::Violin;
+            }
+            1 => {
+                return crate::api::roster::InstrumentDto::Viola;
+            }
+            2 => {
+                return crate::api::roster::InstrumentDto::Cello;
+            }
+            3 => {
+                return crate::api::roster::InstrumentDto::Flute;
+            }
+            4 => {
+                return crate::api::roster::InstrumentDto::Oboe;
+            }
+            5 => {
+                return crate::api::roster::InstrumentDto::Bassoon;
+            }
+            6 => {
+                return crate::api::roster::InstrumentDto::Clarinet;
+            }
+            7 => {
+                return crate::api::roster::InstrumentDto::AltoClarinet;
+            }
+            8 => {
+                return crate::api::roster::InstrumentDto::BassClarinet;
+            }
+            9 => {
+                return crate::api::roster::InstrumentDto::AltoSaxophone;
+            }
+            10 => {
+                return crate::api::roster::InstrumentDto::CurvedSopranoSaxophone;
+            }
+            11 => {
+                return crate::api::roster::InstrumentDto::StraightSopranoSaxophone;
+            }
+            12 => {
+                return crate::api::roster::InstrumentDto::TenorSaxophone;
+            }
+            13 => {
+                return crate::api::roster::InstrumentDto::Trumpet;
+            }
+            14 => {
+                return crate::api::roster::InstrumentDto::Cornet;
+            }
+            15 => {
+                return crate::api::roster::InstrumentDto::Flugelhorn;
+            }
+            16 => {
+                return crate::api::roster::InstrumentDto::FrenchHorn;
+            }
+            17 => {
+                return crate::api::roster::InstrumentDto::Trombone;
+            }
+            18 => {
+                return crate::api::roster::InstrumentDto::Euphonium;
+            }
+            19 => {
+                return crate::api::roster::InstrumentDto::Tuba;
+            }
+            20 => {
+                return crate::api::roster::InstrumentDto::EnglishHorn;
+            }
+            21 => {
+                return crate::api::roster::InstrumentDto::ContraltoViolin;
+            }
+            22 => {
+                let mut var_raw = <String>::sse_decode(deserializer);
+                return crate::api::roster::InstrumentDto::Unknown { raw: var_raw };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseDecode for crate::api::lessons::LessonDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -746,6 +828,19 @@ impl SseDecode for Option<crate::api::lessons::DateDto> {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<crate::api::lessons::DateDto>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::api::roster::InstrumentDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::roster::InstrumentDto>::sse_decode(
+                deserializer,
+            ));
         } else {
             return None;
         }
@@ -970,13 +1065,14 @@ impl SseDecode for crate::api::roster::StudentSummaryDto {
         let mut var_name = <String>::sse_decode(deserializer);
         let mut var_position = <crate::api::roster::StudentPositionDto>::sse_decode(deserializer);
         let mut var_location = <String>::sse_decode(deserializer);
-        let mut var_instrumentName = <Option<String>>::sse_decode(deserializer);
+        let mut var_instrument =
+            <Option<crate::api::roster::InstrumentDto>>::sse_decode(deserializer);
         return crate::api::roster::StudentSummaryDto {
             id: var_id,
             name: var_name,
             position: var_position,
             location: var_location,
-            instrument_name: var_instrumentName,
+            instrument: var_instrument,
         };
     }
 }
@@ -1215,6 +1311,56 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::error_report::ErrorReportDto>
     for crate::api::error_report::ErrorReportDto
 {
     fn into_into_dart(self) -> crate::api::error_report::ErrorReportDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::roster::InstrumentDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::api::roster::InstrumentDto::Violin => [0.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Viola => [1.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Cello => [2.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Flute => [3.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Oboe => [4.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Bassoon => [5.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Clarinet => [6.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::AltoClarinet => [7.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::BassClarinet => [8.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::AltoSaxophone => [9.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::CurvedSopranoSaxophone => {
+                [10.into_dart()].into_dart()
+            }
+            crate::api::roster::InstrumentDto::StraightSopranoSaxophone => {
+                [11.into_dart()].into_dart()
+            }
+            crate::api::roster::InstrumentDto::TenorSaxophone => [12.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Trumpet => [13.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Cornet => [14.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Flugelhorn => [15.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::FrenchHorn => [16.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Trombone => [17.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Euphonium => [18.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Tuba => [19.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::EnglishHorn => [20.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::ContraltoViolin => [21.into_dart()].into_dart(),
+            crate::api::roster::InstrumentDto::Unknown { raw } => {
+                [22.into_dart(), raw.into_into_dart().into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::roster::InstrumentDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::roster::InstrumentDto>
+    for crate::api::roster::InstrumentDto
+{
+    fn into_into_dart(self) -> crate::api::roster::InstrumentDto {
         self
     }
 }
@@ -1549,7 +1695,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::roster::StudentSummaryDto {
             self.name.into_into_dart().into_dart(),
             self.position.into_into_dart().into_dart(),
             self.location.into_into_dart().into_dart(),
-            self.instrument_name.into_into_dart().into_dart(),
+            self.instrument.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -1704,6 +1850,87 @@ impl SseEncode for i32 {
     }
 }
 
+impl SseEncode for crate::api::roster::InstrumentDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::api::roster::InstrumentDto::Violin => {
+                <i32>::sse_encode(0, serializer);
+            }
+            crate::api::roster::InstrumentDto::Viola => {
+                <i32>::sse_encode(1, serializer);
+            }
+            crate::api::roster::InstrumentDto::Cello => {
+                <i32>::sse_encode(2, serializer);
+            }
+            crate::api::roster::InstrumentDto::Flute => {
+                <i32>::sse_encode(3, serializer);
+            }
+            crate::api::roster::InstrumentDto::Oboe => {
+                <i32>::sse_encode(4, serializer);
+            }
+            crate::api::roster::InstrumentDto::Bassoon => {
+                <i32>::sse_encode(5, serializer);
+            }
+            crate::api::roster::InstrumentDto::Clarinet => {
+                <i32>::sse_encode(6, serializer);
+            }
+            crate::api::roster::InstrumentDto::AltoClarinet => {
+                <i32>::sse_encode(7, serializer);
+            }
+            crate::api::roster::InstrumentDto::BassClarinet => {
+                <i32>::sse_encode(8, serializer);
+            }
+            crate::api::roster::InstrumentDto::AltoSaxophone => {
+                <i32>::sse_encode(9, serializer);
+            }
+            crate::api::roster::InstrumentDto::CurvedSopranoSaxophone => {
+                <i32>::sse_encode(10, serializer);
+            }
+            crate::api::roster::InstrumentDto::StraightSopranoSaxophone => {
+                <i32>::sse_encode(11, serializer);
+            }
+            crate::api::roster::InstrumentDto::TenorSaxophone => {
+                <i32>::sse_encode(12, serializer);
+            }
+            crate::api::roster::InstrumentDto::Trumpet => {
+                <i32>::sse_encode(13, serializer);
+            }
+            crate::api::roster::InstrumentDto::Cornet => {
+                <i32>::sse_encode(14, serializer);
+            }
+            crate::api::roster::InstrumentDto::Flugelhorn => {
+                <i32>::sse_encode(15, serializer);
+            }
+            crate::api::roster::InstrumentDto::FrenchHorn => {
+                <i32>::sse_encode(16, serializer);
+            }
+            crate::api::roster::InstrumentDto::Trombone => {
+                <i32>::sse_encode(17, serializer);
+            }
+            crate::api::roster::InstrumentDto::Euphonium => {
+                <i32>::sse_encode(18, serializer);
+            }
+            crate::api::roster::InstrumentDto::Tuba => {
+                <i32>::sse_encode(19, serializer);
+            }
+            crate::api::roster::InstrumentDto::EnglishHorn => {
+                <i32>::sse_encode(20, serializer);
+            }
+            crate::api::roster::InstrumentDto::ContraltoViolin => {
+                <i32>::sse_encode(21, serializer);
+            }
+            crate::api::roster::InstrumentDto::Unknown { raw } => {
+                <i32>::sse_encode(22, serializer);
+                <String>::sse_encode(raw, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseEncode for crate::api::lessons::LessonDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -1854,6 +2081,16 @@ impl SseEncode for Option<crate::api::lessons::DateDto> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::api::lessons::DateDto>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::api::roster::InstrumentDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::roster::InstrumentDto>::sse_encode(value, serializer);
         }
     }
 }
@@ -2031,7 +2268,7 @@ impl SseEncode for crate::api::roster::StudentSummaryDto {
         <String>::sse_encode(self.name, serializer);
         <crate::api::roster::StudentPositionDto>::sse_encode(self.position, serializer);
         <String>::sse_encode(self.location, serializer);
-        <Option<String>>::sse_encode(self.instrument_name, serializer);
+        <Option<crate::api::roster::InstrumentDto>>::sse_encode(self.instrument, serializer);
     }
 }
 

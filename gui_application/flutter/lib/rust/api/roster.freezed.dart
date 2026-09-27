@@ -12,6 +12,1062 @@ part of 'roster.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
+mixin _$InstrumentDto {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto()';
+}
+
+
+}
+
+/// @nodoc
+class $InstrumentDtoCopyWith<$Res>  {
+$InstrumentDtoCopyWith(InstrumentDto _, $Res Function(InstrumentDto) __);
+}
+
+
+/// Adds pattern-matching-related methods to [InstrumentDto].
+extension InstrumentDtoPatterns on InstrumentDto {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( InstrumentDto_Violin value)?  violin,TResult Function( InstrumentDto_Viola value)?  viola,TResult Function( InstrumentDto_Cello value)?  cello,TResult Function( InstrumentDto_Flute value)?  flute,TResult Function( InstrumentDto_Oboe value)?  oboe,TResult Function( InstrumentDto_Bassoon value)?  bassoon,TResult Function( InstrumentDto_Clarinet value)?  clarinet,TResult Function( InstrumentDto_AltoClarinet value)?  altoClarinet,TResult Function( InstrumentDto_BassClarinet value)?  bassClarinet,TResult Function( InstrumentDto_AltoSaxophone value)?  altoSaxophone,TResult Function( InstrumentDto_CurvedSopranoSaxophone value)?  curvedSopranoSaxophone,TResult Function( InstrumentDto_StraightSopranoSaxophone value)?  straightSopranoSaxophone,TResult Function( InstrumentDto_TenorSaxophone value)?  tenorSaxophone,TResult Function( InstrumentDto_Trumpet value)?  trumpet,TResult Function( InstrumentDto_Cornet value)?  cornet,TResult Function( InstrumentDto_Flugelhorn value)?  flugelhorn,TResult Function( InstrumentDto_FrenchHorn value)?  frenchHorn,TResult Function( InstrumentDto_Trombone value)?  trombone,TResult Function( InstrumentDto_Euphonium value)?  euphonium,TResult Function( InstrumentDto_Tuba value)?  tuba,TResult Function( InstrumentDto_EnglishHorn value)?  englishHorn,TResult Function( InstrumentDto_ContraltoViolin value)?  contraltoViolin,TResult Function( InstrumentDto_Unknown value)?  unknown,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case InstrumentDto_Violin() when violin != null:
+return violin(_that);case InstrumentDto_Viola() when viola != null:
+return viola(_that);case InstrumentDto_Cello() when cello != null:
+return cello(_that);case InstrumentDto_Flute() when flute != null:
+return flute(_that);case InstrumentDto_Oboe() when oboe != null:
+return oboe(_that);case InstrumentDto_Bassoon() when bassoon != null:
+return bassoon(_that);case InstrumentDto_Clarinet() when clarinet != null:
+return clarinet(_that);case InstrumentDto_AltoClarinet() when altoClarinet != null:
+return altoClarinet(_that);case InstrumentDto_BassClarinet() when bassClarinet != null:
+return bassClarinet(_that);case InstrumentDto_AltoSaxophone() when altoSaxophone != null:
+return altoSaxophone(_that);case InstrumentDto_CurvedSopranoSaxophone() when curvedSopranoSaxophone != null:
+return curvedSopranoSaxophone(_that);case InstrumentDto_StraightSopranoSaxophone() when straightSopranoSaxophone != null:
+return straightSopranoSaxophone(_that);case InstrumentDto_TenorSaxophone() when tenorSaxophone != null:
+return tenorSaxophone(_that);case InstrumentDto_Trumpet() when trumpet != null:
+return trumpet(_that);case InstrumentDto_Cornet() when cornet != null:
+return cornet(_that);case InstrumentDto_Flugelhorn() when flugelhorn != null:
+return flugelhorn(_that);case InstrumentDto_FrenchHorn() when frenchHorn != null:
+return frenchHorn(_that);case InstrumentDto_Trombone() when trombone != null:
+return trombone(_that);case InstrumentDto_Euphonium() when euphonium != null:
+return euphonium(_that);case InstrumentDto_Tuba() when tuba != null:
+return tuba(_that);case InstrumentDto_EnglishHorn() when englishHorn != null:
+return englishHorn(_that);case InstrumentDto_ContraltoViolin() when contraltoViolin != null:
+return contraltoViolin(_that);case InstrumentDto_Unknown() when unknown != null:
+return unknown(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( InstrumentDto_Violin value)  violin,required TResult Function( InstrumentDto_Viola value)  viola,required TResult Function( InstrumentDto_Cello value)  cello,required TResult Function( InstrumentDto_Flute value)  flute,required TResult Function( InstrumentDto_Oboe value)  oboe,required TResult Function( InstrumentDto_Bassoon value)  bassoon,required TResult Function( InstrumentDto_Clarinet value)  clarinet,required TResult Function( InstrumentDto_AltoClarinet value)  altoClarinet,required TResult Function( InstrumentDto_BassClarinet value)  bassClarinet,required TResult Function( InstrumentDto_AltoSaxophone value)  altoSaxophone,required TResult Function( InstrumentDto_CurvedSopranoSaxophone value)  curvedSopranoSaxophone,required TResult Function( InstrumentDto_StraightSopranoSaxophone value)  straightSopranoSaxophone,required TResult Function( InstrumentDto_TenorSaxophone value)  tenorSaxophone,required TResult Function( InstrumentDto_Trumpet value)  trumpet,required TResult Function( InstrumentDto_Cornet value)  cornet,required TResult Function( InstrumentDto_Flugelhorn value)  flugelhorn,required TResult Function( InstrumentDto_FrenchHorn value)  frenchHorn,required TResult Function( InstrumentDto_Trombone value)  trombone,required TResult Function( InstrumentDto_Euphonium value)  euphonium,required TResult Function( InstrumentDto_Tuba value)  tuba,required TResult Function( InstrumentDto_EnglishHorn value)  englishHorn,required TResult Function( InstrumentDto_ContraltoViolin value)  contraltoViolin,required TResult Function( InstrumentDto_Unknown value)  unknown,}){
+final _that = this;
+switch (_that) {
+case InstrumentDto_Violin():
+return violin(_that);case InstrumentDto_Viola():
+return viola(_that);case InstrumentDto_Cello():
+return cello(_that);case InstrumentDto_Flute():
+return flute(_that);case InstrumentDto_Oboe():
+return oboe(_that);case InstrumentDto_Bassoon():
+return bassoon(_that);case InstrumentDto_Clarinet():
+return clarinet(_that);case InstrumentDto_AltoClarinet():
+return altoClarinet(_that);case InstrumentDto_BassClarinet():
+return bassClarinet(_that);case InstrumentDto_AltoSaxophone():
+return altoSaxophone(_that);case InstrumentDto_CurvedSopranoSaxophone():
+return curvedSopranoSaxophone(_that);case InstrumentDto_StraightSopranoSaxophone():
+return straightSopranoSaxophone(_that);case InstrumentDto_TenorSaxophone():
+return tenorSaxophone(_that);case InstrumentDto_Trumpet():
+return trumpet(_that);case InstrumentDto_Cornet():
+return cornet(_that);case InstrumentDto_Flugelhorn():
+return flugelhorn(_that);case InstrumentDto_FrenchHorn():
+return frenchHorn(_that);case InstrumentDto_Trombone():
+return trombone(_that);case InstrumentDto_Euphonium():
+return euphonium(_that);case InstrumentDto_Tuba():
+return tuba(_that);case InstrumentDto_EnglishHorn():
+return englishHorn(_that);case InstrumentDto_ContraltoViolin():
+return contraltoViolin(_that);case InstrumentDto_Unknown():
+return unknown(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( InstrumentDto_Violin value)?  violin,TResult? Function( InstrumentDto_Viola value)?  viola,TResult? Function( InstrumentDto_Cello value)?  cello,TResult? Function( InstrumentDto_Flute value)?  flute,TResult? Function( InstrumentDto_Oboe value)?  oboe,TResult? Function( InstrumentDto_Bassoon value)?  bassoon,TResult? Function( InstrumentDto_Clarinet value)?  clarinet,TResult? Function( InstrumentDto_AltoClarinet value)?  altoClarinet,TResult? Function( InstrumentDto_BassClarinet value)?  bassClarinet,TResult? Function( InstrumentDto_AltoSaxophone value)?  altoSaxophone,TResult? Function( InstrumentDto_CurvedSopranoSaxophone value)?  curvedSopranoSaxophone,TResult? Function( InstrumentDto_StraightSopranoSaxophone value)?  straightSopranoSaxophone,TResult? Function( InstrumentDto_TenorSaxophone value)?  tenorSaxophone,TResult? Function( InstrumentDto_Trumpet value)?  trumpet,TResult? Function( InstrumentDto_Cornet value)?  cornet,TResult? Function( InstrumentDto_Flugelhorn value)?  flugelhorn,TResult? Function( InstrumentDto_FrenchHorn value)?  frenchHorn,TResult? Function( InstrumentDto_Trombone value)?  trombone,TResult? Function( InstrumentDto_Euphonium value)?  euphonium,TResult? Function( InstrumentDto_Tuba value)?  tuba,TResult? Function( InstrumentDto_EnglishHorn value)?  englishHorn,TResult? Function( InstrumentDto_ContraltoViolin value)?  contraltoViolin,TResult? Function( InstrumentDto_Unknown value)?  unknown,}){
+final _that = this;
+switch (_that) {
+case InstrumentDto_Violin() when violin != null:
+return violin(_that);case InstrumentDto_Viola() when viola != null:
+return viola(_that);case InstrumentDto_Cello() when cello != null:
+return cello(_that);case InstrumentDto_Flute() when flute != null:
+return flute(_that);case InstrumentDto_Oboe() when oboe != null:
+return oboe(_that);case InstrumentDto_Bassoon() when bassoon != null:
+return bassoon(_that);case InstrumentDto_Clarinet() when clarinet != null:
+return clarinet(_that);case InstrumentDto_AltoClarinet() when altoClarinet != null:
+return altoClarinet(_that);case InstrumentDto_BassClarinet() when bassClarinet != null:
+return bassClarinet(_that);case InstrumentDto_AltoSaxophone() when altoSaxophone != null:
+return altoSaxophone(_that);case InstrumentDto_CurvedSopranoSaxophone() when curvedSopranoSaxophone != null:
+return curvedSopranoSaxophone(_that);case InstrumentDto_StraightSopranoSaxophone() when straightSopranoSaxophone != null:
+return straightSopranoSaxophone(_that);case InstrumentDto_TenorSaxophone() when tenorSaxophone != null:
+return tenorSaxophone(_that);case InstrumentDto_Trumpet() when trumpet != null:
+return trumpet(_that);case InstrumentDto_Cornet() when cornet != null:
+return cornet(_that);case InstrumentDto_Flugelhorn() when flugelhorn != null:
+return flugelhorn(_that);case InstrumentDto_FrenchHorn() when frenchHorn != null:
+return frenchHorn(_that);case InstrumentDto_Trombone() when trombone != null:
+return trombone(_that);case InstrumentDto_Euphonium() when euphonium != null:
+return euphonium(_that);case InstrumentDto_Tuba() when tuba != null:
+return tuba(_that);case InstrumentDto_EnglishHorn() when englishHorn != null:
+return englishHorn(_that);case InstrumentDto_ContraltoViolin() when contraltoViolin != null:
+return contraltoViolin(_that);case InstrumentDto_Unknown() when unknown != null:
+return unknown(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  violin,TResult Function()?  viola,TResult Function()?  cello,TResult Function()?  flute,TResult Function()?  oboe,TResult Function()?  bassoon,TResult Function()?  clarinet,TResult Function()?  altoClarinet,TResult Function()?  bassClarinet,TResult Function()?  altoSaxophone,TResult Function()?  curvedSopranoSaxophone,TResult Function()?  straightSopranoSaxophone,TResult Function()?  tenorSaxophone,TResult Function()?  trumpet,TResult Function()?  cornet,TResult Function()?  flugelhorn,TResult Function()?  frenchHorn,TResult Function()?  trombone,TResult Function()?  euphonium,TResult Function()?  tuba,TResult Function()?  englishHorn,TResult Function()?  contraltoViolin,TResult Function( String raw)?  unknown,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case InstrumentDto_Violin() when violin != null:
+return violin();case InstrumentDto_Viola() when viola != null:
+return viola();case InstrumentDto_Cello() when cello != null:
+return cello();case InstrumentDto_Flute() when flute != null:
+return flute();case InstrumentDto_Oboe() when oboe != null:
+return oboe();case InstrumentDto_Bassoon() when bassoon != null:
+return bassoon();case InstrumentDto_Clarinet() when clarinet != null:
+return clarinet();case InstrumentDto_AltoClarinet() when altoClarinet != null:
+return altoClarinet();case InstrumentDto_BassClarinet() when bassClarinet != null:
+return bassClarinet();case InstrumentDto_AltoSaxophone() when altoSaxophone != null:
+return altoSaxophone();case InstrumentDto_CurvedSopranoSaxophone() when curvedSopranoSaxophone != null:
+return curvedSopranoSaxophone();case InstrumentDto_StraightSopranoSaxophone() when straightSopranoSaxophone != null:
+return straightSopranoSaxophone();case InstrumentDto_TenorSaxophone() when tenorSaxophone != null:
+return tenorSaxophone();case InstrumentDto_Trumpet() when trumpet != null:
+return trumpet();case InstrumentDto_Cornet() when cornet != null:
+return cornet();case InstrumentDto_Flugelhorn() when flugelhorn != null:
+return flugelhorn();case InstrumentDto_FrenchHorn() when frenchHorn != null:
+return frenchHorn();case InstrumentDto_Trombone() when trombone != null:
+return trombone();case InstrumentDto_Euphonium() when euphonium != null:
+return euphonium();case InstrumentDto_Tuba() when tuba != null:
+return tuba();case InstrumentDto_EnglishHorn() when englishHorn != null:
+return englishHorn();case InstrumentDto_ContraltoViolin() when contraltoViolin != null:
+return contraltoViolin();case InstrumentDto_Unknown() when unknown != null:
+return unknown(_that.raw);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  violin,required TResult Function()  viola,required TResult Function()  cello,required TResult Function()  flute,required TResult Function()  oboe,required TResult Function()  bassoon,required TResult Function()  clarinet,required TResult Function()  altoClarinet,required TResult Function()  bassClarinet,required TResult Function()  altoSaxophone,required TResult Function()  curvedSopranoSaxophone,required TResult Function()  straightSopranoSaxophone,required TResult Function()  tenorSaxophone,required TResult Function()  trumpet,required TResult Function()  cornet,required TResult Function()  flugelhorn,required TResult Function()  frenchHorn,required TResult Function()  trombone,required TResult Function()  euphonium,required TResult Function()  tuba,required TResult Function()  englishHorn,required TResult Function()  contraltoViolin,required TResult Function( String raw)  unknown,}) {final _that = this;
+switch (_that) {
+case InstrumentDto_Violin():
+return violin();case InstrumentDto_Viola():
+return viola();case InstrumentDto_Cello():
+return cello();case InstrumentDto_Flute():
+return flute();case InstrumentDto_Oboe():
+return oboe();case InstrumentDto_Bassoon():
+return bassoon();case InstrumentDto_Clarinet():
+return clarinet();case InstrumentDto_AltoClarinet():
+return altoClarinet();case InstrumentDto_BassClarinet():
+return bassClarinet();case InstrumentDto_AltoSaxophone():
+return altoSaxophone();case InstrumentDto_CurvedSopranoSaxophone():
+return curvedSopranoSaxophone();case InstrumentDto_StraightSopranoSaxophone():
+return straightSopranoSaxophone();case InstrumentDto_TenorSaxophone():
+return tenorSaxophone();case InstrumentDto_Trumpet():
+return trumpet();case InstrumentDto_Cornet():
+return cornet();case InstrumentDto_Flugelhorn():
+return flugelhorn();case InstrumentDto_FrenchHorn():
+return frenchHorn();case InstrumentDto_Trombone():
+return trombone();case InstrumentDto_Euphonium():
+return euphonium();case InstrumentDto_Tuba():
+return tuba();case InstrumentDto_EnglishHorn():
+return englishHorn();case InstrumentDto_ContraltoViolin():
+return contraltoViolin();case InstrumentDto_Unknown():
+return unknown(_that.raw);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  violin,TResult? Function()?  viola,TResult? Function()?  cello,TResult? Function()?  flute,TResult? Function()?  oboe,TResult? Function()?  bassoon,TResult? Function()?  clarinet,TResult? Function()?  altoClarinet,TResult? Function()?  bassClarinet,TResult? Function()?  altoSaxophone,TResult? Function()?  curvedSopranoSaxophone,TResult? Function()?  straightSopranoSaxophone,TResult? Function()?  tenorSaxophone,TResult? Function()?  trumpet,TResult? Function()?  cornet,TResult? Function()?  flugelhorn,TResult? Function()?  frenchHorn,TResult? Function()?  trombone,TResult? Function()?  euphonium,TResult? Function()?  tuba,TResult? Function()?  englishHorn,TResult? Function()?  contraltoViolin,TResult? Function( String raw)?  unknown,}) {final _that = this;
+switch (_that) {
+case InstrumentDto_Violin() when violin != null:
+return violin();case InstrumentDto_Viola() when viola != null:
+return viola();case InstrumentDto_Cello() when cello != null:
+return cello();case InstrumentDto_Flute() when flute != null:
+return flute();case InstrumentDto_Oboe() when oboe != null:
+return oboe();case InstrumentDto_Bassoon() when bassoon != null:
+return bassoon();case InstrumentDto_Clarinet() when clarinet != null:
+return clarinet();case InstrumentDto_AltoClarinet() when altoClarinet != null:
+return altoClarinet();case InstrumentDto_BassClarinet() when bassClarinet != null:
+return bassClarinet();case InstrumentDto_AltoSaxophone() when altoSaxophone != null:
+return altoSaxophone();case InstrumentDto_CurvedSopranoSaxophone() when curvedSopranoSaxophone != null:
+return curvedSopranoSaxophone();case InstrumentDto_StraightSopranoSaxophone() when straightSopranoSaxophone != null:
+return straightSopranoSaxophone();case InstrumentDto_TenorSaxophone() when tenorSaxophone != null:
+return tenorSaxophone();case InstrumentDto_Trumpet() when trumpet != null:
+return trumpet();case InstrumentDto_Cornet() when cornet != null:
+return cornet();case InstrumentDto_Flugelhorn() when flugelhorn != null:
+return flugelhorn();case InstrumentDto_FrenchHorn() when frenchHorn != null:
+return frenchHorn();case InstrumentDto_Trombone() when trombone != null:
+return trombone();case InstrumentDto_Euphonium() when euphonium != null:
+return euphonium();case InstrumentDto_Tuba() when tuba != null:
+return tuba();case InstrumentDto_EnglishHorn() when englishHorn != null:
+return englishHorn();case InstrumentDto_ContraltoViolin() when contraltoViolin != null:
+return contraltoViolin();case InstrumentDto_Unknown() when unknown != null:
+return unknown(_that.raw);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class InstrumentDto_Violin extends InstrumentDto {
+  const InstrumentDto_Violin(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Violin);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.violin()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Viola extends InstrumentDto {
+  const InstrumentDto_Viola(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Viola);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.viola()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Cello extends InstrumentDto {
+  const InstrumentDto_Cello(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Cello);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.cello()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Flute extends InstrumentDto {
+  const InstrumentDto_Flute(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Flute);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.flute()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Oboe extends InstrumentDto {
+  const InstrumentDto_Oboe(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Oboe);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.oboe()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Bassoon extends InstrumentDto {
+  const InstrumentDto_Bassoon(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Bassoon);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.bassoon()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Clarinet extends InstrumentDto {
+  const InstrumentDto_Clarinet(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Clarinet);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.clarinet()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_AltoClarinet extends InstrumentDto {
+  const InstrumentDto_AltoClarinet(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_AltoClarinet);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.altoClarinet()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_BassClarinet extends InstrumentDto {
+  const InstrumentDto_BassClarinet(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_BassClarinet);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.bassClarinet()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_AltoSaxophone extends InstrumentDto {
+  const InstrumentDto_AltoSaxophone(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_AltoSaxophone);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.altoSaxophone()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_CurvedSopranoSaxophone extends InstrumentDto {
+  const InstrumentDto_CurvedSopranoSaxophone(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_CurvedSopranoSaxophone);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.curvedSopranoSaxophone()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_StraightSopranoSaxophone extends InstrumentDto {
+  const InstrumentDto_StraightSopranoSaxophone(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_StraightSopranoSaxophone);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.straightSopranoSaxophone()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_TenorSaxophone extends InstrumentDto {
+  const InstrumentDto_TenorSaxophone(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_TenorSaxophone);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.tenorSaxophone()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Trumpet extends InstrumentDto {
+  const InstrumentDto_Trumpet(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Trumpet);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.trumpet()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Cornet extends InstrumentDto {
+  const InstrumentDto_Cornet(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Cornet);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.cornet()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Flugelhorn extends InstrumentDto {
+  const InstrumentDto_Flugelhorn(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Flugelhorn);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.flugelhorn()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_FrenchHorn extends InstrumentDto {
+  const InstrumentDto_FrenchHorn(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_FrenchHorn);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.frenchHorn()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Trombone extends InstrumentDto {
+  const InstrumentDto_Trombone(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Trombone);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.trombone()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Euphonium extends InstrumentDto {
+  const InstrumentDto_Euphonium(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Euphonium);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.euphonium()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Tuba extends InstrumentDto {
+  const InstrumentDto_Tuba(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Tuba);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.tuba()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_EnglishHorn extends InstrumentDto {
+  const InstrumentDto_EnglishHorn(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_EnglishHorn);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.englishHorn()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_ContraltoViolin extends InstrumentDto {
+  const InstrumentDto_ContraltoViolin(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_ContraltoViolin);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'InstrumentDto.contraltoViolin()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class InstrumentDto_Unknown extends InstrumentDto {
+  const InstrumentDto_Unknown({required this.raw}): super._();
+  
+
+ final  String raw;
+
+/// Create a copy of InstrumentDto
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$InstrumentDto_UnknownCopyWith<InstrumentDto_Unknown> get copyWith => _$InstrumentDto_UnknownCopyWithImpl<InstrumentDto_Unknown>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Unknown&&(identical(other.raw, raw) || other.raw == raw));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,raw);
+
+@override
+String toString() {
+  return 'InstrumentDto.unknown(raw: $raw)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $InstrumentDto_UnknownCopyWith<$Res> implements $InstrumentDtoCopyWith<$Res> {
+  factory $InstrumentDto_UnknownCopyWith(InstrumentDto_Unknown value, $Res Function(InstrumentDto_Unknown) _then) = _$InstrumentDto_UnknownCopyWithImpl;
+@useResult
+$Res call({
+ String raw
+});
+
+
+
+
+}
+/// @nodoc
+class _$InstrumentDto_UnknownCopyWithImpl<$Res>
+    implements $InstrumentDto_UnknownCopyWith<$Res> {
+  _$InstrumentDto_UnknownCopyWithImpl(this._self, this._then);
+
+  final InstrumentDto_Unknown _self;
+  final $Res Function(InstrumentDto_Unknown) _then;
+
+/// Create a copy of InstrumentDto
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? raw = null,}) {
+  return _then(InstrumentDto_Unknown(
+raw: null == raw ? _self.raw : raw // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$RetrieveAllAvailableStudentsOutcomeDto {
 
 

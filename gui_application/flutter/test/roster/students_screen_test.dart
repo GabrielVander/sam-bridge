@@ -31,9 +31,82 @@ void main() {
       });
     }
 
+    final portugueseInstrumentNames = {
+      Instruments.violin: 'Violino',
+      Instruments.viola: 'Viola',
+      Instruments.cello: 'Violoncelo',
+      Instruments.flute: 'Flauta',
+      Instruments.oboe: 'Oboé',
+      Instruments.bassoon: 'Fagote',
+      Instruments.clarinet: 'Clarinete',
+      Instruments.altoClarinet: 'Clarinete alto',
+      Instruments.bassClarinet: 'Clarinete baixo',
+      Instruments.altoSaxophone: 'Saxofone alto',
+      Instruments.curvedSopranoSaxophone: 'Saxofone soprano curvo',
+      Instruments.straightSopranoSaxophone: 'Saxofone soprano reto',
+      Instruments.tenorSaxophone: 'Saxofone tenor',
+      Instruments.trumpet: 'Trompete',
+      Instruments.cornet: 'Cornet',
+      Instruments.flugelhorn: 'Flugelhorn',
+      Instruments.frenchHorn: 'Trompa',
+      Instruments.trombone: 'Trombone',
+      Instruments.euphonium: 'Eufônio',
+      Instruments.tuba: 'Tuba',
+      Instruments.englishHorn: 'Corne inglês',
+      Instruments.contraltoViolin: 'Violino contralto',
+      Instruments.unknown('BANDOLIM'): 'BANDOLIM',
+    };
+
+    for (final MapEntry(key: instrument, value: name)
+        in portugueseInstrumentNames.entries) {
+      testWidgets('names the $instrument instrument "$name"', (tester) async {
+        await pumpRoster(tester, [studentSummary(instrument: instrument)]);
+
+        expect(find.text(name), findsOneWidget);
+      });
+    }
+
+    final englishInstrumentNames = {
+      Instruments.violin: 'Violin',
+      Instruments.viola: 'Viola',
+      Instruments.cello: 'Cello',
+      Instruments.flute: 'Flute',
+      Instruments.oboe: 'Oboe',
+      Instruments.bassoon: 'Bassoon',
+      Instruments.clarinet: 'Clarinet',
+      Instruments.altoClarinet: 'Alto clarinet',
+      Instruments.bassClarinet: 'Bass clarinet',
+      Instruments.altoSaxophone: 'Alto saxophone',
+      Instruments.curvedSopranoSaxophone: 'Curved soprano saxophone',
+      Instruments.straightSopranoSaxophone: 'Straight soprano saxophone',
+      Instruments.tenorSaxophone: 'Tenor saxophone',
+      Instruments.trumpet: 'Trumpet',
+      Instruments.cornet: 'Cornet',
+      Instruments.flugelhorn: 'Flugelhorn',
+      Instruments.frenchHorn: 'French horn',
+      Instruments.trombone: 'Trombone',
+      Instruments.euphonium: 'Euphonium',
+      Instruments.tuba: 'Tuba',
+      Instruments.englishHorn: 'English horn',
+      Instruments.contraltoViolin: 'Contralto violin',
+    };
+
+    for (final MapEntry(key: instrument, value: name)
+        in englishInstrumentNames.entries) {
+      testWidgets('names the $instrument instrument "$name" in English', (
+        tester,
+      ) async {
+        await pumpRoster(tester, [
+          studentSummary(instrument: instrument),
+        ], locale: const Locale('en'));
+
+        expect(find.text(name), findsOneWidget);
+      });
+    }
+
     testWidgets('shows the instrument with a music note icon', (tester) async {
       await pumpRoster(tester, [
-        studentSummary(instrumentName: 'SAXOFONE TENOR'),
+        studentSummary(instrument: Instruments.tenorSaxophone),
       ]);
 
       expect(find.text('Saxofone tenor'), findsOneWidget);
@@ -43,7 +116,7 @@ void main() {
     testWidgets('puts the instrument between position and location', (
       tester,
     ) async {
-      await pumpRoster(tester, [studentSummary(instrumentName: 'OBOÉ')]);
+      await pumpRoster(tester, [studentSummary(instrument: Instruments.oboe)]);
 
       final position = tester.getTopLeft(find.text('Ensaio')).dy;
       final instrument = tester.getTopLeft(find.text('Oboé')).dy;
@@ -71,9 +144,11 @@ void main() {
       addTearDown(tester.view.reset);
       final longName = List.filled(12, 'INSTRUMENTO').join(' ');
 
-      await pumpRoster(tester, [studentSummary(instrumentName: longName)]);
+      await pumpRoster(tester, [
+        studentSummary(instrument: Instruments.unknown(longName)),
+      ]);
 
-      final text = tester.widget<Text>(find.textContaining('Instrumento'));
+      final text = tester.widget<Text>(find.textContaining('INSTRUMENTO'));
       expect(text.maxLines, 1);
       expect(text.overflow, TextOverflow.ellipsis);
       expect(tester.takeException(), isNull);
@@ -82,7 +157,9 @@ void main() {
     testWidgets('hides the decorative icon from screen readers', (
       tester,
     ) async {
-      await pumpRoster(tester, [studentSummary(instrumentName: 'VIOLINO')]);
+      await pumpRoster(tester, [
+        studentSummary(instrument: Instruments.violin),
+      ]);
 
       expect(
         find.ancestor(

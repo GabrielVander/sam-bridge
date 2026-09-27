@@ -1,3 +1,4 @@
+import 'package:flutter_application/roster/instrument.dart';
 import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:flutter_application/rust/api/roster.dart';
 import 'package:flutter_application/roster/student_position.dart';
@@ -12,15 +13,8 @@ class RosterMapper {
     name: dto.name,
     location: dto.location,
     position: _position(dto.position),
-    instrument: _instrumentLabel(dto.instrumentName),
+    instrument: _instrument(dto.instrument),
   );
-
-  static String? _instrumentLabel(String? name) {
-    final trimmed = name?.trim();
-    if (trimmed == null || trimmed.isEmpty) return null;
-    return trimmed.substring(0, 1).toUpperCase() +
-        trimmed.substring(1).toLowerCase();
-  }
 
   static StudentPosition _position(
     StudentPositionDto position,
@@ -56,5 +50,50 @@ class RosterMapper {
     StudentPositionDto_GemSecretary() => const GemSecretaryPosition(),
     StudentPositionDto_MusicSecretary() => const MusicSecretaryPosition(),
     StudentPositionDto_Invalid(:final raw) => UnrecognizedPosition(raw),
+  };
+
+  static ReportedInstrument? _instrument(
+    InstrumentDto? instrument,
+  ) => switch (instrument) {
+    null => null,
+    InstrumentDto_Violin() => const KnownInstrument(Instrument.violin),
+    InstrumentDto_Viola() => const KnownInstrument(Instrument.viola),
+    InstrumentDto_Cello() => const KnownInstrument(Instrument.cello),
+    InstrumentDto_Flute() => const KnownInstrument(Instrument.flute),
+    InstrumentDto_Oboe() => const KnownInstrument(Instrument.oboe),
+    InstrumentDto_Bassoon() => const KnownInstrument(Instrument.bassoon),
+    InstrumentDto_Clarinet() => const KnownInstrument(Instrument.clarinet),
+    InstrumentDto_AltoClarinet() => const KnownInstrument(
+      Instrument.altoClarinet,
+    ),
+    InstrumentDto_BassClarinet() => const KnownInstrument(
+      Instrument.bassClarinet,
+    ),
+    InstrumentDto_AltoSaxophone() => const KnownInstrument(
+      Instrument.altoSaxophone,
+    ),
+    InstrumentDto_CurvedSopranoSaxophone() => const KnownInstrument(
+      Instrument.curvedSopranoSaxophone,
+    ),
+    InstrumentDto_StraightSopranoSaxophone() => const KnownInstrument(
+      Instrument.straightSopranoSaxophone,
+    ),
+    InstrumentDto_TenorSaxophone() => const KnownInstrument(
+      Instrument.tenorSaxophone,
+    ),
+    InstrumentDto_Trumpet() => const KnownInstrument(Instrument.trumpet),
+    InstrumentDto_Cornet() => const KnownInstrument(Instrument.cornet),
+    InstrumentDto_Flugelhorn() => const KnownInstrument(Instrument.flugelhorn),
+    InstrumentDto_FrenchHorn() => const KnownInstrument(Instrument.frenchHorn),
+    InstrumentDto_Trombone() => const KnownInstrument(Instrument.trombone),
+    InstrumentDto_Euphonium() => const KnownInstrument(Instrument.euphonium),
+    InstrumentDto_Tuba() => const KnownInstrument(Instrument.tuba),
+    InstrumentDto_EnglishHorn() => const KnownInstrument(
+      Instrument.englishHorn,
+    ),
+    InstrumentDto_ContraltoViolin() => const KnownInstrument(
+      Instrument.contraltoViolin,
+    ),
+    InstrumentDto_Unknown(:final raw) => UnrecognizedInstrument(raw),
   };
 }

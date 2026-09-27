@@ -1,9 +1,7 @@
 use std::sync::Arc;
 use student::{
     application::gateways::{StudentGateway, StudentGatewayError},
-    domain::entities::{
-        Instrument, OrganistLevel, Region, SecretaryType, Student, StudentId, StudentPosition,
-    },
+    domain::entities::{OrganistLevel, Region, SecretaryType, Student, StudentId, StudentPosition},
 };
 
 use crate::client::{SamClient, SamStudent};
@@ -73,15 +71,10 @@ fn clean_location(raw: &str) -> String {
 
 fn parse_position(role: &str, level: &str, instrument: &str) -> StudentPosition {
     match role {
-        MUSICIAN_ROLE => {
-            let (instrument, instrument_name) = parse_musician_instrument(instrument);
-
-            StudentPosition::Musician {
-                level: parse_musician_level(level),
-                instrument,
-                instrument_name,
-            }
-        }
+        MUSICIAN_ROLE => StudentPosition::Musician {
+            level: parse_musician_level(level),
+            instrument: parse_instrument(instrument),
+        },
         "ORGANISTA" => StudentPosition::Organist {
             level: parse_organist_level(level),
         },
@@ -101,13 +94,6 @@ fn parse_organist_level(level: &str) -> OrganistLevel {
         "RJM / MEIA HORA" => OrganistLevel::YouthServiceHalfHour,
         other => OrganistLevel::Unknown(other.to_owned()),
     }
-}
-
-fn parse_musician_instrument(raw: &str) -> (Option<Instrument>, Option<String>) {
-    let instrument: Option<Instrument> = parse_instrument(raw);
-    let instrument_name: Option<String> = instrument.as_ref().map(|_| raw.trim().to_owned());
-
-    (instrument, instrument_name)
 }
 
 fn parse_region(location: &str) -> Region {

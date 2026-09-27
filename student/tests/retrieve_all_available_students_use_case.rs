@@ -37,7 +37,6 @@ fn returns_every_available_student() {
             position: StudentPosition::Musician {
                 level: MusicianLevel::Candidate,
                 instrument: Some(Instrument::Violin),
-                instrument_name: Some("VIOLINO".to_string()),
             },
             location: "Location A".to_string(),
             region: Region::AraraquaraSaoCarlos,

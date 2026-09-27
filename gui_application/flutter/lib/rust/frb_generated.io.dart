@@ -65,6 +65,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ErrorReportDto dco_decode_box_autoadd_error_report_dto(dynamic raw);
 
   @protected
+  InstrumentDto dco_decode_box_autoadd_instrument_dto(dynamic raw);
+
+  @protected
   MusicianLevelDto dco_decode_box_autoadd_musician_level_dto(dynamic raw);
 
   @protected
@@ -100,6 +103,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int dco_decode_i_32(dynamic raw);
 
   @protected
+  InstrumentDto dco_decode_instrument_dto(dynamic raw);
+
+  @protected
   LessonDto dco_decode_lesson_dto(dynamic raw);
 
   @protected
@@ -131,6 +137,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DateDto? dco_decode_opt_box_autoadd_date_dto(dynamic raw);
+
+  @protected
+  InstrumentDto? dco_decode_opt_box_autoadd_instrument_dto(dynamic raw);
 
   @protected
   MusicianLevelDto? dco_decode_opt_box_autoadd_musician_level_dto(dynamic raw);
@@ -219,6 +228,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  InstrumentDto sse_decode_box_autoadd_instrument_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   MusicianLevelDto sse_decode_box_autoadd_musician_level_dto(
     SseDeserializer deserializer,
   );
@@ -260,6 +274,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
+  InstrumentDto sse_decode_instrument_dto(SseDeserializer deserializer);
+
+  @protected
   LessonDto sse_decode_lesson_dto(SseDeserializer deserializer);
 
   @protected
@@ -295,6 +312,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DateDto? sse_decode_opt_box_autoadd_date_dto(SseDeserializer deserializer);
+
+  @protected
+  InstrumentDto? sse_decode_opt_box_autoadd_instrument_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   MusicianLevelDto? sse_decode_opt_box_autoadd_musician_level_dto(
@@ -405,6 +427,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_instrument_dto(
+    InstrumentDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_musician_level_dto(
     MusicianLevelDto self,
     SseSerializer serializer,
@@ -454,6 +482,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_instrument_dto(InstrumentDto self, SseSerializer serializer);
 
   @protected
   void sse_encode_lesson_dto(LessonDto self, SseSerializer serializer);
@@ -512,6 +543,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_date_dto(
     DateDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_instrument_dto(
+    InstrumentDto? self,
     SseSerializer serializer,
   );
 
