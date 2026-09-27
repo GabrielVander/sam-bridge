@@ -32,3 +32,20 @@ pub fn text_content(element: scraper::ElementRef<'_>) -> String {
         .trim()
         .to_owned()
 }
+
+pub fn row_id(row: scraper::ElementRef<'_>, prefix: &str) -> Option<String> {
+    row.value()
+        .attr("id")
+        .and_then(|value| value.strip_prefix(prefix))
+        .filter(|value| !value.is_empty())
+        .map(str::to_owned)
+}
+
+pub fn optional_cell<'a>(
+    cells: &mut impl Iterator<Item = scraper::ElementRef<'a>>,
+) -> Option<String> {
+    cells
+        .next()
+        .map(text_content)
+        .filter(|text| !text.is_empty())
+}

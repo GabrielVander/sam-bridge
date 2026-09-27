@@ -33,20 +33,17 @@ type SamSingleStudentJsonResponse = Vec<String>;
 
 impl From<&SamSingleStudentJsonResponse> for SamStudent {
     fn from(value: &SamSingleStudentJsonResponse) -> Self {
-        let id: String = value.first().map_or(String::new(), Clone::clone);
-        let name: String = value.get(1).map_or(String::new(), Clone::clone);
-        let location: String = value.get(2).map_or(String::new(), Clone::clone);
-        let role: String = value.get(3).map_or(String::new(), Clone::clone);
-        let instrument: String = value.get(4).map_or(String::new(), Clone::clone);
-        let level: String = value.get(5).map_or(String::new(), Clone::clone);
-
         Self {
-            id,
-            name,
-            location,
-            role,
-            instrument,
-            level,
+            id: column(value, 0),
+            name: column(value, 1),
+            location: column(value, 2),
+            role: column(value, 3),
+            instrument: column(value, 4),
+            level: column(value, 5),
         }
     }
+}
+
+fn column(row: &SamSingleStudentJsonResponse, index: usize) -> String {
+    row.get(index).cloned().unwrap_or_default()
 }

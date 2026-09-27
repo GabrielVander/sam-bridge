@@ -1,6 +1,8 @@
 use std::vec::IntoIter;
 
-use crate::parsing::dom::{descendants_with_tag, find_descendant, find_descendant_with_id};
+use crate::parsing::dom::{
+    descendants_with_tag, find_descendant, find_descendant_with_id, optional_cell, row_id,
+};
 
 #[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct MtdLesson {
@@ -40,17 +42,10 @@ pub fn parse_method_lessons_body(body: &str) -> Vec<MtdLesson> {
 }
 
 fn parse_row(row: scraper::ElementRef) -> MtdLesson {
-    let id: Option<String> = row
-        .value()
-        .attr("id")
-        .and_then(|value| value.strip_prefix("mtd_"))
-        .filter(|value| !value.is_empty())
-        .map(str::to_owned);
-
     let mut cells: IntoIter<scraper::ElementRef<'_>> = descendants_with_tag(row, "td").into_iter();
 
     MtdLesson {
-        id,
+        id: row_id(row, "mtd_"),
         pages: optional_cell(&mut cells),
         lesson: optional_cell(&mut cells),
         method: optional_cell(&mut cells),
@@ -59,11 +54,4 @@ fn parse_row(row: scraper::ElementRef) -> MtdLesson {
         registration_date: optional_cell(&mut cells),
         observations: optional_cell(&mut cells),
     }
-}
-
-fn optional_cell<'a>(cells: &mut impl Iterator<Item = scraper::ElementRef<'a>>) -> Option<String> {
-    cells
-        .next()
-        .map(super::dom::text_content)
-        .filter(|text| !text.is_empty())
 }

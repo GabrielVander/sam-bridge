@@ -1,7 +1,7 @@
 use std::vec::IntoIter;
 
 use crate::parsing::dom::{
-    descendants_with_tag, find_descendant, find_descendant_with_id, text_content,
+    descendants_with_tag, find_descendant, find_descendant_with_id, optional_cell, row_id,
 };
 
 #[derive(Debug, PartialEq, Eq, Clone, Default)]
@@ -46,17 +46,10 @@ pub fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
 }
 
 fn parse_row(row: scraper::ElementRef) -> MsaLesson {
-    let id: Option<String> = row
-        .value()
-        .attr("id")
-        .and_then(|value| value.strip_prefix("msa_"))
-        .filter(|value| !value.is_empty())
-        .map(str::to_owned);
-
     let mut cells: IntoIter<scraper::ElementRef<'_>> = descendants_with_tag(row, "td").into_iter();
 
     MsaLesson {
-        id,
+        id: row_id(row, "msa_"),
         date: optional_cell(&mut cells),
         phases: optional_cell(&mut cells),
         pages: optional_cell(&mut cells),
@@ -65,11 +58,4 @@ fn parse_row(row: scraper::ElementRef) -> MsaLesson {
         description: optional_cell(&mut cells),
         authorizer: optional_cell(&mut cells),
     }
-}
-
-fn optional_cell<'a>(cells: &mut impl Iterator<Item = scraper::ElementRef<'a>>) -> Option<String> {
-    cells
-        .next()
-        .map(text_content)
-        .filter(|text| !text.is_empty())
 }

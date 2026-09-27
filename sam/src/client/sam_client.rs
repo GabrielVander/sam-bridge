@@ -2,7 +2,7 @@ use thiserror::Error;
 
 use crate::http::{SamOperationError, SamOperations, SamResponse};
 use crate::parsing::{
-    self, AuthResponse, AuthenticationParser, DashboardParser, DashboardResponse,
+    self, AuthResponse, DashboardResponse, parse_authentication_response, parse_dashboard_response,
 };
 
 pub use crate::parsing::{MsaLesson, MtdLesson, SamStudent, StudentLessonsPage};
@@ -34,7 +34,7 @@ impl SamClient for SamClientImpl {
             .authenticate(&credentials.login, &credentials.password)
             .map_err(SamClientError::from)?;
 
-        match AuthenticationParser::parse_response(&response) {
+        match parse_authentication_response(&response) {
             AuthResponse::Authenticated => Ok(()),
             AuthResponse::InvalidCredentials => Err(SamClientError::InvalidCredentials),
             AuthResponse::Unexpected => Err(SamClientError::UnexpectedResponse {
@@ -82,7 +82,7 @@ impl SamClientImpl {
     fn ensure_session_active(&self) -> Result<(), SamClientError> {
         let response: SamResponse = self.sam_ops.dashboard().map_err(SamClientError::from)?;
 
-        match DashboardParser::parse_response(&response) {
+        match parse_dashboard_response(&response) {
             DashboardResponse::Accessed => Ok(()),
             DashboardResponse::Unauthenticated => Err(SamClientError::SessionExpired),
         }
