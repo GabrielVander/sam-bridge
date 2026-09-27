@@ -76,8 +76,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn violin() -> Self {
+    fn violin() -> Self {
         Self {
             instrument: Instrument::Violin,
             tests: vec![
@@ -124,8 +123,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn viola() -> Self {
+    fn viola() -> Self {
         Self {
             instrument: Instrument::Viola,
             tests: vec![
@@ -163,8 +161,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn cello() -> Self {
+    fn cello() -> Self {
         Self {
             instrument: Instrument::Cello,
             tests: vec![
@@ -202,8 +199,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn flute() -> Self {
+    fn flute() -> Self {
         Self {
             instrument: Instrument::Flute,
             tests: vec![
@@ -235,8 +231,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn oboe() -> Self {
+    fn oboe() -> Self {
         Self {
             instrument: Instrument::Oboe,
             tests: vec![
@@ -265,8 +260,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn bassoon() -> Self {
+    fn bassoon() -> Self {
         Self {
             instrument: Instrument::Bassoon,
             tests: vec![
@@ -295,8 +289,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn clarinet() -> Self {
+    fn clarinet() -> Self {
         Self {
             instrument: Instrument::Clarinet,
             tests: vec![
@@ -336,8 +329,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn bass_clarinet() -> Self {
+    fn bass_clarinet() -> Self {
         Self {
             instrument: Instrument::BassClarinet,
             tests: vec![
@@ -372,8 +364,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn saxophone(instrument: Instrument) -> Self {
+    fn saxophone(instrument: Instrument) -> Self {
         Self {
             instrument,
             tests: vec![
@@ -405,8 +396,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn trumpet(instrument: Instrument) -> Self {
+    fn trumpet(instrument: Instrument) -> Self {
         Self {
             instrument,
             tests: vec![
@@ -443,8 +433,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn french_horn() -> Self {
+    fn french_horn() -> Self {
         Self {
             instrument: Instrument::FrenchHorn,
             tests: vec![
@@ -475,8 +464,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn trombone_or_euphonium(instrument: Instrument) -> Self {
+    fn trombone_or_euphonium(instrument: Instrument) -> Self {
         Self {
             instrument,
             tests: vec![
@@ -505,8 +493,7 @@ impl InstrumentRequirements {
         }
     }
 
-    #[must_use]
-    pub fn tuba() -> Self {
+    fn tuba() -> Self {
         Self {
             instrument: Instrument::Tuba,
             tests: vec![
