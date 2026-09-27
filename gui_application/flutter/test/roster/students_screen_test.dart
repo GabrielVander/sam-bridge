@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/errors.dart';
 import '../support/roster.dart';
 
 void main() {
@@ -168,6 +169,27 @@ void main() {
         ),
         findsOneWidget,
       );
+    });
+  });
+
+  group('StudentsScreen failure', () {
+    testWidgets('loads the students again when retrying after a failure', (
+      tester,
+    ) async {
+      await pumpStudents(
+        tester,
+        presenterAnswering([
+          rosterFailed(networkFailure('connection refused')),
+          rosterLoaded([studentSummary(name: 'Jane Doe')]),
+        ]),
+      );
+      expect(find.text('Tentar novamente'), findsOneWidget);
+
+      await tester.tap(find.text('Tentar novamente'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tentar novamente'), findsNothing);
+      expect(find.text('Jane Doe'), findsOneWidget);
     });
   });
 

@@ -150,6 +150,20 @@ void main() {
     );
 
     test(
+      'restoreSession() falls back to the login form when restoring fails',
+      () async {
+        final presenter = buildPresenter(
+          restoreSessionUseCase: () async =>
+              restoreFailed(networkFailure('connection refused')),
+        );
+
+        await presenter.restoreSession();
+
+        expect(presenter.stateValue, isA<AuthIdle>());
+      },
+    );
+
+    test(
       'restoreSession() falls back to the login form when the use case throws',
       () async {
         final presenter = buildPresenter(

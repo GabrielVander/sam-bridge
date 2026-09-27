@@ -18,6 +18,9 @@ RestoreSessionOutcomeDto sessionRestored() =>
 RestoreSessionOutcomeDto noSavedSession() =>
     const RestoreSessionOutcomeDto.notAvailable();
 
+RestoreSessionOutcomeDto restoreFailed(ErrorReportDto report) =>
+    RestoreSessionOutcomeDto.failure(report: report);
+
 Pending<RestoreSessionOutcomeDto> pendingRestore() => Pending();
 
 LogoutOutcomeDto loggedOut() => const LogoutOutcomeDto.successful();
