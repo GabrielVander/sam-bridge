@@ -79,6 +79,10 @@ impl SamClient for SamClientImpl {
         let status: reqwest::StatusCode = reqwest::StatusCode::from_u16(response.status)
             .unwrap_or(reqwest::StatusCode::INTERNAL_SERVER_ERROR);
 
+        if status.is_redirection() {
+            return Err(SamClientError::SessionExpired);
+        }
+
         parsing::parse_student_lessons_page(status, &response.body).map_err(|e| {
             SamClientError::UnexpectedResponse {
                 context: e.to_string(),

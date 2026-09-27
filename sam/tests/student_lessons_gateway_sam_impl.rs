@@ -132,6 +132,30 @@ fn given_an_unexpected_status_the_failure_names_it() {
 }
 
 #[test]
+fn given_sam_redirects_away_from_the_lessons_page_the_session_has_expired() {
+    smol::block_on(async {
+        let mock_server: MockServer = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/licoes/index/500132"))
+            .respond_with(
+                ResponseTemplate::new(307).insert_header("location", mock_server.uri().as_str()),
+            )
+            .mount(&mock_server)
+            .await;
+
+        let gateway: StudentLessonsGatewaySamImpl =
+            build_gateway(&mock_server).expect("gateway should be built");
+
+        let (kind, _) =
+            failure_of(gateway.get_all_for_student_with_id(&StudentId::new("500132".to_owned())))
+                .expect("lessons retrieval should have failed");
+
+        assert_eq!(kind, FailureKind::SessionExpired);
+    });
+}
+
+#[test]
 fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation() {
     let gateway: StudentLessonsGatewaySamImpl =
         build_gateway_for(UNREACHABLE_SITE).expect("gateway should be built");
