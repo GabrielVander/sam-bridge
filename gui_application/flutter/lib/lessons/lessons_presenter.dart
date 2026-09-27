@@ -60,19 +60,21 @@ final class ProgressUnavailable extends ProgressStatus {
 }
 
 class LessonsPresenter extends CubitSignal<LessonsState> {
-  final RetrieveStudentLessonsUseCase retrieveStudentLessons;
-  final AssessStudentProgressUseCase assessStudentProgress;
+  final RetrieveStudentLessonsUseCase _retrieveStudentLessons;
+  final AssessStudentProgressUseCase _assessStudentProgress;
 
   LessonsPresenter({
-    required this.retrieveStudentLessons,
-    required this.assessStudentProgress,
+    required this._retrieveStudentLessons,
+    required this._assessStudentProgress,
   }) : super(initialState: const LessonsIdle());
 
   Future<void> load(String studentId) async {
     emit(const LessonsLoading());
     final progressFuture = _assessProgress(studentId);
     try {
-      final lessonsOutcome = await retrieveStudentLessons(studentId: studentId);
+      final lessonsOutcome = await _retrieveStudentLessons(
+        studentId: studentId,
+      );
 
       switch (lessonsOutcome) {
         case RetrieveStudentLessonsOutcomeDto_Success(:final lessons):
@@ -93,7 +95,7 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
   Future<ProgressStatus> _assessProgress(String studentId) async {
     try {
       return _toProgressStatus(
-        await assessStudentProgress(studentId: studentId),
+        await _assessStudentProgress(studentId: studentId),
       );
     } catch (e) {
       return ProgressUnavailable(ErrorReportMapper.fromThrown(e));

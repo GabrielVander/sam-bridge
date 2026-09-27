@@ -45,20 +45,20 @@ final class AuthFailure extends AuthState {
 }
 
 class AuthPresenter extends CubitSignal<AuthState> {
-  final LoginUseCase loginUseCase;
-  final RestoreSessionUseCase restoreSessionUseCase;
-  final LogoutUseCase logoutUseCase;
+  final LoginUseCase _loginUseCase;
+  final RestoreSessionUseCase _restoreSessionUseCase;
+  final LogoutUseCase _logoutUseCase;
 
   AuthPresenter({
-    required this.loginUseCase,
-    required this.restoreSessionUseCase,
-    required this.logoutUseCase,
+    required this._loginUseCase,
+    required this._restoreSessionUseCase,
+    required this._logoutUseCase,
   }) : super(initialState: const AuthIdle());
 
   Future<void> restoreSession() async {
     emit(const AuthLoading());
     try {
-      final RestoreSessionOutcomeDto outcome = await restoreSessionUseCase();
+      final RestoreSessionOutcomeDto outcome = await _restoreSessionUseCase();
 
       switch (outcome) {
         case RestoreSessionOutcomeDto_Restored():
@@ -82,7 +82,7 @@ class AuthPresenter extends CubitSignal<AuthState> {
 
     emit(const AuthLoading());
     try {
-      final LoginOutcomeDto outcome = await loginUseCase(
+      final LoginOutcomeDto outcome = await _loginUseCase(
         email: username,
         password: password,
       );
@@ -104,7 +104,7 @@ class AuthPresenter extends CubitSignal<AuthState> {
     emit(const AuthLoading());
 
     try {
-      final LogoutOutcomeDto outcome = await logoutUseCase();
+      final LogoutOutcomeDto outcome = await _logoutUseCase();
 
       switch (outcome) {
         case LogoutOutcomeDto_Successful():
