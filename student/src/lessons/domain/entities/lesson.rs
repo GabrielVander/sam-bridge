@@ -18,19 +18,19 @@ pub struct StudentLessons {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Range<T = String> {
-    pub from: T,
-    pub to: T,
+pub struct Range {
+    pub from: String,
+    pub to: String,
 }
 
-impl<T> Range<T> {
-    pub const fn new(from: T, to: T) -> Self {
+impl Range {
+    #[must_use]
+    pub const fn new(from: String, to: String) -> Self {
         Self { from, to }
     }
-    pub fn single(value: T) -> Self
-    where
-        T: Clone,
-    {
+
+    #[must_use]
+    pub fn single(value: String) -> Self {
         Self {
             from: value.clone(),
             to: value,
