@@ -7,11 +7,6 @@ use crate::parsing::{
 
 pub use crate::parsing::{MsaLesson, MtdLesson, SamStudent, StudentLessonsPage};
 
-#[derive(Debug, Clone)]
-pub struct SamClientImpl {
-    sam_ops: SamOperations,
-}
-
 pub trait SamClient: Send + Sync {
     fn login(&self, credentials: &SamCredentials) -> Result<(), SamClientError>;
 
@@ -20,19 +15,15 @@ pub trait SamClient: Send + Sync {
     fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage, SamClientError>;
 }
 
+#[derive(Debug, Clone)]
+pub struct SamClientImpl {
+    sam_ops: SamOperations,
+}
+
 impl SamClientImpl {
     #[must_use]
     pub const fn new(sam_ops: SamOperations) -> Self {
         Self { sam_ops }
-    }
-
-    fn ensure_session_active(&self) -> Result<(), SamClientError> {
-        let response: SamResponse = self.sam_ops.dashboard().map_err(SamClientError::from)?;
-
-        match DashboardParser::parse_response(&response) {
-            DashboardResponse::Accessed => Ok(()),
-            DashboardResponse::Unauthenticated => Err(SamClientError::SessionExpired),
-        }
     }
 }
 
@@ -60,10 +51,7 @@ impl SamClient for SamClientImpl {
             .students_listing()
             .map_err(SamClientError::from)?;
 
-        let status: reqwest::StatusCode = reqwest::StatusCode::from_u16(response.status)
-            .unwrap_or(reqwest::StatusCode::INTERNAL_SERVER_ERROR);
-
-        parsing::parse_students_listing(status, &response.body).map_err(|e| {
+        parsing::parse_students_listing(status_of(&response), &response.body).map_err(|e| {
             SamClientError::UnexpectedResponse {
                 context: format!("{e:#}"),
             }
@@ -76,8 +64,7 @@ impl SamClient for SamClientImpl {
             .student_lessons(student_id)
             .map_err(SamClientError::from)?;
 
-        let status: reqwest::StatusCode = reqwest::StatusCode::from_u16(response.status)
-            .unwrap_or(reqwest::StatusCode::INTERNAL_SERVER_ERROR);
+        let status: reqwest::StatusCode = status_of(&response);
 
         if status.is_redirection() {
             return Err(SamClientError::SessionExpired);
@@ -89,6 +76,22 @@ impl SamClient for SamClientImpl {
             }
         })
     }
+}
+
+impl SamClientImpl {
+    fn ensure_session_active(&self) -> Result<(), SamClientError> {
+        let response: SamResponse = self.sam_ops.dashboard().map_err(SamClientError::from)?;
+
+        match DashboardParser::parse_response(&response) {
+            DashboardResponse::Accessed => Ok(()),
+            DashboardResponse::Unauthenticated => Err(SamClientError::SessionExpired),
+        }
+    }
+}
+
+fn status_of(response: &SamResponse) -> reqwest::StatusCode {
+    reqwest::StatusCode::from_u16(response.status)
+        .unwrap_or(reqwest::StatusCode::INTERNAL_SERVER_ERROR)
 }
 
 #[derive(Error, Debug)]
