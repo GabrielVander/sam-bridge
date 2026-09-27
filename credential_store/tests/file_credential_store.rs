@@ -89,8 +89,8 @@ fn tamper_detection_returns_none() {
 #[test]
 fn a_second_store_pointed_at_the_same_dir_reads_what_the_first_wrote() {
     let dir: tempfile::TempDir = tempfile::tempdir().expect("tempdir");
-    let store1: FileCredentialStore = FileCredentialStore::with_dir(&dir.path().to_string_lossy());
-    let store2: FileCredentialStore = FileCredentialStore::with_dir(&dir.path().to_string_lossy());
+    let store1: FileCredentialStore = FileCredentialStore::with_dir(dir.path());
+    let store2: FileCredentialStore = FileCredentialStore::with_dir(dir.path());
 
     store1.save(&credential()).expect("save via store1");
 
@@ -103,9 +103,9 @@ fn a_second_store_pointed_at_the_same_dir_reads_what_the_first_wrote() {
 #[test]
 fn decrypt_with_wrong_key_returns_none() {
     let dir1: tempfile::TempDir = tempfile::tempdir().expect("dir1");
-    let store1: FileCredentialStore = FileCredentialStore::with_dir(&dir1.path().to_string_lossy());
+    let store1: FileCredentialStore = FileCredentialStore::with_dir(dir1.path());
     let dir2: tempfile::TempDir = tempfile::tempdir().expect("dir2");
-    let store2: FileCredentialStore = FileCredentialStore::with_dir(&dir2.path().to_string_lossy());
+    let store2: FileCredentialStore = FileCredentialStore::with_dir(dir2.path());
 
     store1.save(&credential()).expect("save1");
     store2
@@ -305,6 +305,21 @@ fn a_store_under_a_base_directory_keeps_its_credentials_there() {
 
 #[cfg(unix)]
 #[test]
+fn a_base_directory_whose_name_is_not_utf8_keeps_the_credentials_inside_it() {
+    use std::os::unix::ffi::OsStrExt;
+
+    let root: tempfile::TempDir = tempfile::tempdir().expect("tempdir");
+    let base: std::path::PathBuf = root.path().join(std::ffi::OsStr::from_bytes(b"dados-\xff"));
+    std::fs::create_dir(&base).expect("create a non-UTF-8 directory");
+    let store: FileCredentialStore = FileCredentialStore::under(&base);
+
+    store.save(&credential()).expect("save");
+
+    assert!(base.join("sam_bridge").join("session.enc").is_file());
+}
+
+#[cfg(unix)]
+#[test]
 fn files_have_restricted_permissions() {
     use std::os::unix::fs::PermissionsExt;
 
@@ -350,7 +365,7 @@ fn the_missing_data_dir_error_explains_itself() {
 
 fn temp_store() -> std::io::Result<(FileCredentialStore, tempfile::TempDir)> {
     let dir: tempfile::TempDir = tempfile::tempdir()?;
-    let store: FileCredentialStore = FileCredentialStore::with_dir(&dir.path().to_string_lossy());
+    let store: FileCredentialStore = FileCredentialStore::with_dir(dir.path());
 
     Ok((store, dir))
 }

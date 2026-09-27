@@ -38,12 +38,12 @@ impl FileCredentialStore {
         let _ = std::fs::create_dir_all(&data_dir);
         restrict_permissions(&data_dir, 0o700);
 
-        Self::with_dir(&data_dir.to_string_lossy())
+        Self::with_dir(&data_dir)
     }
 
     #[must_use]
-    pub fn with_dir(dir: &str) -> Self {
-        let dir: PathBuf = Path::new(dir).to_path_buf();
+    pub fn with_dir(dir: &Path) -> Self {
+        let dir: PathBuf = dir.to_path_buf();
 
         Self {
             credential_path: dir.join("session.enc"),
