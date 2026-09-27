@@ -9,7 +9,7 @@ pub enum MethodMilestone {
     Module(u32),
     ExerciseRange { from: u32, to: u32 },
     Complete,
-    Described(&'static str),
+    Unmeasured,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -26,7 +26,6 @@ pub struct MethodAlternative {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TheoryRequirement {
     pub msa_phase: u32,
-    pub note: Option<&'static str>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,9 +33,6 @@ pub struct TestRequirement {
     pub level: MusicianLevel,
     pub method_alternatives: Vec<MethodAlternative>,
     pub theory: TheoryRequirement,
-    pub metric_reading: &'static str,
-    pub hymnal: &'static str,
-    pub observation: Option<&'static str>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -95,7 +91,6 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", page(40))]),
                     ],
-                    Some("Hinos 431 a 480 soprano no natural"),
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -110,17 +105,13 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", page(55))]),
                     ],
-                    Some("Hinário completo soprano 8ª acima"),
                 ),
                 test(
                     MusicianLevel::Officialized,
                     vec![
                         alt(vec![
                             comp("N. Laourex Vol. 1", complete()),
-                            comp(
-                                "N. Laourex Vol. 3",
-                                described("até pág. 24 e da pág. 44 a 53"),
-                            ),
+                            comp("N. Laourex Vol. 3", unmeasured()),
                         ]),
                         alt(vec![
                             comp("Método CCB", complete()),
@@ -128,7 +119,6 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", complete())]),
                     ],
-                    Some("Hinário completo soprano 8ª acima e contralto natural"),
                 ),
             ],
         }
@@ -148,7 +138,6 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", page(40))]),
                     ],
-                    Some("Hinos 431 a 480 tenor no natural"),
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -159,7 +148,6 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", page(55))]),
                     ],
-                    Some("Hinário completo tenor no natural"),
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -170,7 +158,6 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", complete())]),
                     ],
-                    Some("1ª a 3ª posições, hinário completo, tenor no natural"),
                 ),
             ],
         }
@@ -190,7 +177,6 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", page(40))]),
                     ],
-                    Some("Hinos 431 a 480 baixo no natural"),
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -201,7 +187,6 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", page(52))]),
                     ],
-                    Some("Hinário completo baixo no natural"),
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -212,7 +197,6 @@ impl InstrumentRequirements {
                         ]),
                         alt(vec![comp("Método Facilitado (Ed. Britten)", complete())]),
                     ],
-                    Some("Hinário completo baixo no natural"),
                 ),
             ],
         }
@@ -230,7 +214,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Galli", page(41))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(13))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -239,7 +222,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Galli", complete())]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(25))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -248,7 +230,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Galli", complete())]),
                         alt(vec![comp("Método Prático (Almeida Dias)", complete())]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -265,7 +246,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Vol. 1", complete())]),
                         alt(vec![comp("Giampieri (ou similar)", page(21))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -273,7 +253,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Vol. 2", page(16))]),
                         alt(vec![comp("Giampieri (ou similar)", page(30))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -281,7 +260,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Vol. 2", page(30))]),
                         alt(vec![comp("Giampieri (ou similar)", page(50))]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -298,7 +276,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Giampieri", page(18))]),
                         alt(vec![comp("Weissenborn (ou similar)", module(12))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -306,7 +283,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Giampieri", page(26))]),
                         alt(vec![comp("Weissenborn (ou similar)", module(18))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -314,7 +290,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Giampieri", page(43))]),
                         alt(vec![comp("Weissenborn (ou similar)", module(22))]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -330,12 +305,8 @@ impl InstrumentRequirements {
                     vec![
                         alt(vec![comp("Giampieri", page(28))]),
                         alt(vec![comp("Domingos Pecci", page(29))]),
-                        alt(vec![comp(
-                            "Galper Book 1",
-                            described("Lição 26 - até exercício 110"),
-                        )]),
+                        alt(vec![comp("Galper Book 1", unmeasured())]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -348,7 +319,6 @@ impl InstrumentRequirements {
                             comp("Galper Book 2", page(18)),
                         ]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -361,7 +331,6 @@ impl InstrumentRequirements {
                             comp("Galper Book 2", page(29)),
                         ]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -376,12 +345,8 @@ impl InstrumentRequirements {
                     MusicianLevel::YouthService,
                     vec![
                         alt(vec![comp("Giampieri", page(28))]),
-                        alt(vec![comp(
-                            "Galper Book 1",
-                            described("Lição 26 - até exercício 110"),
-                        )]),
+                        alt(vec![comp("Galper Book 1", unmeasured())]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -392,7 +357,6 @@ impl InstrumentRequirements {
                             comp("Galper Book 2", page(18)),
                         ]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -403,7 +367,6 @@ impl InstrumentRequirements {
                             comp("Galper Book 2", page(29)),
                         ]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -421,7 +384,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Amadeu Russo", page(25))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(13))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -430,7 +392,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Amadeu Russo", page(40))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(25))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -439,7 +400,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Amadeu Russo", page(55))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", complete())]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -456,7 +416,6 @@ impl InstrumentRequirements {
                         "Rubank Elementary Method for Cornet or Trumpet",
                         complete(),
                     )])],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -468,7 +427,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Amadeu Russo", page(30))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(25))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -480,7 +438,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Amadeu Russo", page(41))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", complete())]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -497,7 +454,6 @@ impl InstrumentRequirements {
                         comp("Rubank Elementary", complete()),
                         comp("Método Prático para Trompa", lesson(73)),
                     ])],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -506,7 +462,6 @@ impl InstrumentRequirements {
                         comp("Rubank Intermediate", complete()),
                         comp("Método Prático para Trompa", lesson(105)),
                     ])],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -515,7 +470,6 @@ impl InstrumentRequirements {
                         comp("Rubank Intermediate", complete()),
                         comp("Método Prático para Trompa", complete()),
                     ])],
-                    None,
                 ),
             ],
         }
@@ -532,7 +486,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Elementary for Trombone", page(24))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(13))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -540,7 +493,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Elementary for Trombone", page(37))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(25))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -548,7 +500,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Elementary for Trombone", page(48))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", complete())]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -565,7 +516,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Elementary for Tuba", page(24))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(13))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::OfficialService,
@@ -573,7 +523,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Elementary for Tuba", page(37))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", phase(25))]),
                     ],
-                    None,
                 ),
                 test(
                     MusicianLevel::Officialized,
@@ -581,7 +530,6 @@ impl InstrumentRequirements {
                         alt(vec![comp("Rubank Elementary for Tuba", page(48))]),
                         alt(vec![comp("Método Prático (Almeida Dias)", complete())]),
                     ],
-                    None,
                 ),
             ],
         }
@@ -590,46 +538,20 @@ impl InstrumentRequirements {
 
 const fn theory_for(level: &MusicianLevel) -> TheoryRequirement {
     match level {
-        MusicianLevel::Officialized => TheoryRequirement {
-            msa_phase: 16,
-            note: Some("Com repasse na leitura métrica a partir da lição 56"),
-        },
-        MusicianLevel::OfficialService => TheoryRequirement {
-            msa_phase: 16,
-            note: None,
-        },
-        _ => TheoryRequirement {
-            msa_phase: 12,
-            note: None,
-        },
-    }
-}
-
-const fn metric_reading_for(level: &MusicianLevel) -> &'static str {
-    match level {
-        MusicianLevel::YouthService => "Hinos 431 a 480",
-        _ => "Todos os Hinos",
-    }
-}
-
-const fn hymnal_for(level: &MusicianLevel) -> &'static str {
-    match level {
-        MusicianLevel::YouthService => "431 a 480 - Voz principal + Voz alternativa",
-        _ => "Completo - Voz principal + Voz alternativa",
+        MusicianLevel::Officialized | MusicianLevel::OfficialService => {
+            TheoryRequirement { msa_phase: 16 }
+        }
+        _ => TheoryRequirement { msa_phase: 12 },
     }
 }
 
 const fn test(
     level: MusicianLevel,
     method_alternatives: Vec<MethodAlternative>,
-    observation: Option<&'static str>,
 ) -> TestRequirement {
     TestRequirement {
         theory: theory_for(&level),
-        metric_reading: metric_reading_for(&level),
-        hymnal: hymnal_for(&level),
         method_alternatives,
-        observation,
         level,
     }
 }
@@ -673,6 +595,6 @@ const fn complete() -> MethodMilestone {
     MethodMilestone::Complete
 }
 
-const fn described(text: &'static str) -> MethodMilestone {
-    MethodMilestone::Described(text)
+const fn unmeasured() -> MethodMilestone {
+    MethodMilestone::Unmeasured
 }

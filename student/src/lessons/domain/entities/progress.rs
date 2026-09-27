@@ -70,7 +70,7 @@ fn milestone_percent(milestone: &MethodMilestone, recorded: &RecordedProgress) -
         MethodMilestone::Module(_)
         | MethodMilestone::ExerciseRange { .. }
         | MethodMilestone::Complete
-        | MethodMilestone::Described(_) => None,
+        | MethodMilestone::Unmeasured => None,
     }
 }
 
@@ -85,7 +85,7 @@ fn milestone_met(milestone: &MethodMilestone, recorded: &RecordedProgress) -> Op
         MethodMilestone::Module(_)
         | MethodMilestone::ExerciseRange { .. }
         | MethodMilestone::Complete
-        | MethodMilestone::Described(_) => None,
+        | MethodMilestone::Unmeasured => None,
     }
 }
 
