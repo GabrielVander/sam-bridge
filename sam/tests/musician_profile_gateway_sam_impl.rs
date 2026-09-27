@@ -198,10 +198,10 @@ fn every_known_musician_level_is_recognized() {
 }
 
 #[test]
-fn instrument_subtypes_and_aliases_count_as_the_instrument_they_belong_to() {
+fn instrument_voices_and_relatives_are_read_as_the_instrument_sam_lists() {
     for (raw, instrument) in [
-        ("  SAXOFONE TENOR ", Instrument::Saxophone),
-        ("FLUGELHORN", Instrument::Trumpet),
+        ("  SAXOFONE TENOR ", Instrument::TenorSaxophone),
+        ("FLUGELHORN", Instrument::Flugelhorn),
         ("BANDOLIM", Instrument::Unknown("BANDOLIM".to_owned())),
     ] {
         let result: Result<MusicianProfile, MusicianProfileGatewayError> =

@@ -62,8 +62,13 @@ impl InstrumentRequirements {
             Instrument::Bassoon => Some(Self::bassoon()),
             Instrument::Clarinet => Some(Self::clarinet()),
             Instrument::BassClarinet => Some(Self::bass_clarinet()),
-            Instrument::Saxophone => Some(Self::saxophone()),
-            Instrument::Trumpet => Some(Self::trumpet()),
+            Instrument::AltoSaxophone
+            | Instrument::CurvedSopranoSaxophone
+            | Instrument::StraightSopranoSaxophone
+            | Instrument::TenorSaxophone => Some(Self::saxophone(instrument.clone())),
+            Instrument::Trumpet | Instrument::Cornet | Instrument::Flugelhorn => {
+                Some(Self::trumpet(instrument.clone()))
+            }
             Instrument::FrenchHorn => Some(Self::french_horn()),
             Instrument::Trombone => Some(Self::trombone_or_euphonium(Instrument::Trombone)),
             Instrument::Euphonium => Some(Self::trombone_or_euphonium(Instrument::Euphonium)),
@@ -405,9 +410,9 @@ impl InstrumentRequirements {
     }
 
     #[must_use]
-    pub fn saxophone() -> Self {
+    pub fn saxophone(instrument: Instrument) -> Self {
         Self {
-            instrument: Instrument::Saxophone,
+            instrument,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -441,9 +446,9 @@ impl InstrumentRequirements {
     }
 
     #[must_use]
-    pub fn trumpet() -> Self {
+    pub fn trumpet(instrument: Instrument) -> Self {
         Self {
-            instrument: Instrument::Trumpet,
+            instrument,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,

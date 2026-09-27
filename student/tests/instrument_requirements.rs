@@ -228,7 +228,7 @@ fn bass_clarinet_matches_known_thresholds() {
 #[test]
 fn saxophone_matches_known_thresholds() {
     let requirements: InstrumentRequirements =
-        InstrumentRequirements::for_instrument(&Instrument::Saxophone)
+        InstrumentRequirements::for_instrument(&Instrument::AltoSaxophone)
             .expect("saxophone requirements are published");
 
     let youth: &TestRequirement = requirements
@@ -329,6 +329,36 @@ fn trombone_and_euphonium_share_the_same_requirement_shape() {
     assert_eq!(trombone.tests, euphonium.tests);
     assert_eq!(trombone.instrument, Instrument::Trombone);
     assert_eq!(euphonium.instrument, Instrument::Euphonium);
+}
+
+#[test]
+fn every_saxophone_voice_is_held_to_the_saxophone_sheet() {
+    for voice in [
+        Instrument::CurvedSopranoSaxophone,
+        Instrument::StraightSopranoSaxophone,
+        Instrument::TenorSaxophone,
+    ] {
+        assert_eq!(
+            tests_for(&voice),
+            tests_for(&Instrument::AltoSaxophone),
+            "{voice:?}"
+        );
+    }
+}
+
+#[test]
+fn cornet_and_flugelhorn_are_held_to_the_trumpet_sheet() {
+    for relative in [Instrument::Cornet, Instrument::Flugelhorn] {
+        assert_eq!(
+            tests_for(&relative),
+            tests_for(&Instrument::Trumpet),
+            "{relative:?}"
+        );
+    }
+}
+
+fn tests_for(instrument: &Instrument) -> Option<Vec<TestRequirement>> {
+    InstrumentRequirements::for_instrument(instrument).map(|requirements| requirements.tests)
 }
 
 #[test]

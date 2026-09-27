@@ -54,7 +54,7 @@ fn listed_positions(positions: Vec<StudentPosition>) -> Option<Vec<StudentPositi
 fn available_students_are_summarized_with_the_instrument_name_of_musicians() {
     let result = summaries_of(vec![StudentPosition::Musician {
         level: MusicianLevel::YouthService,
-        instrument: Some(Instrument::Saxophone),
+        instrument: Some(Instrument::TenorSaxophone),
         instrument_name: Some("SAXOFONE TENOR".to_owned()),
     }]);
 

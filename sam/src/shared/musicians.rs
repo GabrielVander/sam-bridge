@@ -24,10 +24,13 @@ pub fn parse_instrument(instrument: &str) -> Option<Instrument> {
         "CLARINETE" => Some(Instrument::Clarinet),
         "CLARINETE ALTO" => Some(Instrument::AltoClarinet),
         "CLARINETE BAIXO" => Some(Instrument::BassClarinet),
-        "SAXOFONE ALTO" | "SAXOFONE SOPRANO CUR" | "SAXOFONE SOPRANO RET" | "SAXOFONE TENOR" => {
-            Some(Instrument::Saxophone)
-        }
-        "TROMPETE" | "CORNET" | "FLUGELHORN" => Some(Instrument::Trumpet),
+        "SAXOFONE ALTO" => Some(Instrument::AltoSaxophone),
+        "SAXOFONE SOPRANO CUR" => Some(Instrument::CurvedSopranoSaxophone),
+        "SAXOFONE SOPRANO RET" => Some(Instrument::StraightSopranoSaxophone),
+        "SAXOFONE TENOR" => Some(Instrument::TenorSaxophone),
+        "TROMPETE" => Some(Instrument::Trumpet),
+        "CORNET" => Some(Instrument::Cornet),
+        "FLUGELHORN" => Some(Instrument::Flugelhorn),
         "TROMPA" => Some(Instrument::FrenchHorn),
         "TROMBONE" => Some(Instrument::Trombone),
         "EUPHONIUM" => Some(Instrument::Euphonium),

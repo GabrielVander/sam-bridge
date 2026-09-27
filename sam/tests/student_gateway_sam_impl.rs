@@ -280,7 +280,7 @@ fn a_musician_keeps_the_exact_site_instrument_text_as_its_name() {
             .position,
         musician(
             MusicianLevel::YouthService,
-            Some((Instrument::Saxophone, "SAXOFONE TENOR"))
+            Some((Instrument::TenorSaxophone, "SAXOFONE TENOR"))
         )
     );
 }
@@ -323,6 +323,13 @@ fn every_instrument_sam_lists_is_recognized() {
         ("CLARINETE", Instrument::Clarinet),
         ("CLARINETE ALTO", Instrument::AltoClarinet),
         ("CLARINETE BAIXO", Instrument::BassClarinet),
+        ("SAXOFONE ALTO", Instrument::AltoSaxophone),
+        ("SAXOFONE SOPRANO CUR", Instrument::CurvedSopranoSaxophone),
+        ("SAXOFONE SOPRANO RET", Instrument::StraightSopranoSaxophone),
+        ("SAXOFONE TENOR", Instrument::TenorSaxophone),
+        ("TROMPETE", Instrument::Trumpet),
+        ("CORNET", Instrument::Cornet),
+        ("FLUGELHORN", Instrument::Flugelhorn),
         ("TROMPA", Instrument::FrenchHorn),
         ("TROMBONE", Instrument::Trombone),
         ("EUPHONIUM", Instrument::Euphonium),
@@ -334,37 +341,6 @@ fn every_instrument_sam_lists_is_recognized() {
             student_listed_as("MÚSICO", "RJM", raw).unwrap().position,
             musician(MusicianLevel::YouthService, Some((instrument, raw))),
             "instrument {raw:?}"
-        );
-    }
-}
-
-#[test]
-fn saxophone_subtypes_all_count_as_saxophone() {
-    for raw in [
-        "SAXOFONE ALTO",
-        "SAXOFONE SOPRANO CUR",
-        "SAXOFONE SOPRANO RET",
-        "SAXOFONE TENOR",
-    ] {
-        assert_eq!(
-            student_listed_as("MÚSICO", "RJM", raw).unwrap().position,
-            musician(
-                MusicianLevel::YouthService,
-                Some((Instrument::Saxophone, raw))
-            )
-        );
-    }
-}
-
-#[test]
-fn trumpet_aliases_count_as_trumpet() {
-    for raw in ["TROMPETE", "CORNET", "FLUGELHORN"] {
-        assert_eq!(
-            student_listed_as("MÚSICO", "RJM", raw).unwrap().position,
-            musician(
-                MusicianLevel::YouthService,
-                Some((Instrument::Trumpet, raw))
-            )
         );
     }
 }
