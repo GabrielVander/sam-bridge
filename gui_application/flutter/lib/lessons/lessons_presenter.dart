@@ -70,19 +70,16 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
 
   Future<void> load(String studentId) async {
     emit(const LessonsLoading());
+    final progressFuture = _assessProgress(studentId);
     try {
-      final lessonsFuture = retrieveStudentLessons(studentId: studentId);
-      final progressFuture = assessStudentProgress(studentId: studentId);
-
-      final lessonsOutcome = await lessonsFuture;
-      final progressOutcome = await progressFuture;
+      final lessonsOutcome = await retrieveStudentLessons(studentId: studentId);
 
       switch (lessonsOutcome) {
         case RetrieveStudentLessonsOutcomeDto_Success(:final lessons):
           emit(
             LessonsLoaded(
               LessonsMapper.toViewModel(lessons),
-              _toProgressStatus(progressOutcome),
+              await progressFuture,
             ),
           );
         case RetrieveStudentLessonsOutcomeDto_Failure(:final report):
@@ -90,6 +87,16 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
       }
     } catch (e) {
       emit(LessonsFailure(ErrorReportMapper.fromThrown(e)));
+    }
+  }
+
+  Future<ProgressStatus> _assessProgress(String studentId) async {
+    try {
+      return _toProgressStatus(
+        await assessStudentProgress(studentId: studentId),
+      );
+    } catch (e) {
+      return ProgressUnavailable(ErrorReportMapper.fromThrown(e));
     }
   }
 

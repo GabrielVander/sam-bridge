@@ -99,6 +99,23 @@ void main() {
       },
     );
 
+    test(
+      'load() fails with the lessons error when both use cases throw',
+      () async {
+        final cubit = _buildCubit(
+          retrieveStudentLessons: ({required studentId}) async =>
+              throw StateError('lessons down'),
+          assessStudentProgress: ({required studentId}) async =>
+              throw StateError('progress down'),
+        );
+
+        await cubit.load('500132');
+
+        final state = cubit.stateValue as LessonsFailure;
+        expect(state.report.details, contains('lessons down'));
+      },
+    );
+
     test('load() passes the student id through to both use cases', () async {
       String? receivedLessonsId;
       String? receivedProgressId;
@@ -178,6 +195,23 @@ void main() {
             details: 'Session expired',
           ),
         );
+      },
+    );
+
+    test(
+      'a thrown progress assessment maps to ProgressUnavailable, without failing the whole screen',
+      () async {
+        final cubit = _buildCubit(
+          assessStudentProgress: ({required studentId}) async =>
+              throw StateError('bridge down'),
+        );
+
+        await cubit.load('500132');
+
+        final loaded = cubit.stateValue as LessonsLoaded;
+        final report = (loaded.progress as ProgressUnavailable).report;
+        expect(report.reason, ErrorReason.generic);
+        expect(report.details, contains('bridge down'));
       },
     );
 
