@@ -1,5 +1,3 @@
-import 'package:equatable/equatable.dart';
-
 enum Level {
   candidate,
   practice,
@@ -9,7 +7,7 @@ enum Level {
   halfHour,
 }
 
-sealed class ReportedLevel extends Equatable {
+sealed class ReportedLevel {
   const ReportedLevel();
 }
 
@@ -17,16 +15,10 @@ final class KnownLevel extends ReportedLevel {
   final Level level;
 
   const KnownLevel(this.level);
-
-  @override
-  List<Object?> get props => [level];
 }
 
 final class UnrecognizedLevel extends ReportedLevel {
   final String raw;
 
   const UnrecognizedLevel(this.raw);
-
-  @override
-  List<Object?> get props => [raw];
 }

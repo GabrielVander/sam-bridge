@@ -1,8 +1,7 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter_application/roster/instrument.dart';
 import 'package:flutter_application/roster/student_position.dart';
 
-class StudentListItem extends Equatable {
+class StudentListItem {
   final String id;
   final String name;
   final String location;
@@ -16,7 +15,4 @@ class StudentListItem extends Equatable {
     required this.position,
     this.instrument,
   });
-
-  @override
-  List<Object?> get props => [id, name, location, position, instrument];
 }

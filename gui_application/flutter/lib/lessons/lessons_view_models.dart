@@ -1,11 +1,10 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter_application/shared/level.dart';
 
 enum LessonKind { msa, method }
 
 enum Clef { g, c, f }
 
-class LessonItem extends Equatable {
+class LessonItem {
   final LessonKind kind;
   final String id;
   final DateTime? date;
@@ -29,36 +28,16 @@ class LessonItem extends Equatable {
     required this.instructor,
     required this.method,
   });
-
-  @override
-  List<Object?> get props => [
-    kind,
-    id,
-    date,
-    phase,
-    page,
-    lesson,
-    clef,
-    description,
-    instructor,
-    method,
-  ];
 }
 
-class StudentLessonsView extends Equatable {
+class StudentLessonsView {
   final List<LessonItem> msa;
   final List<LessonItem> method;
 
   const StudentLessonsView({required this.msa, required this.method});
-
-  factory StudentLessonsView.empty() =>
-      const StudentLessonsView(msa: [], method: []);
-
-  @override
-  List<Object?> get props => [msa, method];
 }
 
-class CheckpointView extends Equatable {
+class CheckpointView {
   final ReportedLevel level;
   final bool achieved;
   final bool readyToAdvance;
@@ -72,18 +51,9 @@ class CheckpointView extends Equatable {
     required this.msaMet,
     required this.methodMet,
   });
-
-  @override
-  List<Object?> get props => [
-    level,
-    achieved,
-    readyToAdvance,
-    msaMet,
-    methodMet,
-  ];
 }
 
-class ProgressView extends Equatable {
+class ProgressView {
   final List<CheckpointView> checkpoints;
   final double msaRelativePercent;
   final double methodRelativePercent;
@@ -99,14 +69,4 @@ class ProgressView extends Equatable {
     required this.overallCheckpointPercent,
     this.nextLevel,
   });
-
-  @override
-  List<Object?> get props => [
-    checkpoints,
-    msaRelativePercent,
-    methodRelativePercent,
-    combinedPercent,
-    overallCheckpointPercent,
-    nextLevel,
-  ];
 }

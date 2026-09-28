@@ -1,20 +1,13 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter_application/shared/level.dart';
 
-sealed class StudentPosition extends Equatable {
+sealed class StudentPosition {
   const StudentPosition();
-
-  @override
-  List<Object?> get props => [];
 }
 
 final class LeveledPosition extends StudentPosition {
   final List<Level> levels;
 
   const LeveledPosition(this.levels);
-
-  @override
-  List<Object?> get props => [levels];
 }
 
 final class GemSecretaryPosition extends StudentPosition {
@@ -29,7 +22,4 @@ final class UnrecognizedPosition extends StudentPosition {
   final String raw;
 
   const UnrecognizedPosition(this.raw);
-
-  @override
-  List<Object?> get props => [raw];
 }
