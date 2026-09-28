@@ -7,7 +7,7 @@ use sam::http::SamOperations;
 use sam::roster::adapters::gateways::StudentGatewaySamImpl;
 use student::application::gateways::{FailureKind, StudentGateway, StudentGatewayError};
 use student::domain::entities::{
-    Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentPosition,
+    Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentId, StudentPosition,
 };
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -164,6 +164,87 @@ fn given_a_listing_that_is_not_json_the_details_explain_what_could_not_be_decode
             "the underlying parse error should be kept, got: {details}"
         );
     });
+}
+
+#[test]
+fn a_listing_that_is_not_the_expected_json_fails_to_decode() {
+    for body in [
+        "",
+        "{}",
+        r#"{"something": "else"}"#,
+        r#"{"data": [["1", 2, "3", "4", "5", "6"]]}"#,
+    ] {
+        let (kind, details) = listing_served(body)
+            .and_then(failure_of)
+            .expect("students retrieval should have failed");
+
+        assert_eq!(kind, FailureKind::Unexpected, "body {body:?}");
+        assert!(
+            details.contains("Unable to decode student listing JSON response"),
+            "body {body:?} got: {details}"
+        );
+    }
+}
+
+#[test]
+fn an_empty_listing_has_no_students() {
+    assert_eq!(
+        listing_served(r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#),
+        Some(Ok(Vec::new()))
+    );
+}
+
+#[test]
+fn unknown_fields_and_extra_columns_are_ignored() {
+    assert_eq!(
+        listing_served(
+            r#"{"other":"field","data":[["1","N","L","R","I","LV","EXTRA-1","EXTRA-2"]]}"#
+        ),
+        Some(Ok(vec![Student {
+            id: StudentId::new("1".to_owned()),
+            name: "N".to_owned(),
+            position: StudentPosition::Unknown("R".to_owned()),
+            location: "L".to_owned(),
+        }]))
+    );
+}
+
+#[test]
+fn missing_trailing_columns_are_read_as_empty() {
+    assert_eq!(
+        listing_served(r#"{"data":[["1","NAME"]]}"#),
+        Some(Ok(vec![Student {
+            id: StudentId::new("1".to_owned()),
+            name: "NAME".to_owned(),
+            position: StudentPosition::Unknown(String::new()),
+            location: String::new(),
+        }]))
+    );
+}
+
+fn listing_served(body: &str) -> Option<Result<Vec<Student>, StudentGatewayError>> {
+    smol::block_on(async {
+        let mock_server: MockServer = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/painel"))
+            .respond_with(ResponseTemplate::new(200))
+            .mount(&mock_server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/alunos/listagem"))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .set_body_string(body)
+                    .insert_header("Content-Type", "application/json"),
+            )
+            .mount(&mock_server)
+            .await;
+
+        build_gateway(&mock_server)
+            .ok()
+            .map(|gateway| gateway.get_available_records())
+    })
 }
 
 #[test]
