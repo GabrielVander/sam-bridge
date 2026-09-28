@@ -68,7 +68,71 @@ void main() {
     });
   });
 
+  group('StudentScreen checkpoints', () {
+    testWidgets('shows every level, marking the one ready for the exam', (
+      tester,
+    ) async {
+      await pumpStudent(
+        tester,
+        progress: progressAssessed(
+          progressAssessment(
+            checkpoints: [
+              checkpointStatus(Levels.youthService, achieved: true),
+              checkpointStatus(Levels.officialService, readyToAdvance: true),
+              checkpointStatus(Levels.unknown('EXÓTICO')),
+            ],
+            nextLevel: Levels.officialService,
+          ),
+        ),
+      );
+
+      expect(find.text('Reunião de Jovens e Menores'), findsOneWidget);
+      expect(
+        find.byTooltip('Culto Oficial - pronto para a prova'),
+        findsOneWidget,
+      );
+      expect(find.text('EXÓTICO'), findsOneWidget);
+    });
+  });
+
   group('StudentScreen lessons', () {
+    testWidgets('shows the date, a phase range and a single page', (
+      tester,
+    ) async {
+      await pumpStudent(
+        tester,
+        lessons: [
+          lessonsRetrieved(
+            studentLessons(
+              msa: [
+                lesson(
+                  id: '1',
+                  date: (2025, 9, 9),
+                  phase: ('3.4', '4.1'),
+                  page: ('38', '38'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+
+      expect(find.text('09/09/2025'), findsOneWidget);
+      expect(find.text('Fase 3.4 - 4.1'), findsOneWidget);
+      expect(find.text('Pág. 38'), findsOneWidget);
+    });
+
+    testWidgets('explains a failure of an unknown kind generically', (
+      tester,
+    ) async {
+      await pumpStudent(
+        tester,
+        lessons: [lessonsFailed(unknownFailure('boom'))],
+      );
+
+      expect(find.text('Algo deu errado. Tente novamente.'), findsOneWidget);
+    });
+
     testWidgets('loads the lessons again when retrying after a failure', (
       tester,
     ) async {
