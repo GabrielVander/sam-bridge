@@ -21,28 +21,12 @@ fn configured_sam_site() -> Option<SamSiteConfig> {
     })
 }
 
-fn require_sam_site() -> SamSiteConfig {
-    let Some(site): Option<SamSiteConfig> = configured_sam_site() else {
-        eprintln!(
-            "skipping: set SAM_USERNAME and SAM_PASSWORD (optionally SAM_BASE_URL) to run against the real SAM site"
-        );
-        return SamSiteConfig {
-            base_url: String::new(),
-            username: String::new(),
-            password: String::new(),
-        };
-    };
-
-    site
-}
+const SAM_SITE_REQUIRED: &str =
+    "set SAM_USERNAME and SAM_PASSWORD (optionally SAM_BASE_URL) to explore the real SAM site";
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn invalid_url() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
-
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .build()
@@ -64,11 +48,9 @@ fn invalid_url() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn login_page_returns_ui_html() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -90,11 +72,9 @@ fn login_page_returns_ui_html() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn login_with_invalid_credentials_returns_error_in_html() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -119,11 +99,9 @@ fn login_with_invalid_credentials_returns_error_in_html() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn login_with_valid_credentials_returns_session_id_cookie() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -159,11 +137,9 @@ fn login_with_valid_credentials_returns_session_id_cookie() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn dashboard_is_unacessable_if_not_logged_in() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -187,11 +163,9 @@ fn dashboard_is_unacessable_if_not_logged_in() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn dashboard_is_acessable_if_previously_logged_in() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -232,11 +206,9 @@ fn dashboard_is_acessable_if_previously_logged_in() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn students_listing_is_unacessable_if_not_logged_in() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -262,11 +234,9 @@ fn students_listing_is_unacessable_if_not_logged_in() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn students_listing_fails_even_if_previously_logged_in() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -305,11 +275,9 @@ fn students_listing_fails_even_if_previously_logged_in() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn students_listing_succeeds_if_previously_logged_in_and_has_visited_dashboard() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -359,11 +327,9 @@ fn students_listing_succeeds_if_previously_logged_in_and_has_visited_dashboard()
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn student_lessons_fail_if_not_logged_in() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -391,11 +357,9 @@ fn student_lessons_fail_if_not_logged_in() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn student_lessons_returns_nothing_if_logged_in_but_invalid_student_id() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -438,11 +402,9 @@ fn student_lessons_returns_nothing_if_logged_in_but_invalid_student_id() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn student_lessons_succeeds_if_logged_in_and_valid_student_id() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -485,11 +447,9 @@ fn student_lessons_succeeds_if_logged_in_and_valid_student_id() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn student_lessons_contains_msa_lessons() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -528,11 +488,9 @@ fn student_lessons_contains_msa_lessons() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn student_lessons_contains_instrument_lessons() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -571,11 +529,9 @@ fn student_lessons_contains_instrument_lessons() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn discovers_role_level_and_instrument_vocabulary_from_the_real_students_listing() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -662,11 +618,9 @@ fn discovers_role_level_and_instrument_vocabulary_from_the_real_students_listing
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn discovers_method_names_actually_used_per_instrument() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -770,11 +724,9 @@ fn discovers_method_names_actually_used_per_instrument() {
 }
 
 #[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn discovers_whether_the_lesson_page_reveals_the_students_level() {
-    let site: SamSiteConfig = require_sam_site();
-    if site.base_url.is_empty() {
-        return;
-    }
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
 
     let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
