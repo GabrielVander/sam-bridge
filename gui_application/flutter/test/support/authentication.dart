@@ -6,6 +6,9 @@ import 'pending.dart';
 
 LoginOutcomeDto loggedIn() => const LoginOutcomeDto.successful();
 
+LoginOutcomeDto loggedInWithoutRemembering(ErrorReportDto report) =>
+    LoginOutcomeDto.successfulWithoutRemembering(report: report);
+
 LoginOutcomeDto loginRejected() =>
     const LoginOutcomeDto.invalidEmailOrPassword();
 

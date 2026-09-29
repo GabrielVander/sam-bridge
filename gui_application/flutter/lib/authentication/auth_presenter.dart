@@ -24,7 +24,12 @@ final class AuthLoading extends AuthState {
 }
 
 final class AuthSuccess extends AuthState {
-  const AuthSuccess();
+  final ErrorReport? notRemembered;
+
+  const AuthSuccess({this.notRemembered});
+
+  @override
+  List<Object?> get props => [notRemembered];
 }
 
 final class AuthMissingFields extends AuthState {
@@ -89,8 +94,11 @@ class AuthPresenter extends CubitSignal<AuthState> {
 
       switch (outcome) {
         case LoginOutcomeDto_Successful():
-        case LoginOutcomeDto_SuccessfulWithoutRemembering():
           emit(const AuthSuccess());
+        case LoginOutcomeDto_SuccessfulWithoutRemembering(:final report):
+          emit(
+            AuthSuccess(notRemembered: ErrorReportMapper.toViewModel(report)),
+          );
         case LoginOutcomeDto_InvalidEmailOrPassword():
           emit(const AuthUnauthorized());
         case LoginOutcomeDto_Failure(:final report):

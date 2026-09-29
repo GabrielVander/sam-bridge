@@ -94,6 +94,31 @@ void main() {
     });
 
     test(
+      'submitLogin() succeeds but says why a login could not be remembered',
+      () async {
+        final presenter = buildPresenter(
+          loginUseCase: ({required email, required password}) async =>
+              loggedInWithoutRemembering(
+                localStorageFailure('Permission denied'),
+              ),
+        );
+
+        await presenter.submitLogin('user@example.com', 'secret');
+
+        expect(
+          presenter.stateValue,
+          const AuthSuccess(
+            notRemembered: ErrorReport(
+              reason: ErrorReason.localStorage,
+              details: 'Permission denied',
+            ),
+          ),
+        );
+        expect(presenter.isAuthenticated, isTrue);
+      },
+    );
+
+    test(
       'submitLogin() transitions to Unauthorized on invalid credentials',
       () async {
         final presenter = buildPresenter(
