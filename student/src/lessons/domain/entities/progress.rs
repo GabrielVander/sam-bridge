@@ -53,7 +53,7 @@ pub fn assess(
     assigned_level: &MusicianLevel,
     instrument: Instrument,
     msa_lessons: &[Lesson],
-    method: &[Lesson],
+    method_lessons: &[Lesson],
 ) -> Result<ProgressAssessment, AssessError> {
     if let MusicianLevel::Unknown(raw) = assigned_level {
         return Err(AssessError::UnknownLevel(raw.clone()));
@@ -61,84 +61,49 @@ pub fn assess(
 
     let catalog: InstrumentRequirements = InstrumentRequirements::for_instrument(&instrument)
         .ok_or(AssessError::UnpublishedRequirements(instrument))?;
-
-    let theory_recorded: f64 = max_field(msa_lessons.iter().map(|l| &l.phase));
-    let method_recorded: RecordedProgress = recorded_progress(method);
+    let recorded: RecordedProgress = RecordedProgress::from_lessons(msa_lessons, method_lessons);
 
     let checkpoints: Vec<Checkpoint> = MusicianLevel::ASCENDING
         .iter()
-        .map(|level| {
-            build_checkpoint(
-                assigned_level,
-                level,
-                &catalog,
-                theory_recorded,
-                &method_recorded,
-            )
-        })
+        .map(|level| build_checkpoint(assigned_level, level, &catalog, &recorded))
         .collect();
-
-    let target: Option<(&MusicianLevel, &TestRequirement)> = MusicianLevel::ASCENDING
-        .iter()
-        .zip(checkpoints.iter())
-        .find_map(|(level, checkpoint)| {
-            if checkpoint.is_achieved() {
-                return None;
-            }
-            catalog
-                .requirement_for(level)
-                .map(|requirement| (level, requirement))
-        });
-
-    let (msa_relative, method_relative, combined, next_level) = match target {
-        Some((level, requirement)) => {
-            let msa_relative: f64 =
-                percentage(theory_recorded, f64::from(requirement.theory.msa_phase));
-            let (method_relative, _) = assess_method(requirement, &method_recorded);
-            let combined: f64 = msa_relative.midpoint(method_relative);
-
-            (msa_relative, method_relative, combined, Some(level.clone()))
-        }
-        None => (100.0, 100.0, 100.0, None),
-    };
-
-    let achieved_count: usize = checkpoints.iter().filter(|c| c.is_achieved()).count();
-    let all_achieved: bool = checkpoints.iter().all(Checkpoint::is_achieved);
-    let overall_checkpoint: f64 = if all_achieved {
-        100.0
-    } else {
-        (as_f64(achieved_count) + combined / 100.0) / as_f64(checkpoints.len()) * 100.0
-    };
+    let next_exam: ExamProgress = progress_towards_next_exam(&checkpoints, &catalog, &recorded);
+    let overall_checkpoint_percent: f64 =
+        overall_checkpoint_percent(&checkpoints, next_exam.combined_percent);
 
     Ok(ProgressAssessment {
         checkpoints,
-        msa_relative_percent: msa_relative,
-        method_relative_percent: method_relative,
-        combined_percent: combined,
-        overall_checkpoint_percent: overall_checkpoint,
-        next_level,
+        msa_relative_percent: next_exam.msa_percent,
+        method_relative_percent: next_exam.method_percent,
+        combined_percent: next_exam.combined_percent,
+        overall_checkpoint_percent,
+        next_level: next_exam.level,
     })
 }
 
 struct RecordedProgress {
-    page: f64,
-    lesson: f64,
-    phase: f64,
+    theory_phase: f64,
+    method_page: f64,
+    method_lesson: f64,
+    method_phase: f64,
 }
 
-fn recorded_progress(lessons: &[Lesson]) -> RecordedProgress {
-    RecordedProgress {
-        page: max_field(lessons.iter().map(|l| &l.page)),
-        lesson: max_field(lessons.iter().map(|l| &l.lesson)),
-        phase: max_field(lessons.iter().map(|l| &l.phase)),
+impl RecordedProgress {
+    fn from_lessons(msa_lessons: &[Lesson], method_lessons: &[Lesson]) -> Self {
+        Self {
+            theory_phase: highest(msa_lessons.iter().map(|lesson| &lesson.phase)),
+            method_page: highest(method_lessons.iter().map(|lesson| &lesson.page)),
+            method_lesson: highest(method_lessons.iter().map(|lesson| &lesson.lesson)),
+            method_phase: highest(method_lessons.iter().map(|lesson| &lesson.phase)),
+        }
     }
 }
 
-fn max_field<'a>(ranges: impl Iterator<Item = &'a Option<Range>>) -> f64 {
+fn highest<'a>(ranges: impl Iterator<Item = &'a Option<Range>>) -> f64 {
     ranges
-        .filter_map(|r| r.as_ref())
-        .flat_map(|r| [r.from.trim(), r.to.trim()])
-        .filter_map(|v| v.parse::<f64>().ok())
+        .flatten()
+        .flat_map(|range| [range.from.trim(), range.to.trim()])
+        .filter_map(|value| value.parse::<f64>().ok())
         .fold(0.0_f64, f64::max)
 }
 
@@ -146,8 +111,7 @@ fn build_checkpoint(
     assigned_level: &MusicianLevel,
     level: &MusicianLevel,
     catalog: &InstrumentRequirements,
-    theory_recorded: f64,
-    method_recorded: &RecordedProgress,
+    recorded: &RecordedProgress,
 ) -> Checkpoint {
     let achieved: bool = assigned_level.rank() >= level.rank();
 
@@ -162,8 +126,8 @@ fn build_checkpoint(
         };
     };
 
-    let msa_met: bool = theory_recorded >= f64::from(requirement.theory.msa_phase);
-    let (_, method_met) = assess_method(requirement, method_recorded);
+    let msa_met: bool = measure_theory(requirement, recorded).met;
+    let method_met: bool = measure_method(requirement, recorded).met;
 
     Checkpoint {
         level: level.clone(),
@@ -183,36 +147,56 @@ const fn checkpoint_status(achieved: bool, requirement_met: bool) -> CheckpointS
     }
 }
 
-fn assess_method(requirement: &TestRequirement, recorded: &RecordedProgress) -> (f64, bool) {
-    let assessments: Vec<(f64, bool)> = requirement
-        .method_alternatives
-        .iter()
-        .map(|alternative| assess_alternative(alternative, recorded))
-        .collect();
-
-    let percent: f64 = assessments.iter().map(|(p, _)| *p).fold(0.0, f64::max);
-    let met: bool = assessments.iter().any(|(_, met)| *met);
-
-    (percent, met)
+fn measure_theory(requirement: &TestRequirement, recorded: &RecordedProgress) -> Measurement {
+    Measurement::against(recorded.theory_phase, requirement.theory.msa_phase)
 }
 
-fn assess_alternative(alternative: &MethodAlternative, recorded: &RecordedProgress) -> (f64, bool) {
-    let measurements: Vec<Option<Measurement>> = alternative
+fn measure_method(requirement: &TestRequirement, recorded: &RecordedProgress) -> Measurement {
+    let alternatives: Vec<Measurement> = requirement
+        .method_alternatives
+        .iter()
+        .map(|alternative| measure_alternative(alternative, recorded))
+        .collect();
+
+    Measurement {
+        percent: alternatives
+            .iter()
+            .map(|alternative| alternative.percent)
+            .fold(0.0, f64::max),
+        met: alternatives.iter().any(|alternative| alternative.met),
+    }
+}
+
+fn measure_alternative(
+    alternative: &MethodAlternative,
+    recorded: &RecordedProgress,
+) -> Measurement {
+    let components: Vec<Option<Measurement>> = alternative
         .components
         .iter()
         .map(|component| component.milestone.measure(recorded))
         .collect();
 
-    let measured_percents: Vec<f64> = measurements.iter().flatten().map(|m| m.percent).collect();
-    let all_met: bool = measurements.iter().all(|m| m.is_some_and(|m| m.met));
+    let measured_percents: Vec<f64> = components
+        .iter()
+        .flatten()
+        .map(|component| component.percent)
+        .collect();
 
-    let percent: f64 = if measured_percents.is_empty() {
-        0.0
-    } else {
-        measured_percents.iter().sum::<f64>() / as_f64(measured_percents.len())
-    };
+    Measurement {
+        percent: average(&measured_percents),
+        met: components
+            .iter()
+            .all(|component| component.is_some_and(|component| component.met)),
+    }
+}
 
-    (percent, all_met)
+fn average(values: &[f64]) -> f64 {
+    if values.is_empty() {
+        return 0.0;
+    }
+
+    values.iter().sum::<f64>() / as_f64(values.len())
 }
 
 #[derive(Clone, Copy)]
@@ -224,18 +208,18 @@ struct Measurement {
 impl MethodMilestone {
     fn measure(&self, recorded: &RecordedProgress) -> Option<Measurement> {
         match *self {
-            Self::Page(target) => Some(Measurement::against(recorded.page, target)),
-            Self::Lesson(target) => Some(Measurement::against(recorded.lesson, target)),
+            Self::Page(target) => Some(Measurement::against(recorded.method_page, target)),
+            Self::Lesson(target) => Some(Measurement::against(recorded.method_lesson, target)),
             Self::PageAndLesson { page, lesson } => {
-                let page: Measurement = Measurement::against(recorded.page, page);
-                let lesson: Measurement = Measurement::against(recorded.lesson, lesson);
+                let page: Measurement = Measurement::against(recorded.method_page, page);
+                let lesson: Measurement = Measurement::against(recorded.method_lesson, lesson);
 
                 Some(Measurement {
                     percent: page.percent.midpoint(lesson.percent),
                     met: page.met && lesson.met,
                 })
             }
-            Self::Phase(target) => Some(Measurement::against(recorded.phase, target)),
+            Self::Phase(target) => Some(Measurement::against(recorded.method_phase, target)),
             Self::Module(_) | Self::ExerciseRange { .. } | Self::Complete | Self::Unmeasured => {
                 None
             }
@@ -252,6 +236,65 @@ impl Measurement {
             met: recorded >= target,
         }
     }
+}
+
+struct ExamProgress {
+    level: Option<MusicianLevel>,
+    msa_percent: f64,
+    method_percent: f64,
+    combined_percent: f64,
+}
+
+impl ExamProgress {
+    const fn journey_complete() -> Self {
+        Self {
+            level: None,
+            msa_percent: 100.0,
+            method_percent: 100.0,
+            combined_percent: 100.0,
+        }
+    }
+}
+
+fn progress_towards_next_exam(
+    checkpoints: &[Checkpoint],
+    catalog: &InstrumentRequirements,
+    recorded: &RecordedProgress,
+) -> ExamProgress {
+    checkpoints
+        .iter()
+        .filter(|checkpoint| !checkpoint.is_achieved())
+        .find_map(|checkpoint| {
+            catalog
+                .requirement_for(&checkpoint.level)
+                .map(|requirement| exam_progress(requirement, recorded))
+        })
+        .unwrap_or_else(ExamProgress::journey_complete)
+}
+
+fn exam_progress(requirement: &TestRequirement, recorded: &RecordedProgress) -> ExamProgress {
+    let msa_percent: f64 = measure_theory(requirement, recorded).percent;
+    let method_percent: f64 = measure_method(requirement, recorded).percent;
+
+    ExamProgress {
+        level: Some(requirement.level.clone()),
+        msa_percent,
+        method_percent,
+        combined_percent: msa_percent.midpoint(method_percent),
+    }
+}
+
+fn overall_checkpoint_percent(checkpoints: &[Checkpoint], next_exam_percent: f64) -> f64 {
+    if checkpoints.iter().all(Checkpoint::is_achieved) {
+        return 100.0;
+    }
+
+    let achieved: usize = checkpoints
+        .iter()
+        .filter(|checkpoint| checkpoint.is_achieved())
+        .count();
+
+    (as_f64(achieved) + next_exam_percent / 100.0) / as_f64(checkpoints.len()) * 100.0
 }
 
 fn percentage(current: f64, max: f64) -> f64 {

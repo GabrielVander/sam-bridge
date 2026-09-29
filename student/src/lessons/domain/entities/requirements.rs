@@ -44,7 +44,7 @@ pub struct InstrumentRequirements {
 impl InstrumentRequirements {
     #[must_use]
     pub fn requirement_for(&self, level: &MusicianLevel) -> Option<&TestRequirement> {
-        self.tests.iter().find(|t| &t.level == level)
+        self.tests.iter().find(|test| &test.level == level)
     }
 
     #[must_use]
