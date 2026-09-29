@@ -5,7 +5,7 @@ use gui_application::api::roster::{
 use pretty_assertions::assert_eq;
 use student::application::gateways::{FailureKind, StudentGatewayError};
 use student::domain::entities::{
-    Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentId, StudentPosition,
+    Instrument, MusicianLevel, OrganistLevel, Student, StudentId, StudentPosition,
 };
 
 #[path = "support/helpers.rs"]
@@ -143,9 +143,7 @@ fn only_musicians_have_an_instrument() {
         StudentPosition::Organist {
             level: OrganistLevel::Practice,
         },
-        StudentPosition::Secretary {
-            r#type: SecretaryType::Gem,
-        },
+        StudentPosition::GemSecretary,
         StudentPosition::Unknown("Avocado".to_owned()),
     ]);
 
@@ -213,9 +211,7 @@ fn every_organist_level_is_a_position() {
 
 #[test]
 fn a_gem_secretary_is_a_position() {
-    let positions = listed_positions(vec![StudentPosition::Secretary {
-        r#type: SecretaryType::Gem,
-    }]);
+    let positions = listed_positions(vec![StudentPosition::GemSecretary]);
 
     assert_eq!(positions, Some(vec![StudentPositionDto::GemSecretary]));
 }

@@ -1,6 +1,6 @@
 use student::application::gateways::StudentGatewayError;
 use student::domain::entities::{
-    Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentPosition,
+    Instrument, MusicianLevel, OrganistLevel, Student, StudentPosition,
 };
 
 use crate::api::error_report::ErrorReportDto;
@@ -79,7 +79,7 @@ impl From<Student> for StudentSummaryDto {
                 instrument.clone().map(InstrumentDto::from)
             }
             StudentPosition::Organist { .. }
-            | StudentPosition::Secretary { .. }
+            | StudentPosition::GemSecretary
             | StudentPosition::Unknown(_) => None,
         };
 
@@ -128,7 +128,7 @@ impl From<StudentPosition> for StudentPositionDto {
         match position {
             StudentPosition::Musician { level, .. } => level.into(),
             StudentPosition::Organist { level } => level.into(),
-            StudentPosition::Secretary { r#type } => r#type.into(),
+            StudentPosition::GemSecretary => Self::GemSecretary,
             StudentPosition::Unknown(raw) => Self::Invalid { raw },
         }
     }
@@ -156,14 +156,6 @@ impl From<OrganistLevel> for StudentPositionDto {
             OrganistLevel::OfficialService => Self::OfficialService,
             OrganistLevel::YouthServiceHalfHour => Self::YouthServiceHalfHour,
             OrganistLevel::Unknown(raw) => Self::Invalid { raw },
-        }
-    }
-}
-
-impl From<SecretaryType> for StudentPositionDto {
-    fn from(r#type: SecretaryType) -> Self {
-        match r#type {
-            SecretaryType::Gem => Self::GemSecretary,
         }
     }
 }

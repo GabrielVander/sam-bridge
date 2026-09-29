@@ -9,9 +9,7 @@ pub enum StudentPosition {
     Organist {
         level: OrganistLevel,
     },
-    Secretary {
-        r#type: SecretaryType,
-    },
+    GemSecretary,
     Unknown(String),
 }
 
@@ -23,9 +21,4 @@ pub enum OrganistLevel {
     OfficialService,
     YouthServiceHalfHour,
     Unknown(String),
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum SecretaryType {
-    Gem,
 }

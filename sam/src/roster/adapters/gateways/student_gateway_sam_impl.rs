@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use student::{
     application::gateways::{StudentGateway, StudentGatewayError},
-    domain::entities::{OrganistLevel, SecretaryType, Student, StudentId, StudentPosition},
+    domain::entities::{OrganistLevel, Student, StudentId, StudentPosition},
 };
 
 use crate::client::{SamClient, SamStudent};
@@ -76,9 +76,7 @@ fn parse_position(role: &str, level: &str, instrument: &str) -> StudentPosition 
         "ORGANISTA" => StudentPosition::Organist {
             level: parse_organist_level(level),
         },
-        "SECRETÁRIO DO GEM" => StudentPosition::Secretary {
-            r#type: SecretaryType::Gem,
-        },
+        "SECRETÁRIO DO GEM" => StudentPosition::GemSecretary,
         other => StudentPosition::Unknown(other.to_owned()),
     }
 }

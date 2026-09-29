@@ -5,9 +5,7 @@ use student::{
         gateways::{FailureKind, StudentGateway, StudentGatewayError},
         use_cases::RetrieveAllAvailableStudentsUseCase,
     },
-    domain::entities::{
-        Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentPosition,
-    },
+    domain::entities::{Instrument, MusicianLevel, OrganistLevel, Student, StudentPosition},
 };
 
 use pretty_assertions::assert_eq;
@@ -43,9 +41,7 @@ fn returns_every_available_student() {
         Student {
             id: StudentId::new("2".to_owned()),
             name: "Student B".to_string(),
-            position: StudentPosition::Secretary {
-                r#type: SecretaryType::Gem,
-            },
+            position: StudentPosition::GemSecretary,
             location: "Location B".to_string(),
         },
         Student {

@@ -7,7 +7,7 @@ use sam::http::SamOperations;
 use sam::roster::adapters::gateways::StudentGatewaySamImpl;
 use student::application::gateways::{FailureKind, StudentGateway, StudentGatewayError};
 use student::domain::entities::{
-    Instrument, MusicianLevel, OrganistLevel, SecretaryType, Student, StudentId, StudentPosition,
+    Instrument, MusicianLevel, OrganistLevel, Student, StudentId, StudentPosition,
 };
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -404,9 +404,7 @@ fn a_gem_secretary_is_recognized() {
         student_listed_as("SECRETÁRIO DO GEM", "RJM", "A DEFINIR")
             .unwrap()
             .position,
-        StudentPosition::Secretary {
-            r#type: SecretaryType::Gem,
-        }
+        StudentPosition::GemSecretary
     );
 }
 
@@ -434,9 +432,7 @@ fn positions_other_than_musician_ignore_the_instrument_column() {
         student_listed_as("SECRETÁRIO DO GEM", "RJM", "VIOLINO")
             .unwrap()
             .position,
-        StudentPosition::Secretary {
-            r#type: SecretaryType::Gem,
-        }
+        StudentPosition::GemSecretary
     );
     assert_eq!(
         student_listed_as("BATERISTA", "RJM", "VIOLINO")
