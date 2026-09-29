@@ -57,7 +57,7 @@ fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
                     }),
                     clef: Some(Clef::G),
                     description: Some("Passou lições 7 e 8, estudar próximas lições.".to_owned()),
-                    instructor: Some("MARCOS ROGÉRIO COSME".to_owned()),
+                    instructor: Some("BELTRANO DA SILVA".to_owned()),
                     method: None,
                 }],
                 method: vec![Lesson {
@@ -74,7 +74,7 @@ fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
                     }),
                     clef: None,
                     description: Some("Postura do violino".to_owned()),
-                    instructor: Some("MURILO FAGNER CARDOSO".to_owned()),
+                    instructor: Some("FULANO DE TAL".to_owned()),
                     method: Some("MÉTODO CCB - SCHIMOLL - VIOLINO".to_owned()),
                 }],
             }
@@ -257,7 +257,7 @@ fn every_msa_row_is_read_with_all_its_fields() {
             <td></td>
             <td></td>
             <td>Revisão: Ligaduras. Estudar exercícios 1 e 2, página 32. </td>
-            <td>ELIAS BRANDE</td>
+            <td>CICLANO SOUZA</td>
             <td><button onclick="delete_lancamento_msa(538784)">Apagar</button></td>
         </tr><tr id="msa_559783" role="row" class="even">
             <td>09/09/2025</td>
@@ -266,7 +266,7 @@ fn every_msa_row_is_read_with_all_its_fields() {
             <td>7 - 8</td>
             <td>Sol</td>
             <td>Passou lições 7 e 8, estudar próximas lições.</td>
-            <td>MARCOS ROGÉRIO COSME</td>
+            <td>BELTRANO DA SILVA</td>
             <td><button onclick="delete_lancamento_msa(559783)">Apagar</button></td>
         </tr>"#,
     );
@@ -282,7 +282,7 @@ fn every_msa_row_is_read_with_all_its_fields() {
                 description: Some(
                     "Revisão: Ligaduras. Estudar exercícios 1 e 2, página 32.".to_owned()
                 ),
-                instructor: Some("ELIAS BRANDE".to_owned()),
+                instructor: Some("CICLANO SOUZA".to_owned()),
                 ..Lesson::default()
             },
             Lesson {
@@ -293,7 +293,7 @@ fn every_msa_row_is_read_with_all_its_fields() {
                 lesson: Some(Range::new("7".to_owned(), "8".to_owned())),
                 clef: Some(Clef::G),
                 description: Some("Passou lições 7 e 8, estudar próximas lições.".to_owned()),
-                instructor: Some("MARCOS ROGÉRIO COSME".to_owned()),
+                instructor: Some("BELTRANO DA SILVA".to_owned()),
                 method: None,
             },
         ])
@@ -347,7 +347,7 @@ fn every_method_row_is_read_with_all_its_fields() {
             <td>00</td>
             <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
             <td>24/03/2026</td>
-            <td>MURILO FAGNER CARDOSO</td>
+            <td>FULANO DE TAL</td>
             <td>30/03/2026 18:38:29</td>
             <td>Revisão para RJM </td>
             <td><button onclick="delete_lancamento_mtd(738654)">Apagar</button></td>
@@ -356,7 +356,7 @@ fn every_method_row_is_read_with_all_its_fields() {
             <td>7</td>
             <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
             <td>23/10/2023</td>
-            <td>MURILO FAGNER CARDOSO</td>
+            <td>FULANO DE TAL</td>
             <td>23/10/2023 20:35:24</td>
             <td></td>
             <td><button onclick="delete_lancamento_mtd(190204)">Apagar</button></td>
@@ -372,7 +372,7 @@ fn every_method_row_is_read_with_all_its_fields() {
                 page: Some(Range::single("00".to_owned())),
                 lesson: Some(Range::single("00".to_owned())),
                 description: Some("Revisão para RJM".to_owned()),
-                instructor: Some("MURILO FAGNER CARDOSO".to_owned()),
+                instructor: Some("FULANO DE TAL".to_owned()),
                 method: Some("MÉTODO CCB - SCHIMOLL - VIOLINO".to_owned()),
                 ..Lesson::default()
             },
@@ -381,7 +381,7 @@ fn every_method_row_is_read_with_all_its_fields() {
                 date: NaiveDate::from_ymd_opt(2023, 10, 23),
                 page: Some(Range::single("11".to_owned())),
                 lesson: Some(Range::single("7".to_owned())),
-                instructor: Some("MURILO FAGNER CARDOSO".to_owned()),
+                instructor: Some("FULANO DE TAL".to_owned()),
                 method: Some("MÉTODO CCB - SCHIMOLL - VIOLINO".to_owned()),
                 ..Lesson::default()
             },
@@ -488,7 +488,7 @@ fn student_lessons_page() -> String {
     <td>7 - 8</td>
     <td>Sol</td>
     <td>Passou lições 7 e 8, estudar próximas lições.</td>
-    <td>MARCOS ROGÉRIO COSME</td>
+    <td>BELTRANO DA SILVA</td>
 </tr>
 </tbody></table></div>
 <table id="datatable3"><tbody>
@@ -497,7 +497,7 @@ fn student_lessons_page() -> String {
     <td>00</td>
     <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
     <td>04/12/2023</td>
-    <td>MURILO FAGNER CARDOSO</td>
+    <td>FULANO DE TAL</td>
     <td>04/12/2023 21:17:17</td>
     <td>Postura do violino </td>
 </tr>

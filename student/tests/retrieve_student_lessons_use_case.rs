@@ -21,7 +21,7 @@ fn returns_the_lessons_from_the_gateway() {
             lesson: None,
             clef: Some(Clef::G),
             description: None,
-            instructor: Some("MARCOS ROGÉRIO COSME".to_owned()),
+            instructor: Some("BELTRANO DA SILVA".to_owned()),
             method: None,
         }],
         method: vec![Lesson::default()],
