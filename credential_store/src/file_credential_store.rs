@@ -61,8 +61,11 @@ impl SaveCredentialGateway for FileCredentialStore {
             password: credential.password().as_str().to_owned(),
         };
 
-        self.save_sync(&stored)
-            .map_err(|_| SaveCredentialGatewayError::UnableToPerformOperation)
+        self.save_sync(&stored).map_err(|error| {
+            SaveCredentialGatewayError::UnableToPerformOperation {
+                details: format!("Unable to save the credential file: {error:#}"),
+            }
+        })
     }
 }
 

@@ -135,15 +135,17 @@ struct FakeSaveCredentialGateway {
 }
 
 impl FakeSaveCredentialGateway {
-    const fn unable_to_perform_operation() -> Self {
+    fn unable_to_perform_operation() -> Self {
         Self {
-            result: Err(SaveCredentialGatewayError::UnableToPerformOperation),
+            result: Err(SaveCredentialGatewayError::UnableToPerformOperation {
+                details: "disk full".to_owned(),
+            }),
         }
     }
 }
 
 impl SaveCredentialGateway for FakeSaveCredentialGateway {
     fn save(&self, _credential: &Credential) -> Result<(), SaveCredentialGatewayError> {
-        self.result
+        self.result.clone()
     }
 }

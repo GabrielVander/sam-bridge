@@ -1,6 +1,6 @@
 use authentication::application::gateways::{
     ClearCredentialGateway, ClearCredentialGatewayError, LoadCredentialGateway,
-    SaveCredentialGateway,
+    SaveCredentialGateway, SaveCredentialGatewayError,
 };
 use authentication::domain::entities::{Credential, Email, Password};
 use credential_store::{FileCredentialStore, NoDataDirectory};
@@ -177,8 +177,6 @@ fn save_fails_when_the_key_file_path_is_a_directory() {
 #[cfg(unix)]
 #[test]
 fn save_fails_when_the_credential_file_path_is_a_directory() {
-    use authentication::application::gateways::SaveCredentialGatewayError;
-
     let (store, dir) = temp_store().expect("tempdir");
 
     store
@@ -194,6 +192,34 @@ fn save_fails_when_the_credential_file_path_is_a_directory() {
     assert!(
         result.is_err(),
         "a credential file path occupied by a directory must fail rather than silently succeed"
+    );
+}
+
+#[test]
+fn a_failed_save_explains_why() {
+    let (store, dir) = temp_store().expect("tempdir");
+
+    std::fs::create_dir(dir.path().join("key.bin")).expect("occupy the key path with a directory");
+
+    let result: Result<(), SaveCredentialGatewayError> = store.save(&credential());
+
+    let Err(SaveCredentialGatewayError::UnableToPerformOperation { details }) = result else {
+        panic!("a credential that could not be saved must not be reported as saved");
+    };
+
+    let stray_file: std::path::PathBuf = dir.path().join("stray");
+    std::fs::write(&stray_file, b"").expect("write a stray file");
+    let os_reason: String = std::fs::rename(&stray_file, dir.path().join("key.bin"))
+        .expect_err("the directory still occupies the key path")
+        .to_string();
+
+    assert!(
+        details.contains(&os_reason),
+        "details should say why the credential could not be saved, got: {details}"
+    );
+    assert!(
+        !details.contains("test_pass"),
+        "details must never reveal the password"
     );
 }
 
@@ -225,8 +251,6 @@ fn clear_fails_when_the_credential_file_cannot_be_removed() {
 fn save_fails_when_the_directory_is_not_writable_during_key_creation() {
     use std::os::unix::fs::PermissionsExt;
 
-    use authentication::application::gateways::SaveCredentialGatewayError;
-
     let (store, dir) = temp_store().expect("tempdir");
 
     std::fs::set_permissions(dir.path(), std::fs::Permissions::from_mode(0o500))
@@ -247,8 +271,6 @@ fn save_fails_when_the_directory_is_not_writable_during_key_creation() {
 #[test]
 fn save_fails_when_the_directory_is_not_writable_for_the_credential_file() {
     use std::os::unix::fs::PermissionsExt;
-
-    use authentication::application::gateways::SaveCredentialGatewayError;
 
     let (store, dir) = temp_store().expect("tempdir");
 
