@@ -35,8 +35,9 @@ impl FileCredentialStore {
     pub fn under(base: &Path) -> Self {
         let data_dir: PathBuf = base.join("sam_bridge");
 
-        let _ = std::fs::create_dir_all(&data_dir);
-        restrict_permissions(&data_dir, 0o700);
+        // Best effort: a save reports it if the directory is still missing by then.
+        let _ = std::fs::create_dir_all(&data_dir)
+            .and_then(|()| restrict_permissions(&data_dir, 0o700));
 
         Self::with_dir(&data_dir)
     }
@@ -125,15 +126,15 @@ impl FileCredentialStore {
     }
 
     fn write_private_file(&self, path: &Path, tmp_name: &str, data: &[u8]) -> anyhow::Result<()> {
-        let _ = std::fs::create_dir_all(&self.dir);
+        std::fs::create_dir_all(&self.dir)?;
 
         let tmp: PathBuf = self.dir.join(tmp_name);
 
         std::fs::write(&tmp, data)?;
-        restrict_permissions(&tmp, 0o600);
+        restrict_permissions(&tmp, 0o600)?;
 
         std::fs::rename(&tmp, path)?;
-        restrict_permissions(path, 0o600);
+        restrict_permissions(path, 0o600)?;
 
         Ok(())
     }
@@ -161,12 +162,14 @@ impl FileCredentialStore {
 }
 
 #[cfg(unix)]
-fn restrict_permissions(path: &Path, mode: u32) {
-    let _ = std::fs::set_permissions(path, std::os::unix::fs::PermissionsExt::from_mode(mode));
+fn restrict_permissions(path: &Path, mode: u32) -> std::io::Result<()> {
+    std::fs::set_permissions(path, std::os::unix::fs::PermissionsExt::from_mode(mode))
 }
 
 #[cfg(not(unix))]
-const fn restrict_permissions(_path: &Path, _mode: u32) {}
+const fn restrict_permissions(_path: &Path, _mode: u32) -> std::io::Result<()> {
+    Ok(())
+}
 
 fn key_generation_failed(error: getrandom::Error) -> anyhow::Error {
     anyhow::anyhow!("Failed to generate encryption key: {error}")
