@@ -24,26 +24,6 @@ pub enum ErrorKindDto {
     Unknown,
 }
 
-impl ErrorReportDto {
-    fn from_failure(kind: FailureKind, details: String) -> Self {
-        Self {
-            kind: kind.into(),
-            details,
-        }
-    }
-}
-
-impl From<FailureKind> for ErrorKindDto {
-    fn from(kind: FailureKind) -> Self {
-        match kind {
-            FailureKind::Transient => Self::Network,
-            FailureKind::Unexpected => Self::UnexpectedResponse,
-            FailureKind::SessionExpired => Self::SessionExpired,
-            FailureKind::Unclassified => Self::Unknown,
-        }
-    }
-}
-
 impl From<StartupError> for ErrorReportDto {
     fn from(error: StartupError) -> Self {
         let kind: ErrorKindDto = match error {
@@ -114,6 +94,26 @@ impl From<AssessStudentProgressError> for ErrorReportDto {
                 kind: ErrorKindDto::Unknown,
                 details: other.to_string(),
             },
+        }
+    }
+}
+
+impl ErrorReportDto {
+    fn from_failure(kind: FailureKind, details: String) -> Self {
+        Self {
+            kind: kind.into(),
+            details,
+        }
+    }
+}
+
+impl From<FailureKind> for ErrorKindDto {
+    fn from(kind: FailureKind) -> Self {
+        match kind {
+            FailureKind::Transient => Self::Network,
+            FailureKind::Unexpected => Self::UnexpectedResponse,
+            FailureKind::SessionExpired => Self::SessionExpired,
+            FailureKind::Unclassified => Self::Unknown,
         }
     }
 }
