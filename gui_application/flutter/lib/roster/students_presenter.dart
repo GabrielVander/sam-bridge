@@ -20,18 +20,35 @@ final class StudentsLoading extends StudentsState {
 }
 
 final class StudentsLoaded extends StudentsState {
-  final List<StudentListItem> students;
-  final List<StudentListItem> allStudents;
+  final RosterListing listing;
   final String nameQuery;
   final Set<String> selectedLocations;
   final List<String> availableLocations;
-  const StudentsLoaded(
-    this.students, {
-    this.allStudents = const [],
-    this.nameQuery = '',
-    this.selectedLocations = const {},
-    this.availableLocations = const [],
+  final bool isFiltering;
+  const StudentsLoaded({
+    required this.listing,
+    required this.nameQuery,
+    required this.selectedLocations,
+    required this.availableLocations,
+    required this.isFiltering,
   });
+}
+
+sealed class RosterListing {
+  const RosterListing();
+}
+
+final class NoStudents extends RosterListing {
+  const NoStudents();
+}
+
+final class NoMatches extends RosterListing {
+  const NoMatches();
+}
+
+final class Matches extends RosterListing {
+  final List<StudentListItem> students;
+  const Matches(this.students);
 }
 
 final class StudentsFailure extends StudentsState {
@@ -82,10 +99,17 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
   }
 
   StudentsLoaded _filteredState() => StudentsLoaded(
-    _filter.apply(_all),
-    allStudents: _all,
+    listing: _listing(),
     nameQuery: _filter.nameQuery,
     selectedLocations: _filter.locations,
     availableLocations: StudentFilter.locationsOf(_all),
+    isFiltering: !_filter.isEmpty,
   );
+
+  RosterListing _listing() {
+    if (_all.isEmpty) return const NoStudents();
+    final matching = _filter.apply(_all);
+    if (matching.isEmpty) return const NoMatches();
+    return Matches(matching);
+  }
 }

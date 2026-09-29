@@ -69,8 +69,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
       ),
       _LocationFilterBar(
         selectedLocations: state.selectedLocations,
-        isFiltering:
-            state.nameQuery.isNotEmpty || state.selectedLocations.isNotEmpty,
+        isFiltering: state.isFiltering,
         onPickLocations: () =>
             _pickLocations(state.availableLocations, state.selectedLocations),
         onClearFilters: _clearFilters,
@@ -84,13 +83,15 @@ final class _StudentsScreenState extends State<StudentsScreen> {
       const SizedBox(height: 12),
       const Divider(height: 1),
       Expanded(
-        child: _StudentsListContent(
-          students: state.students,
-          allStudents: state.allStudents,
-          nameQuery: state.nameQuery,
-          selectedLocations: state.selectedLocations,
-          onClearFilters: _clearFilters,
-        ),
+        child: switch (state.listing) {
+          NoStudents() => Center(child: Text(context.l10n.rosterNoStudents)),
+          NoMatches() => _NoResults(
+            nameQuery: state.nameQuery,
+            selectedLocations: state.selectedLocations,
+            onClearFilters: _clearFilters,
+          ),
+          Matches(:final students) => _StudentsList(students),
+        },
       ),
     ],
   );
@@ -233,37 +234,6 @@ final class _SelectedLocationChips extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-final class _StudentsListContent extends StatelessWidget {
-  final List<StudentListItem> students;
-  final List<StudentListItem> allStudents;
-  final String nameQuery;
-  final Set<String> selectedLocations;
-  final VoidCallback onClearFilters;
-
-  const _StudentsListContent({
-    required this.students,
-    required this.allStudents,
-    required this.nameQuery,
-    required this.selectedLocations,
-    required this.onClearFilters,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (allStudents.isEmpty) {
-      return Center(child: Text(context.l10n.rosterNoStudents));
-    }
-    if (students.isEmpty) {
-      return _NoResults(
-        nameQuery: nameQuery,
-        selectedLocations: selectedLocations,
-        onClearFilters: onClearFilters,
-      );
-    }
-    return _StudentsList(students);
   }
 }
 

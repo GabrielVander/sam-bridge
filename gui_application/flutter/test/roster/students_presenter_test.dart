@@ -6,6 +6,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/errors.dart';
 import '../support/roster.dart';
 
+List<String> listedIds(StudentsPresenter presenter) =>
+    switch ((presenter.stateValue as StudentsLoaded).listing) {
+      Matches(:final students) => students.map((s) => s.id).toList(),
+      _ => [],
+    };
+
 void main() {
   group('StudentsPresenter', () {
     test('starts idle', () {
@@ -41,11 +47,7 @@ void main() {
       );
       await loadFuture;
 
-      final state = cubit.stateValue;
-      expect(state, isA<StudentsLoaded>());
-      final loaded = state as StudentsLoaded;
-      expect(loaded.students.map((s) => s.id).toList(), ['1', '2']);
-      expect(loaded.allStudents.length, 2);
+      expect(listedIds(cubit), ['1', '2']);
     });
 
     test(
@@ -87,30 +89,53 @@ void main() {
       },
     );
 
-    test('filter() narrows students by name query', () async {
-      final cubit = StudentsPresenter(
-        retrieveStudents: () async => rosterLoaded([
-          studentSummary(
-            id: '1',
-            name: 'Ana Silva',
-            position: Positions.candidate,
-            location: 'Loc A',
-          ),
-          studentSummary(
-            id: '2',
-            name: 'Beto Souza',
-            position: Positions.candidate,
-            location: 'Loc B',
-          ),
-        ]),
-      );
+    test('an empty roster has no students to list', () async {
+      final cubit = presenterAnswering([rosterLoaded([])]);
 
       await cubit.load();
-      cubit.filter(nameQuery: 'Ana');
 
-      final loaded = cubit.stateValue as StudentsLoaded;
-      expect(loaded.students.map((s) => s.name).toList(), ['Ana Silva']);
-      expect(loaded.allStudents.length, 2);
+      expect((cubit.stateValue as StudentsLoaded).listing, isA<NoStudents>());
+    });
+
+    test('filters that match nobody leave no matches to list', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([studentSummary(name: 'Ana')]),
+      ]);
+
+      await cubit.load();
+      cubit.filter(nameQuery: 'zzzz');
+
+      expect((cubit.stateValue as StudentsLoaded).listing, isA<NoMatches>());
+    });
+
+    test('lists the students that match the filters', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([
+          studentSummary(id: '1', name: 'Ana'),
+          studentSummary(id: '2', name: 'Beto'),
+        ]),
+      ]);
+
+      await cubit.load();
+      cubit.filter(nameQuery: 'Beto');
+
+      expect(listedIds(cubit), ['2']);
+    });
+
+    test('is filtering only while a name or a location is set', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([studentSummary(location: 'Loc A')]),
+      ]);
+      bool isFiltering() => (cubit.stateValue as StudentsLoaded).isFiltering;
+
+      await cubit.load();
+      expect(isFiltering(), isFalse);
+
+      cubit.filter(nameQuery: 'Ana');
+      expect(isFiltering(), isTrue);
+
+      cubit.filter(nameQuery: '', selectedLocations: {'Loc A'});
+      expect(isFiltering(), isTrue);
     });
 
     test('filter() narrows students by selected locations', () async {
@@ -134,8 +159,7 @@ void main() {
       await cubit.load();
       cubit.filter(selectedLocations: {'Loc B'});
 
-      final loaded = cubit.stateValue as StudentsLoaded;
-      expect(loaded.students.map((s) => s.id).toList(), ['2']);
+      expect(listedIds(cubit), ['2']);
     });
 
     test('clearFilters() resets query and locations', () async {
@@ -157,7 +181,7 @@ void main() {
       final loaded = cubit.stateValue as StudentsLoaded;
       expect(loaded.nameQuery, '');
       expect(loaded.selectedLocations, isEmpty);
-      expect(loaded.students.length, 1);
+      expect(listedIds(cubit), ['1']);
     });
   });
 }
