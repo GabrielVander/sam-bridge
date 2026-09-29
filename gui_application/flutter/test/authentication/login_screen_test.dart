@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 import '../support/authentication.dart';
+import '../support/clipboard.dart';
 import '../support/errors.dart';
 import '../support/localization.dart';
 
@@ -120,6 +121,40 @@ void main() {
       expect(attempts, [('user@example.com', 'hunter2')]);
       expect(find.text('lista de alunos aberta'), findsOneWidget);
     });
+
+    testWidgets(
+      'signing in without being remembered opens the students and says why',
+      (tester) async {
+        final copied = recordClipboard(tester);
+        await pumpLoginForm(
+          tester,
+          login: loginAnswering(
+            loggedInWithoutRemembering(
+              localStorageFailure('Permission denied'),
+            ),
+          ),
+        );
+
+        await tester.enterText(_emailField, 'user@example.com');
+        await tester.enterText(_passwordField, 'hunter2');
+        await tester.tap(find.text('Entrar'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('lista de alunos aberta'), findsOneWidget);
+        expect(
+          find.text(
+            'Você entrou, mas não foi possível lembrar o login neste '
+            'dispositivo. Na próxima vez será preciso entrar de novo.',
+          ),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('Copiar detalhes'));
+        await tester.pump();
+
+        expect(copied(), 'Permission denied');
+      },
+    );
 
     testWidgets('asks for both fields when one is missing', (tester) async {
       final attempts = await pumpLoginForm(tester);

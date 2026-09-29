@@ -49,6 +49,7 @@
   "loginSubmit": "Sign in",
   "loginMissingFields": "Enter your username and password",
   "loginUnauthorized": "Invalid username or password",
+  "loginNotRemembered": "You're signed in, but your login couldn't be remembered on this device. You'll need to sign in again next time.",
   "rosterFilterByLocation": "Filter by location",
   "rosterNoLocations": "No locations available.",
   "cancel": "Cancel",

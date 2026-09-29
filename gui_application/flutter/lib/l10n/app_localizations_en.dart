@@ -162,6 +162,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginUnauthorized => 'Invalid username or password';
 
   @override
+  String get loginNotRemembered =>
+      'You\'re signed in, but your login couldn\'t be remembered on this device. You\'ll need to sign in again next time.';
+
+  @override
   String get rosterFilterByLocation => 'Filter by location';
 
   @override

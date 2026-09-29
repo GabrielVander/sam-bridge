@@ -76,20 +76,25 @@ class TechnicalDetails extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.copy),
               tooltip: context.l10n.copyDetails,
-              onPressed: () => _copy(context),
+              onPressed: () => copyDetails(
+                ScaffoldMessenger.of(context),
+                details: details,
+                confirmation: context.l10n.detailsCopied,
+              ),
             ),
           ],
         ),
       ],
     );
   }
+}
 
-  Future<void> _copy(BuildContext context) async {
-    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-    final String confirmation = context.l10n.detailsCopied;
+Future<void> copyDetails(
+  ScaffoldMessengerState messenger, {
+  required String details,
+  required String confirmation,
+}) async {
+  await Clipboard.setData(ClipboardData(text: details));
 
-    await Clipboard.setData(ClipboardData(text: details));
-
-    messenger.showSnackBar(SnackBar(content: Text(confirmation)));
-  }
+  messenger.showSnackBar(SnackBar(content: Text(confirmation)));
 }

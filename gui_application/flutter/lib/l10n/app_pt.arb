@@ -56,6 +56,7 @@
   "loginSubmit": "Entrar",
   "loginMissingFields": "Informe usuário e senha",
   "loginUnauthorized": "Usuário ou senha inválido(a)",
+  "loginNotRemembered": "Você entrou, mas não foi possível lembrar o login neste dispositivo. Na próxima vez será preciso entrar de novo.",
   "rosterFilterByLocation": "Filtrar por local",
   "rosterNoLocations": "Nenhum local disponível.",
   "cancel": "Cancelar",

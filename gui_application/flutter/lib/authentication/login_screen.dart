@@ -2,6 +2,7 @@ import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/errors/error_message.dart';
+import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_application/widgets/loading_indicator.dart';
@@ -15,6 +16,9 @@ class LoginScreen extends StatelessWidget {
     return BlocSignalListener<AuthPresenter, AuthState>(
       listener: (BuildContext context, AuthState state) {
         if (state is AuthSuccess) {
+          if (state.notRemembered case final report?) {
+            _warnNotRemembered(context, report);
+          }
           context.go('/students');
         }
       },
@@ -37,6 +41,25 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+void _warnNotRemembered(BuildContext context, ErrorReport report) {
+  final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+  final String confirmation = context.l10n.detailsCopied;
+
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(context.l10n.loginNotRemembered),
+      action: SnackBarAction(
+        label: context.l10n.copyDetails,
+        onPressed: () => copyDetails(
+          messenger,
+          details: report.details,
+          confirmation: confirmation,
+        ),
+      ),
+    ),
+  );
 }
 
 final class _LoginFormCard extends StatefulWidget {

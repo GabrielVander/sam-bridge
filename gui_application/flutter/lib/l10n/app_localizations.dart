@@ -392,6 +392,12 @@ abstract class AppLocalizations {
   /// **'Usuário ou senha inválido(a)'**
   String get loginUnauthorized;
 
+  /// No description provided for @loginNotRemembered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você entrou, mas não foi possível lembrar o login neste dispositivo. Na próxima vez será preciso entrar de novo.'**
+  String get loginNotRemembered;
+
   /// No description provided for @rosterFilterByLocation.
   ///
   /// In pt, this message translates to:

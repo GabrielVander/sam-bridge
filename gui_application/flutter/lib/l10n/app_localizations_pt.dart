@@ -161,6 +161,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loginUnauthorized => 'Usuário ou senha inválido(a)';
 
   @override
+  String get loginNotRemembered =>
+      'Você entrou, mas não foi possível lembrar o login neste dispositivo. Na próxima vez será preciso entrar de novo.';
+
+  @override
   String get rosterFilterByLocation => 'Filtrar por local';
 
   @override
