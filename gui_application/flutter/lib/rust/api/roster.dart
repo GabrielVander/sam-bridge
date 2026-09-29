@@ -68,19 +68,10 @@ sealed class StudentPositionDto with _$StudentPositionDto {
       StudentPositionDto_OfficialService;
   const factory StudentPositionDto.officialized() =
       StudentPositionDto_Officialized;
-  const factory StudentPositionDto.halfHour() = StudentPositionDto_HalfHour;
   const factory StudentPositionDto.youthServiceHalfHour() =
       StudentPositionDto_YouthServiceHalfHour;
-  const factory StudentPositionDto.youthServicePractice() =
-      StudentPositionDto_YouthServicePractice;
-  const factory StudentPositionDto.youthServiceOfficialService() =
-      StudentPositionDto_YouthServiceOfficialService;
-  const factory StudentPositionDto.youthServiceOfficialized() =
-      StudentPositionDto_YouthServiceOfficialized;
   const factory StudentPositionDto.gemSecretary() =
       StudentPositionDto_GemSecretary;
-  const factory StudentPositionDto.musicSecretary() =
-      StudentPositionDto_MusicSecretary;
   const factory StudentPositionDto.invalid({required String raw}) =
       StudentPositionDto_Invalid;
 }

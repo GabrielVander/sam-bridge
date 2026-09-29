@@ -1409,7 +1409,7 @@ extension StudentPositionDtoPatterns on StudentPositionDto {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( StudentPositionDto_Candidate value)?  candidate,TResult Function( StudentPositionDto_Practice value)?  practice,TResult Function( StudentPositionDto_YouthService value)?  youthService,TResult Function( StudentPositionDto_OfficialService value)?  officialService,TResult Function( StudentPositionDto_Officialized value)?  officialized,TResult Function( StudentPositionDto_HalfHour value)?  halfHour,TResult Function( StudentPositionDto_YouthServiceHalfHour value)?  youthServiceHalfHour,TResult Function( StudentPositionDto_YouthServicePractice value)?  youthServicePractice,TResult Function( StudentPositionDto_YouthServiceOfficialService value)?  youthServiceOfficialService,TResult Function( StudentPositionDto_YouthServiceOfficialized value)?  youthServiceOfficialized,TResult Function( StudentPositionDto_GemSecretary value)?  gemSecretary,TResult Function( StudentPositionDto_MusicSecretary value)?  musicSecretary,TResult Function( StudentPositionDto_Invalid value)?  invalid,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( StudentPositionDto_Candidate value)?  candidate,TResult Function( StudentPositionDto_Practice value)?  practice,TResult Function( StudentPositionDto_YouthService value)?  youthService,TResult Function( StudentPositionDto_OfficialService value)?  officialService,TResult Function( StudentPositionDto_Officialized value)?  officialized,TResult Function( StudentPositionDto_YouthServiceHalfHour value)?  youthServiceHalfHour,TResult Function( StudentPositionDto_GemSecretary value)?  gemSecretary,TResult Function( StudentPositionDto_Invalid value)?  invalid,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case StudentPositionDto_Candidate() when candidate != null:
@@ -1417,14 +1417,9 @@ return candidate(_that);case StudentPositionDto_Practice() when practice != null
 return practice(_that);case StudentPositionDto_YouthService() when youthService != null:
 return youthService(_that);case StudentPositionDto_OfficialService() when officialService != null:
 return officialService(_that);case StudentPositionDto_Officialized() when officialized != null:
-return officialized(_that);case StudentPositionDto_HalfHour() when halfHour != null:
-return halfHour(_that);case StudentPositionDto_YouthServiceHalfHour() when youthServiceHalfHour != null:
-return youthServiceHalfHour(_that);case StudentPositionDto_YouthServicePractice() when youthServicePractice != null:
-return youthServicePractice(_that);case StudentPositionDto_YouthServiceOfficialService() when youthServiceOfficialService != null:
-return youthServiceOfficialService(_that);case StudentPositionDto_YouthServiceOfficialized() when youthServiceOfficialized != null:
-return youthServiceOfficialized(_that);case StudentPositionDto_GemSecretary() when gemSecretary != null:
-return gemSecretary(_that);case StudentPositionDto_MusicSecretary() when musicSecretary != null:
-return musicSecretary(_that);case StudentPositionDto_Invalid() when invalid != null:
+return officialized(_that);case StudentPositionDto_YouthServiceHalfHour() when youthServiceHalfHour != null:
+return youthServiceHalfHour(_that);case StudentPositionDto_GemSecretary() when gemSecretary != null:
+return gemSecretary(_that);case StudentPositionDto_Invalid() when invalid != null:
 return invalid(_that);case _:
   return orElse();
 
@@ -1443,7 +1438,7 @@ return invalid(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( StudentPositionDto_Candidate value)  candidate,required TResult Function( StudentPositionDto_Practice value)  practice,required TResult Function( StudentPositionDto_YouthService value)  youthService,required TResult Function( StudentPositionDto_OfficialService value)  officialService,required TResult Function( StudentPositionDto_Officialized value)  officialized,required TResult Function( StudentPositionDto_HalfHour value)  halfHour,required TResult Function( StudentPositionDto_YouthServiceHalfHour value)  youthServiceHalfHour,required TResult Function( StudentPositionDto_YouthServicePractice value)  youthServicePractice,required TResult Function( StudentPositionDto_YouthServiceOfficialService value)  youthServiceOfficialService,required TResult Function( StudentPositionDto_YouthServiceOfficialized value)  youthServiceOfficialized,required TResult Function( StudentPositionDto_GemSecretary value)  gemSecretary,required TResult Function( StudentPositionDto_MusicSecretary value)  musicSecretary,required TResult Function( StudentPositionDto_Invalid value)  invalid,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( StudentPositionDto_Candidate value)  candidate,required TResult Function( StudentPositionDto_Practice value)  practice,required TResult Function( StudentPositionDto_YouthService value)  youthService,required TResult Function( StudentPositionDto_OfficialService value)  officialService,required TResult Function( StudentPositionDto_Officialized value)  officialized,required TResult Function( StudentPositionDto_YouthServiceHalfHour value)  youthServiceHalfHour,required TResult Function( StudentPositionDto_GemSecretary value)  gemSecretary,required TResult Function( StudentPositionDto_Invalid value)  invalid,}){
 final _that = this;
 switch (_that) {
 case StudentPositionDto_Candidate():
@@ -1451,14 +1446,9 @@ return candidate(_that);case StudentPositionDto_Practice():
 return practice(_that);case StudentPositionDto_YouthService():
 return youthService(_that);case StudentPositionDto_OfficialService():
 return officialService(_that);case StudentPositionDto_Officialized():
-return officialized(_that);case StudentPositionDto_HalfHour():
-return halfHour(_that);case StudentPositionDto_YouthServiceHalfHour():
-return youthServiceHalfHour(_that);case StudentPositionDto_YouthServicePractice():
-return youthServicePractice(_that);case StudentPositionDto_YouthServiceOfficialService():
-return youthServiceOfficialService(_that);case StudentPositionDto_YouthServiceOfficialized():
-return youthServiceOfficialized(_that);case StudentPositionDto_GemSecretary():
-return gemSecretary(_that);case StudentPositionDto_MusicSecretary():
-return musicSecretary(_that);case StudentPositionDto_Invalid():
+return officialized(_that);case StudentPositionDto_YouthServiceHalfHour():
+return youthServiceHalfHour(_that);case StudentPositionDto_GemSecretary():
+return gemSecretary(_that);case StudentPositionDto_Invalid():
 return invalid(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -1473,7 +1463,7 @@ return invalid(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( StudentPositionDto_Candidate value)?  candidate,TResult? Function( StudentPositionDto_Practice value)?  practice,TResult? Function( StudentPositionDto_YouthService value)?  youthService,TResult? Function( StudentPositionDto_OfficialService value)?  officialService,TResult? Function( StudentPositionDto_Officialized value)?  officialized,TResult? Function( StudentPositionDto_HalfHour value)?  halfHour,TResult? Function( StudentPositionDto_YouthServiceHalfHour value)?  youthServiceHalfHour,TResult? Function( StudentPositionDto_YouthServicePractice value)?  youthServicePractice,TResult? Function( StudentPositionDto_YouthServiceOfficialService value)?  youthServiceOfficialService,TResult? Function( StudentPositionDto_YouthServiceOfficialized value)?  youthServiceOfficialized,TResult? Function( StudentPositionDto_GemSecretary value)?  gemSecretary,TResult? Function( StudentPositionDto_MusicSecretary value)?  musicSecretary,TResult? Function( StudentPositionDto_Invalid value)?  invalid,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( StudentPositionDto_Candidate value)?  candidate,TResult? Function( StudentPositionDto_Practice value)?  practice,TResult? Function( StudentPositionDto_YouthService value)?  youthService,TResult? Function( StudentPositionDto_OfficialService value)?  officialService,TResult? Function( StudentPositionDto_Officialized value)?  officialized,TResult? Function( StudentPositionDto_YouthServiceHalfHour value)?  youthServiceHalfHour,TResult? Function( StudentPositionDto_GemSecretary value)?  gemSecretary,TResult? Function( StudentPositionDto_Invalid value)?  invalid,}){
 final _that = this;
 switch (_that) {
 case StudentPositionDto_Candidate() when candidate != null:
@@ -1481,14 +1471,9 @@ return candidate(_that);case StudentPositionDto_Practice() when practice != null
 return practice(_that);case StudentPositionDto_YouthService() when youthService != null:
 return youthService(_that);case StudentPositionDto_OfficialService() when officialService != null:
 return officialService(_that);case StudentPositionDto_Officialized() when officialized != null:
-return officialized(_that);case StudentPositionDto_HalfHour() when halfHour != null:
-return halfHour(_that);case StudentPositionDto_YouthServiceHalfHour() when youthServiceHalfHour != null:
-return youthServiceHalfHour(_that);case StudentPositionDto_YouthServicePractice() when youthServicePractice != null:
-return youthServicePractice(_that);case StudentPositionDto_YouthServiceOfficialService() when youthServiceOfficialService != null:
-return youthServiceOfficialService(_that);case StudentPositionDto_YouthServiceOfficialized() when youthServiceOfficialized != null:
-return youthServiceOfficialized(_that);case StudentPositionDto_GemSecretary() when gemSecretary != null:
-return gemSecretary(_that);case StudentPositionDto_MusicSecretary() when musicSecretary != null:
-return musicSecretary(_that);case StudentPositionDto_Invalid() when invalid != null:
+return officialized(_that);case StudentPositionDto_YouthServiceHalfHour() when youthServiceHalfHour != null:
+return youthServiceHalfHour(_that);case StudentPositionDto_GemSecretary() when gemSecretary != null:
+return gemSecretary(_that);case StudentPositionDto_Invalid() when invalid != null:
 return invalid(_that);case _:
   return null;
 
@@ -1506,21 +1491,16 @@ return invalid(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  candidate,TResult Function()?  practice,TResult Function()?  youthService,TResult Function()?  officialService,TResult Function()?  officialized,TResult Function()?  halfHour,TResult Function()?  youthServiceHalfHour,TResult Function()?  youthServicePractice,TResult Function()?  youthServiceOfficialService,TResult Function()?  youthServiceOfficialized,TResult Function()?  gemSecretary,TResult Function()?  musicSecretary,TResult Function( String raw)?  invalid,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  candidate,TResult Function()?  practice,TResult Function()?  youthService,TResult Function()?  officialService,TResult Function()?  officialized,TResult Function()?  youthServiceHalfHour,TResult Function()?  gemSecretary,TResult Function( String raw)?  invalid,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case StudentPositionDto_Candidate() when candidate != null:
 return candidate();case StudentPositionDto_Practice() when practice != null:
 return practice();case StudentPositionDto_YouthService() when youthService != null:
 return youthService();case StudentPositionDto_OfficialService() when officialService != null:
 return officialService();case StudentPositionDto_Officialized() when officialized != null:
-return officialized();case StudentPositionDto_HalfHour() when halfHour != null:
-return halfHour();case StudentPositionDto_YouthServiceHalfHour() when youthServiceHalfHour != null:
-return youthServiceHalfHour();case StudentPositionDto_YouthServicePractice() when youthServicePractice != null:
-return youthServicePractice();case StudentPositionDto_YouthServiceOfficialService() when youthServiceOfficialService != null:
-return youthServiceOfficialService();case StudentPositionDto_YouthServiceOfficialized() when youthServiceOfficialized != null:
-return youthServiceOfficialized();case StudentPositionDto_GemSecretary() when gemSecretary != null:
-return gemSecretary();case StudentPositionDto_MusicSecretary() when musicSecretary != null:
-return musicSecretary();case StudentPositionDto_Invalid() when invalid != null:
+return officialized();case StudentPositionDto_YouthServiceHalfHour() when youthServiceHalfHour != null:
+return youthServiceHalfHour();case StudentPositionDto_GemSecretary() when gemSecretary != null:
+return gemSecretary();case StudentPositionDto_Invalid() when invalid != null:
 return invalid(_that.raw);case _:
   return orElse();
 
@@ -1539,21 +1519,16 @@ return invalid(_that.raw);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  candidate,required TResult Function()  practice,required TResult Function()  youthService,required TResult Function()  officialService,required TResult Function()  officialized,required TResult Function()  halfHour,required TResult Function()  youthServiceHalfHour,required TResult Function()  youthServicePractice,required TResult Function()  youthServiceOfficialService,required TResult Function()  youthServiceOfficialized,required TResult Function()  gemSecretary,required TResult Function()  musicSecretary,required TResult Function( String raw)  invalid,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  candidate,required TResult Function()  practice,required TResult Function()  youthService,required TResult Function()  officialService,required TResult Function()  officialized,required TResult Function()  youthServiceHalfHour,required TResult Function()  gemSecretary,required TResult Function( String raw)  invalid,}) {final _that = this;
 switch (_that) {
 case StudentPositionDto_Candidate():
 return candidate();case StudentPositionDto_Practice():
 return practice();case StudentPositionDto_YouthService():
 return youthService();case StudentPositionDto_OfficialService():
 return officialService();case StudentPositionDto_Officialized():
-return officialized();case StudentPositionDto_HalfHour():
-return halfHour();case StudentPositionDto_YouthServiceHalfHour():
-return youthServiceHalfHour();case StudentPositionDto_YouthServicePractice():
-return youthServicePractice();case StudentPositionDto_YouthServiceOfficialService():
-return youthServiceOfficialService();case StudentPositionDto_YouthServiceOfficialized():
-return youthServiceOfficialized();case StudentPositionDto_GemSecretary():
-return gemSecretary();case StudentPositionDto_MusicSecretary():
-return musicSecretary();case StudentPositionDto_Invalid():
+return officialized();case StudentPositionDto_YouthServiceHalfHour():
+return youthServiceHalfHour();case StudentPositionDto_GemSecretary():
+return gemSecretary();case StudentPositionDto_Invalid():
 return invalid(_that.raw);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -1568,21 +1543,16 @@ return invalid(_that.raw);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  candidate,TResult? Function()?  practice,TResult? Function()?  youthService,TResult? Function()?  officialService,TResult? Function()?  officialized,TResult? Function()?  halfHour,TResult? Function()?  youthServiceHalfHour,TResult? Function()?  youthServicePractice,TResult? Function()?  youthServiceOfficialService,TResult? Function()?  youthServiceOfficialized,TResult? Function()?  gemSecretary,TResult? Function()?  musicSecretary,TResult? Function( String raw)?  invalid,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  candidate,TResult? Function()?  practice,TResult? Function()?  youthService,TResult? Function()?  officialService,TResult? Function()?  officialized,TResult? Function()?  youthServiceHalfHour,TResult? Function()?  gemSecretary,TResult? Function( String raw)?  invalid,}) {final _that = this;
 switch (_that) {
 case StudentPositionDto_Candidate() when candidate != null:
 return candidate();case StudentPositionDto_Practice() when practice != null:
 return practice();case StudentPositionDto_YouthService() when youthService != null:
 return youthService();case StudentPositionDto_OfficialService() when officialService != null:
 return officialService();case StudentPositionDto_Officialized() when officialized != null:
-return officialized();case StudentPositionDto_HalfHour() when halfHour != null:
-return halfHour();case StudentPositionDto_YouthServiceHalfHour() when youthServiceHalfHour != null:
-return youthServiceHalfHour();case StudentPositionDto_YouthServicePractice() when youthServicePractice != null:
-return youthServicePractice();case StudentPositionDto_YouthServiceOfficialService() when youthServiceOfficialService != null:
-return youthServiceOfficialService();case StudentPositionDto_YouthServiceOfficialized() when youthServiceOfficialized != null:
-return youthServiceOfficialized();case StudentPositionDto_GemSecretary() when gemSecretary != null:
-return gemSecretary();case StudentPositionDto_MusicSecretary() when musicSecretary != null:
-return musicSecretary();case StudentPositionDto_Invalid() when invalid != null:
+return officialized();case StudentPositionDto_YouthServiceHalfHour() when youthServiceHalfHour != null:
+return youthServiceHalfHour();case StudentPositionDto_GemSecretary() when gemSecretary != null:
+return gemSecretary();case StudentPositionDto_Invalid() when invalid != null:
 return invalid(_that.raw);case _:
   return null;
 
@@ -1754,38 +1724,6 @@ String toString() {
 /// @nodoc
 
 
-class StudentPositionDto_HalfHour extends StudentPositionDto {
-  const StudentPositionDto_HalfHour(): super._();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_HalfHour);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'StudentPositionDto.halfHour()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
 class StudentPositionDto_YouthServiceHalfHour extends StudentPositionDto {
   const StudentPositionDto_YouthServiceHalfHour(): super._();
   
@@ -1818,102 +1756,6 @@ String toString() {
 /// @nodoc
 
 
-class StudentPositionDto_YouthServicePractice extends StudentPositionDto {
-  const StudentPositionDto_YouthServicePractice(): super._();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthServicePractice);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'StudentPositionDto.youthServicePractice()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class StudentPositionDto_YouthServiceOfficialService extends StudentPositionDto {
-  const StudentPositionDto_YouthServiceOfficialService(): super._();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthServiceOfficialService);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'StudentPositionDto.youthServiceOfficialService()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class StudentPositionDto_YouthServiceOfficialized extends StudentPositionDto {
-  const StudentPositionDto_YouthServiceOfficialized(): super._();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthServiceOfficialized);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'StudentPositionDto.youthServiceOfficialized()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
 class StudentPositionDto_GemSecretary extends StudentPositionDto {
   const StudentPositionDto_GemSecretary(): super._();
   
@@ -1935,38 +1777,6 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'StudentPositionDto.gemSecretary()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class StudentPositionDto_MusicSecretary extends StudentPositionDto {
-  const StudentPositionDto_MusicSecretary(): super._();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_MusicSecretary);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'StudentPositionDto.musicSecretary()';
 }
 
 

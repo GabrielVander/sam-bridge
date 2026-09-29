@@ -901,20 +901,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 4:
         return StudentPositionDto_Officialized();
       case 5:
-        return StudentPositionDto_HalfHour();
-      case 6:
         return StudentPositionDto_YouthServiceHalfHour();
-      case 7:
-        return StudentPositionDto_YouthServicePractice();
-      case 8:
-        return StudentPositionDto_YouthServiceOfficialService();
-      case 9:
-        return StudentPositionDto_YouthServiceOfficialized();
-      case 10:
+      case 6:
         return StudentPositionDto_GemSecretary();
-      case 11:
-        return StudentPositionDto_MusicSecretary();
-      case 12:
+      case 7:
         return StudentPositionDto_Invalid(raw: dco_decode_String(arr[1]));
       default:
         throw Exception("unreachable");
@@ -1560,20 +1550,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 4:
         return StudentPositionDto_Officialized();
       case 5:
-        return StudentPositionDto_HalfHour();
-      case 6:
         return StudentPositionDto_YouthServiceHalfHour();
-      case 7:
-        return StudentPositionDto_YouthServicePractice();
-      case 8:
-        return StudentPositionDto_YouthServiceOfficialService();
-      case 9:
-        return StudentPositionDto_YouthServiceOfficialized();
-      case 10:
+      case 6:
         return StudentPositionDto_GemSecretary();
-      case 11:
-        return StudentPositionDto_MusicSecretary();
-      case 12:
+      case 7:
         var var_raw = sse_decode_String(deserializer);
         return StudentPositionDto_Invalid(raw: var_raw);
       default:
@@ -2184,22 +2164,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(3, serializer);
       case StudentPositionDto_Officialized():
         sse_encode_i_32(4, serializer);
-      case StudentPositionDto_HalfHour():
-        sse_encode_i_32(5, serializer);
       case StudentPositionDto_YouthServiceHalfHour():
-        sse_encode_i_32(6, serializer);
-      case StudentPositionDto_YouthServicePractice():
-        sse_encode_i_32(7, serializer);
-      case StudentPositionDto_YouthServiceOfficialService():
-        sse_encode_i_32(8, serializer);
-      case StudentPositionDto_YouthServiceOfficialized():
-        sse_encode_i_32(9, serializer);
+        sse_encode_i_32(5, serializer);
       case StudentPositionDto_GemSecretary():
-        sse_encode_i_32(10, serializer);
-      case StudentPositionDto_MusicSecretary():
-        sse_encode_i_32(11, serializer);
+        sse_encode_i_32(6, serializer);
       case StudentPositionDto_Invalid(raw: final raw):
-        sse_encode_i_32(12, serializer);
+        sse_encode_i_32(7, serializer);
         sse_encode_String(raw, serializer);
     }
   }

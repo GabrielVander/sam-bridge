@@ -35,25 +35,11 @@ class RosterMapper {
     StudentPositionDto_Officialized() => const LeveledPosition([
       Level.officialized,
     ]),
-    StudentPositionDto_HalfHour() => const LeveledPosition([Level.halfHour]),
     StudentPositionDto_YouthServiceHalfHour() => const LeveledPosition([
       Level.youthService,
       Level.halfHour,
     ]),
-    StudentPositionDto_YouthServicePractice() => const LeveledPosition([
-      Level.youthService,
-      Level.practice,
-    ]),
-    StudentPositionDto_YouthServiceOfficialService() => const LeveledPosition([
-      Level.youthService,
-      Level.officialService,
-    ]),
-    StudentPositionDto_YouthServiceOfficialized() => const LeveledPosition([
-      Level.youthService,
-      Level.officialized,
-    ]),
     StudentPositionDto_GemSecretary() => const GemSecretaryPosition(),
-    StudentPositionDto_MusicSecretary() => const MusicSecretaryPosition(),
     StudentPositionDto_Invalid(:final raw) => UnrecognizedPosition(raw),
   };
 

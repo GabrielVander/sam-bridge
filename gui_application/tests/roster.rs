@@ -184,12 +184,8 @@ fn every_organist_level_is_a_position() {
         OrganistLevel::Candidate,
         OrganistLevel::Practice,
         OrganistLevel::YouthService,
-        OrganistLevel::HalfHour,
         OrganistLevel::OfficialService,
         OrganistLevel::YouthServiceHalfHour,
-        OrganistLevel::YouthServicePractice,
-        OrganistLevel::YouthServiceOfficialService,
-        OrganistLevel::YouthServiceOfficialized,
         OrganistLevel::Unknown("Peanuts".to_owned()),
     ];
 
@@ -206,12 +202,8 @@ fn every_organist_level_is_a_position() {
             StudentPositionDto::Candidate,
             StudentPositionDto::Practice,
             StudentPositionDto::YouthService,
-            StudentPositionDto::HalfHour,
             StudentPositionDto::OfficialService,
             StudentPositionDto::YouthServiceHalfHour,
-            StudentPositionDto::YouthServicePractice,
-            StudentPositionDto::YouthServiceOfficialService,
-            StudentPositionDto::YouthServiceOfficialized,
             StudentPositionDto::Invalid {
                 raw: "Peanuts".to_owned()
             },
@@ -220,23 +212,12 @@ fn every_organist_level_is_a_position() {
 }
 
 #[test]
-fn every_secretary_type_is_a_position() {
-    let positions = listed_positions(vec![
-        StudentPosition::Secretary {
-            r#type: SecretaryType::Gem,
-        },
-        StudentPosition::Secretary {
-            r#type: SecretaryType::Music,
-        },
-    ]);
+fn a_gem_secretary_is_a_position() {
+    let positions = listed_positions(vec![StudentPosition::Secretary {
+        r#type: SecretaryType::Gem,
+    }]);
 
-    assert_eq!(
-        positions,
-        Some(vec![
-            StudentPositionDto::GemSecretary,
-            StudentPositionDto::MusicSecretary,
-        ])
-    );
+    assert_eq!(positions, Some(vec![StudentPositionDto::GemSecretary]));
 }
 
 #[test]

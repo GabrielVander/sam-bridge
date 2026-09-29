@@ -12,15 +12,8 @@ void main() {
       Positions.youthService: 'Reunião de Jovens e Menores',
       Positions.officialService: 'Culto Oficial',
       Positions.officialized: 'Oficialização',
-      Positions.halfHour: 'Meia Hora',
       Positions.youthServiceHalfHour: 'Reunião de Jovens e Menores / Meia Hora',
-      Positions.youthServicePractice: 'Reunião de Jovens e Menores / Ensaio',
-      Positions.youthServiceOfficialService:
-          'Reunião de Jovens e Menores / Culto Oficial',
-      Positions.youthServiceOfficialized:
-          'Reunião de Jovens e Menores / Oficialização',
       Positions.gemSecretary: 'Secretário(a) do GEM',
-      Positions.musicSecretary: 'Secretário(a) de Música',
       Positions.invalid('ALGO DESCONHECIDO'): 'ALGO DESCONHECIDO',
     };
 

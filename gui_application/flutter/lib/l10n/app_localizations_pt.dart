@@ -56,9 +56,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get positionGemSecretary => 'Secretário(a) do GEM';
 
   @override
-  String get positionMusicSecretary => 'Secretário(a) de Música';
-
-  @override
   String get instrumentViolin => 'Violino';
 
   @override

@@ -54,13 +54,8 @@ pub enum StudentPositionDto {
     YouthService,
     OfficialService,
     Officialized,
-    HalfHour,
     YouthServiceHalfHour,
-    YouthServicePractice,
-    YouthServiceOfficialService,
-    YouthServiceOfficialized,
     GemSecretary,
-    MusicSecretary,
     Invalid { raw: String },
 }
 
@@ -158,12 +153,8 @@ impl From<OrganistLevel> for StudentPositionDto {
             OrganistLevel::Candidate => Self::Candidate,
             OrganistLevel::Practice => Self::Practice,
             OrganistLevel::YouthService => Self::YouthService,
-            OrganistLevel::HalfHour => Self::HalfHour,
             OrganistLevel::OfficialService => Self::OfficialService,
             OrganistLevel::YouthServiceHalfHour => Self::YouthServiceHalfHour,
-            OrganistLevel::YouthServicePractice => Self::YouthServicePractice,
-            OrganistLevel::YouthServiceOfficialService => Self::YouthServiceOfficialService,
-            OrganistLevel::YouthServiceOfficialized => Self::YouthServiceOfficialized,
             OrganistLevel::Unknown(raw) => Self::Invalid { raw },
         }
     }
@@ -173,7 +164,6 @@ impl From<SecretaryType> for StudentPositionDto {
     fn from(r#type: SecretaryType) -> Self {
         match r#type {
             SecretaryType::Gem => Self::GemSecretary,
-            SecretaryType::Music => Self::MusicSecretary,
         }
     }
 }

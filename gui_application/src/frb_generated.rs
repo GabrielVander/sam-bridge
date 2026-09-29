@@ -1045,27 +1045,12 @@ impl SseDecode for crate::api::roster::StudentPositionDto {
                 return crate::api::roster::StudentPositionDto::Officialized;
             }
             5 => {
-                return crate::api::roster::StudentPositionDto::HalfHour;
-            }
-            6 => {
                 return crate::api::roster::StudentPositionDto::YouthServiceHalfHour;
             }
-            7 => {
-                return crate::api::roster::StudentPositionDto::YouthServicePractice;
-            }
-            8 => {
-                return crate::api::roster::StudentPositionDto::YouthServiceOfficialService;
-            }
-            9 => {
-                return crate::api::roster::StudentPositionDto::YouthServiceOfficialized;
-            }
-            10 => {
+            6 => {
                 return crate::api::roster::StudentPositionDto::GemSecretary;
             }
-            11 => {
-                return crate::api::roster::StudentPositionDto::MusicSecretary;
-            }
-            12 => {
+            7 => {
                 let mut var_raw = <String>::sse_decode(deserializer);
                 return crate::api::roster::StudentPositionDto::Invalid { raw: var_raw };
             }
@@ -1694,23 +1679,12 @@ impl flutter_rust_bridge::IntoDart for crate::api::roster::StudentPositionDto {
             crate::api::roster::StudentPositionDto::YouthService => [2.into_dart()].into_dart(),
             crate::api::roster::StudentPositionDto::OfficialService => [3.into_dart()].into_dart(),
             crate::api::roster::StudentPositionDto::Officialized => [4.into_dart()].into_dart(),
-            crate::api::roster::StudentPositionDto::HalfHour => [5.into_dart()].into_dart(),
             crate::api::roster::StudentPositionDto::YouthServiceHalfHour => {
-                [6.into_dart()].into_dart()
+                [5.into_dart()].into_dart()
             }
-            crate::api::roster::StudentPositionDto::YouthServicePractice => {
-                [7.into_dart()].into_dart()
-            }
-            crate::api::roster::StudentPositionDto::YouthServiceOfficialService => {
-                [8.into_dart()].into_dart()
-            }
-            crate::api::roster::StudentPositionDto::YouthServiceOfficialized => {
-                [9.into_dart()].into_dart()
-            }
-            crate::api::roster::StudentPositionDto::GemSecretary => [10.into_dart()].into_dart(),
-            crate::api::roster::StudentPositionDto::MusicSecretary => [11.into_dart()].into_dart(),
+            crate::api::roster::StudentPositionDto::GemSecretary => [6.into_dart()].into_dart(),
             crate::api::roster::StudentPositionDto::Invalid { raw } => {
-                [12.into_dart(), raw.into_into_dart().into_dart()].into_dart()
+                [7.into_dart(), raw.into_into_dart().into_dart()].into_dart()
             }
             _ => {
                 unimplemented!("");
@@ -2293,29 +2267,14 @@ impl SseEncode for crate::api::roster::StudentPositionDto {
             crate::api::roster::StudentPositionDto::Officialized => {
                 <i32>::sse_encode(4, serializer);
             }
-            crate::api::roster::StudentPositionDto::HalfHour => {
+            crate::api::roster::StudentPositionDto::YouthServiceHalfHour => {
                 <i32>::sse_encode(5, serializer);
             }
-            crate::api::roster::StudentPositionDto::YouthServiceHalfHour => {
+            crate::api::roster::StudentPositionDto::GemSecretary => {
                 <i32>::sse_encode(6, serializer);
             }
-            crate::api::roster::StudentPositionDto::YouthServicePractice => {
-                <i32>::sse_encode(7, serializer);
-            }
-            crate::api::roster::StudentPositionDto::YouthServiceOfficialService => {
-                <i32>::sse_encode(8, serializer);
-            }
-            crate::api::roster::StudentPositionDto::YouthServiceOfficialized => {
-                <i32>::sse_encode(9, serializer);
-            }
-            crate::api::roster::StudentPositionDto::GemSecretary => {
-                <i32>::sse_encode(10, serializer);
-            }
-            crate::api::roster::StudentPositionDto::MusicSecretary => {
-                <i32>::sse_encode(11, serializer);
-            }
             crate::api::roster::StudentPositionDto::Invalid { raw } => {
-                <i32>::sse_encode(12, serializer);
+                <i32>::sse_encode(7, serializer);
                 <String>::sse_encode(raw, serializer);
             }
             _ => {

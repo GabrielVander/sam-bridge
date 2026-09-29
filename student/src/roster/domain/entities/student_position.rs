@@ -20,17 +20,12 @@ pub enum OrganistLevel {
     Candidate,
     Practice,
     YouthService,
-    HalfHour,
     OfficialService,
     YouthServiceHalfHour,
-    YouthServicePractice,
-    YouthServiceOfficialService,
-    YouthServiceOfficialized,
     Unknown(String),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SecretaryType {
     Gem,
-    Music,
 }

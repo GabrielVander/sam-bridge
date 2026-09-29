@@ -44,7 +44,7 @@ fn returns_every_available_student() {
             id: StudentId::new("2".to_owned()),
             name: "Student B".to_string(),
             position: StudentPosition::Secretary {
-                r#type: SecretaryType::Music,
+                r#type: SecretaryType::Gem,
             },
             location: "Location B".to_string(),
         },

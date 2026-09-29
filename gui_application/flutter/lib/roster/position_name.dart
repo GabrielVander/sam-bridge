@@ -6,7 +6,6 @@ extension PositionName on AppLocalizations {
   String positionName(StudentPosition position) => switch (position) {
     LeveledPosition(:final levels) => levels.map(levelName).join(' / '),
     GemSecretaryPosition() => positionGemSecretary,
-    MusicSecretaryPosition() => positionMusicSecretary,
     UnrecognizedPosition(:final raw) => raw,
   };
 }

@@ -14,10 +14,6 @@ final class GemSecretaryPosition extends StudentPosition {
   const GemSecretaryPosition();
 }
 
-final class MusicSecretaryPosition extends StudentPosition {
-  const MusicSecretaryPosition();
-}
-
 final class UnrecognizedPosition extends StudentPosition {
   final String raw;
 
