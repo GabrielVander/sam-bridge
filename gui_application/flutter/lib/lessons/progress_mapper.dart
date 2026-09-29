@@ -18,8 +18,12 @@ class ProgressMapper {
   static CheckpointView _toCheckpoint(CheckpointStatusDto dto) =>
       CheckpointView(
         level: _toLevel(dto.level),
-        achieved: dto.achieved,
-        readyToAdvance: dto.readyToAdvance,
+        status: switch (dto) {
+          CheckpointStatusDto(achieved: true) => CheckpointStatus.achieved,
+          CheckpointStatusDto(readyToAdvance: true) =>
+            CheckpointStatus.readyForExam,
+          _ => CheckpointStatus.pending,
+        },
         msaMet: dto.requirement.msaMet,
         methodMet: dto.requirement.methodMet,
       );

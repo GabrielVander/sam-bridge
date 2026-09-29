@@ -31,14 +31,12 @@ LessonItem lessonItem({
 
 CheckpointView checkpoint({
   ReportedLevel level = const KnownLevel(Level.practice),
-  bool achieved = false,
-  bool readyToAdvance = false,
+  CheckpointStatus status = CheckpointStatus.pending,
   bool msaMet = false,
   bool methodMet = false,
 }) => CheckpointView(
   level: level,
-  achieved: achieved,
-  readyToAdvance: readyToAdvance,
+  status: status,
   msaMet: msaMet,
   methodMet: methodMet,
 );

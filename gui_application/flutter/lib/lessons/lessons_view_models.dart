@@ -37,17 +37,17 @@ class StudentLessonsView {
   const StudentLessonsView({required this.msa, required this.method});
 }
 
+enum CheckpointStatus { achieved, readyForExam, pending }
+
 class CheckpointView {
   final ReportedLevel level;
-  final bool achieved;
-  final bool readyToAdvance;
+  final CheckpointStatus status;
   final bool msaMet;
   final bool methodMet;
 
   const CheckpointView({
     required this.level,
-    required this.achieved,
-    required this.readyToAdvance,
+    required this.status,
     required this.msaMet,
     required this.methodMet,
   });

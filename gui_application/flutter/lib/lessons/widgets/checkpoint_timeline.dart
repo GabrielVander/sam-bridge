@@ -81,7 +81,9 @@ final class _Timeline extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 22),
-                child: _Connector(filled: checkpoints[i].achieved),
+                child: _Connector(
+                  filled: checkpoints[i].status == CheckpointStatus.achieved,
+                ),
               ),
             ),
           _CheckpointDot(checkpoint: checkpoints[i]),
@@ -116,22 +118,26 @@ final class _CheckpointDot extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final label = context.l10n.reportedLevelName(checkpoint.level);
-    final (icon, color) = switch (checkpoint) {
-      CheckpointView(achieved: true) => (
+    final (icon, color, tooltip) = switch (checkpoint.status) {
+      CheckpointStatus.achieved => (
         Icons.check_circle,
         colorScheme.primary,
+        label,
       ),
-      CheckpointView(readyToAdvance: true) => (
+      CheckpointStatus.readyForExam => (
         Icons.star,
         Colors.amber.shade700,
+        context.l10n.checkpointReady(label),
       ),
-      _ => (Icons.radio_button_unchecked, colorScheme.outline),
+      CheckpointStatus.pending => (
+        Icons.radio_button_unchecked,
+        colorScheme.outline,
+        label,
+      ),
     };
 
     return Tooltip(
-      message: checkpoint.readyToAdvance
-          ? context.l10n.checkpointReady(label)
-          : label,
+      message: tooltip,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

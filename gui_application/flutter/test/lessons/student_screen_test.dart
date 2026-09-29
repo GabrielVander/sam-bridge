@@ -93,6 +93,29 @@ void main() {
       );
       expect(find.text('EXÓTICO'), findsOneWidget);
     });
+
+    testWidgets('an achieved level is no longer offered for the exam', (
+      tester,
+    ) async {
+      await pumpStudent(
+        tester,
+        progress: progressAssessed(
+          progressAssessment(
+            checkpoints: [
+              checkpointStatus(
+                Levels.youthService,
+                achieved: true,
+                readyToAdvance: true,
+              ),
+            ],
+            nextLevel: Levels.officialService,
+          ),
+        ),
+      );
+
+      expect(find.byTooltip('Reunião de Jovens e Menores'), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    });
   });
 
   group('StudentScreen lessons', () {

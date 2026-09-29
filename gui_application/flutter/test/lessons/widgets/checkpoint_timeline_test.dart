@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_application/lessons/widgets/checkpoint_timeline.dart';
 import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_application/widgets/progress_bar.dart';
@@ -18,7 +19,7 @@ void main() {
             checkpoints: [
               checkpoint(
                 level: const KnownLevel(Level.practice),
-                achieved: true,
+                status: CheckpointStatus.achieved,
               ),
               checkpoint(level: const KnownLevel(Level.officialService)),
               checkpoint(level: const KnownLevel(Level.officialized)),
@@ -86,11 +87,11 @@ void main() {
             checkpoints: [
               checkpoint(
                 level: const KnownLevel(Level.practice),
-                achieved: true,
+                status: CheckpointStatus.achieved,
               ),
               checkpoint(
                 level: const KnownLevel(Level.officialService),
-                readyToAdvance: true,
+                status: CheckpointStatus.readyForExam,
               ),
               checkpoint(level: const KnownLevel(Level.officialized)),
             ],
@@ -113,11 +114,11 @@ void main() {
             checkpoints: [
               checkpoint(
                 level: const KnownLevel(Level.practice),
-                achieved: true,
+                status: CheckpointStatus.achieved,
               ),
               checkpoint(
                 level: const KnownLevel(Level.officialService),
-                readyToAdvance: true,
+                status: CheckpointStatus.readyForExam,
               ),
             ],
           ),
@@ -140,11 +141,11 @@ void main() {
             checkpoints: [
               checkpoint(
                 level: const KnownLevel(Level.practice),
-                achieved: true,
+                status: CheckpointStatus.achieved,
               ),
               checkpoint(
                 level: const KnownLevel(Level.officialService),
-                achieved: true,
+                status: CheckpointStatus.achieved,
               ),
               checkpoint(level: const KnownLevel(Level.officialized)),
             ],
@@ -199,7 +200,7 @@ void main() {
             checkpoints: [
               checkpoint(
                 level: const KnownLevel(Level.youthService),
-                readyToAdvance: true,
+                status: CheckpointStatus.readyForExam,
               ),
             ],
           ),
