@@ -10,24 +10,22 @@ final class StudentCard extends StatelessWidget {
 
   const StudentCard(this.student, {super.key});
 
-  bool get _canOpen => student.id.isNotEmpty;
-
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.zero,
       child: InkWell(
-        onTap: _canOpen
+        onTap: student.canOpen
             ? () => context.go('/students/${student.id}', extra: student.name)
             : null,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              _Avatar(name: student.name),
+              _Avatar(initial: student.initial),
               const SizedBox(width: 14),
               Expanded(child: _details(context)),
-              if (_canOpen) ...[
+              if (student.canOpen) ...[
                 const SizedBox(width: 8),
                 const Icon(Icons.chevron_right),
               ],
@@ -68,9 +66,9 @@ final class StudentCard extends StatelessWidget {
 }
 
 final class _Avatar extends StatelessWidget {
-  final String name;
+  final String initial;
 
-  const _Avatar({required this.name});
+  const _Avatar({required this.initial});
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +78,7 @@ final class _Avatar extends StatelessWidget {
       radius: 22,
       backgroundColor: colors.primaryContainer,
       child: Text(
-        name.isEmpty ? '?' : name.substring(0, 1).toUpperCase(),
+        initial,
         style: TextStyle(
           color: colors.onPrimaryContainer,
           fontWeight: FontWeight.bold,

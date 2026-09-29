@@ -8,8 +8,10 @@ StudentListItem _student(String name, {String location = 'Centro'}) =>
     StudentListItem(
       id: name,
       name: name,
+      initial: '',
       location: location,
       position: const LeveledPosition([Level.practice]),
+      canOpen: true,
     );
 
 List<String> _names(List<StudentListItem> students) =>

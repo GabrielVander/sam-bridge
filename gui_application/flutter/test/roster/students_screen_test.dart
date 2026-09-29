@@ -235,6 +235,14 @@ void main() {
       expect(find.text('J'), findsOneWidget);
     });
 
+    testWidgets('keeps a first character made of two code units whole', (
+      tester,
+    ) async {
+      await pumpRoster(tester, [studentSummary(name: '𝄞 Clave')]);
+
+      expect(find.text('𝄞'), findsOneWidget);
+    });
+
     testWidgets('shows a question mark when the name is empty', (tester) async {
       await pumpRoster(tester, [studentSummary(name: '')]);
 

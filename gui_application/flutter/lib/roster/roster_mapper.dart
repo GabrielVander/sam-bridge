@@ -11,10 +11,16 @@ class RosterMapper {
   static StudentListItem toViewModel(StudentSummaryDto dto) => StudentListItem(
     id: dto.id,
     name: dto.name,
+    initial: _initial(dto.name),
     location: dto.location,
     position: _position(dto.position),
     instrument: _instrument(dto.instrument),
+    canOpen: dto.id.isNotEmpty,
   );
+
+  static String _initial(String name) => name.isEmpty
+      ? '?'
+      : String.fromCharCode(name.runes.first).toUpperCase();
 
   static StudentPosition _position(
     StudentPositionDto position,
