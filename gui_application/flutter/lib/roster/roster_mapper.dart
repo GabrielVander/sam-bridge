@@ -18,9 +18,8 @@ class RosterMapper {
     canOpen: dto.id.isNotEmpty,
   );
 
-  static String _initial(String name) => name.isEmpty
-      ? '?'
-      : String.fromCharCode(name.runes.first).toUpperCase();
+  static String _initial(String name) =>
+      name.isEmpty ? '?' : String.fromCharCode(name.runes.first).toUpperCase();
 
   static StudentPosition _position(
     StudentPositionDto position,
