@@ -159,6 +159,67 @@ void main() {
       expect(isFiltering(), isTrue);
     });
 
+    test('can clear the search only while a name is searched', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([studentSummary()]),
+      ]);
+      bool canClearSearch() =>
+          (cubit.stateValue as StudentsLoaded).canClearSearch;
+
+      await cubit.load();
+      expect(canClearSearch(), isFalse);
+
+      cubit.filter(nameQuery: 'Ana');
+      expect(canClearSearch(), isTrue);
+    });
+
+    test('summarises the location filter by how many are chosen', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([
+          studentSummary(id: '1', location: 'Loc A'),
+          studentSummary(id: '2', location: 'Loc B'),
+        ]),
+      ]);
+      LocationFilterSummary summary() =>
+          (cubit.stateValue as StudentsLoaded).locationFilter;
+
+      await cubit.load();
+      expect(summary(), isA<AnyLocation>());
+
+      cubit.filter(selectedLocations: {'Loc A', 'Loc B'});
+      expect(
+        summary(),
+        isA<ChosenLocations>().having((chosen) => chosen.count, 'count', 2),
+      );
+    });
+
+    test('shows the chosen locations only while there are some', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([studentSummary(location: 'Loc A')]),
+      ]);
+      bool shows() =>
+          (cubit.stateValue as StudentsLoaded).showsSelectedLocations;
+
+      await cubit.load();
+      expect(shows(), isFalse);
+
+      cubit.filter(selectedLocations: {'Loc A'});
+      expect(shows(), isTrue);
+    });
+
+    test('no matches name the search and the chosen locations', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([studentSummary(name: 'Ana', location: 'Loc A')]),
+      ]);
+
+      await cubit.load();
+      cubit.filter(nameQuery: 'zzzz', selectedLocations: {'Loc A'});
+
+      final listing = (cubit.stateValue as StudentsLoaded).listing as NoMatches;
+      expect(listing.searchedName, 'zzzz');
+      expect(listing.chosenLocations, ['Loc A']);
+    });
+
     test('filter() narrows students by selected locations', () async {
       final cubit = StudentsPresenter(
         retrieveStudents: () async => rosterLoaded([
@@ -187,7 +248,9 @@ void main() {
     testWidgets('closing drops a search still waiting to apply', (
       tester,
     ) async {
-      final cubit = presenterAnswering([rosterLoaded([studentSummary()])]);
+      final cubit = presenterAnswering([
+        rosterLoaded([studentSummary()]),
+      ]);
       await cubit.load();
 
       cubit.search('Ana');

@@ -29,13 +29,32 @@ final class StudentsLoaded extends StudentsState {
   final Set<String> selectedLocations;
   final List<String> availableLocations;
   final bool isFiltering;
+  final bool canClearSearch;
+  final LocationFilterSummary locationFilter;
+  final bool showsSelectedLocations;
   const StudentsLoaded({
     required this.listing,
     required this.nameQuery,
     required this.selectedLocations,
     required this.availableLocations,
     required this.isFiltering,
+    required this.canClearSearch,
+    required this.locationFilter,
+    required this.showsSelectedLocations,
   });
+}
+
+sealed class LocationFilterSummary {
+  const LocationFilterSummary();
+}
+
+final class AnyLocation extends LocationFilterSummary {
+  const AnyLocation();
+}
+
+final class ChosenLocations extends LocationFilterSummary {
+  final int count;
+  const ChosenLocations(this.count);
 }
 
 sealed class RosterListing {
@@ -47,7 +66,9 @@ final class NoStudents extends RosterListing {
 }
 
 final class NoMatches extends RosterListing {
-  const NoMatches();
+  final String? searchedName;
+  final List<String>? chosenLocations;
+  const NoMatches({this.searchedName, this.chosenLocations});
 }
 
 final class Matches extends RosterListing {
@@ -110,10 +131,7 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
 
   void search(String nameQuery) {
     _pendingSearch?.cancel();
-    _pendingSearch = Timer(
-      _searchDelay,
-      () => filter(nameQuery: nameQuery),
-    );
+    _pendingSearch = Timer(_searchDelay, () => filter(nameQuery: nameQuery));
   }
 
   void clearSearch() {
@@ -121,9 +139,8 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     filter(nameQuery: '');
   }
 
-  void removeLocation(String location) => filter(
-    selectedLocations: {..._filter.locations}..remove(location),
-  );
+  void removeLocation(String location) =>
+      filter(selectedLocations: {..._filter.locations}..remove(location));
 
   void clearFilters() {
     _pendingSearch?.cancel();
@@ -139,12 +156,24 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     selectedLocations: _filter.locations,
     availableLocations: StudentFilter.locationsOf(_all),
     isFiltering: !_filter.isEmpty,
+    canClearSearch: _filter.nameQuery.isNotEmpty,
+    locationFilter: _filter.locations.isEmpty
+        ? const AnyLocation()
+        : ChosenLocations(_filter.locations.length),
+    showsSelectedLocations: _filter.locations.isNotEmpty,
   );
 
   RosterListing _listing() {
     if (_all.isEmpty) return const NoStudents();
     final matching = _filter.apply(_all);
-    if (matching.isEmpty) return const NoMatches();
+    if (matching.isEmpty) {
+      return NoMatches(
+        searchedName: _filter.nameQuery.isEmpty ? null : _filter.nameQuery,
+        chosenLocations: _filter.locations.isEmpty
+            ? null
+            : _filter.locations.toList(),
+      );
+    }
     return Matches(matching);
   }
 }

@@ -54,18 +54,18 @@ final class _StudentsScreenState extends State<StudentsScreen> {
     children: [
       _SearchField(
         controller: _searchController,
-        hasQuery: state.nameQuery.isNotEmpty,
+        canClear: state.canClearSearch,
         onChanged: _presenter.search,
         onCleared: _clearSearch,
       ),
       _LocationFilterBar(
-        selectedLocations: state.selectedLocations,
+        summary: state.locationFilter,
         isFiltering: state.isFiltering,
         onPickLocations: () =>
             _pickLocations(state.availableLocations, state.selectedLocations),
         onClearFilters: _clearFilters,
       ),
-      if (state.selectedLocations.isNotEmpty)
+      if (state.showsSelectedLocations)
         _SelectedLocationChips(
           selectedLocations: state.selectedLocations,
           onRemoved: _presenter.removeLocation,
@@ -75,9 +75,9 @@ final class _StudentsScreenState extends State<StudentsScreen> {
       Expanded(
         child: switch (state.listing) {
           NoStudents() => Center(child: Text(context.l10n.rosterNoStudents)),
-          NoMatches() => _NoResults(
-            nameQuery: state.nameQuery,
-            selectedLocations: state.selectedLocations,
+          NoMatches(:final searchedName, :final chosenLocations) => _NoResults(
+            searchedName: searchedName,
+            chosenLocations: chosenLocations,
             onClearFilters: _clearFilters,
           ),
           Matches(:final students) => _StudentsList(students),
@@ -113,13 +113,13 @@ final class _StudentsScreenState extends State<StudentsScreen> {
 
 final class _SearchField extends StatelessWidget {
   final TextEditingController controller;
-  final bool hasQuery;
+  final bool canClear;
   final ValueChanged<String> onChanged;
   final VoidCallback onCleared;
 
   const _SearchField({
     required this.controller,
-    required this.hasQuery,
+    required this.canClear,
     required this.onChanged,
     required this.onCleared,
   });
@@ -133,7 +133,7 @@ final class _SearchField extends StatelessWidget {
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.search),
           hintText: context.l10n.rosterSearchHint,
-          suffixIcon: hasQuery
+          suffixIcon: canClear
               ? IconButton(icon: const Icon(Icons.clear), onPressed: onCleared)
               : null,
         ),
@@ -145,13 +145,13 @@ final class _SearchField extends StatelessWidget {
 }
 
 final class _LocationFilterBar extends StatelessWidget {
-  final Set<String> selectedLocations;
+  final LocationFilterSummary summary;
   final bool isFiltering;
   final VoidCallback onPickLocations;
   final VoidCallback onClearFilters;
 
   const _LocationFilterBar({
-    required this.selectedLocations,
+    required this.summary,
     required this.isFiltering,
     required this.onPickLocations,
     required this.onClearFilters,
@@ -166,13 +166,11 @@ final class _LocationFilterBar extends StatelessWidget {
           Expanded(
             child: OutlinedButton.icon(
               icon: const Icon(Icons.filter_list, size: 18),
-              label: Text(
-                selectedLocations.isEmpty
-                    ? context.l10n.rosterFilterByLocation
-                    : context.l10n.rosterSelectedLocations(
-                        selectedLocations.length,
-                      ),
-              ),
+              label: Text(switch (summary) {
+                AnyLocation() => context.l10n.rosterFilterByLocation,
+                ChosenLocations(:final count) =>
+                  context.l10n.rosterSelectedLocations(count),
+              }),
               onPressed: onPickLocations,
             ),
           ),
@@ -218,13 +216,13 @@ final class _SelectedLocationChips extends StatelessWidget {
 }
 
 final class _NoResults extends StatelessWidget {
-  final String nameQuery;
-  final Set<String> selectedLocations;
+  final String? searchedName;
+  final List<String>? chosenLocations;
   final VoidCallback onClearFilters;
 
   const _NoResults({
-    required this.nameQuery,
-    required this.selectedLocations,
+    required this.searchedName,
+    required this.chosenLocations,
     required this.onClearFilters,
   });
 
@@ -239,16 +237,17 @@ final class _NoResults extends StatelessWidget {
             const Icon(Icons.search_off, size: 48),
             const SizedBox(height: 12),
             Text(
-              nameQuery.isNotEmpty
-                  ? context.l10n.rosterNoResultsFor(nameQuery)
-                  : context.l10n.rosterNoResults,
+              switch (searchedName) {
+                final name? => context.l10n.rosterNoResultsFor(name),
+                null => context.l10n.rosterNoResults,
+              },
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            if (selectedLocations.isNotEmpty) ...[
+            if (chosenLocations case final locations?) ...[
               const SizedBox(height: 4),
               Text(
-                context.l10n.rosterInLocations(selectedLocations.join(', ')),
+                context.l10n.rosterInLocations(locations.join(', ')),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
