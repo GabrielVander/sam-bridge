@@ -50,6 +50,27 @@ void main() {
       expect(listedIds(cubit), ['1', '2']);
     });
 
+    test('opening the roster loads it the first time', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([studentSummary(id: '1')]),
+      ]);
+
+      await cubit.open();
+
+      expect(listedIds(cubit), ['1']);
+    });
+
+    test('opening the roster again keeps what is already loaded', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([studentSummary(id: '1')]),
+      ]);
+      await cubit.open();
+
+      await cubit.open();
+
+      expect(listedIds(cubit), ['1']);
+    });
+
     test(
       'load() transitions Loading -> Failure carrying the mapped error report',
       () async {
@@ -172,6 +193,16 @@ void main() {
       cubit.search('Ana');
       await cubit.close();
       await tester.pump(const Duration(seconds: 1));
+    });
+
+    test('remembers the name being searched', () async {
+      final cubit = presenterAnswering([rosterLoaded([])]);
+      expect(cubit.nameQuery, '');
+
+      await cubit.load();
+      cubit.filter(nameQuery: 'Ana');
+
+      expect(cubit.nameQuery, 'Ana');
     });
 
     test('removing a location keeps the other selected ones', () async {

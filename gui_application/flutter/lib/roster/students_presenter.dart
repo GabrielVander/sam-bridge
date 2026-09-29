@@ -75,6 +75,12 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     return super.close();
   }
 
+  String get nameQuery => _filter.nameQuery;
+
+  Future<void> open() async {
+    if (stateValue is StudentsIdle) await load();
+  }
+
   Future<void> load() async {
     emit(const StudentsLoading());
     try {

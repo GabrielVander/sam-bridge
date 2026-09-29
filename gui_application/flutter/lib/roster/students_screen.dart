@@ -16,19 +16,14 @@ class StudentsScreen extends StatefulWidget {
 }
 
 final class _StudentsScreenState extends State<StudentsScreen> {
-  final _searchController = TextEditingController();
+  late final TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
+    _searchController = TextEditingController(text: _presenter.nameQuery);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final state = _presenter.stateValue;
-      if (state is StudentsIdle) {
-        _presenter.load();
-      } else if (state is StudentsLoaded) {
-        _searchController.text = state.nameQuery;
-      }
+      if (mounted) _presenter.open();
     });
   }
 
