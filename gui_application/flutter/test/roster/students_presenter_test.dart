@@ -162,6 +162,18 @@ void main() {
       expect(listedIds(cubit), ['2']);
     });
 
+    // testWidgets only for its fake clock: no widget is involved.
+    testWidgets('closing drops a search still waiting to apply', (
+      tester,
+    ) async {
+      final cubit = presenterAnswering([rosterLoaded([studentSummary()])]);
+      await cubit.load();
+
+      cubit.search('Ana');
+      await cubit.close();
+      await tester.pump(const Duration(seconds: 1));
+    });
+
     test('removing a location keeps the other selected ones', () async {
       final cubit = presenterAnswering([
         rosterLoaded([

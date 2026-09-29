@@ -80,6 +80,22 @@ void main() {
       expect(tester.widget<TextField>(_searchField).controller?.text, isEmpty);
     });
 
+    testWidgets('clearing drops a search that was still waiting to apply', (
+      tester,
+    ) async {
+      await pumpRoster(tester, _everyone);
+      await search(tester, 'ana');
+
+      await tester.enterText(_searchField, 'bruno');
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ana Lima'), findsOneWidget);
+      expect(find.text('Bruno Costa'), findsOneWidget);
+    });
+
     testWidgets('says when nothing matches and offers to clear the filters', (
       tester,
     ) async {

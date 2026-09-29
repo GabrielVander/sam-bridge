@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/l10n/l10n.dart';
@@ -19,7 +17,6 @@ class StudentsScreen extends StatefulWidget {
 
 final class _StudentsScreenState extends State<StudentsScreen> {
   final _searchController = TextEditingController();
-  Timer? _debounce;
 
   @override
   void initState() {
@@ -38,7 +35,6 @@ final class _StudentsScreenState extends State<StudentsScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    _debounce?.cancel();
     super.dispose();
   }
 
@@ -64,7 +60,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
       _SearchField(
         controller: _searchController,
         hasQuery: state.nameQuery.isNotEmpty,
-        onChanged: _onSearchChanged,
+        onChanged: _presenter.search,
         onCleared: _clearSearch,
       ),
       _LocationFilterBar(
@@ -95,17 +91,9 @@ final class _StudentsScreenState extends State<StudentsScreen> {
     ],
   );
 
-  void _onSearchChanged(String value) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 250), () {
-      if (!mounted) return;
-      _presenter.filter(nameQuery: value);
-    });
-  }
-
   void _clearSearch() {
     _searchController.clear();
-    _presenter.filter(nameQuery: '');
+    _presenter.clearSearch();
   }
 
   void _clearFilters() {

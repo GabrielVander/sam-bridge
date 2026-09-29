@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_signals/bloc_signals.dart';
 import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/roster/student_list_item.dart';
@@ -6,6 +8,8 @@ import 'package:flutter_application/roster/ports/retrieve_students_use_case.dart
 import 'package:flutter_application/roster/roster_mapper.dart';
 import 'package:flutter_application/roster/student_filter.dart';
 import 'package:flutter_application/rust/api/roster.dart';
+
+const Duration _searchDelay = Duration(milliseconds: 250);
 
 sealed class StudentsState {
   const StudentsState();
@@ -60,9 +64,16 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
   final RetrieveStudentsUseCase _retrieveStudents;
   List<StudentListItem> _all = [];
   StudentFilter _filter = const StudentFilter();
+  Timer? _pendingSearch;
 
   StudentsPresenter({required this._retrieveStudents})
     : super(initialState: const StudentsIdle());
+
+  @override
+  Future<void> close() {
+    _pendingSearch?.cancel();
+    return super.close();
+  }
 
   Future<void> load() async {
     emit(const StudentsLoading());
@@ -91,11 +102,25 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     }
   }
 
+  void search(String nameQuery) {
+    _pendingSearch?.cancel();
+    _pendingSearch = Timer(
+      _searchDelay,
+      () => filter(nameQuery: nameQuery),
+    );
+  }
+
+  void clearSearch() {
+    _pendingSearch?.cancel();
+    filter(nameQuery: '');
+  }
+
   void removeLocation(String location) => filter(
     selectedLocations: {..._filter.locations}..remove(location),
   );
 
   void clearFilters() {
+    _pendingSearch?.cancel();
     _filter = const StudentFilter();
     if (stateValue is StudentsLoaded) {
       emit(_filteredState());
