@@ -1,4 +1,4 @@
-use authentication::application::gateways::AuthorizationError;
+use authentication::application::gateways::{AuthorizationError, SaveCredentialGatewayError};
 use authentication::application::use_cases::LogoutError;
 use sam::diagnostics::error_chain;
 use shared_kernel::failure_kind::FailureKind;
@@ -44,6 +44,15 @@ impl From<AuthorizationError> for ErrorReportDto {
             AuthorizationError::UnableToPerformOperation { kind, details } => {
                 Self::from_failure(kind, details)
             }
+        }
+    }
+}
+
+impl From<SaveCredentialGatewayError> for ErrorReportDto {
+    fn from(error: SaveCredentialGatewayError) -> Self {
+        Self {
+            kind: ErrorKindDto::LocalStorage,
+            details: error.to_string(),
         }
     }
 }

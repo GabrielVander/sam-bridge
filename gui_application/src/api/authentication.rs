@@ -7,6 +7,7 @@ use crate::api::error_report::ErrorReportDto;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LoginOutcomeDto {
     Successful,
+    SuccessfulWithoutRemembering { report: ErrorReportDto },
     InvalidEmailOrPassword,
     Failure { report: ErrorReportDto },
 }
@@ -27,8 +28,11 @@ pub enum LogoutOutcomeDto {
 impl From<Result<LoginOutcome, LoginUseCaseError>> for LoginOutcomeDto {
     fn from(result: Result<LoginOutcome, LoginUseCaseError>) -> Self {
         match result {
-            Ok(LoginOutcome::LoggedIn | LoginOutcome::LoggedInWithoutRemembering(_)) => {
-                Self::Successful
+            Ok(LoginOutcome::LoggedIn) => Self::Successful,
+            Ok(LoginOutcome::LoggedInWithoutRemembering(error)) => {
+                Self::SuccessfulWithoutRemembering {
+                    report: error.into(),
+                }
             }
             Err(LoginUseCaseError::InvalidEmailOrPassword) => Self::InvalidEmailOrPassword,
             Err(LoginUseCaseError::UnableToPerformAuthorization(error)) => Self::Failure {

@@ -689,8 +689,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 0:
         return LoginOutcomeDto_Successful();
       case 1:
-        return LoginOutcomeDto_InvalidEmailOrPassword();
+        return LoginOutcomeDto_SuccessfulWithoutRemembering(
+          report: dco_decode_box_autoadd_error_report_dto(arr[1]),
+        );
       case 2:
+        return LoginOutcomeDto_InvalidEmailOrPassword();
+      case 3:
         return LoginOutcomeDto_Failure(
           report: dco_decode_box_autoadd_error_report_dto(arr[1]),
         );
@@ -1298,8 +1302,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 0:
         return LoginOutcomeDto_Successful();
       case 1:
-        return LoginOutcomeDto_InvalidEmailOrPassword();
+        var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
+        return LoginOutcomeDto_SuccessfulWithoutRemembering(report: var_report);
       case 2:
+        return LoginOutcomeDto_InvalidEmailOrPassword();
+      case 3:
         var var_report = sse_decode_box_autoadd_error_report_dto(deserializer);
         return LoginOutcomeDto_Failure(report: var_report);
       default:
@@ -1944,10 +1951,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     switch (self) {
       case LoginOutcomeDto_Successful():
         sse_encode_i_32(0, serializer);
-      case LoginOutcomeDto_InvalidEmailOrPassword():
+      case LoginOutcomeDto_SuccessfulWithoutRemembering(report: final report):
         sse_encode_i_32(1, serializer);
-      case LoginOutcomeDto_Failure(report: final report):
+        sse_encode_box_autoadd_error_report_dto(report, serializer);
+      case LoginOutcomeDto_InvalidEmailOrPassword():
         sse_encode_i_32(2, serializer);
+      case LoginOutcomeDto_Failure(report: final report):
+        sse_encode_i_32(3, serializer);
         sse_encode_box_autoadd_error_report_dto(report, serializer);
     }
   }

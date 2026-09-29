@@ -55,11 +55,12 @@ extension LoginOutcomeDtoPatterns on LoginOutcomeDto {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoginOutcomeDto_Successful value)?  successful,TResult Function( LoginOutcomeDto_InvalidEmailOrPassword value)?  invalidEmailOrPassword,TResult Function( LoginOutcomeDto_Failure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoginOutcomeDto_Successful value)?  successful,TResult Function( LoginOutcomeDto_SuccessfulWithoutRemembering value)?  successfulWithoutRemembering,TResult Function( LoginOutcomeDto_InvalidEmailOrPassword value)?  invalidEmailOrPassword,TResult Function( LoginOutcomeDto_Failure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case LoginOutcomeDto_Successful() when successful != null:
-return successful(_that);case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
+return successful(_that);case LoginOutcomeDto_SuccessfulWithoutRemembering() when successfulWithoutRemembering != null:
+return successfulWithoutRemembering(_that);case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
 return invalidEmailOrPassword(_that);case LoginOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return orElse();
@@ -79,11 +80,12 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoginOutcomeDto_Successful value)  successful,required TResult Function( LoginOutcomeDto_InvalidEmailOrPassword value)  invalidEmailOrPassword,required TResult Function( LoginOutcomeDto_Failure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoginOutcomeDto_Successful value)  successful,required TResult Function( LoginOutcomeDto_SuccessfulWithoutRemembering value)  successfulWithoutRemembering,required TResult Function( LoginOutcomeDto_InvalidEmailOrPassword value)  invalidEmailOrPassword,required TResult Function( LoginOutcomeDto_Failure value)  failure,}){
 final _that = this;
 switch (_that) {
 case LoginOutcomeDto_Successful():
-return successful(_that);case LoginOutcomeDto_InvalidEmailOrPassword():
+return successful(_that);case LoginOutcomeDto_SuccessfulWithoutRemembering():
+return successfulWithoutRemembering(_that);case LoginOutcomeDto_InvalidEmailOrPassword():
 return invalidEmailOrPassword(_that);case LoginOutcomeDto_Failure():
 return failure(_that);}
 }
@@ -99,11 +101,12 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoginOutcomeDto_Successful value)?  successful,TResult? Function( LoginOutcomeDto_InvalidEmailOrPassword value)?  invalidEmailOrPassword,TResult? Function( LoginOutcomeDto_Failure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoginOutcomeDto_Successful value)?  successful,TResult? Function( LoginOutcomeDto_SuccessfulWithoutRemembering value)?  successfulWithoutRemembering,TResult? Function( LoginOutcomeDto_InvalidEmailOrPassword value)?  invalidEmailOrPassword,TResult? Function( LoginOutcomeDto_Failure value)?  failure,}){
 final _that = this;
 switch (_that) {
 case LoginOutcomeDto_Successful() when successful != null:
-return successful(_that);case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
+return successful(_that);case LoginOutcomeDto_SuccessfulWithoutRemembering() when successfulWithoutRemembering != null:
+return successfulWithoutRemembering(_that);case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
 return invalidEmailOrPassword(_that);case LoginOutcomeDto_Failure() when failure != null:
 return failure(_that);case _:
   return null;
@@ -122,10 +125,11 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  successful,TResult Function()?  invalidEmailOrPassword,TResult Function( ErrorReportDto report)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  successful,TResult Function( ErrorReportDto report)?  successfulWithoutRemembering,TResult Function()?  invalidEmailOrPassword,TResult Function( ErrorReportDto report)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LoginOutcomeDto_Successful() when successful != null:
-return successful();case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
+return successful();case LoginOutcomeDto_SuccessfulWithoutRemembering() when successfulWithoutRemembering != null:
+return successfulWithoutRemembering(_that.report);case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
 return invalidEmailOrPassword();case LoginOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return orElse();
@@ -145,10 +149,11 @@ return failure(_that.report);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  successful,required TResult Function()  invalidEmailOrPassword,required TResult Function( ErrorReportDto report)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  successful,required TResult Function( ErrorReportDto report)  successfulWithoutRemembering,required TResult Function()  invalidEmailOrPassword,required TResult Function( ErrorReportDto report)  failure,}) {final _that = this;
 switch (_that) {
 case LoginOutcomeDto_Successful():
-return successful();case LoginOutcomeDto_InvalidEmailOrPassword():
+return successful();case LoginOutcomeDto_SuccessfulWithoutRemembering():
+return successfulWithoutRemembering(_that.report);case LoginOutcomeDto_InvalidEmailOrPassword():
 return invalidEmailOrPassword();case LoginOutcomeDto_Failure():
 return failure(_that.report);}
 }
@@ -164,10 +169,11 @@ return failure(_that.report);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  successful,TResult? Function()?  invalidEmailOrPassword,TResult? Function( ErrorReportDto report)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  successful,TResult? Function( ErrorReportDto report)?  successfulWithoutRemembering,TResult? Function()?  invalidEmailOrPassword,TResult? Function( ErrorReportDto report)?  failure,}) {final _that = this;
 switch (_that) {
 case LoginOutcomeDto_Successful() when successful != null:
-return successful();case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
+return successful();case LoginOutcomeDto_SuccessfulWithoutRemembering() when successfulWithoutRemembering != null:
+return successfulWithoutRemembering(_that.report);case LoginOutcomeDto_InvalidEmailOrPassword() when invalidEmailOrPassword != null:
 return invalidEmailOrPassword();case LoginOutcomeDto_Failure() when failure != null:
 return failure(_that.report);case _:
   return null;
@@ -208,6 +214,72 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class LoginOutcomeDto_SuccessfulWithoutRemembering extends LoginOutcomeDto {
+  const LoginOutcomeDto_SuccessfulWithoutRemembering({required this.report}): super._();
+  
+
+ final  ErrorReportDto report;
+
+/// Create a copy of LoginOutcomeDto
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LoginOutcomeDto_SuccessfulWithoutRememberingCopyWith<LoginOutcomeDto_SuccessfulWithoutRemembering> get copyWith => _$LoginOutcomeDto_SuccessfulWithoutRememberingCopyWithImpl<LoginOutcomeDto_SuccessfulWithoutRemembering>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_SuccessfulWithoutRemembering&&(identical(other.report, report) || other.report == report));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,report);
+
+@override
+String toString() {
+  return 'LoginOutcomeDto.successfulWithoutRemembering(report: $report)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $LoginOutcomeDto_SuccessfulWithoutRememberingCopyWith<$Res> implements $LoginOutcomeDtoCopyWith<$Res> {
+  factory $LoginOutcomeDto_SuccessfulWithoutRememberingCopyWith(LoginOutcomeDto_SuccessfulWithoutRemembering value, $Res Function(LoginOutcomeDto_SuccessfulWithoutRemembering) _then) = _$LoginOutcomeDto_SuccessfulWithoutRememberingCopyWithImpl;
+@useResult
+$Res call({
+ ErrorReportDto report
+});
+
+
+
+
+}
+/// @nodoc
+class _$LoginOutcomeDto_SuccessfulWithoutRememberingCopyWithImpl<$Res>
+    implements $LoginOutcomeDto_SuccessfulWithoutRememberingCopyWith<$Res> {
+  _$LoginOutcomeDto_SuccessfulWithoutRememberingCopyWithImpl(this._self, this._then);
+
+  final LoginOutcomeDto_SuccessfulWithoutRemembering _self;
+  final $Res Function(LoginOutcomeDto_SuccessfulWithoutRemembering) _then;
+
+/// Create a copy of LoginOutcomeDto
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? report = null,}) {
+  return _then(LoginOutcomeDto_SuccessfulWithoutRemembering(
+report: null == report ? _self.report : report // ignore: cast_nullable_to_non_nullable
+as ErrorReportDto,
+  ));
+}
+
+
+}
 
 /// @nodoc
 

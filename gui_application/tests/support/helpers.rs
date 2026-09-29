@@ -28,6 +28,7 @@ pub struct FakeSam {
     authorization: Result<AuthorizationResult, AuthorizationError>,
     stored_credential: Option<Credential>,
     clear_failure: Option<String>,
+    save_failure: Option<String>,
     students: Result<Vec<Student>, StudentGatewayError>,
     musician_profile: Result<MusicianProfile, MusicianProfileGatewayError>,
     lessons: Result<StudentLessons, StudentLessonsGatewayError>,
@@ -39,6 +40,7 @@ impl Default for FakeSam {
             authorization: Ok(AuthorizationResult::Authorized),
             stored_credential: None,
             clear_failure: None,
+            save_failure: None,
             students: Ok(Vec::new()),
             musician_profile: Err(MusicianProfileGatewayError::NotFound),
             lessons: Ok(StudentLessons::default()),
@@ -78,6 +80,14 @@ impl FakeSam {
     }
 
     #[must_use]
+    pub fn failing_to_save(self, details: &str) -> Self {
+        Self {
+            save_failure: Some(details.to_owned()),
+            ..self
+        }
+    }
+
+    #[must_use]
     pub fn listing(self, students: Result<Vec<Student>, StudentGatewayError>) -> Self {
         Self { students, ..self }
     }
@@ -105,6 +115,7 @@ impl FakeSam {
         let credential_store = Arc::new(FakeCredentialStore {
             stored: Mutex::new(self.stored_credential),
             clear_failure: self.clear_failure,
+            save_failure: self.save_failure,
         });
         let lessons: Arc<dyn StudentLessonsGateway> = Arc::new(Answering(self.lessons));
 
@@ -155,6 +166,7 @@ impl StudentLessonsGateway for Answering<Result<StudentLessons, StudentLessonsGa
 struct FakeCredentialStore {
     stored: Mutex<Option<Credential>>,
     clear_failure: Option<String>,
+    save_failure: Option<String>,
 }
 
 impl FakeCredentialStore {
@@ -165,6 +177,11 @@ impl FakeCredentialStore {
 
 impl SaveCredentialGateway for FakeCredentialStore {
     fn save(&self, credential: &Credential) -> Result<(), SaveCredentialGatewayError> {
+        if let Some(details) = &self.save_failure {
+            return Err(SaveCredentialGatewayError::UnableToPerformOperation {
+                details: details.clone(),
+            });
+        }
         *self.stored() = Some(credential.clone());
         Ok(())
     }

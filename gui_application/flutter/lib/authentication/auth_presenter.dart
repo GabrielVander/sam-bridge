@@ -89,6 +89,7 @@ class AuthPresenter extends CubitSignal<AuthState> {
 
       switch (outcome) {
         case LoginOutcomeDto_Successful():
+        case LoginOutcomeDto_SuccessfulWithoutRemembering():
           emit(const AuthSuccess());
         case LoginOutcomeDto_InvalidEmailOrPassword():
           emit(const AuthUnauthorized());

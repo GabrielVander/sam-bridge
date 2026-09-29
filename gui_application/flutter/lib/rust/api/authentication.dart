@@ -16,6 +16,9 @@ sealed class LoginOutcomeDto with _$LoginOutcomeDto {
   const LoginOutcomeDto._();
 
   const factory LoginOutcomeDto.successful() = LoginOutcomeDto_Successful;
+  const factory LoginOutcomeDto.successfulWithoutRemembering({
+    required ErrorReportDto report,
+  }) = LoginOutcomeDto_SuccessfulWithoutRemembering;
   const factory LoginOutcomeDto.invalidEmailOrPassword() =
       LoginOutcomeDto_InvalidEmailOrPassword;
   const factory LoginOutcomeDto.failure({required ErrorReportDto report}) =

@@ -745,9 +745,16 @@ impl SseDecode for crate::api::authentication::LoginOutcomeDto {
                 return crate::api::authentication::LoginOutcomeDto::Successful;
             }
             1 => {
-                return crate::api::authentication::LoginOutcomeDto::InvalidEmailOrPassword;
+                let mut var_report =
+                    <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
+                return crate::api::authentication::LoginOutcomeDto::SuccessfulWithoutRemembering {
+                    report: var_report,
+                };
             }
             2 => {
+                return crate::api::authentication::LoginOutcomeDto::InvalidEmailOrPassword;
+            }
+            3 => {
                 let mut var_report =
                     <crate::api::error_report::ErrorReportDto>::sse_decode(deserializer);
                 return crate::api::authentication::LoginOutcomeDto::Failure { report: var_report };
@@ -1429,11 +1436,14 @@ impl flutter_rust_bridge::IntoDart for crate::api::authentication::LoginOutcomeD
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
             crate::api::authentication::LoginOutcomeDto::Successful => [0.into_dart()].into_dart(),
+            crate::api::authentication::LoginOutcomeDto::SuccessfulWithoutRemembering {
+                report,
+            } => [1.into_dart(), report.into_into_dart().into_dart()].into_dart(),
             crate::api::authentication::LoginOutcomeDto::InvalidEmailOrPassword => {
-                [1.into_dart()].into_dart()
+                [2.into_dart()].into_dart()
             }
             crate::api::authentication::LoginOutcomeDto::Failure { report } => {
-                [2.into_dart(), report.into_into_dart().into_dart()].into_dart()
+                [3.into_dart(), report.into_into_dart().into_dart()].into_dart()
             }
             _ => {
                 unimplemented!("");
@@ -2041,11 +2051,17 @@ impl SseEncode for crate::api::authentication::LoginOutcomeDto {
             crate::api::authentication::LoginOutcomeDto::Successful => {
                 <i32>::sse_encode(0, serializer);
             }
-            crate::api::authentication::LoginOutcomeDto::InvalidEmailOrPassword => {
+            crate::api::authentication::LoginOutcomeDto::SuccessfulWithoutRemembering {
+                report,
+            } => {
                 <i32>::sse_encode(1, serializer);
+                <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
+            }
+            crate::api::authentication::LoginOutcomeDto::InvalidEmailOrPassword => {
+                <i32>::sse_encode(2, serializer);
             }
             crate::api::authentication::LoginOutcomeDto::Failure { report } => {
-                <i32>::sse_encode(2, serializer);
+                <i32>::sse_encode(3, serializer);
                 <crate::api::error_report::ErrorReportDto>::sse_encode(report, serializer);
             }
             _ => {

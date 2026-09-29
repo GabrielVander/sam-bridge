@@ -35,6 +35,28 @@ fn an_authorized_login_is_successful() {
 }
 
 #[test]
+fn a_login_that_cannot_be_remembered_is_successful_with_a_local_storage_report() {
+    let facade = FakeSam::default()
+        .authorizing(Ok(AuthorizationResult::Authorized))
+        .failing_to_save("Unable to save the credential file: Permission denied")
+        .build();
+
+    let result = facade.login("e".to_owned(), "p".to_owned());
+
+    assert_eq!(
+        result,
+        LoginOutcomeDto::SuccessfulWithoutRemembering {
+            report: ErrorReportDto {
+                kind: ErrorKindDto::LocalStorage,
+                details: "Unable to perform credential storage operation: \
+                          Unable to save the credential file: Permission denied"
+                    .to_owned(),
+            }
+        }
+    );
+}
+
+#[test]
 fn a_login_sam_rejects_is_an_invalid_email_or_password() {
     let facade = FakeSam::default()
         .authorizing(Ok(AuthorizationResult::Unauthorized))
