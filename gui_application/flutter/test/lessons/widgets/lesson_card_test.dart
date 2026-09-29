@@ -89,6 +89,17 @@ void main() {
       expect(find.textContaining('Clave'), findsNothing);
     });
 
+    testWidgets('shows the instructor even without a clef or description', (
+      tester,
+    ) async {
+      await pumpInApp(
+        tester,
+        LessonCard(lessonItem(clef: null, description: '')),
+      );
+
+      expect(find.text('Maria Souza'), findsOneWidget);
+    });
+
     testWidgets('tells MSA lessons apart from method lessons by icon', (
       tester,
     ) async {
