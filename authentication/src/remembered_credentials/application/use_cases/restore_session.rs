@@ -5,7 +5,7 @@ use thiserror::Error;
 use crate::{
     application::gateways::{
         AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway,
-        ClearCredentialGateway, LoadCredentialGateway,
+        ClearCredentialGateway, ClearCredentialGatewayError, LoadCredentialGateway,
     },
     domain::entities::Credential,
 };
@@ -40,7 +40,7 @@ impl RestoreSessionUseCase {
             Ok(AuthorizationResult::Unauthorized) => {
                 self.credential_eraser
                     .clear()
-                    .map_err(|_| RestoreSessionError::UnableToClearRejectedCredentials)?;
+                    .map_err(RestoreSessionError::UnableToClearRejectedCredentials)?;
                 Ok(RestoreSessionOutcome::CredentialsRejected)
             }
             Err(error) => Err(RestoreSessionError::UnableToPerformOperation(error)),
@@ -60,5 +60,5 @@ pub enum RestoreSessionError {
     #[error(transparent)]
     UnableToPerformOperation(AuthorizationError),
     #[error("Unable to clear rejected credentials")]
-    UnableToClearRejectedCredentials,
+    UnableToClearRejectedCredentials(#[source] ClearCredentialGatewayError),
 }

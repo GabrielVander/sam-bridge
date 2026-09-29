@@ -50,7 +50,7 @@ impl From<Result<RestoreSessionOutcome, RestoreSessionError>> for RestoreSession
                 RestoreSessionOutcome::NoStoredCredentials
                 | RestoreSessionOutcome::CredentialsRejected,
             )
-            | Err(RestoreSessionError::UnableToClearRejectedCredentials) => Self::NotAvailable,
+            | Err(RestoreSessionError::UnableToClearRejectedCredentials(_)) => Self::NotAvailable,
             Err(RestoreSessionError::UnableToPerformOperation(error)) => Self::Failure {
                 report: error.into(),
             },

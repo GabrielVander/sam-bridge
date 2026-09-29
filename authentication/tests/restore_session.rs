@@ -100,7 +100,11 @@ fn use_case_when_rejected_credentials_cannot_be_cleared_surfaces_the_failure() {
 
     assert_eq!(
         result,
-        Err(RestoreSessionError::UnableToClearRejectedCredentials)
+        Err(RestoreSessionError::UnableToClearRejectedCredentials(
+            ClearCredentialGatewayError::UnableToPerformOperation {
+                details: "Unable to remove the credential file: Permission denied".to_owned(),
+            }
+        ))
     );
 }
 
