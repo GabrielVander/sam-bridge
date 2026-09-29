@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_application/errors/error_reason.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/clipboard.dart';
 import '../support/localization.dart';
 
 const _details = 'Request failed for operation dashboard: connection refused';
@@ -84,22 +84,7 @@ void main() {
     testWidgets('copies the details to the clipboard and confirms it', (
       tester,
     ) async {
-      String? copied;
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        (call) async {
-          if (call.method == 'Clipboard.setData') {
-            copied = (call.arguments as Map)['text'] as String;
-          }
-          return null;
-        },
-      );
-      addTearDown(
-        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          SystemChannels.platform,
-          null,
-        ),
-      );
+      final copied = recordClipboard(tester);
       await pumpPanel(tester);
       await tester.tap(find.text('Detalhes técnicos'));
       await tester.pumpAndSettle();
@@ -107,7 +92,7 @@ void main() {
       await tester.tap(find.byTooltip('Copiar detalhes'));
       await tester.pump();
 
-      expect(copied, _details);
+      expect(copied(), _details);
       expect(find.text('Detalhes copiados'), findsOneWidget);
     });
 
