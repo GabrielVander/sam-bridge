@@ -28,6 +28,9 @@ class LessonItem {
     required this.instructor,
     required this.method,
   });
+
+  bool get hasNotes =>
+      clef != null || description.isNotEmpty || instructor.isNotEmpty;
 }
 
 class StudentLessonsView {

@@ -61,9 +61,7 @@ final class LessonCard extends StatelessWidget {
                         ),
                     ],
                   ),
-                  if (clef != null ||
-                      lesson.description.isNotEmpty ||
-                      lesson.instructor.isNotEmpty) ...[
+                  if (lesson.hasNotes) ...[
                     const SizedBox(height: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
