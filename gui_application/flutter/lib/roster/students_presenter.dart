@@ -91,6 +91,10 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     }
   }
 
+  void removeLocation(String location) => filter(
+    selectedLocations: {..._filter.locations}..remove(location),
+  );
+
   void clearFilters() {
     _filter = const StudentFilter();
     if (stateValue is StudentsLoaded) {

@@ -77,8 +77,7 @@ final class _StudentsScreenState extends State<StudentsScreen> {
       if (state.selectedLocations.isNotEmpty)
         _SelectedLocationChips(
           selectedLocations: state.selectedLocations,
-          onChanged: (locations) =>
-              _presenter.filter(selectedLocations: locations),
+          onRemoved: _presenter.removeLocation,
         ),
       const SizedBox(height: 12),
       const Divider(height: 1),
@@ -209,11 +208,11 @@ final class _LocationFilterBar extends StatelessWidget {
 
 final class _SelectedLocationChips extends StatelessWidget {
   final Set<String> selectedLocations;
-  final ValueChanged<Set<String>> onChanged;
+  final ValueChanged<String> onRemoved;
 
   const _SelectedLocationChips({
     required this.selectedLocations,
-    required this.onChanged,
+    required this.onRemoved,
   });
 
   @override
@@ -227,9 +226,7 @@ final class _SelectedLocationChips extends StatelessWidget {
           for (final location in selectedLocations)
             InputChip(
               label: Text(location),
-              onDeleted: () => onChanged(
-                Set<String>.from(selectedLocations)..remove(location),
-              ),
+              onDeleted: () => onRemoved(location),
             ),
         ],
       ),

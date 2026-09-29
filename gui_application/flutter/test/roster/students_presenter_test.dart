@@ -162,6 +162,22 @@ void main() {
       expect(listedIds(cubit), ['2']);
     });
 
+    test('removing a location keeps the other selected ones', () async {
+      final cubit = presenterAnswering([
+        rosterLoaded([
+          studentSummary(id: '1', location: 'Loc A'),
+          studentSummary(id: '2', location: 'Loc B'),
+        ]),
+      ]);
+
+      await cubit.load();
+      cubit.filter(selectedLocations: {'Loc A', 'Loc B'});
+      cubit.removeLocation('Loc A');
+
+      expect((cubit.stateValue as StudentsLoaded).selectedLocations, {'Loc B'});
+      expect(listedIds(cubit), ['2']);
+    });
+
     test('clearFilters() resets query and locations', () async {
       final cubit = StudentsPresenter(
         retrieveStudents: () async => rosterLoaded([
