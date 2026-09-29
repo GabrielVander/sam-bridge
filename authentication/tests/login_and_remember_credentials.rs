@@ -3,7 +3,7 @@ use authentication::application::gateways::{
     LoadCredentialGateway, SaveCredentialGateway, SaveCredentialGatewayError,
 };
 use authentication::application::use_cases::{
-    LoginAndRememberCredentialsUseCase, LoginUseCaseError,
+    LoginAndRememberCredentialsUseCase, LoginOutcome, LoginUseCaseError,
 };
 use authentication::domain::entities::{Credential, Email, Password};
 use pretty_assertions::assert_eq;
@@ -25,10 +25,10 @@ fn successful_login_saves_the_credential() {
         in_memory_credential_store.clone(),
     );
 
-    let result: Result<(), LoginUseCaseError> =
+    let result: Result<LoginOutcome, LoginUseCaseError> =
         use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
-    assert_eq!(result, Ok(()));
+    assert_eq!(result, Ok(LoginOutcome::LoggedIn));
     assert_eq!(
         in_memory_credential_store.load(),
         Some(Credential::new(
@@ -47,7 +47,7 @@ fn failed_login_never_attempts_to_save_the_credential() {
     let use_case: LoginAndRememberCredentialsUseCase =
         LoginAndRememberCredentialsUseCase::new(authorization_gateway, credential_gateway.clone());
 
-    let result: Result<(), LoginUseCaseError> =
+    let result: Result<LoginOutcome, LoginUseCaseError> =
         use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(result, Err(LoginUseCaseError::InvalidEmailOrPassword));
@@ -59,7 +59,7 @@ fn failed_login_never_attempts_to_save_the_credential() {
 }
 
 #[test]
-fn a_failure_to_save_the_credential_does_not_fail_the_login() {
+fn a_login_whose_credential_cannot_be_saved_is_not_remembered_and_says_why() {
     let authorization_gateway: Arc<FakeAuthorizationGateway> =
         Arc::new(FakeAuthorizationGateway::always_authorized());
     let credential_gateway: Arc<FakeSaveCredentialGateway> =
@@ -68,10 +68,17 @@ fn a_failure_to_save_the_credential_does_not_fail_the_login() {
     let use_case: LoginAndRememberCredentialsUseCase =
         LoginAndRememberCredentialsUseCase::new(authorization_gateway, credential_gateway);
 
-    let result: Result<(), LoginUseCaseError> =
+    let result: Result<LoginOutcome, LoginUseCaseError> =
         use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
-    assert_eq!(result, Ok(()));
+    assert_eq!(
+        result,
+        Ok(LoginOutcome::LoggedInWithoutRemembering(
+            SaveCredentialGatewayError::UnableToPerformOperation {
+                details: "disk full".to_owned(),
+            }
+        ))
+    );
 }
 
 #[test]
@@ -88,7 +95,7 @@ fn authorization_gateway_failure_is_reported_with_its_kind_and_details() {
     let use_case =
         LoginAndRememberCredentialsUseCase::new(fake_authorization, fake_save_credential);
 
-    let result: Result<(), LoginUseCaseError> =
+    let result: Result<LoginOutcome, LoginUseCaseError> =
         use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(

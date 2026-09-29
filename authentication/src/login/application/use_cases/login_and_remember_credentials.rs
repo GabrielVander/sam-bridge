@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::{
     application::gateways::{
         AuthorizationError, AuthorizationResult, AuthorizeCredentialGateway, SaveCredentialGateway,
+        SaveCredentialGatewayError,
     },
     domain::entities::{Credential, Email, Password},
 };
@@ -25,18 +26,32 @@ impl LoginAndRememberCredentialsUseCase {
         }
     }
 
-    pub fn execute(&self, email: String, password: String) -> Result<(), LoginUseCaseError> {
+    pub fn execute(
+        &self,
+        email: String,
+        password: String,
+    ) -> Result<LoginOutcome, LoginUseCaseError> {
         let credential: Credential = Credential::new(Email::new(email), Password::new(password));
 
         match self.authorizer.authorize(&credential) {
-            Ok(AuthorizationResult::Authorized) => {
-                let _ = self.credential_storage.save(&credential);
-                Ok(())
-            }
+            Ok(AuthorizationResult::Authorized) => Ok(self.remember(&credential)),
             Ok(AuthorizationResult::Unauthorized) => Err(LoginUseCaseError::InvalidEmailOrPassword),
             Err(error) => Err(LoginUseCaseError::UnableToPerformAuthorization(error)),
         }
     }
+
+    fn remember(&self, credential: &Credential) -> LoginOutcome {
+        match self.credential_storage.save(credential) {
+            Ok(()) => LoginOutcome::LoggedIn,
+            Err(error) => LoginOutcome::LoggedInWithoutRemembering(error),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LoginOutcome {
+    LoggedIn,
+    LoggedInWithoutRemembering(SaveCredentialGatewayError),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
