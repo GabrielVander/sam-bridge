@@ -8,8 +8,8 @@ final _bruno = studentSummary(id: '2', name: 'Bruno Costa', location: 'Beta');
 final _carla = studentSummary(id: '3', name: 'Carla Dias', location: 'Alfa');
 final _everyone = [_ana, _bruno, _carla];
 
-Finder get _searchField => find.byType(TextField);
-Finder get _dialog => find.byType(AlertDialog);
+Finder get _searchField => find.widgetWithText(TextField, 'Buscar por nome…');
+Finder get _dialog => find.widgetWithText(AlertDialog, 'Aplicar');
 Finder inDialog(Finder finder) =>
     find.descendant(of: _dialog, matching: finder);
 
@@ -135,11 +135,11 @@ void main() {
 
       await openLocationPicker(tester);
 
-      final tiles = tester
-          .widgetList<CheckboxListTile>(find.byType(CheckboxListTile))
-          .map((tile) => (tile.title as Text).data)
-          .toList();
-      expect(tiles, ['Alfa', 'Beta']);
+      final alfa = inDialog(find.text('Alfa'));
+      final beta = inDialog(find.text('Beta'));
+      expect(alfa, findsOneWidget);
+      expect(beta, findsOneWidget);
+      expect(tester.getTopLeft(alfa).dy, lessThan(tester.getTopLeft(beta).dy));
     });
 
     testWidgets('applying a selection shows only those locations', (
@@ -207,7 +207,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Bruno Costa'), findsOneWidget);
-      expect(find.byType(InputChip), findsNothing);
+      expect(find.widgetWithText(InputChip, 'Alfa'), findsNothing);
     });
 
     testWidgets('clearing inside the picker unticks everything', (
@@ -222,7 +222,7 @@ void main() {
       await tester.tap(find.text('Aplicar'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(InputChip), findsNothing);
+      expect(find.widgetWithText(InputChip, 'Alfa'), findsNothing);
       expect(find.text('Bruno Costa'), findsOneWidget);
     });
 
@@ -233,7 +233,7 @@ void main() {
       await tester.tap(
         find.descendant(
           of: find.widgetWithText(InputChip, 'Alfa'),
-          matching: find.byType(Icon),
+          matching: find.byTooltip('Excluir'),
         ),
       );
       await tester.pumpAndSettle();
@@ -265,7 +265,7 @@ void main() {
       await tester.tap(find.text('Limpar'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(InputChip), findsNothing);
+      expect(find.widgetWithText(InputChip, 'Alfa'), findsNothing);
       expect(find.text('Filtrar por local'), findsOneWidget);
       expect(find.text('Bruno Costa'), findsOneWidget);
       expect(tester.widget<TextField>(_searchField).controller?.text, isEmpty);

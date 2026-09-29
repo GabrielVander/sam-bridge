@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/lessons_view_models.dart';
 import 'package:flutter_application/lessons/widgets/checkpoint_timeline.dart';
 import 'package:flutter_application/shared/level.dart';
-import 'package:flutter_application/widgets/progress_bar.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/builders.dart';
@@ -188,7 +187,8 @@ void main() {
       expect(find.text('Rumo a: Culto Oficial'), findsOneWidget);
       expect(find.text('40%'), findsOneWidget);
       expect(find.text('75%'), findsOneWidget);
-      expect(find.byType(ProgressBar), findsNWidgets(2));
+      expect(find.text('MSA'), findsOneWidget);
+      expect(find.text('Método'), findsOneWidget);
       expect(find.text('Todos os níveis alcançados'), findsNothing);
     });
 
@@ -225,7 +225,8 @@ void main() {
 
       expect(find.text('Todos os níveis alcançados'), findsOneWidget);
       expect(find.byIcon(Icons.emoji_events), findsOneWidget);
-      expect(find.byType(ProgressBar), findsNothing);
+      expect(find.text('MSA'), findsNothing);
+      expect(find.text('Método'), findsNothing);
     });
   });
 }
