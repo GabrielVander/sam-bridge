@@ -99,7 +99,8 @@ impl From<student_entities::MusicianLevel> for MusicianLevelDto {
         match level {
             student_entities::MusicianLevel::Candidate => Self::Candidate,
             student_entities::MusicianLevel::Practice => Self::Practice,
-            student_entities::MusicianLevel::YouthService => Self::YouthService,
+            student_entities::MusicianLevel::YouthService
+            | student_entities::MusicianLevel::YouthServicePractice => Self::YouthService,
             student_entities::MusicianLevel::OfficialService => Self::OfficialService,
             student_entities::MusicianLevel::Officialized => Self::Officialized,
             student_entities::MusicianLevel::Unknown(raw) => Self::Unknown { raw },

@@ -13,6 +13,7 @@ void main() {
       Positions.officialService: 'Culto Oficial',
       Positions.officialized: 'Oficialização',
       Positions.youthServiceHalfHour: 'Reunião de Jovens e Menores / Meia Hora',
+      Positions.youthServicePractice: 'Reunião de Jovens e Menores / Ensaio',
       Positions.gemSecretary: 'Secretário(a) do GEM',
       Positions.invalid('ALGO DESCONHECIDO'): 'ALGO DESCONHECIDO',
     };

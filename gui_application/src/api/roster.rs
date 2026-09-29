@@ -55,6 +55,7 @@ pub enum StudentPositionDto {
     OfficialService,
     Officialized,
     YouthServiceHalfHour,
+    YouthServicePractice,
     GemSecretary,
     Invalid { raw: String },
 }
@@ -140,6 +141,7 @@ impl From<MusicianLevel> for StudentPositionDto {
             MusicianLevel::Candidate => Self::Candidate,
             MusicianLevel::Practice => Self::Practice,
             MusicianLevel::YouthService => Self::YouthService,
+            MusicianLevel::YouthServicePractice => Self::YouthServicePractice,
             MusicianLevel::OfficialService => Self::OfficialService,
             MusicianLevel::Officialized => Self::Officialized,
             MusicianLevel::Unknown(raw) => Self::Invalid { raw },

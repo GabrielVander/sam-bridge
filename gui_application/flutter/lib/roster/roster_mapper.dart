@@ -39,6 +39,10 @@ class RosterMapper {
       Level.youthService,
       Level.halfHour,
     ]),
+    StudentPositionDto_YouthServicePractice() => const LeveledPosition([
+      Level.youthService,
+      Level.practice,
+    ]),
     StudentPositionDto_GemSecretary() => const GemSecretaryPosition(),
     StudentPositionDto_Invalid(:final raw) => UnrecognizedPosition(raw),
   };

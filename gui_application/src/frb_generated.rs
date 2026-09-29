@@ -1048,9 +1048,12 @@ impl SseDecode for crate::api::roster::StudentPositionDto {
                 return crate::api::roster::StudentPositionDto::YouthServiceHalfHour;
             }
             6 => {
-                return crate::api::roster::StudentPositionDto::GemSecretary;
+                return crate::api::roster::StudentPositionDto::YouthServicePractice;
             }
             7 => {
+                return crate::api::roster::StudentPositionDto::GemSecretary;
+            }
+            8 => {
                 let mut var_raw = <String>::sse_decode(deserializer);
                 return crate::api::roster::StudentPositionDto::Invalid { raw: var_raw };
             }
@@ -1682,9 +1685,12 @@ impl flutter_rust_bridge::IntoDart for crate::api::roster::StudentPositionDto {
             crate::api::roster::StudentPositionDto::YouthServiceHalfHour => {
                 [5.into_dart()].into_dart()
             }
-            crate::api::roster::StudentPositionDto::GemSecretary => [6.into_dart()].into_dart(),
+            crate::api::roster::StudentPositionDto::YouthServicePractice => {
+                [6.into_dart()].into_dart()
+            }
+            crate::api::roster::StudentPositionDto::GemSecretary => [7.into_dart()].into_dart(),
             crate::api::roster::StudentPositionDto::Invalid { raw } => {
-                [7.into_dart(), raw.into_into_dart().into_dart()].into_dart()
+                [8.into_dart(), raw.into_into_dart().into_dart()].into_dart()
             }
             _ => {
                 unimplemented!("");
@@ -2270,11 +2276,14 @@ impl SseEncode for crate::api::roster::StudentPositionDto {
             crate::api::roster::StudentPositionDto::YouthServiceHalfHour => {
                 <i32>::sse_encode(5, serializer);
             }
-            crate::api::roster::StudentPositionDto::GemSecretary => {
+            crate::api::roster::StudentPositionDto::YouthServicePractice => {
                 <i32>::sse_encode(6, serializer);
             }
-            crate::api::roster::StudentPositionDto::Invalid { raw } => {
+            crate::api::roster::StudentPositionDto::GemSecretary => {
                 <i32>::sse_encode(7, serializer);
+            }
+            crate::api::roster::StudentPositionDto::Invalid { raw } => {
+                <i32>::sse_encode(8, serializer);
                 <String>::sse_encode(raw, serializer);
             }
             _ => {

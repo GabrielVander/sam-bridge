@@ -121,6 +121,14 @@ fn a_level_whose_requirements_are_met_is_ready_for_the_exam() {
 }
 
 #[test]
+fn rehearsing_at_the_youth_meeting_is_the_youth_meeting_on_the_progress_journey() {
+    assert_eq!(
+        MusicianLevelDto::from(MusicianLevel::YouthServicePractice),
+        MusicianLevelDto::YouthService
+    );
+}
+
+#[test]
 fn a_student_without_an_instrument_is_reported_as_such() {
     let result = assessment_of(Ok(musician(MusicianLevel::Candidate, None)));
 

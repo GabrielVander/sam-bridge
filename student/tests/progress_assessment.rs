@@ -67,6 +67,34 @@ fn the_assigned_level_and_every_level_below_it_are_achieved() {
 }
 
 #[test]
+fn a_musician_rehearsing_at_the_youth_meeting_has_reached_the_youth_meeting() {
+    let assessment: ProgressAssessment = assess(
+        &MusicianLevel::YouthServicePractice,
+        Instrument::Violin,
+        &[],
+        &[],
+    )
+    .unwrap();
+
+    let statuses: Vec<(MusicianLevel, CheckpointStatus)> = assessment
+        .checkpoints
+        .iter()
+        .map(|c| (c.level.clone(), c.status))
+        .collect();
+
+    assert_eq!(
+        statuses,
+        vec![
+            (MusicianLevel::Candidate, CheckpointStatus::Achieved),
+            (MusicianLevel::Practice, CheckpointStatus::Achieved),
+            (MusicianLevel::YouthService, CheckpointStatus::Achieved),
+            (MusicianLevel::OfficialService, CheckpointStatus::Pending),
+            (MusicianLevel::Officialized, CheckpointStatus::Pending),
+        ]
+    );
+}
+
+#[test]
 fn meeting_a_higher_levels_requirements_makes_it_ready_for_the_exam() {
     let assessment: ProgressAssessment = assess(
         &MusicianLevel::Candidate,

@@ -52,6 +52,8 @@ abstract final class Positions {
       StudentPositionDto.officialized();
   static const StudentPositionDto youthServiceHalfHour =
       StudentPositionDto.youthServiceHalfHour();
+  static const StudentPositionDto youthServicePractice =
+      StudentPositionDto.youthServicePractice();
   static const StudentPositionDto gemSecretary =
       StudentPositionDto.gemSecretary();
 

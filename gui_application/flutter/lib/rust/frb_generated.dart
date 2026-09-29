@@ -903,8 +903,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 5:
         return StudentPositionDto_YouthServiceHalfHour();
       case 6:
-        return StudentPositionDto_GemSecretary();
+        return StudentPositionDto_YouthServicePractice();
       case 7:
+        return StudentPositionDto_GemSecretary();
+      case 8:
         return StudentPositionDto_Invalid(raw: dco_decode_String(arr[1]));
       default:
         throw Exception("unreachable");
@@ -1552,8 +1554,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 5:
         return StudentPositionDto_YouthServiceHalfHour();
       case 6:
-        return StudentPositionDto_GemSecretary();
+        return StudentPositionDto_YouthServicePractice();
       case 7:
+        return StudentPositionDto_GemSecretary();
+      case 8:
         var var_raw = sse_decode_String(deserializer);
         return StudentPositionDto_Invalid(raw: var_raw);
       default:
@@ -2166,10 +2170,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(4, serializer);
       case StudentPositionDto_YouthServiceHalfHour():
         sse_encode_i_32(5, serializer);
-      case StudentPositionDto_GemSecretary():
+      case StudentPositionDto_YouthServicePractice():
         sse_encode_i_32(6, serializer);
-      case StudentPositionDto_Invalid(raw: final raw):
+      case StudentPositionDto_GemSecretary():
         sse_encode_i_32(7, serializer);
+      case StudentPositionDto_Invalid(raw: final raw):
+        sse_encode_i_32(8, serializer);
         sse_encode_String(raw, serializer);
     }
   }

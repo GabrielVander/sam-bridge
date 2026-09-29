@@ -156,6 +156,7 @@ fn every_musician_level_is_a_position() {
         musician(MusicianLevel::Candidate),
         musician(MusicianLevel::Practice),
         musician(MusicianLevel::YouthService),
+        musician(MusicianLevel::YouthServicePractice),
         musician(MusicianLevel::OfficialService),
         musician(MusicianLevel::Officialized),
         musician(MusicianLevel::Unknown("Strawberry".to_owned())),
@@ -167,6 +168,7 @@ fn every_musician_level_is_a_position() {
             StudentPositionDto::Candidate,
             StudentPositionDto::Practice,
             StudentPositionDto::YouthService,
+            StudentPositionDto::YouthServicePractice,
             StudentPositionDto::OfficialService,
             StudentPositionDto::Officialized,
             StudentPositionDto::Invalid {

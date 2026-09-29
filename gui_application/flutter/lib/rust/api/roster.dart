@@ -70,6 +70,8 @@ sealed class StudentPositionDto with _$StudentPositionDto {
       StudentPositionDto_Officialized;
   const factory StudentPositionDto.youthServiceHalfHour() =
       StudentPositionDto_YouthServiceHalfHour;
+  const factory StudentPositionDto.youthServicePractice() =
+      StudentPositionDto_YouthServicePractice;
   const factory StudentPositionDto.gemSecretary() =
       StudentPositionDto_GemSecretary;
   const factory StudentPositionDto.invalid({required String raw}) =
