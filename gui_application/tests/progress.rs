@@ -1,7 +1,7 @@
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use gui_application::api::progress::{
-    AssessStudentProgressOutcomeDto, CheckpointStatusDto, MusicianLevelDto, ProgressAssessmentDto,
-    RequirementStatusDto,
+    AssessStudentProgressOutcomeDto, CheckpointDto, CheckpointStatusDto, MusicianLevelDto,
+    ProgressAssessmentDto, RequirementStatusDto,
 };
 use pretty_assertions::assert_eq;
 use student::application::gateways::{
@@ -38,11 +38,31 @@ fn an_assessment_carries_every_checkpoint_and_percentage() {
         AssessStudentProgressOutcomeDto::Success {
             assessment: ProgressAssessmentDto {
                 checkpoints: vec![
-                    checkpoint(MusicianLevelDto::Candidate, true, true),
-                    checkpoint(MusicianLevelDto::Practice, false, true),
-                    checkpoint(MusicianLevelDto::YouthService, false, false),
-                    checkpoint(MusicianLevelDto::OfficialService, false, false),
-                    checkpoint(MusicianLevelDto::Officialized, false, false),
+                    checkpoint(
+                        MusicianLevelDto::Candidate,
+                        CheckpointStatusDto::Achieved,
+                        true
+                    ),
+                    checkpoint(
+                        MusicianLevelDto::Practice,
+                        CheckpointStatusDto::Pending,
+                        true
+                    ),
+                    checkpoint(
+                        MusicianLevelDto::YouthService,
+                        CheckpointStatusDto::Pending,
+                        false
+                    ),
+                    checkpoint(
+                        MusicianLevelDto::OfficialService,
+                        CheckpointStatusDto::Pending,
+                        false
+                    ),
+                    checkpoint(
+                        MusicianLevelDto::Officialized,
+                        CheckpointStatusDto::Pending,
+                        false
+                    ),
                 ],
                 msa_relative_percent: 50.0,
                 method_relative_percent: 0.0,
@@ -65,6 +85,39 @@ fn an_officialized_musician_has_no_next_level() {
         panic!("the progress should be assessed, got {result:?}");
     };
     assert_eq!(assessment.next_level, None);
+}
+
+#[test]
+fn a_level_whose_requirements_are_met_is_ready_for_the_exam() {
+    let facade = FakeSam::default()
+        .profiling(Ok(musician(
+            MusicianLevel::Candidate,
+            Some(Instrument::Violin),
+        )))
+        .teaching(Ok(StudentLessons {
+            msa: vec![Lesson {
+                phase: Some(Range::single("12".to_owned())),
+                ..Lesson::default()
+            }],
+            method: vec![Lesson {
+                page: Some(Range::single("46".to_owned())),
+                lesson: Some(Range::single("113".to_owned())),
+                ..Lesson::default()
+            }],
+        }))
+        .build();
+
+    let AssessStudentProgressOutcomeDto::Success { assessment } =
+        facade.assess_student_progress("1".to_owned())
+    else {
+        panic!("the progress should be assessed");
+    };
+    let youth_service: Option<CheckpointStatusDto> = assessment
+        .checkpoints
+        .into_iter()
+        .find(|checkpoint| checkpoint.level == MusicianLevelDto::YouthService)
+        .map(|checkpoint| checkpoint.status);
+    assert_eq!(youth_service, Some(CheckpointStatusDto::ReadyForExam));
 }
 
 #[test]
@@ -191,13 +244,12 @@ const fn musician(level: MusicianLevel, instrument: Option<Instrument>) -> Music
 
 const fn checkpoint(
     level: MusicianLevelDto,
-    achieved: bool,
+    status: CheckpointStatusDto,
     requirement_met: bool,
-) -> CheckpointStatusDto {
-    CheckpointStatusDto {
+) -> CheckpointDto {
+    CheckpointDto {
         level,
-        achieved,
-        ready_to_advance: false,
+        status,
         requirement: RequirementStatusDto {
             msa_met: requirement_met,
             method_met: requirement_met,

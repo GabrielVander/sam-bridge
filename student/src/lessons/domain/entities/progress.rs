@@ -19,16 +19,29 @@ pub struct RequirementStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CheckpointStatus {
+pub struct Checkpoint {
     pub level: MusicianLevel,
-    pub achieved: bool,
-    pub ready_to_advance: bool,
+    pub status: CheckpointStatus,
     pub requirement: RequirementStatus,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CheckpointStatus {
+    Achieved,
+    ReadyForExam,
+    Pending,
+}
+
+impl Checkpoint {
+    #[must_use]
+    pub fn is_achieved(&self) -> bool {
+        self.status == CheckpointStatus::Achieved
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ProgressAssessment {
-    pub checkpoints: Vec<CheckpointStatus>,
+    pub checkpoints: Vec<Checkpoint>,
     pub msa_relative_percent: f64,
     pub method_relative_percent: f64,
     pub combined_percent: f64,
@@ -52,7 +65,7 @@ pub fn assess(
     let theory_recorded: f64 = max_field(msa_lessons.iter().map(|l| &l.phase));
     let method_recorded: RecordedProgress = recorded_progress(method);
 
-    let checkpoints: Vec<CheckpointStatus> = MusicianLevel::ASCENDING
+    let checkpoints: Vec<Checkpoint> = MusicianLevel::ASCENDING
         .iter()
         .map(|level| {
             build_checkpoint(
@@ -69,7 +82,7 @@ pub fn assess(
         .iter()
         .zip(checkpoints.iter())
         .find_map(|(level, checkpoint)| {
-            if checkpoint.achieved {
+            if checkpoint.is_achieved() {
                 return None;
             }
             catalog
@@ -89,8 +102,8 @@ pub fn assess(
         None => (100.0, 100.0, 100.0, None),
     };
 
-    let achieved_count: usize = checkpoints.iter().filter(|c| c.achieved).count();
-    let all_achieved: bool = checkpoints.iter().all(|c| c.achieved);
+    let achieved_count: usize = checkpoints.iter().filter(|c| c.is_achieved()).count();
+    let all_achieved: bool = checkpoints.iter().all(Checkpoint::is_achieved);
     let overall_checkpoint: f64 = if all_achieved {
         100.0
     } else {
@@ -135,14 +148,13 @@ fn build_checkpoint(
     catalog: &InstrumentRequirements,
     theory_recorded: f64,
     method_recorded: &RecordedProgress,
-) -> CheckpointStatus {
+) -> Checkpoint {
     let achieved: bool = assigned_level.rank() >= level.rank();
 
     let Some(requirement) = catalog.requirement_for(level) else {
-        return CheckpointStatus {
+        return Checkpoint {
             level: level.clone(),
-            achieved,
-            ready_to_advance: false,
+            status: checkpoint_status(achieved, false),
             requirement: RequirementStatus {
                 msa_met: true,
                 method_met: true,
@@ -153,14 +165,21 @@ fn build_checkpoint(
     let msa_met: bool = theory_recorded >= f64::from(requirement.theory.msa_phase);
     let (_, method_met) = assess_method(requirement, method_recorded);
 
-    CheckpointStatus {
+    Checkpoint {
         level: level.clone(),
-        achieved,
-        ready_to_advance: !achieved && msa_met && method_met,
+        status: checkpoint_status(achieved, msa_met && method_met),
         requirement: RequirementStatus {
             msa_met,
             method_met,
         },
+    }
+}
+
+const fn checkpoint_status(achieved: bool, requirement_met: bool) -> CheckpointStatus {
+    match (achieved, requirement_met) {
+        (true, _) => CheckpointStatus::Achieved,
+        (false, true) => CheckpointStatus::ReadyForExam,
+        (false, false) => CheckpointStatus::Pending,
     }
 }
 

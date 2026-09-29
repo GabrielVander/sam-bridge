@@ -6,8 +6,8 @@ use student::application::gateways::{
 };
 use student::application::use_cases::{AssessStudentProgressError, AssessStudentProgressUseCase};
 use student::domain::entities::{
-    AssessError, CheckpointStatus, Instrument, MusicianLevel, MusicianProfile, ProgressAssessment,
-    StudentId, StudentLessons,
+    AssessError, Checkpoint, CheckpointStatus, Instrument, MusicianLevel, MusicianProfile,
+    ProgressAssessment, StudentId, StudentLessons,
 };
 
 #[path = "support/helpers.rs"]
@@ -30,10 +30,10 @@ fn assesses_progress_from_the_gateways_profile_and_lessons() {
         .execute(&StudentId::new("500132".to_owned()))
         .expect("should succeed");
 
-    let youth_service: &CheckpointStatus =
+    let youth_service: &Checkpoint =
         checkpoint(&assessment, &MusicianLevel::YouthService).expect("youth service checkpoint");
 
-    assert!(youth_service.ready_to_advance);
+    assert_eq!(youth_service.status, CheckpointStatus::ReadyForExam);
 }
 
 #[test]

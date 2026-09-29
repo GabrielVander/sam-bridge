@@ -84,6 +84,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   StudentLessonsDto dco_decode_box_autoadd_student_lessons_dto(dynamic raw);
 
   @protected
+  CheckpointDto dco_decode_checkpoint_dto(dynamic raw);
+
+  @protected
   CheckpointStatusDto dco_decode_checkpoint_status_dto(dynamic raw);
 
   @protected
@@ -111,7 +114,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LessonDto dco_decode_lesson_dto(dynamic raw);
 
   @protected
-  List<CheckpointStatusDto> dco_decode_list_checkpoint_status_dto(dynamic raw);
+  List<CheckpointDto> dco_decode_list_checkpoint_dto(dynamic raw);
 
   @protected
   List<LessonDto> dco_decode_list_lesson_dto(dynamic raw);
@@ -253,6 +256,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  CheckpointDto sse_decode_checkpoint_dto(SseDeserializer deserializer);
+
+  @protected
   CheckpointStatusDto sse_decode_checkpoint_status_dto(
     SseDeserializer deserializer,
   );
@@ -282,7 +288,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LessonDto sse_decode_lesson_dto(SseDeserializer deserializer);
 
   @protected
-  List<CheckpointStatusDto> sse_decode_list_checkpoint_status_dto(
+  List<CheckpointDto> sse_decode_list_checkpoint_dto(
     SseDeserializer deserializer,
   );
 
@@ -459,6 +465,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_checkpoint_dto(CheckpointDto self, SseSerializer serializer);
+
+  @protected
   void sse_encode_checkpoint_status_dto(
     CheckpointStatusDto self,
     SseSerializer serializer,
@@ -492,8 +501,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_lesson_dto(LessonDto self, SseSerializer serializer);
 
   @protected
-  void sse_encode_list_checkpoint_status_dto(
-    List<CheckpointStatusDto> self,
+  void sse_encode_list_checkpoint_dto(
+    List<CheckpointDto> self,
     SseSerializer serializer,
   );
 

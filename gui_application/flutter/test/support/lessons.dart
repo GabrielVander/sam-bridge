@@ -69,19 +69,24 @@ abstract final class Levels {
       MusicianLevelDto.unknown(raw: raw);
 }
 
-CheckpointStatusDto checkpointStatus(
-  MusicianLevelDto level, {
-  bool achieved = false,
-  bool readyToAdvance = false,
-}) => CheckpointStatusDto(
-  level: level,
-  achieved: achieved,
-  readyToAdvance: readyToAdvance,
-  requirement: const RequirementStatusDto(msaMet: true, methodMet: true),
-);
+CheckpointDto achievedCheckpoint(MusicianLevelDto level) =>
+    _checkpoint(level, CheckpointStatusDto.achieved);
+
+CheckpointDto readyForExamCheckpoint(MusicianLevelDto level) =>
+    _checkpoint(level, CheckpointStatusDto.readyForExam);
+
+CheckpointDto pendingCheckpoint(MusicianLevelDto level) =>
+    _checkpoint(level, CheckpointStatusDto.pending);
+
+CheckpointDto _checkpoint(MusicianLevelDto level, CheckpointStatusDto status) =>
+    CheckpointDto(
+      level: level,
+      status: status,
+      requirement: const RequirementStatusDto(msaMet: true, methodMet: true),
+    );
 
 ProgressAssessmentDto progressAssessment({
-  List<CheckpointStatusDto> checkpoints = const [],
+  List<CheckpointDto> checkpoints = const [],
   double msaRelativePercent = 0,
   double methodRelativePercent = 0,
   double combinedPercent = 0,

@@ -21,16 +21,22 @@ pub enum MusicianLevelDto {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CheckpointStatusDto {
+pub struct CheckpointDto {
     pub level: MusicianLevelDto,
-    pub achieved: bool,
-    pub ready_to_advance: bool,
+    pub status: CheckpointStatusDto,
     pub requirement: RequirementStatusDto,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CheckpointStatusDto {
+    Achieved,
+    ReadyForExam,
+    Pending,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ProgressAssessmentDto {
-    pub checkpoints: Vec<CheckpointStatusDto>,
+    pub checkpoints: Vec<CheckpointDto>,
     pub msa_relative_percent: f64,
     pub method_relative_percent: f64,
     pub combined_percent: f64,
@@ -77,7 +83,7 @@ impl From<student_entities::ProgressAssessment> for ProgressAssessmentDto {
             checkpoints: assessment
                 .checkpoints
                 .into_iter()
-                .map(CheckpointStatusDto::from)
+                .map(CheckpointDto::from)
                 .collect(),
             msa_relative_percent: assessment.msa_relative_percent,
             method_relative_percent: assessment.method_relative_percent,
@@ -101,16 +107,25 @@ impl From<student_entities::MusicianLevel> for MusicianLevelDto {
     }
 }
 
-impl From<student_entities::CheckpointStatus> for CheckpointStatusDto {
-    fn from(checkpoint: student_entities::CheckpointStatus) -> Self {
+impl From<student_entities::Checkpoint> for CheckpointDto {
+    fn from(checkpoint: student_entities::Checkpoint) -> Self {
         Self {
             level: checkpoint.level.into(),
-            achieved: checkpoint.achieved,
-            ready_to_advance: checkpoint.ready_to_advance,
+            status: checkpoint.status.into(),
             requirement: RequirementStatusDto {
                 msa_met: checkpoint.requirement.msa_met,
                 method_met: checkpoint.requirement.method_met,
             },
+        }
+    }
+}
+
+impl From<student_entities::CheckpointStatus> for CheckpointStatusDto {
+    fn from(status: student_entities::CheckpointStatus) -> Self {
+        match status {
+            student_entities::CheckpointStatus::Achieved => Self::Achieved,
+            student_entities::CheckpointStatus::ReadyForExam => Self::ReadyForExam,
+            student_entities::CheckpointStatus::Pending => Self::Pending,
         }
     }
 }

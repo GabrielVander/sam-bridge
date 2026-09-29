@@ -480,19 +480,30 @@ impl SseDecode for bool {
     }
 }
 
-impl SseDecode for crate::api::progress::CheckpointStatusDto {
+impl SseDecode for crate::api::progress::CheckpointDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_level = <crate::api::progress::MusicianLevelDto>::sse_decode(deserializer);
-        let mut var_achieved = <bool>::sse_decode(deserializer);
-        let mut var_readyToAdvance = <bool>::sse_decode(deserializer);
+        let mut var_status = <crate::api::progress::CheckpointStatusDto>::sse_decode(deserializer);
         let mut var_requirement =
             <crate::api::progress::RequirementStatusDto>::sse_decode(deserializer);
-        return crate::api::progress::CheckpointStatusDto {
+        return crate::api::progress::CheckpointDto {
             level: var_level,
-            achieved: var_achieved,
-            ready_to_advance: var_readyToAdvance,
+            status: var_status,
             requirement: var_requirement,
+        };
+    }
+}
+
+impl SseDecode for crate::api::progress::CheckpointStatusDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::progress::CheckpointStatusDto::Achieved,
+            1 => crate::api::progress::CheckpointStatusDto::ReadyForExam,
+            2 => crate::api::progress::CheckpointStatusDto::Pending,
+            _ => unreachable!("Invalid variant for CheckpointStatusDto: {}", inner),
         };
     }
 }
@@ -673,13 +684,13 @@ impl SseDecode for crate::api::lessons::LessonDto {
     }
 }
 
-impl SseDecode for Vec<crate::api::progress::CheckpointStatusDto> {
+impl SseDecode for Vec<crate::api::progress::CheckpointDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
-            ans_.push(<crate::api::progress::CheckpointStatusDto>::sse_decode(
+            ans_.push(<crate::api::progress::CheckpointDto>::sse_decode(
                 deserializer,
             ));
         }
@@ -875,7 +886,7 @@ impl SseDecode for crate::api::progress::ProgressAssessmentDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_checkpoints =
-            <Vec<crate::api::progress::CheckpointStatusDto>>::sse_decode(deserializer);
+            <Vec<crate::api::progress::CheckpointDto>>::sse_decode(deserializer);
         let mut var_msaRelativePercent = <f64>::sse_decode(deserializer);
         let mut var_methodRelativePercent = <f64>::sse_decode(deserializer);
         let mut var_combinedPercent = <f64>::sse_decode(deserializer);
@@ -1209,15 +1220,36 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::progress::AssessStudentProgre
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::progress::CheckpointStatusDto {
+impl flutter_rust_bridge::IntoDart for crate::api::progress::CheckpointDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.level.into_into_dart().into_dart(),
-            self.achieved.into_into_dart().into_dart(),
-            self.ready_to_advance.into_into_dart().into_dart(),
+            self.status.into_into_dart().into_dart(),
             self.requirement.into_into_dart().into_dart(),
         ]
         .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::progress::CheckpointDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::progress::CheckpointDto>
+    for crate::api::progress::CheckpointDto
+{
+    fn into_into_dart(self) -> crate::api::progress::CheckpointDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::progress::CheckpointStatusDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Achieved => 0.into_dart(),
+            Self::ReadyForExam => 1.into_dart(),
+            Self::Pending => 2.into_dart(),
+            _ => unreachable!(),
+        }
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
@@ -1773,13 +1805,29 @@ impl SseEncode for bool {
     }
 }
 
-impl SseEncode for crate::api::progress::CheckpointStatusDto {
+impl SseEncode for crate::api::progress::CheckpointDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <crate::api::progress::MusicianLevelDto>::sse_encode(self.level, serializer);
-        <bool>::sse_encode(self.achieved, serializer);
-        <bool>::sse_encode(self.ready_to_advance, serializer);
+        <crate::api::progress::CheckpointStatusDto>::sse_encode(self.status, serializer);
         <crate::api::progress::RequirementStatusDto>::sse_encode(self.requirement, serializer);
+    }
+}
+
+impl SseEncode for crate::api::progress::CheckpointStatusDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::progress::CheckpointStatusDto::Achieved => 0,
+                crate::api::progress::CheckpointStatusDto::ReadyForExam => 1,
+                crate::api::progress::CheckpointStatusDto::Pending => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -1946,12 +1994,12 @@ impl SseEncode for crate::api::lessons::LessonDto {
     }
 }
 
-impl SseEncode for Vec<crate::api::progress::CheckpointStatusDto> {
+impl SseEncode for Vec<crate::api::progress::CheckpointDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::api::progress::CheckpointStatusDto>::sse_encode(item, serializer);
+            <crate::api::progress::CheckpointDto>::sse_encode(item, serializer);
         }
     }
 }
@@ -2118,7 +2166,7 @@ impl SseEncode for Option<crate::api::lessons::RangeDto> {
 impl SseEncode for crate::api::progress::ProgressAssessmentDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::api::progress::CheckpointStatusDto>>::sse_encode(self.checkpoints, serializer);
+        <Vec<crate::api::progress::CheckpointDto>>::sse_encode(self.checkpoints, serializer);
         <f64>::sse_encode(self.msa_relative_percent, serializer);
         <f64>::sse_encode(self.method_relative_percent, serializer);
         <f64>::sse_encode(self.combined_percent, serializer);

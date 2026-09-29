@@ -77,9 +77,9 @@ void main() {
         progress: progressAssessed(
           progressAssessment(
             checkpoints: [
-              checkpointStatus(Levels.youthService, achieved: true),
-              checkpointStatus(Levels.officialService, readyToAdvance: true),
-              checkpointStatus(Levels.unknown('EXÓTICO')),
+              achievedCheckpoint(Levels.youthService),
+              readyForExamCheckpoint(Levels.officialService),
+              pendingCheckpoint(Levels.unknown('EXÓTICO')),
             ],
             nextLevel: Levels.officialService,
           ),
@@ -94,20 +94,12 @@ void main() {
       expect(find.text('EXÓTICO'), findsOneWidget);
     });
 
-    testWidgets('an achieved level is no longer offered for the exam', (
-      tester,
-    ) async {
+    testWidgets('marks an achieved level as achieved', (tester) async {
       await pumpStudent(
         tester,
         progress: progressAssessed(
           progressAssessment(
-            checkpoints: [
-              checkpointStatus(
-                Levels.youthService,
-                achieved: true,
-                readyToAdvance: true,
-              ),
-            ],
+            checkpoints: [achievedCheckpoint(Levels.youthService)],
             nextLevel: Levels.officialService,
           ),
         ),

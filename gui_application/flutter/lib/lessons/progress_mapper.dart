@@ -15,18 +15,16 @@ class ProgressMapper {
     },
   );
 
-  static CheckpointView _toCheckpoint(CheckpointStatusDto dto) =>
-      CheckpointView(
-        level: _toLevel(dto.level),
-        status: switch (dto) {
-          CheckpointStatusDto(achieved: true) => CheckpointStatus.achieved,
-          CheckpointStatusDto(readyToAdvance: true) =>
-            CheckpointStatus.readyForExam,
-          _ => CheckpointStatus.pending,
-        },
-        msaMet: dto.requirement.msaMet,
-        methodMet: dto.requirement.methodMet,
-      );
+  static CheckpointView _toCheckpoint(CheckpointDto dto) => CheckpointView(
+    level: _toLevel(dto.level),
+    status: switch (dto.status) {
+      CheckpointStatusDto.achieved => CheckpointStatus.achieved,
+      CheckpointStatusDto.readyForExam => CheckpointStatus.readyForExam,
+      CheckpointStatusDto.pending => CheckpointStatus.pending,
+    },
+    msaMet: dto.requirement.msaMet,
+    methodMet: dto.requirement.methodMet,
+  );
 
   static ReportedLevel _toLevel(MusicianLevelDto level) => switch (level) {
     MusicianLevelDto_Candidate() => const KnownLevel(Level.candidate),

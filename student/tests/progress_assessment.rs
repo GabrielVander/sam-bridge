@@ -1,6 +1,7 @@
 use pretty_assertions::assert_eq;
 use student::domain::entities::{
-    AssessError, CheckpointStatus, Instrument, Lesson, MusicianLevel, ProgressAssessment, assess,
+    AssessError, Checkpoint, CheckpointStatus, Instrument, Lesson, MusicianLevel,
+    ProgressAssessment, assess,
 };
 
 #[path = "support/helpers.rs"]
@@ -12,12 +13,18 @@ fn a_candidate_without_lessons_has_only_the_first_checkpoint() {
     let assessment: ProgressAssessment =
         assess(&MusicianLevel::Candidate, Instrument::Violin, &[], &[]).unwrap();
 
-    assert!(
+    assert_eq!(
         checkpoint(&assessment, &MusicianLevel::Candidate)
             .unwrap()
-            .achieved
+            .status,
+        CheckpointStatus::Achieved
     );
-    assert!(!assessment.checkpoints.iter().any(|c| c.ready_to_advance));
+    assert!(
+        !assessment
+            .checkpoints
+            .iter()
+            .any(|c| c.status == CheckpointStatus::ReadyForExam)
+    );
     assert!((assessment.overall_checkpoint_percent - 20.0).abs() < 0.1);
     assert!(
         is_about(assessment.msa_relative_percent, 0.0),
@@ -41,26 +48,26 @@ fn the_assigned_level_and_every_level_below_it_are_achieved() {
     )
     .unwrap();
 
-    let achieved: Vec<(MusicianLevel, bool)> = assessment
+    let statuses: Vec<(MusicianLevel, CheckpointStatus)> = assessment
         .checkpoints
         .iter()
-        .map(|c| (c.level.clone(), c.achieved))
+        .map(|c| (c.level.clone(), c.status))
         .collect();
 
     assert_eq!(
-        achieved,
+        statuses,
         vec![
-            (MusicianLevel::Candidate, true),
-            (MusicianLevel::Practice, true),
-            (MusicianLevel::YouthService, true),
-            (MusicianLevel::OfficialService, false),
-            (MusicianLevel::Officialized, false),
+            (MusicianLevel::Candidate, CheckpointStatus::Achieved),
+            (MusicianLevel::Practice, CheckpointStatus::Achieved),
+            (MusicianLevel::YouthService, CheckpointStatus::Achieved),
+            (MusicianLevel::OfficialService, CheckpointStatus::Pending),
+            (MusicianLevel::Officialized, CheckpointStatus::Pending),
         ]
     );
 }
 
 #[test]
-fn meeting_a_higher_levels_requirements_shows_ready_to_advance() {
+fn meeting_a_higher_levels_requirements_makes_it_ready_for_the_exam() {
     let assessment: ProgressAssessment = assess(
         &MusicianLevel::Candidate,
         Instrument::Violin,
@@ -69,14 +76,29 @@ fn meeting_a_higher_levels_requirements_shows_ready_to_advance() {
     )
     .unwrap();
 
-    let practice: &CheckpointStatus = checkpoint(&assessment, &MusicianLevel::Practice).unwrap();
-    assert!(!practice.achieved);
-    assert!(!practice.ready_to_advance);
+    let practice: &Checkpoint = checkpoint(&assessment, &MusicianLevel::Practice).unwrap();
+    assert_eq!(practice.status, CheckpointStatus::Pending);
 
-    let youth_service: &CheckpointStatus =
-        checkpoint(&assessment, &MusicianLevel::YouthService).unwrap();
-    assert!(!youth_service.achieved);
-    assert!(youth_service.ready_to_advance);
+    let youth_service: &Checkpoint = checkpoint(&assessment, &MusicianLevel::YouthService).unwrap();
+    assert_eq!(youth_service.status, CheckpointStatus::ReadyForExam);
+}
+
+#[test]
+fn an_achieved_level_is_not_ready_for_the_exam_again() {
+    let assessment: ProgressAssessment = assess(
+        &MusicianLevel::YouthService,
+        Instrument::Violin,
+        &[msa_lesson("12", "12")],
+        &[method_lesson("46", "113")],
+    )
+    .unwrap();
+
+    assert_eq!(
+        checkpoint(&assessment, &MusicianLevel::YouthService)
+            .unwrap()
+            .status,
+        CheckpointStatus::Achieved
+    );
 }
 
 #[test]
@@ -97,10 +119,11 @@ fn official_service_needs_msa_phase_16() {
     )
     .unwrap();
 
-    assert!(
+    assert_eq!(
         checkpoint(&assessment, &MusicianLevel::OfficialService)
             .unwrap()
-            .ready_to_advance
+            .status,
+        CheckpointStatus::ReadyForExam
     );
 }
 
@@ -114,10 +137,9 @@ fn officialization_cannot_be_verified_from_the_lessons_alone() {
     )
     .unwrap();
 
-    let officialized: &CheckpointStatus =
-        checkpoint(&assessment, &MusicianLevel::Officialized).unwrap();
+    let officialized: &Checkpoint = checkpoint(&assessment, &MusicianLevel::Officialized).unwrap();
 
-    assert!(!officialized.ready_to_advance);
+    assert_eq!(officialized.status, CheckpointStatus::Pending);
     assert!(!officialized.requirement.method_met);
 }
 
@@ -126,7 +148,12 @@ fn an_officialized_musician_has_completed_the_whole_journey() {
     let assessment: ProgressAssessment =
         assess(&MusicianLevel::Officialized, Instrument::Violin, &[], &[]).unwrap();
 
-    assert!(assessment.checkpoints.iter().all(|c| c.achieved));
+    assert!(
+        assessment
+            .checkpoints
+            .iter()
+            .all(|c| c.status == CheckpointStatus::Achieved)
+    );
     assert_eq!(assessment.next_level, None);
     assert!((assessment.overall_checkpoint_percent - 100.0).abs() < f64::EPSILON);
     assert!((assessment.combined_percent - 100.0).abs() < f64::EPSILON);

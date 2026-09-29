@@ -9,7 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'progress.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 @freezed
 sealed class AssessStudentProgressOutcomeDto
@@ -31,36 +31,31 @@ sealed class AssessStudentProgressOutcomeDto
   }) = AssessStudentProgressOutcomeDto_Failure;
 }
 
-class CheckpointStatusDto {
+class CheckpointDto {
   final MusicianLevelDto level;
-  final bool achieved;
-  final bool readyToAdvance;
+  final CheckpointStatusDto status;
   final RequirementStatusDto requirement;
 
-  const CheckpointStatusDto({
+  const CheckpointDto({
     required this.level,
-    required this.achieved,
-    required this.readyToAdvance,
+    required this.status,
     required this.requirement,
   });
 
   @override
-  int get hashCode =>
-      level.hashCode ^
-      achieved.hashCode ^
-      readyToAdvance.hashCode ^
-      requirement.hashCode;
+  int get hashCode => level.hashCode ^ status.hashCode ^ requirement.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CheckpointStatusDto &&
+      other is CheckpointDto &&
           runtimeType == other.runtimeType &&
           level == other.level &&
-          achieved == other.achieved &&
-          readyToAdvance == other.readyToAdvance &&
+          status == other.status &&
           requirement == other.requirement;
 }
+
+enum CheckpointStatusDto { achieved, readyForExam, pending }
 
 @freezed
 sealed class MusicianLevelDto with _$MusicianLevelDto {
@@ -77,7 +72,7 @@ sealed class MusicianLevelDto with _$MusicianLevelDto {
 }
 
 class ProgressAssessmentDto {
-  final List<CheckpointStatusDto> checkpoints;
+  final List<CheckpointDto> checkpoints;
   final double msaRelativePercent;
   final double methodRelativePercent;
   final double combinedPercent;

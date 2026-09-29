@@ -515,17 +515,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  CheckpointStatusDto dco_decode_checkpoint_status_dto(dynamic raw) {
+  CheckpointDto dco_decode_checkpoint_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = dcoDecodeList(raw);
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return CheckpointStatusDto(
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return CheckpointDto(
       level: dco_decode_musician_level_dto(arr[0]),
-      achieved: dco_decode_bool(arr[1]),
-      readyToAdvance: dco_decode_bool(arr[2]),
-      requirement: dco_decode_requirement_status_dto(arr[3]),
+      status: dco_decode_checkpoint_status_dto(arr[1]),
+      requirement: dco_decode_requirement_status_dto(arr[2]),
     );
+  }
+
+  @protected
+  CheckpointStatusDto dco_decode_checkpoint_status_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return CheckpointStatusDto.values[dcoDecodePrimitiveInt(raw)];
   }
 
   @protected
@@ -653,9 +658,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<CheckpointStatusDto> dco_decode_list_checkpoint_status_dto(dynamic raw) {
+  List<CheckpointDto> dco_decode_list_checkpoint_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dcoDecodeList(raw).map(dco_decode_checkpoint_status_dto).toList();
+    return dcoDecodeList(raw).map(dco_decode_checkpoint_dto).toList();
   }
 
   @protected
@@ -775,7 +780,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 6)
       throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return ProgressAssessmentDto(
-      checkpoints: dco_decode_list_checkpoint_status_dto(arr[0]),
+      checkpoints: dco_decode_list_checkpoint_dto(arr[0]),
       msaRelativePercent: dco_decode_f_64(arr[1]),
       methodRelativePercent: dco_decode_f_64(arr[2]),
       combinedPercent: dco_decode_f_64(arr[3]),
@@ -1090,20 +1095,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CheckpointDto sse_decode_checkpoint_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_level = sse_decode_musician_level_dto(deserializer);
+    var var_status = sse_decode_checkpoint_status_dto(deserializer);
+    var var_requirement = sse_decode_requirement_status_dto(deserializer);
+    return CheckpointDto(
+      level: var_level,
+      status: var_status,
+      requirement: var_requirement,
+    );
+  }
+
+  @protected
   CheckpointStatusDto sse_decode_checkpoint_status_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_level = sse_decode_musician_level_dto(deserializer);
-    var var_achieved = sse_decode_bool(deserializer);
-    var var_readyToAdvance = sse_decode_bool(deserializer);
-    var var_requirement = sse_decode_requirement_status_dto(deserializer);
-    return CheckpointStatusDto(
-      level: var_level,
-      achieved: var_achieved,
-      readyToAdvance: var_readyToAdvance,
-      requirement: var_requirement,
-    );
+    var inner = sse_decode_i_32(deserializer);
+    return CheckpointStatusDto.values[inner];
   }
 
   @protected
@@ -1233,15 +1243,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<CheckpointStatusDto> sse_decode_list_checkpoint_status_dto(
+  List<CheckpointDto> sse_decode_list_checkpoint_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <CheckpointStatusDto>[];
+    var ans_ = <CheckpointDto>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_checkpoint_status_dto(deserializer));
+      ans_.add(sse_decode_checkpoint_dto(deserializer));
     }
     return ans_;
   }
@@ -1412,7 +1422,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_checkpoints = sse_decode_list_checkpoint_status_dto(deserializer);
+    var var_checkpoints = sse_decode_list_checkpoint_dto(deserializer);
     var var_msaRelativePercent = sse_decode_f_64(deserializer);
     var var_methodRelativePercent = sse_decode_f_64(deserializer);
     var var_combinedPercent = sse_decode_f_64(deserializer);
@@ -1753,15 +1763,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_checkpoint_dto(CheckpointDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_musician_level_dto(self.level, serializer);
+    sse_encode_checkpoint_status_dto(self.status, serializer);
+    sse_encode_requirement_status_dto(self.requirement, serializer);
+  }
+
+  @protected
   void sse_encode_checkpoint_status_dto(
     CheckpointStatusDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_musician_level_dto(self.level, serializer);
-    sse_encode_bool(self.achieved, serializer);
-    sse_encode_bool(self.readyToAdvance, serializer);
-    sse_encode_requirement_status_dto(self.requirement, serializer);
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -1875,14 +1890,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_checkpoint_status_dto(
-    List<CheckpointStatusDto> self,
+  void sse_encode_list_checkpoint_dto(
+    List<CheckpointDto> self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
-      sse_encode_checkpoint_status_dto(item, serializer);
+      sse_encode_checkpoint_dto(item, serializer);
     }
   }
 
@@ -2056,7 +2071,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_checkpoint_status_dto(self.checkpoints, serializer);
+    sse_encode_list_checkpoint_dto(self.checkpoints, serializer);
     sse_encode_f_64(self.msaRelativePercent, serializer);
     sse_encode_f_64(self.methodRelativePercent, serializer);
     sse_encode_f_64(self.combinedPercent, serializer);
