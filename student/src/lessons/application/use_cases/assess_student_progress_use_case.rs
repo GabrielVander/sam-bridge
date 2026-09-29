@@ -10,18 +10,6 @@ use crate::lessons::{
 use crate::shared::domain::entities::StudentId;
 use thiserror::Error;
 
-#[derive(Debug, Clone, PartialEq, Eq, Error)]
-pub enum AssessStudentProgressError {
-    #[error(transparent)]
-    Profile(#[from] MusicianProfileGatewayError),
-    #[error(transparent)]
-    Lessons(#[from] StudentLessonsGatewayError),
-    #[error("student has no instrument assigned yet")]
-    NoInstrumentAssigned,
-    #[error(transparent)]
-    Assessment(#[from] AssessError),
-}
-
 #[derive(Clone)]
 pub struct AssessStudentProgressUseCase {
     profile_gateway: Arc<dyn MusicianProfileGateway>,
@@ -59,4 +47,16 @@ impl AssessStudentProgressUseCase {
             &lessons.method,
         )?)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum AssessStudentProgressError {
+    #[error(transparent)]
+    Profile(#[from] MusicianProfileGatewayError),
+    #[error(transparent)]
+    Lessons(#[from] StudentLessonsGatewayError),
+    #[error("student has no instrument assigned yet")]
+    NoInstrumentAssigned,
+    #[error(transparent)]
+    Assessment(#[from] AssessError),
 }
