@@ -7,6 +7,7 @@ pub fn parse_musician_level(level: &str) -> MusicianLevel {
         "CANDIDATO(A)" => MusicianLevel::Candidate,
         "ENSAIO" => MusicianLevel::Practice,
         "RJM" => MusicianLevel::YouthService,
+        "RJM / ENSAIO" => MusicianLevel::YouthServicePractice,
         "CULTO OFICIAL" => MusicianLevel::OfficialService,
         other => MusicianLevel::Unknown(other.to_owned()),
     }

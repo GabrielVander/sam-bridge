@@ -177,11 +177,8 @@ fn every_known_musician_level_is_recognized() {
         ("CANDIDATO(A)", MusicianLevel::Candidate),
         ("ENSAIO", MusicianLevel::Practice),
         ("RJM", MusicianLevel::YouthService),
+        ("RJM / ENSAIO", MusicianLevel::YouthServicePractice),
         ("CULTO OFICIAL", MusicianLevel::OfficialService),
-        (
-            "RJM / ENSAIO",
-            MusicianLevel::Unknown("RJM / ENSAIO".to_owned()),
-        ),
     ] {
         let result: Result<MusicianProfile, MusicianProfileGatewayError> =
             profile_of("MÚSICO", raw, "VIOLINO");

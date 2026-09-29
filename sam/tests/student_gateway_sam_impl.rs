@@ -284,6 +284,7 @@ fn every_known_musician_level_is_recognized() {
         ("CANDIDATO(A)", MusicianLevel::Candidate),
         ("ENSAIO", MusicianLevel::Practice),
         ("RJM", MusicianLevel::YouthService),
+        ("RJM / ENSAIO", MusicianLevel::YouthServicePractice),
         ("CULTO OFICIAL", MusicianLevel::OfficialService),
     ] {
         assert_eq!(
@@ -298,14 +299,12 @@ fn every_known_musician_level_is_recognized() {
 
 #[test]
 fn a_musician_level_sam_has_not_confirmed_keeps_what_sam_wrote() {
-    for raw in ["PRÁTICO(A)", "RJM / ENSAIO"] {
-        assert_eq!(
-            student_listed_as("MÚSICO", raw, "A DEFINIR")
-                .unwrap()
-                .position,
-            musician(MusicianLevel::Unknown(raw.to_owned()), None)
-        );
-    }
+    assert_eq!(
+        student_listed_as("MÚSICO", "PRÁTICO(A)", "A DEFINIR")
+            .unwrap()
+            .position,
+        musician(MusicianLevel::Unknown("PRÁTICO(A)".to_owned()), None)
+    );
 }
 
 #[test]
