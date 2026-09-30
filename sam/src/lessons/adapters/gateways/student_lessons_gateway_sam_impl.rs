@@ -58,7 +58,10 @@ impl From<MtdLesson> for Lesson {
         Self {
             id: lesson.id,
             date: lesson.date.as_deref().and_then(parse_date),
-            phase: None,
+            phase: lesson
+                .observations
+                .as_deref()
+                .and_then(parse_phase_from_notes),
             page: lesson.pages.as_deref().and_then(parse_range),
             lesson: lesson.lesson.as_deref().and_then(parse_range),
             clef: None,
@@ -102,6 +105,21 @@ fn parse_listed_range(listed: &str) -> Option<Range> {
         || Range::single(first.to_owned()),
         |last| Range::new(first.to_owned(), last.to_owned()),
     ))
+}
+
+fn parse_phase_from_notes(notes: &str) -> Option<Range> {
+    let notes: &str = notes.trim_start();
+    let after_word: &str = notes
+        .get(..4)
+        .filter(|word| word.eq_ignore_ascii_case("fase"))
+        .and_then(|_| notes.get(4..))?;
+    let phase: String = after_word
+        .trim_start()
+        .chars()
+        .take_while(char::is_ascii_digit)
+        .collect();
+
+    (!phase.is_empty()).then(|| Range::single(phase))
 }
 
 fn parse_clef(raw: &str) -> Option<Clef> {

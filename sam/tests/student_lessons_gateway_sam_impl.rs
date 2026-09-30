@@ -533,6 +533,37 @@ fn a_method_book_the_requirements_do_not_name_belongs_to_no_book() {
 }
 
 #[test]
+fn a_method_lesson_whose_notes_open_with_a_phase_records_that_phase() {
+    for (notes, phase) in [
+        ("Fase 25: lição 40 da pag 28 e lição 15 da pag 40", "25"),
+        ("FASE 7 - lição 3", "7"),
+        ("  fase 12", "12"),
+    ] {
+        assert_eq!(
+            method_lesson_with_notes(notes).unwrap().phase,
+            Some(Range::single(phase.to_owned())),
+            "{notes:?}"
+        );
+    }
+}
+
+#[test]
+fn a_method_lesson_whose_notes_do_not_open_with_a_phase_records_none() {
+    for notes in [
+        "Estudar fase 2 das lições das lições 17,18,19,20.",
+        "Fase: revisão",
+        "Fases anteriores revisadas",
+        "",
+    ] {
+        assert_eq!(
+            method_lesson_with_notes(notes).unwrap().phase,
+            None,
+            "{notes:?}"
+        );
+    }
+}
+
+#[test]
 fn a_method_row_without_any_field_is_still_read() {
     assert_eq!(
         method_lessons_listed(
@@ -559,6 +590,14 @@ fn assert_recognized(cases: &[(&str, &[MethodBook])]) {
             "method {sam_name:?}"
         );
     }
+}
+
+fn method_lesson_with_notes(notes: &str) -> Option<Lesson> {
+    let row: String = format!(
+        "<tr><td>1</td><td>1</td><td>METODO</td><td></td><td></td><td></td><td>{notes}</td><td></td></tr>"
+    );
+
+    method_lessons_listed(&row)?.into_iter().next()
 }
 
 fn method_books_of(sam_name: &str) -> Option<Vec<MethodBook>> {
