@@ -61,6 +61,13 @@ final class LessonCard extends StatelessWidget {
                         ),
                     ],
                   ),
+                  if (lesson.method.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      lesson.method,
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ],
                   if (lesson.hasNotes) ...[
                     const SizedBox(height: 8),
                     Column(

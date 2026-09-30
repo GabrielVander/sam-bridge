@@ -100,6 +100,30 @@ void main() {
       expect(find.text('Maria Souza'), findsOneWidget);
     });
 
+    testWidgets('names the method book the lesson was recorded in', (
+      tester,
+    ) async {
+      await pumpInApp(
+        tester,
+        LessonCard(
+          lessonItem(
+            kind: LessonKind.method,
+            method: 'MÉTODO CCB - SCHIMOLL - VIOLINO',
+          ),
+        ),
+      );
+
+      expect(find.text('MÉTODO CCB - SCHIMOLL - VIOLINO'), findsOneWidget);
+    });
+
+    testWidgets('names no method book when the lesson has none', (
+      tester,
+    ) async {
+      await pumpInApp(tester, LessonCard(lessonItem(method: '')));
+
+      expect(find.textContaining('Método'), findsNothing);
+    });
+
     testWidgets('tells MSA lessons apart from method lessons by icon', (
       tester,
     ) async {
