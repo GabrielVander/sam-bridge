@@ -8,6 +8,9 @@ import 'package:flutter_application/startup_failure_app.dart';
 import 'package:flutter_application/rust/api.dart';
 import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_application/rust/frb_generated.dart';
+import 'package:flutter_application/window/desktop_window.dart'
+    if (dart.library.js_interop) 'package:flutter_application/window/desktop_window_web.dart';
+import 'package:flutter_application/window/window_controls.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 Future<void> main() async {
@@ -21,10 +24,14 @@ Future<void> main() async {
       version: packageInfo.version,
       buildNumber: packageInfo.buildNumber,
     ),
+    windowControls: await frameDesktopWindow(),
   );
 }
 
-Future<void> _start({required String versionDisplay}) async {
+Future<void> _start({
+  required String versionDisplay,
+  required WindowControls? windowControls,
+}) async {
   final ApplicationFacade application;
 
   try {
@@ -33,7 +40,11 @@ Future<void> _start({required String versionDisplay}) async {
     runApp(
       StartupFailureApp(
         report: ErrorReportMapper.toViewModel(report),
-        onRetry: () => _start(versionDisplay: versionDisplay),
+        onRetry: () => _start(
+          versionDisplay: versionDisplay,
+          windowControls: windowControls,
+        ),
+        windowControls: windowControls,
       ),
     );
 
@@ -61,6 +72,7 @@ Future<void> _start({required String versionDisplay}) async {
       authPresenter: authPresenter,
       studentsPresenter: studentsPresenter,
       lessonsPresenter: lessonsPresenter,
+      windowControls: windowControls,
     ),
   );
 }

@@ -24,6 +24,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
+  window_manager: ^0.5.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
