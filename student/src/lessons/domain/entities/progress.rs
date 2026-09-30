@@ -103,6 +103,10 @@ impl<'a> RecordedProgress<'a> {
         highest(self.lessons_in(book).map(|lesson| &lesson.lesson))
     }
 
+    fn highest_phase_in(&self, book: MethodBook) -> f64 {
+        highest(self.lessons_in(book).map(|lesson| &lesson.phase))
+    }
+
     fn lessons_in(&self, book: MethodBook) -> impl Iterator<Item = &Lesson> {
         self.method_lessons
             .iter()
@@ -236,9 +240,11 @@ impl MethodComponent {
                     met: page.met && lesson.met,
                 })
             }
-            // SAM records pages and lesson numbers for method books, never phases.
-            MethodMilestone::Phase(_)
-            | MethodMilestone::Module(_)
+            MethodMilestone::Phase(target) => Some(Measurement::against(
+                recorded.highest_phase_in(self.book),
+                target,
+            )),
+            MethodMilestone::Module(_)
             | MethodMilestone::ExerciseRange { .. }
             | MethodMilestone::Complete
             | MethodMilestone::Unmeasured => None,

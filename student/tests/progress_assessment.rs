@@ -424,20 +424,31 @@ fn a_lesson_milestone_is_met_from_the_target_lesson_on() {
 }
 
 #[test]
-fn a_phase_milestone_cannot_be_measured_because_sam_records_no_method_phases() {
-    let at_phase: Lesson = Lesson {
-        method_books: vec![MethodBook::AlmeidaDiasFlute],
-        ..method_phase_lesson("13")
-    };
+fn a_phase_milestone_is_met_from_the_target_phase_on() {
+    let at_target: ProgressAssessment = candidate_on(
+        Instrument::Flute,
+        &[phase_lesson_in(MethodBook::AlmeidaDiasFlute, "13")],
+    )
+    .unwrap();
+    let one_short: ProgressAssessment = candidate_on(
+        Instrument::Flute,
+        &[phase_lesson_in(MethodBook::AlmeidaDiasFlute, "12")],
+    )
+    .unwrap();
 
-    let assessment: ProgressAssessment = candidate_on(Instrument::Flute, &[at_phase]).unwrap();
+    assert_eq!(meets_youth_service_method(&at_target), Some(true));
+    assert_eq!(meets_youth_service_method(&one_short), Some(false));
+}
+
+#[test]
+fn a_phase_counts_only_toward_the_book_it_was_recorded_in() {
+    let assessment: ProgressAssessment = candidate_on(
+        Instrument::Flute,
+        &[phase_lesson_in(MethodBook::Galli, "13")],
+    )
+    .unwrap();
 
     assert_eq!(meets_youth_service_method(&assessment), Some(false));
-    assert!(
-        is_about(assessment.method_relative_percent, 0.0),
-        "got {}",
-        assessment.method_relative_percent
-    );
 }
 
 #[test]
@@ -578,6 +589,13 @@ fn beginning_strings_and_volmer(beginning_strings_lesson: &str, volmer_page: &st
         ),
         method_lesson_in(MethodBook::BertaVolmer1, volmer_page, "0"),
     ]
+}
+
+fn phase_lesson_in(book: MethodBook, phase: &str) -> Lesson {
+    Lesson {
+        method_books: vec![book],
+        ..method_phase_lesson(phase)
+    }
 }
 
 fn meets_youth_service_method(assessment: &ProgressAssessment) -> Option<bool> {
