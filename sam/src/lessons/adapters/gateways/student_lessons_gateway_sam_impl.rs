@@ -83,10 +83,24 @@ fn parse_range(raw: &str) -> Option<Range> {
         return None;
     }
 
-    trimmed.split_once(" - ").map_or_else(
-        || Some(Range::single(trimmed.to_owned())),
-        |(from, to)| Some(Range::new(from.trim().to_owned(), to.trim().to_owned())),
-    )
+    if let Some((from, to)) = trimmed.split_once(" - ") {
+        return Some(Range::new(from.trim().to_owned(), to.trim().to_owned()));
+    }
+
+    parse_listed_range(trimmed)
+}
+
+fn parse_listed_range(listed: &str) -> Option<Range> {
+    let mut values = listed
+        .split(',')
+        .map(str::trim)
+        .filter(|value| !value.is_empty());
+    let first: &str = values.next()?;
+
+    Some(values.next_back().map_or_else(
+        || Range::single(first.to_owned()),
+        |last| Range::new(first.to_owned(), last.to_owned()),
+    ))
 }
 
 fn parse_clef(raw: &str) -> Option<Clef> {

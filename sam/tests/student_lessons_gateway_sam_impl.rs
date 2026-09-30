@@ -705,6 +705,21 @@ fn a_single_value_is_a_range_that_starts_and_ends_there() {
 }
 
 #[test]
+fn a_listed_range_spans_its_first_to_its_last_value() {
+    for (listed, from, to) in [
+        ("12,13", "12", "13"),
+        ("01,2,3,4,5", "01", "5"),
+        ("8,9,10,11,", "8", "11"),
+    ] {
+        assert_eq!(
+            msa_lesson_with_phases(listed).unwrap().phase,
+            Some(Range::new(from.to_owned(), to.to_owned())),
+            "{listed:?}"
+        );
+    }
+}
+
+#[test]
 fn a_blank_range_is_left_out() {
     for blank in ["", "   "] {
         assert_eq!(msa_lesson_with_phases(blank).unwrap().phase, None);
