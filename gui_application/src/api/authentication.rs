@@ -1,5 +1,5 @@
 use authentication::application::use_cases::{
-    LoginOutcome, LoginUseCaseError, LogoutError, RestoreSessionError, RestoreSessionOutcome,
+    LoginError, LoginOutcome, LogoutError, RestoreSessionError, RestoreSessionOutcome,
 };
 
 use crate::api::error_report::ErrorReportDto;
@@ -25,8 +25,8 @@ pub enum LogoutOutcomeDto {
     Failure { report: ErrorReportDto },
 }
 
-impl From<Result<LoginOutcome, LoginUseCaseError>> for LoginOutcomeDto {
-    fn from(result: Result<LoginOutcome, LoginUseCaseError>) -> Self {
+impl From<Result<LoginOutcome, LoginError>> for LoginOutcomeDto {
+    fn from(result: Result<LoginOutcome, LoginError>) -> Self {
         match result {
             Ok(LoginOutcome::LoggedIn) => Self::Successful,
             Ok(LoginOutcome::LoggedInWithoutRemembering(error)) => {
@@ -34,8 +34,8 @@ impl From<Result<LoginOutcome, LoginUseCaseError>> for LoginOutcomeDto {
                     report: error.into(),
                 }
             }
-            Err(LoginUseCaseError::InvalidEmailOrPassword) => Self::InvalidEmailOrPassword,
-            Err(LoginUseCaseError::UnableToPerformAuthorization(error)) => Self::Failure {
+            Err(LoginError::InvalidEmailOrPassword) => Self::InvalidEmailOrPassword,
+            Err(LoginError::UnableToPerformAuthorization(error)) => Self::Failure {
                 report: error.into(),
             },
         }

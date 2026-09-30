@@ -1,3 +1,3 @@
-mod login_and_remember_credentials;
+mod login_and_remember_credentials_use_case;
 
-pub use login_and_remember_credentials::*;
+pub use login_and_remember_credentials_use_case::*;

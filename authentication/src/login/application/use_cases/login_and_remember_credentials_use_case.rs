@@ -26,17 +26,13 @@ impl LoginAndRememberCredentialsUseCase {
         }
     }
 
-    pub fn execute(
-        &self,
-        email: String,
-        password: String,
-    ) -> Result<LoginOutcome, LoginUseCaseError> {
+    pub fn execute(&self, email: String, password: String) -> Result<LoginOutcome, LoginError> {
         let credential: Credential = Credential::new(Email::new(email), Password::new(password));
 
         match self.authorizer.authorize(&credential) {
             Ok(AuthorizationResult::Authorized) => Ok(self.remember(&credential)),
-            Ok(AuthorizationResult::Unauthorized) => Err(LoginUseCaseError::InvalidEmailOrPassword),
-            Err(error) => Err(LoginUseCaseError::UnableToPerformAuthorization(error)),
+            Ok(AuthorizationResult::Unauthorized) => Err(LoginError::InvalidEmailOrPassword),
+            Err(error) => Err(LoginError::UnableToPerformAuthorization(error)),
         }
     }
 
@@ -55,7 +51,7 @@ pub enum LoginOutcome {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum LoginUseCaseError {
+pub enum LoginError {
     InvalidEmailOrPassword,
     UnableToPerformAuthorization(AuthorizationError),
 }

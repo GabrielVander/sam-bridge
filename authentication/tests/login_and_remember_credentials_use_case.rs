@@ -3,7 +3,7 @@ use authentication::application::gateways::{
     LoadCredentialGateway, SaveCredentialGateway, SaveCredentialGatewayError,
 };
 use authentication::application::use_cases::{
-    LoginAndRememberCredentialsUseCase, LoginOutcome, LoginUseCaseError,
+    LoginAndRememberCredentialsUseCase, LoginError, LoginOutcome,
 };
 use authentication::domain::entities::{Credential, Email, Password};
 use pretty_assertions::assert_eq;
@@ -25,7 +25,7 @@ fn successful_login_saves_the_credential() {
         in_memory_credential_store.clone(),
     );
 
-    let result: Result<LoginOutcome, LoginUseCaseError> =
+    let result: Result<LoginOutcome, LoginError> =
         use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(result, Ok(LoginOutcome::LoggedIn));
@@ -47,10 +47,10 @@ fn failed_login_never_attempts_to_save_the_credential() {
     let use_case: LoginAndRememberCredentialsUseCase =
         LoginAndRememberCredentialsUseCase::new(authorization_gateway, credential_gateway.clone());
 
-    let result: Result<LoginOutcome, LoginUseCaseError> =
+    let result: Result<LoginOutcome, LoginError> =
         use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
-    assert_eq!(result, Err(LoginUseCaseError::InvalidEmailOrPassword));
+    assert_eq!(result, Err(LoginError::InvalidEmailOrPassword));
     assert_eq!(
         credential_gateway.load(),
         None,
@@ -68,7 +68,7 @@ fn a_login_whose_credential_cannot_be_saved_is_not_remembered_and_says_why() {
     let use_case: LoginAndRememberCredentialsUseCase =
         LoginAndRememberCredentialsUseCase::new(authorization_gateway, credential_gateway);
 
-    let result: Result<LoginOutcome, LoginUseCaseError> =
+    let result: Result<LoginOutcome, LoginError> =
         use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(
@@ -95,12 +95,12 @@ fn authorization_gateway_failure_is_reported_with_its_kind_and_details() {
     let use_case =
         LoginAndRememberCredentialsUseCase::new(fake_authorization, fake_save_credential);
 
-    let result: Result<LoginOutcome, LoginUseCaseError> =
+    let result: Result<LoginOutcome, LoginError> =
         use_case.execute("Some email".to_string(), "secretpassword123".to_string());
 
     assert_eq!(
         result,
-        Err(LoginUseCaseError::UnableToPerformAuthorization(
+        Err(LoginError::UnableToPerformAuthorization(
             AuthorizationError::UnableToPerformOperation {
                 kind: FailureKind::Transient,
                 details: "connection refused".to_owned(),

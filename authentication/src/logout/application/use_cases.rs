@@ -1,3 +1,3 @@
-mod logout;
+mod logout_use_case;
 
-pub use logout::*;
+pub use logout_use_case::*;
