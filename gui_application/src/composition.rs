@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use authentication::application::gateways::AuthorizeCredentialGateway;
 use authentication::application::use_cases::{
     LoginAndRememberCredentialsUseCase, LogoutUseCase, RestoreSessionUseCase,
 };
@@ -12,7 +13,9 @@ use sam::{
     lessons::adapters::gateways::{MusicianProfileGatewaySamImpl, StudentLessonsGatewaySamImpl},
     roster::adapters::gateways::StudentGatewaySamImpl,
 };
-use student::application::gateways::{MusicianProfileGateway, StudentLessonsGateway};
+use student::application::gateways::{
+    MusicianProfileGateway, StudentGateway, StudentLessonsGateway,
+};
 use student::application::use_cases::{
     AssessStudentProgressUseCase, RetrieveAllAvailableStudentsUseCase,
     RetrieveStudentLessonsUseCase,
@@ -97,7 +100,7 @@ pub fn build_application_with(
         },
     ));
 
-    let sam_credential_gateway: Arc<AuthorizationGatewaySamImpl> =
+    let sam_credential_gateway: Arc<dyn AuthorizeCredentialGateway> =
         Arc::new(AuthorizationGatewaySamImpl::new(sam_client.clone()));
 
     let login_and_remember_credentials: LoginAndRememberCredentialsUseCase =
@@ -114,7 +117,7 @@ pub fn build_application_with(
         sam_credential_gateway,
     );
 
-    let sam_student_gateway: Arc<StudentGatewaySamImpl> =
+    let sam_student_gateway: Arc<dyn StudentGateway> =
         Arc::new(StudentGatewaySamImpl::new(sam_client.clone()));
 
     let retrieve_all_available_students: RetrieveAllAvailableStudentsUseCase =
