@@ -11,6 +11,8 @@ import 'package:flutter_application/rust/api/error_report.dart';
 sealed class AuthState extends Equatable {
   const AuthState();
 
+  bool get isSignedIn => false;
+
   @override
   List<Object?> get props => [];
 }
@@ -27,6 +29,9 @@ final class AuthSuccess extends AuthState {
   final ErrorReport? notRemembered;
 
   const AuthSuccess({this.notRemembered});
+
+  @override
+  bool get isSignedIn => true;
 
   @override
   List<Object?> get props => [notRemembered];
@@ -126,5 +131,5 @@ class AuthPresenter extends CubitSignal<AuthState> {
     }
   }
 
-  bool get isAuthenticated => stateValue is AuthSuccess;
+  bool get isAuthenticated => stateValue.isSignedIn;
 }

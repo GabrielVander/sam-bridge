@@ -22,7 +22,7 @@ class MainScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         actions: [
           BlocSignalBuilder<AuthPresenter, AuthState>(
-            builder: (context, state) => state is AuthSuccess
+            builder: (context, state) => state.isSignedIn
                 ? IconButton(
                     icon: const Icon(Icons.logout),
                     tooltip: context.l10n.logOut,
