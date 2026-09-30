@@ -85,12 +85,12 @@ fn use_case_when_rejected_credentials_cannot_be_cleared_surfaces_the_failure() {
 
     let fake_authorization_gateway: Arc<FakeCredentialAuthorizer> =
         Arc::new(FakeCredentialAuthorizer::not_authorizing());
-    let fake_credential_eraser: Arc<FakeClearCredentialGateway> =
+    let fake_credential_clearer: Arc<FakeClearCredentialGateway> =
         Arc::new(FakeClearCredentialGateway::unable_to_perform_operation());
 
     let use_case: RestoreSessionUseCase = RestoreSessionUseCase::new(
         in_memory_credential_store.clone(),
-        fake_credential_eraser,
+        fake_credential_clearer,
         fake_authorization_gateway,
     );
 

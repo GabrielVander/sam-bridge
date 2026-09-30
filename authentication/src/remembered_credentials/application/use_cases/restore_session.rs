@@ -13,19 +13,19 @@ use crate::{
 #[derive(Clone)]
 pub struct RestoreSessionUseCase {
     credential_loader: Arc<dyn LoadCredentialGateway>,
-    credential_eraser: Arc<dyn ClearCredentialGateway>,
+    credential_clearer: Arc<dyn ClearCredentialGateway>,
     authorizer: Arc<dyn AuthorizeCredentialGateway>,
 }
 
 impl RestoreSessionUseCase {
     pub fn new(
         credential_loader: Arc<dyn LoadCredentialGateway>,
-        credential_eraser: Arc<dyn ClearCredentialGateway>,
+        credential_clearer: Arc<dyn ClearCredentialGateway>,
         authorizer: Arc<dyn AuthorizeCredentialGateway>,
     ) -> Self {
         Self {
             credential_loader,
-            credential_eraser,
+            credential_clearer,
             authorizer,
         }
     }
@@ -38,7 +38,7 @@ impl RestoreSessionUseCase {
         match self.authorizer.authorize(&credential) {
             Ok(AuthorizationResult::Authorized) => Ok(RestoreSessionOutcome::Restored),
             Ok(AuthorizationResult::Unauthorized) => {
-                self.credential_eraser
+                self.credential_clearer
                     .clear()
                     .map_err(RestoreSessionError::UnableToClearRejectedCredentials)?;
                 Ok(RestoreSessionOutcome::CredentialsRejected)
