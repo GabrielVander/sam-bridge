@@ -37,6 +37,7 @@ fn every_field_of_a_lesson_is_carried() {
             description: Some("desc".to_owned()),
             instructor: Some("instructor".to_owned()),
             method: Some("method".to_owned()),
+            method_books: Vec::new(),
         }],
         method: vec![Lesson::default()],
     });

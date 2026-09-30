@@ -1,12 +1,12 @@
 use pretty_assertions::assert_eq;
 use student::domain::entities::{
-    AssessError, Checkpoint, CheckpointStatus, Instrument, Lesson, MusicianLevel,
+    AssessError, Checkpoint, CheckpointStatus, Instrument, Lesson, MethodBook, MusicianLevel,
     ProgressAssessment, assess,
 };
 
 #[path = "support/helpers.rs"]
 mod support;
-use support::{checkpoint, method_lesson, method_phase_lesson, msa_lesson};
+use support::{checkpoint, method_lesson, method_lesson_in, method_phase_lesson, msa_lesson};
 
 #[test]
 fn a_candidate_without_lessons_has_only_the_first_checkpoint() {
@@ -100,7 +100,10 @@ fn meeting_a_higher_levels_requirements_makes_it_ready_for_the_exam() {
         &MusicianLevel::Candidate,
         Instrument::Violin,
         &[msa_lesson("12", "12")],
-        &[method_lesson("46", "113")],
+        &[
+            method_lesson_in(MethodBook::Ccb, "46", "113"),
+            method_lesson_in(MethodBook::HansSitt1, "0", "6"),
+        ],
     )
     .unwrap();
 
@@ -131,8 +134,11 @@ fn an_achieved_level_is_not_ready_for_the_exam_again() {
 
 #[test]
 fn the_best_alternative_counts_even_when_it_is_not_the_first_listed() {
-    let assessment: ProgressAssessment =
-        candidate_on(Instrument::Violin, &[method_lesson("0", "6")]).unwrap();
+    let assessment: ProgressAssessment = candidate_on(
+        Instrument::Violin,
+        &[method_lesson_in(MethodBook::HansSitt1, "0", "6")],
+    )
+    .unwrap();
 
     assert!(assessment.method_relative_percent > 40.0);
 }
@@ -143,7 +149,10 @@ fn official_service_needs_msa_phase_16() {
         &MusicianLevel::YouthService,
         Instrument::Violin,
         &[msa_lesson("15", "16")],
-        &[method_lesson("67", "162")],
+        &[
+            method_lesson_in(MethodBook::Ccb, "67", "162"),
+            method_lesson_in(MethodBook::HansSitt1, "0", "14"),
+        ],
     )
     .unwrap();
 
@@ -161,7 +170,13 @@ fn officialization_cannot_be_verified_from_the_lessons_alone() {
         &MusicianLevel::OfficialService,
         Instrument::Violin,
         &[msa_lesson("16", "16")],
-        &[method_lesson("999", "999")],
+        &[
+            method_lesson_in(MethodBook::Laoureux1, "999", "999"),
+            method_lesson_in(MethodBook::Laoureux3, "999", "999"),
+            method_lesson_in(MethodBook::Ccb, "999", "999"),
+            method_lesson_in(MethodBook::HansSitt1, "999", "999"),
+            method_lesson_in(MethodBook::BrittenViolin1, "999", "999"),
+        ],
     )
     .unwrap();
 
@@ -334,11 +349,58 @@ fn an_instrument_without_published_requirements_cannot_be_assessed() {
 }
 
 #[test]
+fn a_method_lesson_counts_only_toward_the_book_it_was_recorded_in() {
+    let right_book: ProgressAssessment = candidate_on(
+        Instrument::Violin,
+        &[method_lesson_in(MethodBook::Laoureux1, "35", "0")],
+    )
+    .unwrap();
+    let other_book: ProgressAssessment = candidate_on(
+        Instrument::Violin,
+        &[method_lesson_in(MethodBook::Galli, "35", "0")],
+    )
+    .unwrap();
+
+    assert_eq!(meets_youth_service_method(&right_book), Some(true));
+    assert_eq!(meets_youth_service_method(&other_book), Some(false));
+    assert!(
+        is_about(other_book.method_relative_percent, 0.0),
+        "got {}",
+        other_book.method_relative_percent
+    );
+}
+
+#[test]
+fn a_lesson_that_may_belong_to_several_books_counts_toward_each() {
+    let dotzauer_of_either_volume: Lesson = Lesson {
+        method_books: vec![MethodBook::Dotzauer1, MethodBook::Dotzauer2],
+        ..method_lesson_in(MethodBook::Dotzauer1, "34", "80")
+    };
+
+    let assessment: ProgressAssessment = candidate_on(
+        Instrument::Cello,
+        &[
+            method_lesson_in(MethodBook::BeginningStringsCello, "0", "6"),
+            dotzauer_of_either_volume,
+        ],
+    )
+    .unwrap();
+
+    assert_eq!(meets_youth_service_method(&assessment), Some(true));
+}
+
+#[test]
 fn a_page_milestone_is_met_from_the_target_page_on() {
-    let at_target: ProgressAssessment =
-        candidate_on(Instrument::Flute, &[method_lesson("41", "0")]).unwrap();
-    let one_short: ProgressAssessment =
-        candidate_on(Instrument::Flute, &[method_lesson("40", "0")]).unwrap();
+    let at_target: ProgressAssessment = candidate_on(
+        Instrument::Flute,
+        &[method_lesson_in(MethodBook::Galli, "41", "0")],
+    )
+    .unwrap();
+    let one_short: ProgressAssessment = candidate_on(
+        Instrument::Flute,
+        &[method_lesson_in(MethodBook::Galli, "40", "0")],
+    )
+    .unwrap();
 
     assert_eq!(meets_youth_service_method(&at_target), Some(true));
     assert_eq!(meets_youth_service_method(&one_short), Some(false));
@@ -346,35 +408,55 @@ fn a_page_milestone_is_met_from_the_target_page_on() {
 
 #[test]
 fn a_lesson_milestone_is_met_from_the_target_lesson_on() {
-    let at_target: ProgressAssessment =
-        candidate_on(Instrument::Flute, &[method_lesson("0", "41")]).unwrap();
-    let one_short: ProgressAssessment =
-        candidate_on(Instrument::Flute, &[method_lesson("0", "40")]).unwrap();
+    let at_target: ProgressAssessment = candidate_on(
+        Instrument::Flute,
+        &[method_lesson_in(MethodBook::Pares, "0", "41")],
+    )
+    .unwrap();
+    let one_short: ProgressAssessment = candidate_on(
+        Instrument::Flute,
+        &[method_lesson_in(MethodBook::Pares, "0", "40")],
+    )
+    .unwrap();
 
     assert_eq!(meets_youth_service_method(&at_target), Some(true));
     assert_eq!(meets_youth_service_method(&one_short), Some(false));
 }
 
 #[test]
-fn a_phase_milestone_is_met_from_the_target_phase_on() {
-    let at_target: ProgressAssessment =
-        candidate_on(Instrument::Flute, &[method_phase_lesson("13")]).unwrap();
-    let one_short: ProgressAssessment =
-        candidate_on(Instrument::Flute, &[method_phase_lesson("12")]).unwrap();
+fn a_phase_milestone_cannot_be_measured_because_sam_records_no_method_phases() {
+    let at_phase: Lesson = Lesson {
+        method_books: vec![MethodBook::AlmeidaDiasFlute],
+        ..method_phase_lesson("13")
+    };
 
-    assert_eq!(meets_youth_service_method(&at_target), Some(true));
-    assert_eq!(meets_youth_service_method(&one_short), Some(false));
-    assert!(one_short.method_relative_percent > 0.0);
+    let assessment: ProgressAssessment = candidate_on(Instrument::Flute, &[at_phase]).unwrap();
+
+    assert_eq!(meets_youth_service_method(&assessment), Some(false));
+    assert!(
+        is_about(assessment.method_relative_percent, 0.0),
+        "got {}",
+        assessment.method_relative_percent
+    );
 }
 
 #[test]
 fn a_page_and_lesson_milestone_needs_both_targets_reached() {
-    let both: ProgressAssessment =
-        candidate_on(Instrument::Cello, &[method_lesson("34", "80")]).unwrap();
-    let page_only: ProgressAssessment =
-        candidate_on(Instrument::Cello, &[method_lesson("34", "79")]).unwrap();
-    let lesson_only: ProgressAssessment =
-        candidate_on(Instrument::Cello, &[method_lesson("33", "80")]).unwrap();
+    let both: ProgressAssessment = candidate_on(
+        Instrument::Cello,
+        &beginning_strings_and_dotzauer("34", "80"),
+    )
+    .unwrap();
+    let page_only: ProgressAssessment = candidate_on(
+        Instrument::Cello,
+        &beginning_strings_and_dotzauer("34", "79"),
+    )
+    .unwrap();
+    let lesson_only: ProgressAssessment = candidate_on(
+        Instrument::Cello,
+        &beginning_strings_and_dotzauer("33", "80"),
+    )
+    .unwrap();
 
     assert_eq!(meets_youth_service_method(&both), Some(true));
     assert_eq!(
@@ -391,7 +473,7 @@ fn a_page_and_lesson_milestone_needs_both_targets_reached() {
 
 #[test]
 fn milestones_that_the_lessons_cannot_measure_are_never_met_and_add_no_progress() {
-    let far_along: [Lesson; 1] = [method_lesson("999", "999")];
+    let far_along: [Lesson; 1] = [method_lesson_in(MethodBook::RubankTrumpet, "999", "999")];
 
     let complete: ProgressAssessment = candidate_on(Instrument::Trumpet, &far_along).unwrap();
 
@@ -402,15 +484,18 @@ fn milestones_that_the_lessons_cannot_measure_are_never_met_and_add_no_progress(
         complete.method_relative_percent
     );
 
-    let module: ProgressAssessment =
-        candidate_on(Instrument::Bassoon, &[method_lesson("0", "999")]).unwrap();
+    let module: ProgressAssessment = candidate_on(
+        Instrument::Bassoon,
+        &[method_lesson_in(MethodBook::Weissenborn, "0", "999")],
+    )
+    .unwrap();
     assert_eq!(meets_youth_service_method(&module), Some(false));
 
     let exercise_range: ProgressAssessment = assess(
         &MusicianLevel::YouthService,
         Instrument::Trumpet,
         &[msa_lesson("16", "16")],
-        &[method_lesson("0", "999")],
+        &[method_lesson_in(MethodBook::Getchel2, "0", "999")],
     )
     .unwrap();
 
@@ -425,11 +510,11 @@ fn milestones_that_the_lessons_cannot_measure_are_never_met_and_add_no_progress(
 #[test]
 fn an_alternative_is_met_only_when_every_component_is() {
     let both: ProgressAssessment =
-        candidate_on(Instrument::Viola, &[method_lesson("31", "6")]).unwrap();
+        candidate_on(Instrument::Viola, &beginning_strings_and_volmer("6", "31")).unwrap();
     let page_short: ProgressAssessment =
-        candidate_on(Instrument::Viola, &[method_lesson("30", "6")]).unwrap();
+        candidate_on(Instrument::Viola, &beginning_strings_and_volmer("6", "30")).unwrap();
     let lesson_short: ProgressAssessment =
-        candidate_on(Instrument::Viola, &[method_lesson("31", "5")]).unwrap();
+        candidate_on(Instrument::Viola, &beginning_strings_and_volmer("5", "31")).unwrap();
 
     assert_eq!(meets_youth_service_method(&both), Some(true));
     assert_eq!(meets_youth_service_method(&page_short), Some(false));
@@ -438,8 +523,11 @@ fn an_alternative_is_met_only_when_every_component_is() {
 
 #[test]
 fn an_alternative_with_an_unmeasurable_component_is_never_met_but_its_measurable_part_counts() {
-    let assessment: ProgressAssessment =
-        candidate_on(Instrument::FrenchHorn, &[method_lesson("0", "73")]).unwrap();
+    let assessment: ProgressAssessment = candidate_on(
+        Instrument::FrenchHorn,
+        &[method_lesson_in(MethodBook::AlmeidaDiasHorn, "0", "73")],
+    )
+    .unwrap();
 
     assert_eq!(meets_youth_service_method(&assessment), Some(false));
     assert!(
@@ -451,8 +539,15 @@ fn an_alternative_with_an_unmeasurable_component_is_never_met_but_its_measurable
 
 #[test]
 fn an_alternatives_progress_is_the_average_of_its_measurable_components() {
-    let assessment: ProgressAssessment =
-        candidate_on(Instrument::Viola, &[method_lesson("0", "3")]).unwrap();
+    let assessment: ProgressAssessment = candidate_on(
+        Instrument::Viola,
+        &[method_lesson_in(
+            MethodBook::BeginningStringsViola,
+            "0",
+            "3",
+        )],
+    )
+    .unwrap();
 
     assert!(
         is_about(assessment.method_relative_percent, 25.0),
@@ -465,6 +560,24 @@ fn candidate_on(
     method: &[Lesson],
 ) -> Result<ProgressAssessment, AssessError> {
     assess(&MusicianLevel::Candidate, instrument, &[], method)
+}
+
+fn beginning_strings_and_dotzauer(dotzauer_page: &str, dotzauer_lesson: &str) -> [Lesson; 2] {
+    [
+        method_lesson_in(MethodBook::BeginningStringsCello, "0", "6"),
+        method_lesson_in(MethodBook::Dotzauer1, dotzauer_page, dotzauer_lesson),
+    ]
+}
+
+fn beginning_strings_and_volmer(beginning_strings_lesson: &str, volmer_page: &str) -> [Lesson; 2] {
+    [
+        method_lesson_in(
+            MethodBook::BeginningStringsViola,
+            "0",
+            beginning_strings_lesson,
+        ),
+        method_lesson_in(MethodBook::BertaVolmer1, volmer_page, "0"),
+    ]
 }
 
 fn meets_youth_service_method(assessment: &ProgressAssessment) -> Option<bool> {

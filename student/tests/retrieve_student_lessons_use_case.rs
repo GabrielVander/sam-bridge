@@ -23,6 +23,7 @@ fn returns_the_lessons_from_the_gateway() {
             description: None,
             instructor: Some("BELTRANO DA SILVA".to_owned()),
             method: None,
+            method_books: Vec::new(),
         }],
         method: vec![Lesson::default()],
     };

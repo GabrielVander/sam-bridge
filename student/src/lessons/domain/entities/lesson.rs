@@ -1,3 +1,5 @@
+use crate::lessons::domain::entities::MethodBook;
+
 #[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct Lesson {
     pub id: Option<String>,
@@ -9,6 +11,7 @@ pub struct Lesson {
     pub description: Option<String>,
     pub instructor: Option<String>,
     pub method: Option<String>,
+    pub method_books: Vec<MethodBook>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Default)]

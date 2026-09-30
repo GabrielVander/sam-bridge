@@ -6,14 +6,14 @@ use student::application::gateways::{
 };
 use student::application::use_cases::{AssessStudentProgressError, AssessStudentProgressUseCase};
 use student::domain::entities::{
-    AssessError, Checkpoint, CheckpointStatus, Instrument, MusicianLevel, MusicianProfile,
-    ProgressAssessment, StudentId, StudentLessons,
+    AssessError, Checkpoint, CheckpointStatus, Instrument, MethodBook, MusicianLevel,
+    MusicianProfile, ProgressAssessment, StudentId, StudentLessons,
 };
 
 #[path = "support/helpers.rs"]
 mod support;
 use support::{
-    FakeMusicianProfileGateway, FakeStudentLessonsGateway, checkpoint, method_lesson, msa_lesson,
+    FakeMusicianProfileGateway, FakeStudentLessonsGateway, checkpoint, method_lesson_in, msa_lesson,
 };
 
 #[test]
@@ -22,7 +22,7 @@ fn assesses_progress_from_the_gateways_profile_and_lessons() {
         Ok(musician(MusicianLevel::Candidate, Some(Instrument::Violin))),
         Ok(StudentLessons {
             msa: vec![msa_lesson("12", "12")],
-            method: vec![method_lesson("46", "113")],
+            method: vec![method_lesson_in(MethodBook::Laoureux1, "35", "0")],
         }),
     );
 

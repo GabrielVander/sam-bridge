@@ -8,7 +8,7 @@ use student::application::gateways::{
     FailureKind, MusicianProfileGatewayError, StudentLessonsGatewayError,
 };
 use student::domain::entities::{
-    Instrument, Lesson, MusicianLevel, MusicianProfile, Range, StudentLessons,
+    Instrument, Lesson, MethodBook, MusicianLevel, MusicianProfile, Range, StudentLessons,
 };
 
 #[path = "support/helpers.rs"]
@@ -100,8 +100,8 @@ fn a_level_whose_requirements_are_met_is_ready_for_the_exam() {
                 ..Lesson::default()
             }],
             method: vec![Lesson {
-                page: Some(Range::single("46".to_owned())),
-                lesson: Some(Range::single("113".to_owned())),
+                page: Some(Range::single("35".to_owned())),
+                method_books: vec![MethodBook::Laoureux1],
                 ..Lesson::default()
             }],
         }))

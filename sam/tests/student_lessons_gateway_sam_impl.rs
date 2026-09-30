@@ -7,7 +7,7 @@ use sam::lessons::adapters::gateways::StudentLessonsGatewaySamImpl;
 use student::application::gateways::{
     FailureKind, StudentLessonsGateway, StudentLessonsGatewayError,
 };
-use student::domain::entities::{Clef, Lesson, Range, StudentId, StudentLessons};
+use student::domain::entities::{Clef, Lesson, MethodBook, Range, StudentId, StudentLessons};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
@@ -59,6 +59,7 @@ fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
                     description: Some("Passou lições 7 e 8, estudar próximas lições.".to_owned()),
                     instructor: Some("BELTRANO DA SILVA".to_owned()),
                     method: None,
+                    method_books: Vec::new(),
                 }],
                 method: vec![Lesson {
                     id: Some("214020".to_owned()),
@@ -76,6 +77,7 @@ fn given_lessons_page_should_map_both_categories_to_domain_lessons() {
                     description: Some("Postura do violino".to_owned()),
                     instructor: Some("FULANO DE TAL".to_owned()),
                     method: Some("MÉTODO CCB - SCHIMOLL - VIOLINO".to_owned()),
+                    method_books: vec![MethodBook::Ccb],
                 }],
             }
         );
@@ -295,6 +297,7 @@ fn every_msa_row_is_read_with_all_its_fields() {
                 description: Some("Passou lições 7 e 8, estudar próximas lições.".to_owned()),
                 instructor: Some("BELTRANO DA SILVA".to_owned()),
                 method: None,
+                method_books: Vec::new(),
             },
         ])
     );
@@ -374,6 +377,7 @@ fn every_method_row_is_read_with_all_its_fields() {
                 description: Some("Revisão para RJM".to_owned()),
                 instructor: Some("FULANO DE TAL".to_owned()),
                 method: Some("MÉTODO CCB - SCHIMOLL - VIOLINO".to_owned()),
+                method_books: vec![MethodBook::Ccb],
                 ..Lesson::default()
             },
             Lesson {
@@ -383,10 +387,149 @@ fn every_method_row_is_read_with_all_its_fields() {
                 lesson: Some(Range::single("7".to_owned())),
                 instructor: Some("FULANO DE TAL".to_owned()),
                 method: Some("MÉTODO CCB - SCHIMOLL - VIOLINO".to_owned()),
+                method_books: vec![MethodBook::Ccb],
                 ..Lesson::default()
             },
         ])
     );
+}
+
+#[test]
+fn every_string_method_book_the_requirements_name_is_recognized() {
+    assert_recognized(&[
+        (
+            "NICOLAS LAOUREUX VOL. I - VIOLINO",
+            &[MethodBook::Laoureux1],
+        ),
+        (
+            "NICOLAS LAOUREUX  VOL. III - VIOLINO",
+            &[MethodBook::Laoureux3],
+        ),
+        ("MÉTODO CCB - SCHIMOLL - VIOLINO", &[MethodBook::Ccb]),
+        ("2° SCHMOLL", &[MethodBook::Ccb]),
+        ("SCHMOLL", &[MethodBook::Ccb]),
+        ("HANS SITT - VIOLINO", &[MethodBook::HansSitt1]),
+        (
+            "ED. BRITTEN - MÉTODO FACILITADO - VIOLINO - VOLUME 1",
+            &[MethodBook::BrittenViolin1],
+        ),
+        (
+            "BEGINNING STRINGS - VIOLA",
+            &[MethodBook::BeginningStringsViola],
+        ),
+        ("A TUNE A DAY - VIOLA", &[MethodBook::ATuneADay3]),
+        (
+            "ED. BRITTEN - MÉTODO FACILITADO - VIOLA - VOLUME 1",
+            &[MethodBook::BrittenViola1],
+        ),
+        (
+            "BEGINNING STRINGS - VIOLONCELLO",
+            &[MethodBook::BeginningStringsCello],
+        ),
+        (
+            "DOTZAUER - VIOLONCELLO - VOLUME 1",
+            &[MethodBook::Dotzauer1],
+        ),
+        ("DOTZAUER", &[MethodBook::Dotzauer1, MethodBook::Dotzauer2]),
+        (
+            "ED. BRITTEN - MÉTODO FACILITADO - VIOLONCELO - VOLUME 1",
+            &[MethodBook::BrittenCello1],
+        ),
+    ]);
+}
+
+#[test]
+fn every_woodwind_method_book_the_requirements_name_is_recognized() {
+    assert_recognized(&[
+        ("PARÉS - FLAUTA", &[MethodBook::Pares]),
+        ("GALLI - FLAUTA", &[MethodBook::Galli]),
+        (
+            "ALMEIDA DIAS - MÉTODO FACILITADO - FLAUTA",
+            &[MethodBook::AlmeidaDiasFlute],
+        ),
+        (
+            "GIAMPIERI - OBOÉ , OBOÉ D'AMORE , CORNE INGLES",
+            &[MethodBook::GiampieriOboe],
+        ),
+        ("GIAMPIERI - FAGOTE", &[MethodBook::GiampieriBassoon]),
+        ("WEISSENBORN - FAGOTE", &[MethodBook::Weissenborn]),
+        (
+            "GIAMPIERI - CLARINETE SIB / LA",
+            &[MethodBook::GiampieriClarinet],
+        ),
+        (
+            "GALPER  - CLARINETE SIB / LA",
+            &[MethodBook::GalperClarinet1, MethodBook::GalperClarinet2],
+        ),
+        (
+            "NABOR PIRES CAMARGO - CLARINETE SIB / LA",
+            &[MethodBook::NaborPiresCamargo],
+        ),
+        (
+            "GALPER - CLARINETE ALTO MIB / CLARINETE BAIXO SIB",
+            &[MethodBook::GalperAltoBass1, MethodBook::GalperAltoBass2],
+        ),
+        (
+            "AMADEU RUSSO - PADRONIZAÇÃO DE ENSINO - SAXOFONES SOPRANO, ALTO, TENOR, BARÍTONO",
+            &[MethodBook::AmadeuRussoSaxophone],
+        ),
+        (
+            "ALMEIDA DIAS - MÉTODO PRÁTICO - SAXOFONES SOPRANO, ALTO, TENOR, BARÍTONO",
+            &[MethodBook::AlmeidaDiasSaxophone],
+        ),
+    ]);
+}
+
+#[test]
+fn every_brass_method_book_the_requirements_name_is_recognized() {
+    assert_recognized(&[
+        (
+            "RUBANK - TROMPETE, CORNET, FLUGELHORN",
+            &[MethodBook::RubankTrumpet],
+        ),
+        (
+            "AMADEU RUSSO - TROMPETE, CORNET, FLUGELHORN, TROMBONE, EUPHONIO, BARÍTONO DE PISTO",
+            &[MethodBook::AmadeuRussoBrass],
+        ),
+        (
+            "ALMEIDA DIAS - MÉTODO PRÁTICO - TROMPETE, CORNET, FLUGELHORN",
+            &[MethodBook::AlmeidaDiasTrumpet],
+        ),
+        (
+            "RUBANK ELEMENTARY- TROMPA FA / SIB",
+            &[MethodBook::RubankElementaryHorn],
+        ),
+        (
+            "ALMEIDA DIAS - MÉTODO PRÁTICO - TROMPA FA / SIB",
+            &[MethodBook::AlmeidaDiasHorn],
+        ),
+        (
+            "RUBANK - TROMBONE, TROMBONITO, BARÍTONO, EUPHONIUM",
+            &[MethodBook::RubankTrombone],
+        ),
+        (
+            "ALMEIDA DIAS - MÉTODO PRÁTICO - TROMBONE, TROMBONITO, BARÍTONO, EUPHONIUM",
+            &[MethodBook::AlmeidaDiasTrombone],
+        ),
+        (
+            "ALMEIDA DIAS - MÉTODO PRÁTICO - TUBA",
+            &[MethodBook::AlmeidaDiasTuba],
+        ),
+    ]);
+}
+
+#[test]
+fn a_method_book_the_requirements_do_not_name_belongs_to_no_book() {
+    for sam_name in [
+        "POZZOLI",
+        "OUTROS (DIGITAR O NOME DO MÉTODO NO CAMPO OBSERVAÇÕES)",
+    ] {
+        assert_eq!(
+            method_books_of(sam_name),
+            Some(Vec::new()),
+            "method {sam_name:?}"
+        );
+    }
 }
 
 #[test]
@@ -406,6 +549,27 @@ fn an_empty_method_table_has_no_lessons() {
 
 fn msa_lessons_listed(rows_html: &str) -> Option<Vec<Lesson>> {
     lessons_served(&lessons_page(&msa_table(rows_html), "")).map(|lessons| lessons.msa)
+}
+
+fn assert_recognized(cases: &[(&str, &[MethodBook])]) {
+    for (sam_name, books) in cases {
+        assert_eq!(
+            method_books_of(sam_name),
+            Some(books.to_vec()),
+            "method {sam_name:?}"
+        );
+    }
+}
+
+fn method_books_of(sam_name: &str) -> Option<Vec<MethodBook>> {
+    let row: String = format!(
+        "<tr><td>1</td><td>1</td><td>{sam_name}</td><td></td><td></td><td></td><td></td><td></td></tr>"
+    );
+
+    method_lessons_listed(&row)?
+        .into_iter()
+        .next()
+        .map(|lesson| lesson.method_books)
 }
 
 fn method_lessons_listed(rows_html: &str) -> Option<Vec<Lesson>> {

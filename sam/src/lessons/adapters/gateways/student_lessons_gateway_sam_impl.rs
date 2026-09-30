@@ -4,6 +4,7 @@ use student::domain::entities::{Clef, Lesson, Range, StudentId, StudentLessons};
 
 use crate::client::{MsaLesson, MtdLesson, SamClient, StudentLessonsPage};
 use crate::diagnostics::{error_chain, failure_kind};
+use crate::lessons::adapters::gateways::method_books::recognize_method_books;
 
 pub struct StudentLessonsGatewaySamImpl {
     client: Arc<dyn SamClient>,
@@ -46,6 +47,7 @@ impl From<MsaLesson> for Lesson {
             description: lesson.description,
             instructor: lesson.authorizer,
             method: None,
+            method_books: Vec::new(),
         }
     }
 }
@@ -61,6 +63,11 @@ impl From<MtdLesson> for Lesson {
             clef: None,
             description: lesson.observations,
             instructor: lesson.authorizer,
+            method_books: lesson
+                .method
+                .as_deref()
+                .map(recognize_method_books)
+                .unwrap_or_default(),
             method: lesson.method,
         }
     }

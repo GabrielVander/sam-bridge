@@ -1,5 +1,6 @@
 use crate::lessons::domain::entities::{
-    InstrumentRequirements, Lesson, MethodAlternative, MethodMilestone, Range, TestRequirement,
+    InstrumentRequirements, Lesson, MethodAlternative, MethodBook, MethodComponent,
+    MethodMilestone, Range, TestRequirement,
 };
 use crate::shared::domain::entities::{Instrument, MusicianLevel};
 use thiserror::Error;
@@ -81,21 +82,31 @@ pub fn assess(
     })
 }
 
-struct RecordedProgress {
+struct RecordedProgress<'a> {
     theory_phase: f64,
-    method_page: f64,
-    method_lesson: f64,
-    method_phase: f64,
+    method_lessons: &'a [Lesson],
 }
 
-impl RecordedProgress {
-    fn from_lessons(msa_lessons: &[Lesson], method_lessons: &[Lesson]) -> Self {
+impl<'a> RecordedProgress<'a> {
+    fn from_lessons(msa_lessons: &[Lesson], method_lessons: &'a [Lesson]) -> Self {
         Self {
             theory_phase: highest(msa_lessons.iter().map(|lesson| &lesson.phase)),
-            method_page: highest(method_lessons.iter().map(|lesson| &lesson.page)),
-            method_lesson: highest(method_lessons.iter().map(|lesson| &lesson.lesson)),
-            method_phase: highest(method_lessons.iter().map(|lesson| &lesson.phase)),
+            method_lessons,
         }
+    }
+
+    fn highest_page_in(&self, book: MethodBook) -> f64 {
+        highest(self.lessons_in(book).map(|lesson| &lesson.page))
+    }
+
+    fn highest_lesson_in(&self, book: MethodBook) -> f64 {
+        highest(self.lessons_in(book).map(|lesson| &lesson.lesson))
+    }
+
+    fn lessons_in(&self, book: MethodBook) -> impl Iterator<Item = &Lesson> {
+        self.method_lessons
+            .iter()
+            .filter(move |lesson| lesson.method_books.contains(&book))
     }
 }
 
@@ -174,7 +185,7 @@ fn measure_alternative(
     let components: Vec<Option<Measurement>> = alternative
         .components
         .iter()
-        .map(|component| component.milestone.measure(recorded))
+        .map(|component| component.measure(recorded))
         .collect();
 
     let measured_percents: Vec<f64> = components
@@ -205,24 +216,32 @@ struct Measurement {
     met: bool,
 }
 
-impl MethodMilestone {
+impl MethodComponent {
     fn measure(&self, recorded: &RecordedProgress) -> Option<Measurement> {
-        match *self {
-            Self::Page(target) => Some(Measurement::against(recorded.method_page, target)),
-            Self::Lesson(target) => Some(Measurement::against(recorded.method_lesson, target)),
-            Self::PageAndLesson { page, lesson } => {
-                let page: Measurement = Measurement::against(recorded.method_page, page);
-                let lesson: Measurement = Measurement::against(recorded.method_lesson, lesson);
+        let page = || recorded.highest_page_in(self.book);
+        let lesson = || recorded.highest_lesson_in(self.book);
+
+        match self.milestone {
+            MethodMilestone::Page(target) => Some(Measurement::against(page(), target)),
+            MethodMilestone::Lesson(target) => Some(Measurement::against(lesson(), target)),
+            MethodMilestone::PageAndLesson {
+                page: page_target,
+                lesson: lesson_target,
+            } => {
+                let page: Measurement = Measurement::against(page(), page_target);
+                let lesson: Measurement = Measurement::against(lesson(), lesson_target);
 
                 Some(Measurement {
                     percent: page.percent.midpoint(lesson.percent),
                     met: page.met && lesson.met,
                 })
             }
-            Self::Phase(target) => Some(Measurement::against(recorded.method_phase, target)),
-            Self::Module(_) | Self::ExerciseRange { .. } | Self::Complete | Self::Unmeasured => {
-                None
-            }
+            // SAM records pages and lesson numbers for method books, never phases.
+            MethodMilestone::Phase(_)
+            | MethodMilestone::Module(_)
+            | MethodMilestone::ExerciseRange { .. }
+            | MethodMilestone::Complete
+            | MethodMilestone::Unmeasured => None,
         }
     }
 }

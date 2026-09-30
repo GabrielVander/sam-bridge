@@ -1,3 +1,4 @@
+mod method_books;
 mod musician_profile_gateway_sam_impl;
 mod student_lessons_gateway_sam_impl;
 
