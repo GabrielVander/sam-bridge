@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/errors.dart';
@@ -156,13 +157,11 @@ void main() {
         studentSummary(instrument: Instruments.violin),
       ]);
 
-      expect(
-        find.ancestor(
-          of: find.byIcon(Icons.music_note_outlined),
-          matching: find.byType(ExcludeSemantics),
-        ),
-        findsOneWidget,
-      );
+      final semantics = tester.ensureSemantics();
+      final glyph = String.fromCharCode(Icons.music_note_outlined.codePoint);
+
+      expect(spokenLabels(tester), isNot(contains(contains(glyph))));
+      semantics.dispose();
     });
   });
 
@@ -243,4 +242,22 @@ void main() {
       expect(find.text('?'), findsOneWidget);
     });
   });
+}
+
+List<String> spokenLabels(WidgetTester tester) {
+  final labels = <String>[];
+  void collect(SemanticsNode node) {
+    labels.add(node.label);
+    node.visitChildren((child) {
+      collect(child);
+      return true;
+    });
+  }
+
+  var root = tester.getSemantics(find.byType(Scaffold).first);
+  while (root.parent != null) {
+    root = root.parent!;
+  }
+  collect(root);
+  return labels;
 }
