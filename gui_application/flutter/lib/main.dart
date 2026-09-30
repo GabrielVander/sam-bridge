@@ -12,6 +12,9 @@ import 'package:flutter_application/window/desktop_window.dart'
     if (dart.library.js_interop) 'package:flutter_application/window/desktop_window_web.dart';
 import 'package:flutter_application/window/window_controls.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+const String _chosenLocationsKey = 'roster.chosenLocations';
 
 Future<void> main() async {
   await RustLib.init();
@@ -56,8 +59,17 @@ Future<void> _start({
     restoreSessionUseCase: application.restoreSession,
     logoutUseCase: application.logout,
   );
+  final SharedPreferencesWithCache preferences =
+      await SharedPreferencesWithCache.create(
+        cacheOptions: const SharedPreferencesWithCacheOptions(
+          allowList: {_chosenLocationsKey},
+        ),
+      );
   final StudentsPresenter studentsPresenter = StudentsPresenter(
     retrieveStudents: application.retrieveAllAvailableStudents,
+    rememberedLocations: {...?preferences.getStringList(_chosenLocationsKey)},
+    rememberLocations: (locations) =>
+        preferences.setStringList(_chosenLocationsKey, locations.toList()),
   );
   final LessonsPresenter lessonsPresenter = LessonsPresenter(
     retrieveStudentLessons: application.retrieveStudentLessons,
