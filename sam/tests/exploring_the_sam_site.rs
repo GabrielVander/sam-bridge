@@ -839,25 +839,7 @@ fn discovers_where_almeida_dias_lessons_record_the_phase() {
         .as_array()
         .expect("listing response should have a data array");
 
-    let almeida_dias_players: Vec<String> = rows
-        .iter()
-        .filter(|row| column(row, 3) == "MÚSICO")
-        .filter(|row| {
-            let instrument: String = column(row, 4);
-            instrument.starts_with("FLAUTA")
-                || instrument.starts_with("SAXOFONE")
-                || [
-                    "TROMPETE",
-                    "CORNET",
-                    "FLUGELHORN",
-                    "TROMBONE",
-                    "EUPHONIUM",
-                    "TUBA",
-                ]
-                .contains(&instrument.as_str())
-        })
-        .map(|row| column(row, 0))
-        .collect();
+    let almeida_dias_players: Vec<String> = almeida_dias_players(rows);
 
     let mtd_row_selector: scraper::Selector =
         scraper::Selector::parse("table#datatable3 tbody tr").unwrap();
@@ -867,6 +849,8 @@ fn discovers_where_almeida_dias_lessons_record_the_phase() {
     let mut lessons: BTreeMap<String, usize> = BTreeMap::new();
     let mut rows_seen: usize = 0;
     let mut notes_naming_a_phase: Vec<String> = Vec::new();
+    let mut notes_mentioning_a_phase: usize = 0;
+    let mut notes_opening_with_a_phase: usize = 0;
 
     for student_id in &almeida_dias_players {
         let body: String = client
@@ -893,16 +877,53 @@ fn discovers_where_almeida_dias_lessons_record_the_phase() {
             rows_seen += 1;
             *pages.entry(page.clone()).or_insert(0) += 1;
             *lessons.entry(lesson.clone()).or_insert(0) += 1;
-            if notes.to_uppercase().contains("FASE") && notes_naming_a_phase.len() < 15 {
-                notes_naming_a_phase.push(notes.chars().take(80).collect());
+            if notes.to_uppercase().contains("FASE") {
+                notes_mentioning_a_phase += 1;
+                if notes_naming_a_phase.len() < 15 {
+                    notes_naming_a_phase.push(notes.chars().take(80).collect());
+                }
+            }
+            if opens_with_a_phase(notes) {
+                notes_opening_with_a_phase += 1;
             }
         }
     }
 
     println!("almeida dias rows: {rows_seen}");
+    println!("notes mentioning a phase: {notes_mentioning_a_phase}");
+    println!("notes opening with a phase: {notes_opening_with_a_phase}");
     println!("page column values: {pages:#?}");
     println!("lesson column values: {lessons:#?}");
     println!("notes naming a phase (sample): {notes_naming_a_phase:#?}");
+}
+
+fn almeida_dias_players(rows: &[serde_json::Value]) -> Vec<String> {
+    rows.iter()
+        .filter(|row| column(row, 3) == "MÚSICO")
+        .filter(|row| {
+            let instrument: String = column(row, 4);
+            instrument.starts_with("FLAUTA")
+                || instrument.starts_with("SAXOFONE")
+                || [
+                    "TROMPETE",
+                    "CORNET",
+                    "FLUGELHORN",
+                    "TROMBONE",
+                    "EUPHONIUM",
+                    "TUBA",
+                ]
+                .contains(&instrument.as_str())
+        })
+        .map(|row| column(row, 0))
+        .collect()
+}
+
+fn opens_with_a_phase(notes: &str) -> bool {
+    let opening: String = notes.trim_start().chars().take(4).collect();
+    let rest: String = notes.trim_start().chars().skip(4).collect();
+
+    opening.eq_ignore_ascii_case("fase")
+        && rest.trim_start().starts_with(|c: char| c.is_ascii_digit())
 }
 
 fn one_musician_id_per_level(rows: &[serde_json::Value]) -> BTreeMap<String, String> {
