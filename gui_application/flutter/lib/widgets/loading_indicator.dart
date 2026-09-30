@@ -1,9 +1,7 @@
-import 'dart:async';
-
+import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/l10n/l10n.dart';
-
-const Duration _slowConnectionThreshold = Duration(seconds: 10);
+import 'package:flutter_application/widgets/loading_presenter.dart';
 
 class LoadingIndicator extends StatefulWidget {
   const LoadingIndicator({super.key});
@@ -13,21 +11,11 @@ class LoadingIndicator extends StatefulWidget {
 }
 
 class _LoadingIndicatorState extends State<LoadingIndicator> {
-  late final Timer _slowConnectionTimer;
-  bool _slow = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _slowConnectionTimer = Timer(
-      _slowConnectionThreshold,
-      () => setState(() => _slow = true),
-    );
-  }
+  final LoadingPresenter _presenter = LoadingPresenter();
 
   @override
   void dispose() {
-    _slowConnectionTimer.cancel();
+    _presenter.close();
     super.dispose();
   }
 
@@ -40,10 +28,19 @@ class _LoadingIndicatorState extends State<LoadingIndicator> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(),
-            if (_slow) ...[
-              const SizedBox(height: 16),
-              Text(context.l10n.slowConnection, textAlign: TextAlign.center),
-            ],
+            BlocSignalBuilder<LoadingPresenter, LoadingState>(
+              bloc: _presenter,
+              builder: (context, state) => switch (state) {
+                Waiting() => const SizedBox.shrink(),
+                WaitingLong() => Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text(
+                    context.l10n.slowConnection,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              },
+            ),
           ],
         ),
       ),
