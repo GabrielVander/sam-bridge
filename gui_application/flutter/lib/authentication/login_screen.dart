@@ -74,20 +74,20 @@ final class _LoginFormCard extends StatefulWidget {
 }
 
 final class _LoginFormCardState extends State<_LoginFormCard> {
-  final TextEditingController _username = TextEditingController();
+  final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _username.dispose();
+    _email.dispose();
     _password.dispose();
     super.dispose();
   }
 
   void _submit(BuildContext context) {
     FocusScope.of(context).unfocus();
-    context.read<AuthPresenter>().submitLogin(_username.text, _password.text);
+    context.read<AuthPresenter>().submitLogin(_email.text, _password.text);
   }
 
   @override
@@ -146,7 +146,7 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                   ],
                   const SizedBox(height: 28),
                   TextField(
-                    controller: _username,
+                    controller: _email,
                     decoration: InputDecoration(
                       labelText: context.l10n.loginEmail,
                       prefixIcon: const Icon(Icons.person),

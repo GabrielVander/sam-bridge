@@ -84,8 +84,8 @@ class AuthPresenter extends CubitSignal<AuthState> {
     }
   }
 
-  Future<void> submitLogin(String username, String password) async {
-    if (username.isEmpty || password.isEmpty) {
+  Future<void> submitLogin(String email, String password) async {
+    if (email.isEmpty || password.isEmpty) {
       emit(const AuthMissingFields());
       return;
     }
@@ -93,7 +93,7 @@ class AuthPresenter extends CubitSignal<AuthState> {
     emit(const AuthLoading());
     try {
       final LoginOutcomeDto outcome = await _loginUseCase(
-        email: username,
+        email: email,
         password: password,
       );
 
