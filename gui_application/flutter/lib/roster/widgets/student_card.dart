@@ -100,7 +100,7 @@ final class _IconLine extends StatelessWidget {
 
     return Row(
       children: [
-        ExcludeSemantics(child: Icon(icon, size: 14, color: color)),
+        Icon(icon, size: 14, color: color),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
