@@ -4,6 +4,7 @@ import 'package:bloc_signals/bloc_signals.dart';
 import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/roster/student_list_item.dart';
 import 'package:flutter_application/errors/error_report.dart';
+import 'package:flutter_application/roster/ports/remember_locations.dart';
 import 'package:flutter_application/roster/ports/retrieve_students_use_case.dart';
 import 'package:flutter_application/roster/roster_mapper.dart';
 import 'package:flutter_application/roster/student_filter.dart';
@@ -83,12 +84,21 @@ final class StudentsFailure extends StudentsState {
 
 class StudentsPresenter extends CubitSignal<StudentsState> {
   final RetrieveStudentsUseCase _retrieveStudents;
+  final RememberLocations _rememberLocations;
   List<StudentListItem> _all = [];
-  StudentFilter _filter = const StudentFilter();
+  StudentFilter _filter;
   Timer? _pendingSearch;
 
-  StudentsPresenter({required this._retrieveStudents})
-    : super(initialState: const StudentsIdle());
+  StudentsPresenter({
+    required this._retrieveStudents,
+    Set<String> rememberedLocations = const {},
+    this._rememberLocations = _rememberNothing,
+  }) : _filter = StudentFilter(
+         locations: Set.unmodifiable(rememberedLocations),
+       ),
+       super(initialState: const StudentsIdle());
+
+  static Future<void> _rememberNothing(Set<String> _) async {}
 
   @override
   Future<void> close() {
@@ -124,6 +134,7 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
       nameQuery: nameQuery,
       locations: selectedLocations,
     );
+    if (selectedLocations != null) _rememberLocations(_filter.locations);
     if (stateValue is StudentsLoaded) {
       emit(_filteredState());
     }
@@ -145,6 +156,7 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
   void clearFilters() {
     _pendingSearch?.cancel();
     _filter = const StudentFilter();
+    _rememberLocations(_filter.locations);
     if (stateValue is StudentsLoaded) {
       emit(_filteredState());
     }

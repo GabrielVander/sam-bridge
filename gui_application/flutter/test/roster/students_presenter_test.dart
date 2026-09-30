@@ -284,6 +284,84 @@ void main() {
       expect(listedIds(cubit), ['2']);
     });
 
+    test('filters by the locations remembered from before', () async {
+      final cubit = StudentsPresenter(
+        retrieveStudents: () async => rosterLoaded([
+          studentSummary(id: '1', location: 'Loc A'),
+          studentSummary(id: '2', location: 'Loc B'),
+        ]),
+        rememberedLocations: {'Loc B'},
+      );
+
+      await cubit.load();
+
+      expect((cubit.stateValue as StudentsLoaded).selectedLocations, {'Loc B'});
+      expect(listedIds(cubit), ['2']);
+    });
+
+    test('remembers the chosen locations', () async {
+      final List<Set<String>> remembered = [];
+      final cubit = StudentsPresenter(
+        retrieveStudents: () async =>
+            rosterLoaded([studentSummary(location: 'Loc A')]),
+        rememberLocations: (locations) async => remembered.add(locations),
+      );
+
+      await cubit.load();
+      cubit.filter(selectedLocations: {'Loc A'});
+
+      expect(remembered, [
+        {'Loc A'},
+      ]);
+    });
+
+    test('removing a location remembers the other chosen ones', () async {
+      final List<Set<String>> remembered = [];
+      final cubit = StudentsPresenter(
+        retrieveStudents: () async => rosterLoaded([
+          studentSummary(id: '1', location: 'Loc A'),
+          studentSummary(id: '2', location: 'Loc B'),
+        ]),
+        rememberedLocations: {'Loc A', 'Loc B'},
+        rememberLocations: (locations) async => remembered.add(locations),
+      );
+
+      await cubit.load();
+      cubit.removeLocation('Loc A');
+
+      expect(remembered, [
+        {'Loc B'},
+      ]);
+    });
+
+    test('searching a name leaves the remembered locations alone', () async {
+      final List<Set<String>> remembered = [];
+      final cubit = StudentsPresenter(
+        retrieveStudents: () async => rosterLoaded([studentSummary()]),
+        rememberLocations: (locations) async => remembered.add(locations),
+      );
+
+      await cubit.load();
+      cubit.filter(nameQuery: 'Ana');
+
+      expect(remembered, isEmpty);
+    });
+
+    test('clearing the filters forgets the chosen locations', () async {
+      final List<Set<String>> remembered = [];
+      final cubit = StudentsPresenter(
+        retrieveStudents: () async =>
+            rosterLoaded([studentSummary(location: 'Loc A')]),
+        rememberedLocations: {'Loc A'},
+        rememberLocations: (locations) async => remembered.add(locations),
+      );
+
+      await cubit.load();
+      cubit.clearFilters();
+
+      expect(remembered, [<String>{}]);
+    });
+
     test('clearFilters() resets query and locations', () async {
       final cubit = StudentsPresenter(
         retrieveStudents: () async => rosterLoaded([
