@@ -500,15 +500,6 @@ impl InstrumentRequirements {
     }
 }
 
-const fn theory_for(level: &MusicianLevel) -> TheoryRequirement {
-    match level {
-        MusicianLevel::Officialized | MusicianLevel::OfficialService => {
-            TheoryRequirement { msa_phase: 16 }
-        }
-        _ => TheoryRequirement { msa_phase: 12 },
-    }
-}
-
 const fn test(
     level: MusicianLevel,
     method_alternatives: Vec<MethodAlternative>,
@@ -517,6 +508,15 @@ const fn test(
         theory: theory_for(&level),
         method_alternatives,
         level,
+    }
+}
+
+const fn theory_for(level: &MusicianLevel) -> TheoryRequirement {
+    match level {
+        MusicianLevel::Officialized | MusicianLevel::OfficialService => {
+            TheoryRequirement { msa_phase: 16 }
+        }
+        _ => TheoryRequirement { msa_phase: 12 },
     }
 }
 
