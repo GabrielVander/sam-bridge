@@ -3,6 +3,7 @@ import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/roster/instrument_name.dart';
 import 'package:flutter_application/roster/position_name.dart';
 import 'package:flutter_application/roster/student_list_item.dart';
+import 'package:flutter_application/router.dart';
 import 'package:go_router/go_router.dart';
 
 final class StudentCard extends StatelessWidget {
@@ -16,7 +17,7 @@ final class StudentCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: InkWell(
         onTap: student.canOpen
-            ? () => context.go('/students/${student.id}', extra: student.name)
+            ? () => context.go(Routes.student(student.id), extra: student.name)
             : null,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

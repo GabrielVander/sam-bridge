@@ -4,6 +4,7 @@ import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/errors/error_message.dart';
 import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/l10n/l10n.dart';
+import 'package:flutter_application/router.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
 import 'package:flutter_application/widgets/loading_indicator.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +20,7 @@ class LoginScreen extends StatelessWidget {
           if (state.notRemembered case final report?) {
             _warnNotRemembered(context, report);
           }
-          context.go('/students');
+          context.go(Routes.students);
         }
       },
       child: BlocSignalBuilder<AuthPresenter, AuthState>(

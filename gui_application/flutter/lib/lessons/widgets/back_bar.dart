@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/l10n/l10n.dart';
+import 'package:flutter_application/router.dart';
 import 'package:go_router/go_router.dart';
 
 final class BackBar extends StatelessWidget {
@@ -17,7 +18,7 @@ final class BackBar extends StatelessWidget {
           IconButton(
             tooltip: context.l10n.backToStudents,
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.go('/students'),
+            onPressed: () => context.go(Routes.students),
           ),
           const SizedBox(width: 4),
           Text(

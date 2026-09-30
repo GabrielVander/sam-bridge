@@ -9,6 +9,13 @@ import 'package:flutter_application/main_screen.dart';
 import 'package:flutter_application/roster/students_screen.dart';
 import 'package:go_router/go_router.dart';
 
+abstract final class Routes {
+  static const String login = '/login';
+  static const String students = '/students';
+
+  static String student(String id) => '$students/$id';
+}
+
 class PresenterRefreshListenable extends ChangeNotifier {
   StreamSubscription<dynamic>? _subscription;
 
@@ -29,14 +36,16 @@ GoRouter buildRouter({
 }) {
   return GoRouter(
     navigatorKey: GlobalKey<NavigatorState>(),
-    initialLocation: authPresenter.isAuthenticated ? '/students' : '/login',
+    initialLocation: authPresenter.isAuthenticated
+        ? Routes.students
+        : Routes.login,
     refreshListenable: PresenterRefreshListenable(authPresenter.stream),
     redirect: (BuildContext context, GoRouterState state) {
       final bool loggedIn = authPresenter.isAuthenticated;
-      final bool loggingIn = state.matchedLocation == '/login';
+      final bool loggingIn = state.matchedLocation == Routes.login;
 
-      if (!loggedIn && !loggingIn) return '/login';
-      if (loggedIn && loggingIn) return '/students';
+      if (!loggedIn && !loggingIn) return Routes.login;
+      if (loggedIn && loggingIn) return Routes.students;
       return null;
     },
     routes: [
@@ -45,11 +54,11 @@ GoRouter buildRouter({
             MainScreen(versionDisplay: appVersion, child: child),
         routes: [
           GoRoute(
-            path: '/login',
+            path: Routes.login,
             builder: (BuildContext _, GoRouterState _) => const LoginScreen(),
           ),
           GoRoute(
-            path: '/students',
+            path: Routes.students,
             builder: (BuildContext _, GoRouterState _) =>
                 const StudentsScreen(),
             routes: [
