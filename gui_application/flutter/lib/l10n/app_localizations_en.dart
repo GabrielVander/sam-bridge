@@ -258,6 +258,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progressAllLevelsReached => 'All levels reached';
 
   @override
+  String progressPercent(int percent) {
+    return '$percent%';
+  }
+
+  @override
   String checkpointReady(String level) {
     return '$level - ready for the exam';
   }

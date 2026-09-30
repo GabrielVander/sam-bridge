@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/l10n/l10n.dart';
 
 class ProgressBar extends StatelessWidget {
   final String label;
@@ -26,7 +27,7 @@ class ProgressBar extends StatelessWidget {
         SizedBox(
           width: 42,
           child: Text(
-            '${percent.toStringAsFixed(0)}%',
+            context.l10n.progressPercent(percent.round()),
             style: Theme.of(context).textTheme.labelSmall,
             textAlign: TextAlign.end,
           ),

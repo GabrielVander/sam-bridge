@@ -542,6 +542,12 @@ abstract class AppLocalizations {
   /// **'Todos os níveis alcançados'**
   String get progressAllLevelsReached;
 
+  /// No description provided for @progressPercent.
+  ///
+  /// In pt, this message translates to:
+  /// **'{percent}%'**
+  String progressPercent(int percent);
+
   /// No description provided for @checkpointReady.
   ///
   /// In pt, this message translates to:

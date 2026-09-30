@@ -74,6 +74,7 @@
   "msa": "MSA",
   "method": "Method",
   "progressAllLevelsReached": "All levels reached",
+  "progressPercent": "{percent}%",
   "checkpointReady": "{level} - ready for the exam",
   "lessonPhase": "Phase {phase}",
   "lessonPage": "p. {page}",

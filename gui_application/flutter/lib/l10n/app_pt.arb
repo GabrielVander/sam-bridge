@@ -123,6 +123,14 @@
   "msa": "MSA",
   "method": "Método",
   "progressAllLevelsReached": "Todos os níveis alcançados",
+  "progressPercent": "{percent}%",
+  "@progressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "checkpointReady": "{level} - pronto para a prova",
   "@checkpointReady": {
     "placeholders": {
