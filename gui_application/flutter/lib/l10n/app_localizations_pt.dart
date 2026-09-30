@@ -131,6 +131,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get clefF => 'Fá';
 
   @override
+  String get windowMinimize => 'Minimizar';
+
+  @override
+  String get windowMaximize => 'Maximizar';
+
+  @override
+  String get windowClose => 'Fechar';
+
+  @override
   String get logOut => 'Sair';
 
   @override

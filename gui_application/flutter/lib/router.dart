@@ -7,6 +7,7 @@ import 'package:flutter_application/authentication/login_screen.dart';
 import 'package:flutter_application/lessons/student_screen.dart';
 import 'package:flutter_application/main_screen.dart';
 import 'package:flutter_application/roster/students_screen.dart';
+import 'package:flutter_application/window/window_controls.dart';
 import 'package:go_router/go_router.dart';
 
 abstract final class Routes {
@@ -32,6 +33,7 @@ class PresenterRefreshListenable extends ChangeNotifier {
 
 GoRouter buildRouter({
   required String appVersion,
+  required WindowControls? windowControls,
   required AuthPresenter authPresenter,
 }) {
   return GoRouter(
@@ -51,7 +53,11 @@ GoRouter buildRouter({
     routes: [
       ShellRoute(
         builder: (BuildContext context, GoRouterState state, Widget child) =>
-            MainScreen(versionDisplay: appVersion, child: child),
+            MainScreen(
+              versionDisplay: appVersion,
+              windowControls: windowControls,
+              child: child,
+            ),
         routes: [
           GoRoute(
             path: Routes.login,

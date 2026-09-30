@@ -6,6 +6,7 @@ import 'package:flutter_application/rust/api/authentication.dart';
 import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_application/rust/api/progress.dart';
 import 'package:flutter_application/rust/api/roster.dart';
+import 'package:flutter_application/window/window_controls.dart';
 
 import 'roster.dart';
 
@@ -16,6 +17,7 @@ Future<SamSiteApp> composeFakeApp({
   LogoutOutcomeDto logout = const LogoutOutcomeDto.successful(),
   List<StudentSummaryDto>? students,
   String versionDisplay = 'v1.0.0+1',
+  WindowControls? windowControls,
 }) async {
   final AuthPresenter authPresenter = AuthPresenter(
     loginUseCase: ({required email, required password}) async => login,
@@ -45,5 +47,6 @@ Future<SamSiteApp> composeFakeApp({
     authPresenter: authPresenter,
     studentsPresenter: studentsPresenter,
     lessonsPresenter: lessonsPresenter,
+    windowControls: windowControls,
   );
 }

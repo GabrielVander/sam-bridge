@@ -4,15 +4,19 @@ import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/l10n/app_localizations.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/widgets/error_panel.dart';
+import 'package:flutter_application/window/window_controls.dart';
+import 'package:flutter_application/window/window_title_bar.dart';
 
 class StartupFailureApp extends StatelessWidget {
   final ErrorReport report;
   final VoidCallback onRetry;
+  final WindowControls? windowControls;
 
   const StartupFailureApp({
     super.key,
     required this.report,
     required this.onRetry,
+    this.windowControls,
   });
 
   @override
@@ -24,6 +28,9 @@ class StartupFailureApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
       home: Scaffold(
+        appBar: windowControls == null
+            ? null
+            : WindowTitleBar(title: '', controls: windowControls),
         body: ErrorPanel(report: report, onRetry: onRetry),
       ),
     );

@@ -132,6 +132,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clefF => 'F';
 
   @override
+  String get windowMinimize => 'Minimize';
+
+  @override
+  String get windowMaximize => 'Maximize';
+
+  @override
+  String get windowClose => 'Close';
+
+  @override
   String get logOut => 'Log out';
 
   @override

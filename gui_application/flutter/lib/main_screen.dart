@@ -2,24 +2,27 @@ import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/l10n/l10n.dart';
+import 'package:flutter_application/window/window_controls.dart';
+import 'package:flutter_application/window/window_title_bar.dart';
 
 class MainScreen extends StatelessWidget {
   final String versionDisplay;
+  final WindowControls? windowControls;
   final Widget child;
 
   const MainScreen({
     super.key,
     required this.versionDisplay,
+    required this.windowControls,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.appTitle),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      appBar: WindowTitleBar(
+        title: context.l10n.appTitle,
+        controls: windowControls,
         actions: [
           BlocSignalBuilder<AuthPresenter, AuthState>(
             builder: (context, state) => state.isSignedIn

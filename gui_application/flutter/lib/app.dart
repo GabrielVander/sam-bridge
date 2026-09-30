@@ -6,12 +6,14 @@ import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/router.dart';
+import 'package:flutter_application/window/window_controls.dart';
 
 class SamSiteApp extends StatelessWidget {
   final String versionDisplay;
   final AuthPresenter authPresenter;
   final StudentsPresenter studentsPresenter;
   final LessonsPresenter lessonsPresenter;
+  final WindowControls? windowControls;
 
   const SamSiteApp({
     super.key,
@@ -19,6 +21,7 @@ class SamSiteApp extends StatelessWidget {
     required this.authPresenter,
     required this.studentsPresenter,
     required this.lessonsPresenter,
+    this.windowControls,
   });
 
   @override
@@ -37,6 +40,7 @@ class SamSiteApp extends StatelessWidget {
             supportedLocales: AppLocalizations.supportedLocales,
             routerConfig: buildRouter(
               appVersion: versionDisplay,
+              windowControls: windowControls,
               authPresenter: authPresenter,
             ),
             debugShowCheckedModeBanner: false,

@@ -332,6 +332,24 @@ abstract class AppLocalizations {
   /// **'Fá'**
   String get clefF;
 
+  /// No description provided for @windowMinimize.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minimizar'**
+  String get windowMinimize;
+
+  /// No description provided for @windowMaximize.
+  ///
+  /// In pt, this message translates to:
+  /// **'Maximizar'**
+  String get windowMaximize;
+
+  /// No description provided for @windowClose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechar'**
+  String get windowClose;
+
   /// No description provided for @logOut.
   ///
   /// In pt, this message translates to:
