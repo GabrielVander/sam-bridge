@@ -1,7 +1,5 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-const MAX_STUDENTS_PER_INSTRUMENT: usize = 15;
-
 struct SamSiteConfig {
     base_url: String,
     username: String,
@@ -662,7 +660,7 @@ fn discovers_method_names_actually_used_per_instrument() {
         .as_array()
         .expect("listing response should have a data array");
 
-    let mut sampled_student_ids_by_instrument: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let mut student_ids_by_instrument: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for row in rows {
         if column(row, 3) != "MÚSICO" {
             continue;
@@ -671,22 +669,20 @@ fn discovers_method_names_actually_used_per_instrument() {
         if instrument == "A DEFINIR" {
             continue;
         }
-        let ids: &mut Vec<String> = sampled_student_ids_by_instrument
+        student_ids_by_instrument
             .entry(instrument)
-            .or_default();
-        if ids.len() < MAX_STUDENTS_PER_INSTRUMENT {
-            ids.push(column(row, 0));
-        }
+            .or_default()
+            .push(column(row, 0));
     }
 
     let mtd_row_selector: scraper::Selector =
         scraper::Selector::parse("table#datatable3 tbody tr").unwrap();
     let cell_selector: scraper::Selector = scraper::Selector::parse("td").unwrap();
 
-    let mut methods_by_instrument: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    let mut methods_by_instrument: BTreeMap<String, BTreeMap<String, usize>> = BTreeMap::new();
 
-    for (instrument, student_ids) in &sampled_student_ids_by_instrument {
-        let mut methods: BTreeSet<String> = BTreeSet::new();
+    for (instrument, student_ids) in &student_ids_by_instrument {
+        let mut lessons_per_method: BTreeMap<String, usize> = BTreeMap::new();
 
         for student_id in student_ids {
             let response: reqwest::blocking::Response = client
@@ -706,20 +702,20 @@ fn discovers_method_names_actually_used_per_instrument() {
                         .trim()
                         .to_owned();
                     if !method_name.is_empty() {
-                        methods.insert(method_name);
+                        *lessons_per_method.entry(method_name).or_insert(0) += 1;
                     }
                 }
             }
         }
 
-        methods_by_instrument.insert(instrument.clone(), methods);
+        methods_by_instrument.insert(instrument.clone(), lessons_per_method);
     }
 
-    println!("methods actually used per instrument (sampled): {methods_by_instrument:#?}");
+    println!("lessons per method for each instrument: {methods_by_instrument:#?}");
 
     assert!(
         !methods_by_instrument.is_empty(),
-        "expected at least one sampled instrument"
+        "expected at least one instrument"
     );
 }
 
