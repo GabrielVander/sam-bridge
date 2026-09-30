@@ -38,7 +38,6 @@ pub struct TestRequirement {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InstrumentRequirements {
-    pub instrument: Instrument,
     pub tests: Vec<TestRequirement>,
 }
 
@@ -62,13 +61,12 @@ impl InstrumentRequirements {
             Instrument::AltoSaxophone
             | Instrument::CurvedSopranoSaxophone
             | Instrument::StraightSopranoSaxophone
-            | Instrument::TenorSaxophone => Some(Self::saxophone(instrument.clone())),
+            | Instrument::TenorSaxophone => Some(Self::saxophone()),
             Instrument::Trumpet | Instrument::Cornet | Instrument::Flugelhorn => {
-                Some(Self::trumpet(instrument.clone()))
+                Some(Self::trumpet())
             }
             Instrument::FrenchHorn => Some(Self::french_horn()),
-            Instrument::Trombone => Some(Self::trombone_or_euphonium(Instrument::Trombone)),
-            Instrument::Euphonium => Some(Self::trombone_or_euphonium(Instrument::Euphonium)),
+            Instrument::Trombone | Instrument::Euphonium => Some(Self::trombone_or_euphonium()),
             Instrument::Tuba => Some(Self::tuba()),
             Instrument::AltoClarinet
             | Instrument::EnglishHorn
@@ -79,7 +77,6 @@ impl InstrumentRequirements {
 
     fn violin() -> Self {
         Self {
-            instrument: Instrument::Violin,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -126,7 +123,6 @@ impl InstrumentRequirements {
 
     fn viola() -> Self {
         Self {
-            instrument: Instrument::Viola,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -164,7 +160,6 @@ impl InstrumentRequirements {
 
     fn cello() -> Self {
         Self {
-            instrument: Instrument::Cello,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -202,7 +197,6 @@ impl InstrumentRequirements {
 
     fn flute() -> Self {
         Self {
-            instrument: Instrument::Flute,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -234,7 +228,6 @@ impl InstrumentRequirements {
 
     fn oboe() -> Self {
         Self {
-            instrument: Instrument::Oboe,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -263,7 +256,6 @@ impl InstrumentRequirements {
 
     fn bassoon() -> Self {
         Self {
-            instrument: Instrument::Bassoon,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -292,7 +284,6 @@ impl InstrumentRequirements {
 
     fn clarinet() -> Self {
         Self {
-            instrument: Instrument::Clarinet,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -332,7 +323,6 @@ impl InstrumentRequirements {
 
     fn bass_clarinet() -> Self {
         Self {
-            instrument: Instrument::BassClarinet,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -365,9 +355,8 @@ impl InstrumentRequirements {
         }
     }
 
-    fn saxophone(instrument: Instrument) -> Self {
+    fn saxophone() -> Self {
         Self {
-            instrument,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -397,9 +386,8 @@ impl InstrumentRequirements {
         }
     }
 
-    fn trumpet(instrument: Instrument) -> Self {
+    fn trumpet() -> Self {
         Self {
-            instrument,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -427,7 +415,6 @@ impl InstrumentRequirements {
 
     fn french_horn() -> Self {
         Self {
-            instrument: Instrument::FrenchHorn,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -456,9 +443,8 @@ impl InstrumentRequirements {
         }
     }
 
-    fn trombone_or_euphonium(instrument: Instrument) -> Self {
+    fn trombone_or_euphonium() -> Self {
         Self {
-            instrument,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
@@ -487,7 +473,6 @@ impl InstrumentRequirements {
 
     fn tuba() -> Self {
         Self {
-            instrument: Instrument::Tuba,
             tests: vec![
                 test(
                     MusicianLevel::YouthService,
