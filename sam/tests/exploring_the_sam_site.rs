@@ -795,6 +795,116 @@ fn discovers_whether_the_lesson_page_reveals_the_students_level() {
     );
 }
 
+#[test]
+#[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
+fn discovers_where_almeida_dias_lessons_record_the_phase() {
+    let site: SamSiteConfig = configured_sam_site().expect(SAM_SITE_REQUIRED);
+
+    let client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let authorized_session_id: String = client
+        .post(build_sam_authentication_url(&site))
+        .form(&[
+            ("login", site.username.as_str()),
+            ("password", site.password.as_str()),
+        ])
+        .send()
+        .unwrap()
+        .cookies()
+        .find(|i| i.name() == "PHPSESSID")
+        .unwrap()
+        .value()
+        .to_string();
+    let session_cookie: String = format!("PHPSESSID={authorized_session_id}");
+
+    client
+        .get(build_sam_dashboard_url(&site))
+        .header(reqwest::header::COOKIE, &session_cookie)
+        .send()
+        .unwrap();
+
+    let listing_body: String = client
+        .get(build_sam_students_listing_url(&site))
+        .header(reqwest::header::COOKIE, session_cookie.clone())
+        .send()
+        .unwrap()
+        .text()
+        .unwrap();
+    let listing: serde_json::Value =
+        serde_json::from_str(&listing_body).expect("listing response should be valid JSON");
+    let rows: &Vec<serde_json::Value> = listing["data"]
+        .as_array()
+        .expect("listing response should have a data array");
+
+    let almeida_dias_players: Vec<String> = rows
+        .iter()
+        .filter(|row| column(row, 3) == "MÚSICO")
+        .filter(|row| {
+            let instrument: String = column(row, 4);
+            instrument.starts_with("FLAUTA")
+                || instrument.starts_with("SAXOFONE")
+                || [
+                    "TROMPETE",
+                    "CORNET",
+                    "FLUGELHORN",
+                    "TROMBONE",
+                    "EUPHONIUM",
+                    "TUBA",
+                ]
+                .contains(&instrument.as_str())
+        })
+        .map(|row| column(row, 0))
+        .collect();
+
+    let mtd_row_selector: scraper::Selector =
+        scraper::Selector::parse("table#datatable3 tbody tr").unwrap();
+    let cell_selector: scraper::Selector = scraper::Selector::parse("td").unwrap();
+
+    let mut pages: BTreeMap<String, usize> = BTreeMap::new();
+    let mut lessons: BTreeMap<String, usize> = BTreeMap::new();
+    let mut rows_seen: usize = 0;
+    let mut notes_naming_a_phase: Vec<String> = Vec::new();
+
+    for student_id in &almeida_dias_players {
+        let body: String = client
+            .get(build_sam_student_lessons_url(&site, student_id))
+            .header(reqwest::header::COOKIE, session_cookie.clone())
+            .send()
+            .unwrap()
+            .text()
+            .unwrap();
+
+        let document: scraper::Html = scraper::Html::parse_document(&body);
+        for row in document.select(&mtd_row_selector) {
+            let cells: Vec<String> = row
+                .select(&cell_selector)
+                .map(|cell| cell.text().collect::<Vec<_>>().join(" ").trim().to_owned())
+                .collect();
+            let [page, lesson, method, _, _, _, notes, ..] = cells.as_slice() else {
+                continue;
+            };
+            if !method.starts_with("ALMEIDA DIAS") {
+                continue;
+            }
+
+            rows_seen += 1;
+            *pages.entry(page.clone()).or_insert(0) += 1;
+            *lessons.entry(lesson.clone()).or_insert(0) += 1;
+            if notes.to_uppercase().contains("FASE") && notes_naming_a_phase.len() < 15 {
+                notes_naming_a_phase.push(notes.chars().take(80).collect());
+            }
+        }
+    }
+
+    println!("almeida dias rows: {rows_seen}");
+    println!("page column values: {pages:#?}");
+    println!("lesson column values: {lessons:#?}");
+    println!("notes naming a phase (sample): {notes_naming_a_phase:#?}");
+}
+
 fn one_musician_id_per_level(rows: &[serde_json::Value]) -> BTreeMap<String, String> {
     let mut sample: BTreeMap<String, String> = BTreeMap::new();
     for row in rows {
