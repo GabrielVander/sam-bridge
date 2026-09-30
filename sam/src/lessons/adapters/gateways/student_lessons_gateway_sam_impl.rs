@@ -15,6 +15,7 @@ impl StudentLessonsGatewaySamImpl {
         Self { client }
     }
 }
+
 impl StudentLessonsGateway for StudentLessonsGatewaySamImpl {
     fn get_all_for_student_with_id(
         &self,

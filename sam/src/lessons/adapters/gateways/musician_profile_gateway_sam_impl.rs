@@ -15,6 +15,7 @@ impl MusicianProfileGatewaySamImpl {
         Self { client }
     }
 }
+
 impl MusicianProfileGateway for MusicianProfileGatewaySamImpl {
     fn get_by_id(&self, id: &StudentId) -> Result<MusicianProfile, MusicianProfileGatewayError> {
         let sam_students: Vec<SamStudent> = self.client.students().map_err(|error| {

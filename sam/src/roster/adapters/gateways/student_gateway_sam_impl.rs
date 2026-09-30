@@ -17,6 +17,7 @@ impl StudentGatewaySamImpl {
         Self { client }
     }
 }
+
 impl StudentGateway for StudentGatewaySamImpl {
     fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
         let sam_students: Vec<SamStudent> = self.client.students().map_err(|error| {

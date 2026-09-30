@@ -16,6 +16,7 @@ impl AuthorizationGatewaySamImpl {
         Self { client }
     }
 }
+
 impl AuthorizeCredentialGateway for AuthorizationGatewaySamImpl {
     fn authorize(
         &self,
