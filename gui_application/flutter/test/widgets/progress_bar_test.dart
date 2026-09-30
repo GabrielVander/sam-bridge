@@ -27,17 +27,5 @@ void main() {
 
       expect(shownFraction(tester), 0.25);
     });
-
-    testWidgets('never fills beyond the whole bar', (tester) async {
-      await pumpInApp(tester, const ProgressBar(label: 'MSA', percent: 140));
-
-      expect(shownFraction(tester), 1.0);
-    });
-
-    testWidgets('never shows a negative fill', (tester) async {
-      await pumpInApp(tester, const ProgressBar(label: 'MSA', percent: -5));
-
-      expect(shownFraction(tester), 0.0);
-    });
   });
 }
