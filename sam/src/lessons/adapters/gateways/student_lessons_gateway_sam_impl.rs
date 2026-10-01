@@ -70,8 +70,7 @@ impl From<MtdLesson> for Lesson {
             method_books: lesson
                 .method
                 .as_deref()
-                .map(recognize_method_books)
-                .unwrap_or_default(),
+                .map_or_default(recognize_method_books),
             method: lesson.method,
         }
     }
