@@ -1,5 +1,5 @@
 [toolchain]
-channel = "nightly-2026-09-03"
+channel = "nightly-2026-09-30"
 components = ["clippy", "rustfmt", "llvm-tools"]
 targets = [
   "aarch64-apple-darwin",
