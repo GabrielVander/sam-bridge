@@ -518,11 +518,11 @@ abstract class AppLocalizations {
   /// **'Nenhuma lição de método registrada.'**
   String get lessonsNoMethod;
 
-  /// No description provided for @backToStudents.
+  /// No description provided for @back.
   ///
   /// In pt, this message translates to:
   /// **'Voltar'**
-  String get backToStudents;
+  String get back;
 
   /// No description provided for @studentList.
   ///

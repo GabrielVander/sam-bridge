@@ -244,7 +244,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get lessonsNoMethod => 'Nenhuma lição de método registrada.';
 
   @override
-  String get backToStudents => 'Voltar';
+  String get back => 'Voltar';
 
   @override
   String get studentList => 'Lista de alunos';

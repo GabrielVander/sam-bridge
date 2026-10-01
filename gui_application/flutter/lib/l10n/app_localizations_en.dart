@@ -245,7 +245,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lessonsNoMethod => 'No method lessons recorded.';
 
   @override
-  String get backToStudents => 'Back';
+  String get back => 'Back';
 
   @override
   String get studentList => 'Student list';

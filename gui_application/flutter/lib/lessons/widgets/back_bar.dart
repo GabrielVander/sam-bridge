@@ -16,7 +16,7 @@ final class BackBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            tooltip: context.l10n.backToStudents,
+            tooltip: context.l10n.back,
             icon: const Icon(Icons.arrow_back),
             onPressed: () => context.go(Routes.students),
           ),

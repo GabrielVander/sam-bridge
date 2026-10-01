@@ -70,7 +70,7 @@
   "lessonsMethodTab": "Method ({count})",
   "lessonsNoMsa": "No approved lessons recorded.",
   "lessonsNoMethod": "No method lessons recorded.",
-  "backToStudents": "Back",
+  "back": "Back",
   "studentList": "Student list",
   "progressTitle": "Progress",
   "progressTowards": "Next: {level}",

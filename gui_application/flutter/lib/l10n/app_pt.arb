@@ -112,7 +112,7 @@
   },
   "lessonsNoMsa": "Nenhuma lição aprovada registrada.",
   "lessonsNoMethod": "Nenhuma lição de método registrada.",
-  "backToStudents": "Voltar",
+  "back": "Voltar",
   "studentList": "Lista de alunos",
   "progressTitle": "Progresso",
   "progressTowards": "Rumo a: {level}",
