@@ -21,6 +21,7 @@ Future<SamSiteApp> composeFakeApp({
   LogoutOutcomeDto logout = const LogoutOutcomeDto.successful(),
   List<StudentSummaryDto>? students,
   String versionDisplay = 'v1.0.0+1',
+  String? rememberedLanguage,
   WindowControls? windowControls,
 }) async {
   final AuthPresenter authPresenter = AuthPresenter(
@@ -51,7 +52,9 @@ Future<SamSiteApp> composeFakeApp({
     authPresenter: authPresenter,
     studentsPresenter: studentsPresenter,
     lessonsPresenter: lessonsPresenter,
-    settingsPresenter: SettingsPresenter(),
+    settingsPresenter: SettingsPresenter(
+      rememberedLanguage: rememberedLanguage,
+    ),
     windowControls: windowControls,
   );
 }

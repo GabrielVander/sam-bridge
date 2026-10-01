@@ -89,6 +89,14 @@ void main() {
       expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
     });
 
+    testWidgets('speaks the language the user chose over the OS one', (
+      tester,
+    ) async {
+      await pumpApp(tester, await composeFakeApp(rememberedLanguage: 'en'));
+
+      expect(find.text('Sign in with your SAM account'), findsOneWidget);
+    });
+
     testWidgets('falls back to English for a language it does not speak', (
       tester,
     ) async {
