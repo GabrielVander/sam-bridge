@@ -643,6 +643,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'O SAM está demorando para responder. Aguarde mais um pouco…'**
   String get slowConnection;
+
+  /// No description provided for @settings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Configurações'**
+  String get settings;
+
+  /// No description provided for @language.
+  ///
+  /// In pt, this message translates to:
+  /// **'Idioma'**
+  String get language;
 }
 
 class _AppLocalizationsDelegate

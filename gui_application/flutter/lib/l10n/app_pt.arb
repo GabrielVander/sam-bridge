@@ -188,5 +188,7 @@
   "technicalDetails": "Detalhes técnicos",
   "copyDetails": "Copiar detalhes",
   "detailsCopied": "Detalhes copiados",
-  "slowConnection": "O SAM está demorando para responder. Aguarde mais um pouco…"
+  "slowConnection": "O SAM está demorando para responder. Aguarde mais um pouco…",
+  "settings": "Configurações",
+  "language": "Idioma"
 }

@@ -90,5 +90,7 @@
   "technicalDetails": "Technical details",
   "copyDetails": "Copy details",
   "detailsCopied": "Details copied",
-  "slowConnection": "SAM is taking a while to respond. Please wait a little longer…"
+  "slowConnection": "SAM is taking a while to respond. Please wait a little longer…",
+  "settings": "Settings",
+  "language": "Language"
 }

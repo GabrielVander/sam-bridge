@@ -323,4 +323,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get slowConnection =>
       'O SAM está demorando para responder. Aguarde mais um pouco…';
+
+  @override
+  String get settings => 'Configurações';
+
+  @override
+  String get language => 'Idioma';
 }

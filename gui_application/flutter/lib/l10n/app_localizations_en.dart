@@ -324,4 +324,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get slowConnection =>
       'SAM is taking a while to respond. Please wait a little longer…';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get language => 'Language';
 }

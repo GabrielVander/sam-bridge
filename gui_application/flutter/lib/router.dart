@@ -7,12 +7,14 @@ import 'package:flutter_application/authentication/login_screen.dart';
 import 'package:flutter_application/lessons/student_screen.dart';
 import 'package:flutter_application/main_screen.dart';
 import 'package:flutter_application/roster/students_screen.dart';
+import 'package:flutter_application/settings/settings_screen.dart';
 import 'package:flutter_application/window/window_controls.dart';
 import 'package:go_router/go_router.dart';
 
 abstract final class Routes {
   static const String login = '/login';
   static const String students = '/students';
+  static const String settings = '/settings';
 
   static String student(String id) => '$students/$id';
 }
@@ -45,8 +47,10 @@ GoRouter buildRouter({
     redirect: (BuildContext context, GoRouterState state) {
       final bool loggedIn = authPresenter.isAuthenticated;
       final bool loggingIn = state.matchedLocation == Routes.login;
+      final bool openToEveryone =
+          loggingIn || state.matchedLocation == Routes.settings;
 
-      if (!loggedIn && !loggingIn) return Routes.login;
+      if (!loggedIn && !openToEveryone) return Routes.login;
       if (loggedIn && loggingIn) return Routes.students;
       return null;
     },
@@ -62,6 +66,11 @@ GoRouter buildRouter({
           GoRoute(
             path: Routes.login,
             builder: (BuildContext _, GoRouterState _) => const LoginScreen(),
+          ),
+          GoRoute(
+            path: Routes.settings,
+            builder: (BuildContext _, GoRouterState _) =>
+                const SettingsScreen(),
           ),
           GoRoute(
             path: Routes.students,
