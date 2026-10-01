@@ -1,3 +1,4 @@
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/app.dart';
@@ -7,6 +8,12 @@ Future<void> openSettings(WidgetTester tester) async {
   await tester.tap(find.byTooltip('Configurações'));
   await tester.pumpAndSettle();
 }
+
+SemanticsNode option(WidgetTester tester, String language) =>
+    tester.getSemantics(find.text(language));
+
+final Matcher chosen = isSemantics(isChecked: true);
+final Matcher notChosen = isSemantics(isChecked: false);
 
 void main() {
   testWidgets('can be opened before signing in', (tester) async {
@@ -52,5 +59,23 @@ void main() {
 
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Configurações'), findsNothing);
+  });
+
+  testWidgets('marks the language in use, starting with the system one', (
+    tester,
+  ) async {
+    final SemanticsHandle semantics = tester.ensureSemantics();
+    await pumpApp(tester, await composeFakeApp());
+    await openSettings(tester);
+
+    expect(option(tester, 'Idioma do sistema'), chosen);
+    expect(option(tester, 'English'), notChosen);
+
+    await tester.tap(find.text('English'));
+    await tester.pumpAndSettle();
+
+    expect(option(tester, 'System language'), notChosen);
+    expect(option(tester, 'English'), chosen);
+    semantics.dispose();
   });
 }
