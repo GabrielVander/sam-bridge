@@ -667,6 +667,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Idioma do sistema'**
   String get systemLanguage;
+
+  /// No description provided for @version.
+  ///
+  /// In pt, this message translates to:
+  /// **'Versão'**
+  String get version;
 }
 
 class _AppLocalizationsDelegate

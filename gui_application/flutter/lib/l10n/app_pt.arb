@@ -192,5 +192,6 @@
   "settings": "Configurações",
   "language": "Idioma",
   "languageName": "Português",
-  "systemLanguage": "Idioma do sistema"
+  "systemLanguage": "Idioma do sistema",
+  "version": "Versão"
 }

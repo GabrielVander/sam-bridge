@@ -58,7 +58,6 @@ GoRouter buildRouter({
       ShellRoute(
         builder: (BuildContext context, GoRouterState state, Widget child) =>
             MainScreen(
-              versionDisplay: appVersion,
               windowControls: windowControls,
               offersSettings: state.uri.path != Routes.settings,
               child: child,
@@ -71,7 +70,7 @@ GoRouter buildRouter({
           GoRoute(
             path: Routes.settings,
             builder: (BuildContext _, GoRouterState _) =>
-                const SettingsScreen(),
+                SettingsScreen(versionDisplay: appVersion),
           ),
           GoRoute(
             path: Routes.students,

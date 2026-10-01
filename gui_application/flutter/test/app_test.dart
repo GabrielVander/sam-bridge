@@ -44,13 +44,10 @@ void main() {
       expect(find.text('Entre com seu usuário SAM'), findsNothing);
     });
 
-    testWidgets('shows the app name and the version on every screen', (
-      tester,
-    ) async {
-      await pumpApp(tester, await composeFakeApp(versionDisplay: 'v2.3.4+56'));
+    testWidgets('shows the app name', (tester) async {
+      await pumpApp(tester, await composeFakeApp());
 
       expect(find.text('SAM Bridge'), findsOneWidget);
-      expect(find.text('v2.3.4+56'), findsOneWidget);
     });
 
     testWidgets('uses the dark theme', (tester) async {

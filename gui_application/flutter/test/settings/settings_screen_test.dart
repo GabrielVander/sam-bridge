@@ -78,4 +78,14 @@ void main() {
     expect(option(tester, 'English'), chosen);
     semantics.dispose();
   });
+
+  testWidgets('is where the app version is shown', (tester) async {
+    await pumpApp(tester, await composeFakeApp(versionDisplay: 'v2.3.4+56'));
+    expect(find.text('v2.3.4+56'), findsNothing);
+
+    await openSettings(tester);
+
+    expect(find.text('Versão'), findsOneWidget);
+    expect(find.text('v2.3.4+56'), findsOneWidget);
+  });
 }

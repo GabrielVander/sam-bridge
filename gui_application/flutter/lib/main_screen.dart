@@ -8,14 +8,12 @@ import 'package:flutter_application/window/window_title_bar.dart';
 import 'package:go_router/go_router.dart';
 
 class MainScreen extends StatelessWidget {
-  final String versionDisplay;
   final WindowControls? windowControls;
   final bool offersSettings;
   final Widget child;
 
   const MainScreen({
     super.key,
-    required this.versionDisplay,
     required this.windowControls,
     required this.offersSettings,
     required this.child,
@@ -44,18 +42,6 @@ class MainScreen extends StatelessWidget {
                 : const SizedBox.shrink(),
           ),
         ],
-      ),
-      bottomNavigationBar: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        child: Text(
-          versionDisplay,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
       ),
       body: child,
     );

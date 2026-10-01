@@ -94,5 +94,6 @@
   "settings": "Settings",
   "language": "Language",
   "languageName": "English",
-  "systemLanguage": "System language"
+  "systemLanguage": "System language",
+  "version": "Version"
 }

@@ -6,14 +6,20 @@ import 'package:flutter_application/settings/settings_presenter.dart';
 import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  final String versionDisplay;
+
+  const SettingsScreen({super.key, required this.versionDisplay});
 
   @override
   Widget build(BuildContext context) {
     return BlocSignalBuilder<SettingsPresenter, SettingsState>(
       builder: (context, state) => ListView(
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
-        children: [_header(context), _languages(context, state)],
+        children: [
+          _header(context),
+          _languages(context, state),
+          _about(context),
+        ],
       ),
     );
   }
@@ -58,4 +64,11 @@ class SettingsScreen extends StatelessWidget {
       locale,
     ).languageName,
   };
+
+  Widget _about(BuildContext context) => Card(
+    child: ListTile(
+      title: Text(context.l10n.version),
+      trailing: Text(versionDisplay),
+    ),
+  );
 }
