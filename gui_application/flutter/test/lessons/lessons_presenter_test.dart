@@ -81,23 +81,20 @@ void main() {
       },
     );
 
-    test(
-      'load() never shows a raw exception as the message when a use case throws',
-      () async {
-        final cubit = _buildCubit(
-          retrieveStudentLessons: ({required studentId}) async =>
-              throw StateError('bridge down'),
-        );
+    test('load() never shows a raw exception as the message when a use case throws', () async {
+      final cubit = _buildCubit(
+        retrieveStudentLessons: ({required studentId}) async =>
+            throw StateError('bridge down'),
+      );
 
-        await cubit.load('500132');
+      await cubit.load('500132');
 
-        final state = cubit.stateValue;
-        expect(state, isA<LessonsFailure>());
-        final report = (state as LessonsFailure).report;
-        expect(report.reason, ErrorReason.generic);
-        expect(report.details, contains('bridge down'));
-      },
-    );
+      final state = cubit.stateValue;
+      expect(state, isA<LessonsFailure>());
+      final report = (state as LessonsFailure).report;
+      expect(report.reason, ErrorReason.generic);
+      expect(report.details, contains('bridge down'));
+    });
 
     test(
       'load() fails with the lessons error when both use cases throw',
@@ -158,62 +155,53 @@ void main() {
       expect(progress.view.overallCheckpointPercent, 60);
     });
 
-    test(
-      'an unknown-level progress outcome maps to ProgressUnknownLevel without failing the whole screen',
-      () async {
-        final cubit = _buildCubit(
-          assessStudentProgress: ({required studentId}) async =>
-              levelNotRecognized('EXÓTICO'),
-        );
+    test('an unknown-level progress outcome maps to ProgressUnknownLevel without failing the whole screen', () async {
+      final cubit = _buildCubit(
+        assessStudentProgress: ({required studentId}) async =>
+            levelNotRecognized('EXÓTICO'),
+      );
 
-        await cubit.load('500132');
+      await cubit.load('500132');
 
-        final state = cubit.stateValue;
-        expect(state, isA<LessonsLoaded>());
-        final loaded = state as LessonsLoaded;
-        expect(loaded.progress, isA<ProgressUnknownLevel>());
-        expect((loaded.progress as ProgressUnknownLevel).raw, 'EXÓTICO');
-      },
-    );
+      final state = cubit.stateValue;
+      expect(state, isA<LessonsLoaded>());
+      final loaded = state as LessonsLoaded;
+      expect(loaded.progress, isA<ProgressUnknownLevel>());
+      expect((loaded.progress as ProgressUnknownLevel).raw, 'EXÓTICO');
+    });
 
-    test(
-      'a progress failure maps to ProgressUnavailable carrying the error report, without failing the whole screen',
-      () async {
-        final cubit = _buildCubit(
-          assessStudentProgress: ({required studentId}) async =>
-              progressFailed(sessionExpiredFailure('Session expired')),
-        );
+    test('a progress failure maps to ProgressUnavailable carrying the error report, without failing the whole screen', () async {
+      final cubit = _buildCubit(
+        assessStudentProgress: ({required studentId}) async =>
+            progressFailed(sessionExpiredFailure('Session expired')),
+      );
 
-        await cubit.load('500132');
+      await cubit.load('500132');
 
-        final loaded = cubit.stateValue as LessonsLoaded;
-        expect(loaded.progress, isA<ProgressUnavailable>());
-        expect(
-          (loaded.progress as ProgressUnavailable).report,
-          const ErrorReport(
-            reason: ErrorReason.sessionExpired,
-            details: 'Session expired',
-          ),
-        );
-      },
-    );
+      final loaded = cubit.stateValue as LessonsLoaded;
+      expect(loaded.progress, isA<ProgressUnavailable>());
+      expect(
+        (loaded.progress as ProgressUnavailable).report,
+        const ErrorReport(
+          reason: ErrorReason.sessionExpired,
+          details: 'Session expired',
+        ),
+      );
+    });
 
-    test(
-      'a thrown progress assessment maps to ProgressUnavailable, without failing the whole screen',
-      () async {
-        final cubit = _buildCubit(
-          assessStudentProgress: ({required studentId}) async =>
-              throw StateError('bridge down'),
-        );
+    test('a thrown progress assessment maps to ProgressUnavailable, without failing the whole screen', () async {
+      final cubit = _buildCubit(
+        assessStudentProgress: ({required studentId}) async =>
+            throw StateError('bridge down'),
+      );
 
-        await cubit.load('500132');
+      await cubit.load('500132');
 
-        final loaded = cubit.stateValue as LessonsLoaded;
-        final report = (loaded.progress as ProgressUnavailable).report;
-        expect(report.reason, ErrorReason.generic);
-        expect(report.details, contains('bridge down'));
-      },
-    );
+      final loaded = cubit.stateValue as LessonsLoaded;
+      final report = (loaded.progress as ProgressUnavailable).report;
+      expect(report.reason, ErrorReason.generic);
+      expect(report.details, contains('bridge down'));
+    });
 
     test('a non-musician maps to ProgressNotAMusician', () async {
       final cubit = _buildCubit(

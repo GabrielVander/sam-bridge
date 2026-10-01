@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'lessons.dart';
@@ -9,6 +9,7 @@ part of 'lessons.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -20,7 +21,7 @@ mixin _$RetrieveStudentLessonsOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto);
 }
 
 
@@ -29,7 +30,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RetrieveStudentLessonsOutcomeDto()';
+    return 'RetrieveStudentLessonsOutcomeDto()';
 }
 
 
@@ -190,16 +191,18 @@ $RetrieveStudentLessonsOutcomeDto_SuccessCopyWith<RetrieveStudentLessonsOutcomeD
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto_Success&&(identical(other.lessons, lessons) || other.lessons == lessons));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto_Success&&(identical(other.lessons, lessons) || other.lessons == lessons));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lessons);
+int get hashCode {
+    return Object.hash(runtimeType,lessons);
+}
 
 @override
 String toString() {
-  return 'RetrieveStudentLessonsOutcomeDto.success(lessons: $lessons)';
+    return 'RetrieveStudentLessonsOutcomeDto.success(lessons: $lessons)';
 }
 
 
@@ -256,16 +259,18 @@ $RetrieveStudentLessonsOutcomeDto_FailureCopyWith<RetrieveStudentLessonsOutcomeD
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveStudentLessonsOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,report);
+int get hashCode {
+    return Object.hash(runtimeType,report);
+}
 
 @override
 String toString() {
-  return 'RetrieveStudentLessonsOutcomeDto.failure(report: $report)';
+    return 'RetrieveStudentLessonsOutcomeDto.failure(report: $report)';
 }
 
 

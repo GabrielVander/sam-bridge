@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'authentication.dart';
@@ -9,6 +9,7 @@ part of 'authentication.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -20,7 +21,7 @@ mixin _$LoginOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto);
 }
 
 
@@ -29,7 +30,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginOutcomeDto()';
+    return 'LoginOutcomeDto()';
 }
 
 
@@ -197,7 +198,7 @@ class LoginOutcomeDto_Successful extends LoginOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_Successful);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_Successful);
 }
 
 
@@ -206,7 +207,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginOutcomeDto.successful()';
+    return 'LoginOutcomeDto.successful()';
 }
 
 
@@ -234,16 +235,18 @@ $LoginOutcomeDto_SuccessfulWithoutRememberingCopyWith<LoginOutcomeDto_Successful
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_SuccessfulWithoutRemembering&&(identical(other.report, report) || other.report == report));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_SuccessfulWithoutRemembering&&(identical(other.report, report) || other.report == report));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,report);
+int get hashCode {
+    return Object.hash(runtimeType,report);
+}
 
 @override
 String toString() {
-  return 'LoginOutcomeDto.successfulWithoutRemembering(report: $report)';
+    return 'LoginOutcomeDto.successfulWithoutRemembering(report: $report)';
 }
 
 
@@ -295,7 +298,7 @@ class LoginOutcomeDto_InvalidEmailOrPassword extends LoginOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_InvalidEmailOrPassword);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_InvalidEmailOrPassword);
 }
 
 
@@ -304,7 +307,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LoginOutcomeDto.invalidEmailOrPassword()';
+    return 'LoginOutcomeDto.invalidEmailOrPassword()';
 }
 
 
@@ -332,16 +335,18 @@ $LoginOutcomeDto_FailureCopyWith<LoginOutcomeDto_Failure> get copyWith => _$Logi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,report);
+int get hashCode {
+    return Object.hash(runtimeType,report);
+}
 
 @override
 String toString() {
-  return 'LoginOutcomeDto.failure(report: $report)';
+    return 'LoginOutcomeDto.failure(report: $report)';
 }
 
 
@@ -388,7 +393,7 @@ mixin _$LogoutOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto);
 }
 
 
@@ -397,7 +402,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LogoutOutcomeDto()';
+    return 'LogoutOutcomeDto()';
 }
 
 
@@ -553,7 +558,7 @@ class LogoutOutcomeDto_Successful extends LogoutOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto_Successful);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto_Successful);
 }
 
 
@@ -562,7 +567,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'LogoutOutcomeDto.successful()';
+    return 'LogoutOutcomeDto.successful()';
 }
 
 
@@ -590,16 +595,18 @@ $LogoutOutcomeDto_FailureCopyWith<LogoutOutcomeDto_Failure> get copyWith => _$Lo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LogoutOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,report);
+int get hashCode {
+    return Object.hash(runtimeType,report);
+}
 
 @override
 String toString() {
-  return 'LogoutOutcomeDto.failure(report: $report)';
+    return 'LogoutOutcomeDto.failure(report: $report)';
 }
 
 
@@ -646,7 +653,7 @@ mixin _$RestoreSessionOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto);
 }
 
 
@@ -655,7 +662,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RestoreSessionOutcomeDto()';
+    return 'RestoreSessionOutcomeDto()';
 }
 
 
@@ -817,7 +824,7 @@ class RestoreSessionOutcomeDto_Restored extends RestoreSessionOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_Restored);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_Restored);
 }
 
 
@@ -826,7 +833,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RestoreSessionOutcomeDto.restored()';
+    return 'RestoreSessionOutcomeDto.restored()';
 }
 
 
@@ -849,7 +856,7 @@ class RestoreSessionOutcomeDto_NotAvailable extends RestoreSessionOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_NotAvailable);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_NotAvailable);
 }
 
 
@@ -858,7 +865,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RestoreSessionOutcomeDto.notAvailable()';
+    return 'RestoreSessionOutcomeDto.notAvailable()';
 }
 
 
@@ -886,16 +893,18 @@ $RestoreSessionOutcomeDto_FailureCopyWith<RestoreSessionOutcomeDto_Failure> get 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RestoreSessionOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,report);
+int get hashCode {
+    return Object.hash(runtimeType,report);
+}
 
 @override
 String toString() {
-  return 'RestoreSessionOutcomeDto.failure(report: $report)';
+    return 'RestoreSessionOutcomeDto.failure(report: $report)';
 }
 
 

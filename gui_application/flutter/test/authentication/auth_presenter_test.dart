@@ -156,23 +156,20 @@ void main() {
       },
     );
 
-    test(
-      'submitLogin() reports a failure instead of hanging when the use case throws',
-      () async {
-        final presenter = buildPresenter(
-          loginUseCase: ({required email, required password}) async =>
-              throw StateError('bridge down'),
-        );
+    test('submitLogin() reports a failure instead of hanging when the use case throws', () async {
+      final presenter = buildPresenter(
+        loginUseCase: ({required email, required password}) async =>
+            throw StateError('bridge down'),
+      );
 
-        await presenter.submitLogin('user@example.com', 'secret');
+      await presenter.submitLogin('user@example.com', 'secret');
 
-        final state = presenter.stateValue;
-        expect(state, isA<AuthFailure>());
-        final report = (state as AuthFailure).report;
-        expect(report.reason, ErrorReason.generic);
-        expect(report.details, contains('bridge down'));
-      },
-    );
+      final state = presenter.stateValue;
+      expect(state, isA<AuthFailure>());
+      final report = (state as AuthFailure).report;
+      expect(report.reason, ErrorReason.generic);
+      expect(report.details, contains('bridge down'));
+    });
 
     test(
       'restoreSession() falls back to the login form when restoring fails',

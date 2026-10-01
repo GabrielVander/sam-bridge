@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/lessons/lessons_view_models.dart';
+
 import 'lesson_card.dart';
 
 final class CategoryLessonsView extends StatelessWidget {

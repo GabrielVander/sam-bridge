@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'progress.dart';
@@ -9,6 +9,7 @@ part of 'progress.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -20,7 +21,7 @@ mixin _$AssessStudentProgressOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto);
 }
 
 
@@ -29,7 +30,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcomeDto()';
+    return 'AssessStudentProgressOutcomeDto()';
 }
 
 
@@ -208,16 +209,18 @@ $AssessStudentProgressOutcomeDto_SuccessCopyWith<AssessStudentProgressOutcomeDto
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_Success&&(identical(other.assessment, assessment) || other.assessment == assessment));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_Success&&(identical(other.assessment, assessment) || other.assessment == assessment));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,assessment);
+int get hashCode {
+    return Object.hash(runtimeType,assessment);
+}
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcomeDto.success(assessment: $assessment)';
+    return 'AssessStudentProgressOutcomeDto.success(assessment: $assessment)';
 }
 
 
@@ -269,7 +272,7 @@ class AssessStudentProgressOutcomeDto_NoInstrumentAssigned extends AssessStudent
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_NoInstrumentAssigned);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_NoInstrumentAssigned);
 }
 
 
@@ -278,7 +281,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcomeDto.noInstrumentAssigned()';
+    return 'AssessStudentProgressOutcomeDto.noInstrumentAssigned()';
 }
 
 
@@ -306,16 +309,18 @@ $AssessStudentProgressOutcomeDto_UnknownLevelCopyWith<AssessStudentProgressOutco
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_UnknownLevel&&(identical(other.rawLevel, rawLevel) || other.rawLevel == rawLevel));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_UnknownLevel&&(identical(other.rawLevel, rawLevel) || other.rawLevel == rawLevel));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,rawLevel);
+int get hashCode {
+    return Object.hash(runtimeType,rawLevel);
+}
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcomeDto.unknownLevel(rawLevel: $rawLevel)';
+    return 'AssessStudentProgressOutcomeDto.unknownLevel(rawLevel: $rawLevel)';
 }
 
 
@@ -367,7 +372,7 @@ class AssessStudentProgressOutcomeDto_NotAMusician extends AssessStudentProgress
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_NotAMusician);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_NotAMusician);
 }
 
 
@@ -376,7 +381,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcomeDto.notAMusician()';
+    return 'AssessStudentProgressOutcomeDto.notAMusician()';
 }
 
 
@@ -404,16 +409,18 @@ $AssessStudentProgressOutcomeDto_FailureCopyWith<AssessStudentProgressOutcomeDto
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AssessStudentProgressOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,report);
+int get hashCode {
+    return Object.hash(runtimeType,report);
+}
 
 @override
 String toString() {
-  return 'AssessStudentProgressOutcomeDto.failure(report: $report)';
+    return 'AssessStudentProgressOutcomeDto.failure(report: $report)';
 }
 
 
@@ -460,7 +467,7 @@ mixin _$MusicianLevelDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto);
 }
 
 
@@ -469,7 +476,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'MusicianLevelDto()';
+    return 'MusicianLevelDto()';
 }
 
 
@@ -649,7 +656,7 @@ class MusicianLevelDto_Candidate extends MusicianLevelDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_Candidate);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_Candidate);
 }
 
 
@@ -658,7 +665,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'MusicianLevelDto.candidate()';
+    return 'MusicianLevelDto.candidate()';
 }
 
 
@@ -681,7 +688,7 @@ class MusicianLevelDto_Practice extends MusicianLevelDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_Practice);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_Practice);
 }
 
 
@@ -690,7 +697,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'MusicianLevelDto.practice()';
+    return 'MusicianLevelDto.practice()';
 }
 
 
@@ -713,7 +720,7 @@ class MusicianLevelDto_YouthService extends MusicianLevelDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_YouthService);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_YouthService);
 }
 
 
@@ -722,7 +729,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'MusicianLevelDto.youthService()';
+    return 'MusicianLevelDto.youthService()';
 }
 
 
@@ -745,7 +752,7 @@ class MusicianLevelDto_OfficialService extends MusicianLevelDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_OfficialService);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_OfficialService);
 }
 
 
@@ -754,7 +761,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'MusicianLevelDto.officialService()';
+    return 'MusicianLevelDto.officialService()';
 }
 
 
@@ -777,7 +784,7 @@ class MusicianLevelDto_Officialized extends MusicianLevelDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_Officialized);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_Officialized);
 }
 
 
@@ -786,7 +793,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'MusicianLevelDto.officialized()';
+    return 'MusicianLevelDto.officialized()';
 }
 
 
@@ -814,16 +821,18 @@ $MusicianLevelDto_UnknownCopyWith<MusicianLevelDto_Unknown> get copyWith => _$Mu
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_Unknown&&(identical(other.raw, raw) || other.raw == raw));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MusicianLevelDto_Unknown&&(identical(other.raw, raw) || other.raw == raw));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,raw);
+int get hashCode {
+    return Object.hash(runtimeType,raw);
+}
 
 @override
 String toString() {
-  return 'MusicianLevelDto.unknown(raw: $raw)';
+    return 'MusicianLevelDto.unknown(raw: $raw)';
 }
 
 

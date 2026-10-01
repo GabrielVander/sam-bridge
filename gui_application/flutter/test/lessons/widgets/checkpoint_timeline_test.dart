@@ -152,9 +152,8 @@ void main() {
         ),
       );
 
-      final scheme = Theme.of(
-        tester.element(find.byType(Scaffold)),
-      ).colorScheme;
+      final scheme = Theme.of(tester.element(find.byType(Scaffold)))
+          .colorScheme;
       bool isConnector(Widget w, Color color) =>
           w is Container && w.color == color && w.constraints?.maxHeight == 2;
 

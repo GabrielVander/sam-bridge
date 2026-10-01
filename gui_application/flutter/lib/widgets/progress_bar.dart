@@ -18,9 +18,9 @@ class ProgressBar extends StatelessWidget {
         Expanded(
           child: LinearProgressIndicator(
             value: percent / 100,
-            backgroundColor: Theme.of(
-              context,
-            ).colorScheme.surfaceContainerHighest,
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest,
           ),
         ),
         const SizedBox(width: 8),

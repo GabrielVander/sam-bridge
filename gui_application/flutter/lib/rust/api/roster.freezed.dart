@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'roster.dart';
@@ -9,6 +9,7 @@ part of 'roster.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -20,7 +21,7 @@ mixin _$InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto);
 }
 
 
@@ -29,7 +30,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto()';
+    return 'InstrumentDto()';
 }
 
 
@@ -311,7 +312,7 @@ class InstrumentDto_Violin extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Violin);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Violin);
 }
 
 
@@ -320,7 +321,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.violin()';
+    return 'InstrumentDto.violin()';
 }
 
 
@@ -343,7 +344,7 @@ class InstrumentDto_Viola extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Viola);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Viola);
 }
 
 
@@ -352,7 +353,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.viola()';
+    return 'InstrumentDto.viola()';
 }
 
 
@@ -375,7 +376,7 @@ class InstrumentDto_Cello extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Cello);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Cello);
 }
 
 
@@ -384,7 +385,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.cello()';
+    return 'InstrumentDto.cello()';
 }
 
 
@@ -407,7 +408,7 @@ class InstrumentDto_Flute extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Flute);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Flute);
 }
 
 
@@ -416,7 +417,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.flute()';
+    return 'InstrumentDto.flute()';
 }
 
 
@@ -439,7 +440,7 @@ class InstrumentDto_Oboe extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Oboe);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Oboe);
 }
 
 
@@ -448,7 +449,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.oboe()';
+    return 'InstrumentDto.oboe()';
 }
 
 
@@ -471,7 +472,7 @@ class InstrumentDto_Bassoon extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Bassoon);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Bassoon);
 }
 
 
@@ -480,7 +481,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.bassoon()';
+    return 'InstrumentDto.bassoon()';
 }
 
 
@@ -503,7 +504,7 @@ class InstrumentDto_Clarinet extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Clarinet);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Clarinet);
 }
 
 
@@ -512,7 +513,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.clarinet()';
+    return 'InstrumentDto.clarinet()';
 }
 
 
@@ -535,7 +536,7 @@ class InstrumentDto_AltoClarinet extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_AltoClarinet);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_AltoClarinet);
 }
 
 
@@ -544,7 +545,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.altoClarinet()';
+    return 'InstrumentDto.altoClarinet()';
 }
 
 
@@ -567,7 +568,7 @@ class InstrumentDto_BassClarinet extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_BassClarinet);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_BassClarinet);
 }
 
 
@@ -576,7 +577,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.bassClarinet()';
+    return 'InstrumentDto.bassClarinet()';
 }
 
 
@@ -599,7 +600,7 @@ class InstrumentDto_AltoSaxophone extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_AltoSaxophone);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_AltoSaxophone);
 }
 
 
@@ -608,7 +609,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.altoSaxophone()';
+    return 'InstrumentDto.altoSaxophone()';
 }
 
 
@@ -631,7 +632,7 @@ class InstrumentDto_CurvedSopranoSaxophone extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_CurvedSopranoSaxophone);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_CurvedSopranoSaxophone);
 }
 
 
@@ -640,7 +641,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.curvedSopranoSaxophone()';
+    return 'InstrumentDto.curvedSopranoSaxophone()';
 }
 
 
@@ -663,7 +664,7 @@ class InstrumentDto_StraightSopranoSaxophone extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_StraightSopranoSaxophone);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_StraightSopranoSaxophone);
 }
 
 
@@ -672,7 +673,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.straightSopranoSaxophone()';
+    return 'InstrumentDto.straightSopranoSaxophone()';
 }
 
 
@@ -695,7 +696,7 @@ class InstrumentDto_TenorSaxophone extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_TenorSaxophone);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_TenorSaxophone);
 }
 
 
@@ -704,7 +705,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.tenorSaxophone()';
+    return 'InstrumentDto.tenorSaxophone()';
 }
 
 
@@ -727,7 +728,7 @@ class InstrumentDto_Trumpet extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Trumpet);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Trumpet);
 }
 
 
@@ -736,7 +737,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.trumpet()';
+    return 'InstrumentDto.trumpet()';
 }
 
 
@@ -759,7 +760,7 @@ class InstrumentDto_Cornet extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Cornet);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Cornet);
 }
 
 
@@ -768,7 +769,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.cornet()';
+    return 'InstrumentDto.cornet()';
 }
 
 
@@ -791,7 +792,7 @@ class InstrumentDto_Flugelhorn extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Flugelhorn);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Flugelhorn);
 }
 
 
@@ -800,7 +801,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.flugelhorn()';
+    return 'InstrumentDto.flugelhorn()';
 }
 
 
@@ -823,7 +824,7 @@ class InstrumentDto_FrenchHorn extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_FrenchHorn);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_FrenchHorn);
 }
 
 
@@ -832,7 +833,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.frenchHorn()';
+    return 'InstrumentDto.frenchHorn()';
 }
 
 
@@ -855,7 +856,7 @@ class InstrumentDto_Trombone extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Trombone);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Trombone);
 }
 
 
@@ -864,7 +865,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.trombone()';
+    return 'InstrumentDto.trombone()';
 }
 
 
@@ -887,7 +888,7 @@ class InstrumentDto_Euphonium extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Euphonium);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Euphonium);
 }
 
 
@@ -896,7 +897,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.euphonium()';
+    return 'InstrumentDto.euphonium()';
 }
 
 
@@ -919,7 +920,7 @@ class InstrumentDto_Tuba extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Tuba);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Tuba);
 }
 
 
@@ -928,7 +929,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.tuba()';
+    return 'InstrumentDto.tuba()';
 }
 
 
@@ -951,7 +952,7 @@ class InstrumentDto_EnglishHorn extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_EnglishHorn);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_EnglishHorn);
 }
 
 
@@ -960,7 +961,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.englishHorn()';
+    return 'InstrumentDto.englishHorn()';
 }
 
 
@@ -983,7 +984,7 @@ class InstrumentDto_ContraltoViolin extends InstrumentDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_ContraltoViolin);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_ContraltoViolin);
 }
 
 
@@ -992,7 +993,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'InstrumentDto.contraltoViolin()';
+    return 'InstrumentDto.contraltoViolin()';
 }
 
 
@@ -1020,16 +1021,18 @@ $InstrumentDto_UnknownCopyWith<InstrumentDto_Unknown> get copyWith => _$Instrume
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Unknown&&(identical(other.raw, raw) || other.raw == raw));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is InstrumentDto_Unknown&&(identical(other.raw, raw) || other.raw == raw));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,raw);
+int get hashCode {
+    return Object.hash(runtimeType,raw);
+}
 
 @override
 String toString() {
-  return 'InstrumentDto.unknown(raw: $raw)';
+    return 'InstrumentDto.unknown(raw: $raw)';
 }
 
 
@@ -1076,7 +1079,7 @@ mixin _$RetrieveAllAvailableStudentsOutcomeDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveAllAvailableStudentsOutcomeDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveAllAvailableStudentsOutcomeDto);
 }
 
 
@@ -1085,7 +1088,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'RetrieveAllAvailableStudentsOutcomeDto()';
+    return 'RetrieveAllAvailableStudentsOutcomeDto()';
 }
 
 
@@ -1231,7 +1234,7 @@ return failure(_that.report);case _:
 
 
 class RetrieveAllAvailableStudentsOutcomeDto_Success extends RetrieveAllAvailableStudentsOutcomeDto {
-  const RetrieveAllAvailableStudentsOutcomeDto_Success({required final  List<StudentSummaryDto> students}): _students = students,super._();
+  const RetrieveAllAvailableStudentsOutcomeDto_Success({required  List<StudentSummaryDto> students}): _students = students,super._();
   
 
  final  List<StudentSummaryDto> _students;
@@ -1252,16 +1255,18 @@ $RetrieveAllAvailableStudentsOutcomeDto_SuccessCopyWith<RetrieveAllAvailableStud
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveAllAvailableStudentsOutcomeDto_Success&&const DeepCollectionEquality().equals(other._students, _students));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveAllAvailableStudentsOutcomeDto_Success&&const DeepCollectionEquality().equals(other.students, _students));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_students));
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_students));
+}
 
 @override
 String toString() {
-  return 'RetrieveAllAvailableStudentsOutcomeDto.success(students: $students)';
+    return 'RetrieveAllAvailableStudentsOutcomeDto.success(students: $students)';
 }
 
 
@@ -1318,16 +1323,18 @@ $RetrieveAllAvailableStudentsOutcomeDto_FailureCopyWith<RetrieveAllAvailableStud
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveAllAvailableStudentsOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is RetrieveAllAvailableStudentsOutcomeDto_Failure&&(identical(other.report, report) || other.report == report));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,report);
+int get hashCode {
+    return Object.hash(runtimeType,report);
+}
 
 @override
 String toString() {
-  return 'RetrieveAllAvailableStudentsOutcomeDto.failure(report: $report)';
+    return 'RetrieveAllAvailableStudentsOutcomeDto.failure(report: $report)';
 }
 
 
@@ -1374,7 +1381,7 @@ mixin _$StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto);
 }
 
 
@@ -1383,7 +1390,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto()';
+    return 'StudentPositionDto()';
 }
 
 
@@ -1581,7 +1588,7 @@ class StudentPositionDto_Candidate extends StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_Candidate);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_Candidate);
 }
 
 
@@ -1590,7 +1597,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto.candidate()';
+    return 'StudentPositionDto.candidate()';
 }
 
 
@@ -1613,7 +1620,7 @@ class StudentPositionDto_Practice extends StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_Practice);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_Practice);
 }
 
 
@@ -1622,7 +1629,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto.practice()';
+    return 'StudentPositionDto.practice()';
 }
 
 
@@ -1645,7 +1652,7 @@ class StudentPositionDto_YouthService extends StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthService);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthService);
 }
 
 
@@ -1654,7 +1661,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto.youthService()';
+    return 'StudentPositionDto.youthService()';
 }
 
 
@@ -1677,7 +1684,7 @@ class StudentPositionDto_OfficialService extends StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_OfficialService);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_OfficialService);
 }
 
 
@@ -1686,7 +1693,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto.officialService()';
+    return 'StudentPositionDto.officialService()';
 }
 
 
@@ -1709,7 +1716,7 @@ class StudentPositionDto_Officialized extends StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_Officialized);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_Officialized);
 }
 
 
@@ -1718,7 +1725,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto.officialized()';
+    return 'StudentPositionDto.officialized()';
 }
 
 
@@ -1741,7 +1748,7 @@ class StudentPositionDto_YouthServiceHalfHour extends StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthServiceHalfHour);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthServiceHalfHour);
 }
 
 
@@ -1750,7 +1757,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto.youthServiceHalfHour()';
+    return 'StudentPositionDto.youthServiceHalfHour()';
 }
 
 
@@ -1773,7 +1780,7 @@ class StudentPositionDto_YouthServicePractice extends StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthServicePractice);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_YouthServicePractice);
 }
 
 
@@ -1782,7 +1789,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto.youthServicePractice()';
+    return 'StudentPositionDto.youthServicePractice()';
 }
 
 
@@ -1805,7 +1812,7 @@ class StudentPositionDto_GemSecretary extends StudentPositionDto {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_GemSecretary);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_GemSecretary);
 }
 
 
@@ -1814,7 +1821,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'StudentPositionDto.gemSecretary()';
+    return 'StudentPositionDto.gemSecretary()';
 }
 
 
@@ -1842,16 +1849,18 @@ $StudentPositionDto_InvalidCopyWith<StudentPositionDto_Invalid> get copyWith => 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_Invalid&&(identical(other.raw, raw) || other.raw == raw));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is StudentPositionDto_Invalid&&(identical(other.raw, raw) || other.raw == raw));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,raw);
+int get hashCode {
+    return Object.hash(runtimeType,raw);
+}
 
 @override
 String toString() {
-  return 'StudentPositionDto.invalid(raw: $raw)';
+    return 'StudentPositionDto.invalid(raw: $raw)';
 }
 
 

@@ -106,9 +106,9 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
                 children: [
                   CircleAvatar(
                     radius: 32,
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.primaryContainer,
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer,
                     child: Icon(
                       Icons.lock_person,
                       size: 32,
