@@ -7,8 +7,9 @@ import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/router.dart';
 import 'package:flutter_application/window/window_controls.dart';
+import 'package:go_router/go_router.dart';
 
-class SamSiteApp extends StatelessWidget {
+class SamSiteApp extends StatefulWidget {
   final String versionDisplay;
   final AuthPresenter authPresenter;
   final StudentsPresenter studentsPresenter;
@@ -25,30 +26,43 @@ class SamSiteApp extends StatelessWidget {
   });
 
   @override
+  State<SamSiteApp> createState() => _SamSiteAppState();
+}
+
+class _SamSiteAppState extends State<SamSiteApp> {
+  late final GoRouter _router = buildRouter(
+    appVersion: widget.versionDisplay,
+    windowControls: widget.windowControls,
+    authPresenter: widget.authPresenter,
+  );
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocSignalProvider(
       providers: [
-        BlocSignalProvider<AuthPresenter>.value(value: authPresenter),
-        BlocSignalProvider<StudentsPresenter>.value(value: studentsPresenter),
-        BlocSignalProvider<LessonsPresenter>.value(value: lessonsPresenter),
+        BlocSignalProvider<AuthPresenter>.value(value: widget.authPresenter),
+        BlocSignalProvider<StudentsPresenter>.value(
+          value: widget.studentsPresenter,
+        ),
+        BlocSignalProvider<LessonsPresenter>.value(
+          value: widget.lessonsPresenter,
+        ),
       ],
-      child: Builder(
-        builder: (context) {
-          return MaterialApp.router(
-            onGenerateTitle: (context) => context.l10n.appTitle,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            routerConfig: buildRouter(
-              appVersion: versionDisplay,
-              windowControls: windowControls,
-              authPresenter: authPresenter,
-            ),
-            debugShowCheckedModeBanner: false,
-            theme: buildTheme(),
-          );
-        },
+      child: MaterialApp.router(
+        onGenerateTitle: (context) => context.l10n.appTitle,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: _router,
+        debugShowCheckedModeBanner: false,
+        theme: buildTheme(),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
   }
 }
 
