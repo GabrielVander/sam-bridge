@@ -329,4 +329,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get language => 'Idioma';
+
+  @override
+  String get languageName => 'Português';
+
+  @override
+  String get systemLanguage => 'Idioma do sistema';
 }

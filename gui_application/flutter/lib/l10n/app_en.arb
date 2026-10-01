@@ -92,5 +92,7 @@
   "detailsCopied": "Details copied",
   "slowConnection": "SAM is taking a while to respond. Please wait a little longer…",
   "settings": "Settings",
-  "language": "Language"
+  "language": "Language",
+  "languageName": "English",
+  "systemLanguage": "System language"
 }

@@ -4,6 +4,7 @@ import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/rust/api/authentication.dart';
+import 'package:flutter_application/settings/settings_presenter.dart';
 import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_application/rust/api/progress.dart';
 import 'package:flutter_application/rust/api/roster.dart';
@@ -50,6 +51,7 @@ Future<SamSiteApp> composeFakeApp({
     authPresenter: authPresenter,
     studentsPresenter: studentsPresenter,
     lessonsPresenter: lessonsPresenter,
+    settingsPresenter: SettingsPresenter(),
     windowControls: windowControls,
   );
 }

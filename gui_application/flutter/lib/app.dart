@@ -6,6 +6,7 @@ import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/router.dart';
+import 'package:flutter_application/settings/settings_presenter.dart';
 import 'package:flutter_application/window/window_controls.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,6 +15,7 @@ class SamSiteApp extends StatefulWidget {
   final AuthPresenter authPresenter;
   final StudentsPresenter studentsPresenter;
   final LessonsPresenter lessonsPresenter;
+  final SettingsPresenter settingsPresenter;
   final WindowControls? windowControls;
 
   const SamSiteApp({
@@ -22,6 +24,7 @@ class SamSiteApp extends StatefulWidget {
     required this.authPresenter,
     required this.studentsPresenter,
     required this.lessonsPresenter,
+    required this.settingsPresenter,
     this.windowControls,
   });
 
@@ -47,14 +50,20 @@ class _SamSiteAppState extends State<SamSiteApp> {
         BlocSignalProvider<LessonsPresenter>.value(
           value: widget.lessonsPresenter,
         ),
+        BlocSignalProvider<SettingsPresenter>.value(
+          value: widget.settingsPresenter,
+        ),
       ],
-      child: MaterialApp.router(
-        onGenerateTitle: (context) => context.l10n.appTitle,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        routerConfig: _router,
-        debugShowCheckedModeBanner: false,
-        theme: buildTheme(),
+      child: BlocSignalBuilder<SettingsPresenter, SettingsState>(
+        builder: (context, settings) => MaterialApp.router(
+          onGenerateTitle: (context) => context.l10n.appTitle,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: settings.appLocale,
+          routerConfig: _router,
+          debugShowCheckedModeBanner: false,
+          theme: buildTheme(),
+        ),
       ),
     );
   }

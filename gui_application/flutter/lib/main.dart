@@ -4,6 +4,7 @@ import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/errors/error_report_mapper.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
+import 'package:flutter_application/settings/settings_presenter.dart';
 import 'package:flutter_application/startup_failure_app.dart';
 import 'package:flutter_application/rust/api.dart';
 import 'package:flutter_application/rust/api/error_report.dart';
@@ -15,6 +16,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _chosenLocationsKey = 'roster.chosenLocations';
+const String _languageKey = 'settings.language';
 
 Future<void> main() async {
   await RustLib.init();
@@ -62,7 +64,7 @@ Future<void> _start({
   final SharedPreferencesWithCache preferences =
       await SharedPreferencesWithCache.create(
         cacheOptions: const SharedPreferencesWithCacheOptions(
-          allowList: {_chosenLocationsKey},
+          allowList: {_chosenLocationsKey, _languageKey},
         ),
       );
   final StudentsPresenter studentsPresenter = StudentsPresenter(
@@ -76,6 +78,13 @@ Future<void> _start({
     assessStudentProgress: application.assessStudentProgress,
   );
 
+  final SettingsPresenter settingsPresenter = SettingsPresenter(
+    rememberedLanguage: preferences.getString(_languageKey),
+    rememberLanguage: (languageCode) => languageCode == null
+        ? preferences.remove(_languageKey)
+        : preferences.setString(_languageKey, languageCode),
+  );
+
   await authPresenter.restoreSession();
 
   runApp(
@@ -84,6 +93,7 @@ Future<void> _start({
       authPresenter: authPresenter,
       studentsPresenter: studentsPresenter,
       lessonsPresenter: lessonsPresenter,
+      settingsPresenter: settingsPresenter,
       windowControls: windowControls,
     ),
   );

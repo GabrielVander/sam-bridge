@@ -40,4 +40,17 @@ void main() {
 
     expect(find.byTooltip('Configurações'), findsNothing);
   });
+
+  testWidgets('switches the app to the language the user picks', (
+    tester,
+  ) async {
+    await pumpApp(tester, await composeFakeApp());
+    await openSettings(tester);
+
+    await tester.tap(find.text('English'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Configurações'), findsNothing);
+  });
 }

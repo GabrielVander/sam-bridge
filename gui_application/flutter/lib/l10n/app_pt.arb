@@ -190,5 +190,7 @@
   "detailsCopied": "Detalhes copiados",
   "slowConnection": "O SAM está demorando para responder. Aguarde mais um pouco…",
   "settings": "Configurações",
-  "language": "Idioma"
+  "language": "Idioma",
+  "languageName": "Português",
+  "systemLanguage": "Idioma do sistema"
 }
