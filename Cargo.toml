@@ -15,12 +15,12 @@ credential_store = { path = "credential_store" }
 student = { path = "student" }
 sam = { path = "sam" }
 shared_kernel = { path = "shared_kernel" }
-anyhow = "1.0.103"
-thiserror = "2.0.18"
+anyhow = "1.0.104"
+thiserror = "2.0.21"
 chrono = "0.4.45"
 pretty_assertions = "1.4.1"
 smol = "2.0.2"
-reqwest = { version = "0.13.4", features = [
+reqwest = { version = "0.13.5", features = [
   "blocking",
   "form",
   "cookies",
