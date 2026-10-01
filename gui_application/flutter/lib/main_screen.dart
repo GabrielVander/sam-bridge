@@ -10,12 +10,14 @@ import 'package:go_router/go_router.dart';
 class MainScreen extends StatelessWidget {
   final String versionDisplay;
   final WindowControls? windowControls;
+  final bool offersSettings;
   final Widget child;
 
   const MainScreen({
     super.key,
     required this.versionDisplay,
     required this.windowControls,
+    required this.offersSettings,
     required this.child,
   });
 
@@ -26,11 +28,12 @@ class MainScreen extends StatelessWidget {
         title: context.l10n.appTitle,
         controls: windowControls,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: context.l10n.settings,
-            onPressed: () => context.push(Routes.settings),
-          ),
+          if (offersSettings)
+            IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: context.l10n.settings,
+              onPressed: () => context.push(Routes.settings),
+            ),
           BlocSignalBuilder<AuthPresenter, AuthState>(
             builder: (context, state) => state.isSignedIn
                 ? IconButton(

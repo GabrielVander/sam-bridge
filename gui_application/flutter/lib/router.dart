@@ -60,6 +60,7 @@ GoRouter buildRouter({
             MainScreen(
               versionDisplay: appVersion,
               windowControls: windowControls,
+              offersSettings: state.uri.path != Routes.settings,
               child: child,
             ),
         routes: [
