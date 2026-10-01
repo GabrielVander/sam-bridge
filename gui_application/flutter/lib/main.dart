@@ -23,6 +23,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  final SharedPreferencesWithCache preferences =
+      await SharedPreferencesWithCache.create(
+        cacheOptions: const SharedPreferencesWithCacheOptions(
+          allowList: {_chosenLocationsKey, _languageKey},
+        ),
+      );
 
   await _start(
     versionDisplay: formatVersion(
@@ -30,12 +36,21 @@ Future<void> main() async {
       buildNumber: packageInfo.buildNumber,
     ),
     windowControls: await frameDesktopWindow(),
+    preferences: preferences,
+    settingsPresenter: SettingsPresenter(
+      rememberedLanguage: preferences.getString(_languageKey),
+      rememberLanguage: (languageCode) => languageCode == null
+          ? preferences.remove(_languageKey)
+          : preferences.setString(_languageKey, languageCode),
+    ),
   );
 }
 
 Future<void> _start({
   required String versionDisplay,
   required WindowControls? windowControls,
+  required SharedPreferencesWithCache preferences,
+  required SettingsPresenter settingsPresenter,
 }) async {
   final ApplicationFacade application;
 
@@ -48,8 +63,11 @@ Future<void> _start({
         onRetry: () => _start(
           versionDisplay: versionDisplay,
           windowControls: windowControls,
+          preferences: preferences,
+          settingsPresenter: settingsPresenter,
         ),
         windowControls: windowControls,
+        locale: settingsPresenter.stateValue.appLocale,
       ),
     );
 
@@ -61,12 +79,6 @@ Future<void> _start({
     restoreSessionUseCase: application.restoreSession,
     logoutUseCase: application.logout,
   );
-  final SharedPreferencesWithCache preferences =
-      await SharedPreferencesWithCache.create(
-        cacheOptions: const SharedPreferencesWithCacheOptions(
-          allowList: {_chosenLocationsKey, _languageKey},
-        ),
-      );
   final StudentsPresenter studentsPresenter = StudentsPresenter(
     retrieveStudents: application.retrieveAllAvailableStudents,
     rememberedLocations: {...?preferences.getStringList(_chosenLocationsKey)},
@@ -76,13 +88,6 @@ Future<void> _start({
   final LessonsPresenter lessonsPresenter = LessonsPresenter(
     retrieveStudentLessons: application.retrieveStudentLessons,
     assessStudentProgress: application.assessStudentProgress,
-  );
-
-  final SettingsPresenter settingsPresenter = SettingsPresenter(
-    rememberedLanguage: preferences.getString(_languageKey),
-    rememberLanguage: (languageCode) => languageCode == null
-        ? preferences.remove(_languageKey)
-        : preferences.setString(_languageKey, languageCode),
   );
 
   await authPresenter.restoreSession();

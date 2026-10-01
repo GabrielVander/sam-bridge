@@ -52,4 +52,19 @@ void main() {
     );
     expect(find.text('Try again'), findsOneWidget);
   });
+
+  testWidgets('explains the failure in the language the user chose', (
+    tester,
+  ) async {
+    setOsLocale(tester, brazilianPortuguese);
+    await tester.pumpWidget(
+      StartupFailureApp(
+        report: report,
+        onRetry: () {},
+        locale: const Locale('en'),
+      ),
+    );
+
+    expect(find.text('Try again'), findsOneWidget);
+  });
 }

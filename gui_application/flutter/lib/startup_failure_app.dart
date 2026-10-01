@@ -11,12 +11,14 @@ class StartupFailureApp extends StatelessWidget {
   final ErrorReport report;
   final VoidCallback onRetry;
   final WindowControls? windowControls;
+  final Locale? locale;
 
   const StartupFailureApp({
     super.key,
     required this.report,
     required this.onRetry,
     this.windowControls,
+    this.locale,
   });
 
   @override
@@ -25,6 +27,7 @@ class StartupFailureApp extends StatelessWidget {
       onGenerateTitle: (context) => context.l10n.appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      locale: locale,
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
       home: Scaffold(
