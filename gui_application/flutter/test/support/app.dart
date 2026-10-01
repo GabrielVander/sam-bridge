@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_application/app.dart';
 import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/lessons/lessons_presenter.dart';
@@ -7,7 +8,9 @@ import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_application/rust/api/progress.dart';
 import 'package:flutter_application/rust/api/roster.dart';
 import 'package:flutter_application/window/window_controls.dart';
+import 'package:flutter_test/flutter_test.dart';
 
+import 'localization.dart';
 import 'roster.dart';
 
 Future<SamSiteApp> composeFakeApp({
@@ -49,4 +52,14 @@ Future<SamSiteApp> composeFakeApp({
     lessonsPresenter: lessonsPresenter,
     windowControls: windowControls,
   );
+}
+
+Future<void> pumpApp(
+  WidgetTester tester,
+  SamSiteApp app, {
+  Locale osLocale = brazilianPortuguese,
+}) async {
+  setOsLocale(tester, osLocale);
+  await tester.pumpWidget(app);
+  await tester.pumpAndSettle();
 }

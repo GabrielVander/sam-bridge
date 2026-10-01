@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/app.dart';
 import 'package:flutter_application/main.dart' show formatVersion;
 import 'package:flutter_application/main_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,17 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'support/app.dart';
 import 'support/authentication.dart';
 import 'support/errors.dart';
-import 'support/localization.dart';
-
-Future<void> pumpApp(
-  WidgetTester tester,
-  SamSiteApp app, {
-  Locale osLocale = brazilianPortuguese,
-}) async {
-  setOsLocale(tester, osLocale);
-  await tester.pumpWidget(app);
-  await tester.pumpAndSettle();
-}
 
 Finder get _emailField => find.widgetWithText(TextField, 'Email');
 Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
