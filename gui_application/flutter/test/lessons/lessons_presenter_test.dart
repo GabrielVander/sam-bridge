@@ -9,18 +9,6 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/errors.dart';
 import '../support/lessons.dart';
 
-LessonsPresenter _buildCubit({
-  RetrieveStudentLessonsUseCase? retrieveStudentLessons,
-  AssessStudentProgressUseCase? assessStudentProgress,
-}) => LessonsPresenter(
-  retrieveStudentLessons:
-      retrieveStudentLessons ??
-      ({required studentId}) async => lessonsRetrieved(),
-  assessStudentProgress:
-      assessStudentProgress ??
-      ({required studentId}) async => noInstrumentAssigned(),
-);
-
 void main() {
   group('LessonsCubitSignal', () {
     test('starts idle', () {
@@ -215,3 +203,15 @@ void main() {
     });
   });
 }
+
+LessonsPresenter _buildCubit({
+  RetrieveStudentLessonsUseCase? retrieveStudentLessons,
+  AssessStudentProgressUseCase? assessStudentProgress,
+}) => LessonsPresenter(
+  retrieveStudentLessons:
+      retrieveStudentLessons ??
+      ({required studentId}) async => lessonsRetrieved(),
+  assessStudentProgress:
+      assessStudentProgress ??
+      ({required studentId}) async => noInstrumentAssigned(),
+);

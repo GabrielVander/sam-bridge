@@ -6,12 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/errors.dart';
 import '../support/roster.dart';
 
-List<String> listedIds(StudentsPresenter presenter) =>
-    switch ((presenter.stateValue as StudentsLoaded).listing) {
-      Matches(:final students) => students.map((s) => s.id).toList(),
-      _ => [],
-    };
-
 void main() {
   group('StudentsPresenter', () {
     test('starts idle', () {
@@ -385,3 +379,9 @@ void main() {
     });
   });
 }
+
+List<String> listedIds(StudentsPresenter presenter) =>
+    switch ((presenter.stateValue as StudentsLoaded).listing) {
+      Matches(:final students) => students.map((s) => s.id).toList(),
+      _ => [],
+    };

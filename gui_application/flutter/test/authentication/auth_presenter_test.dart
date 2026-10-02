@@ -9,21 +9,6 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/authentication.dart';
 import '../support/errors.dart';
 
-AuthPresenter buildPresenter({
-  LoginUseCase? loginUseCase,
-  RestoreSessionUseCase? restoreSessionUseCase,
-  LogoutUseCase? logoutUseCase,
-}) {
-  return AuthPresenter(
-    loginUseCase:
-        loginUseCase ??
-        ({required email, required password}) async => loggedIn(),
-    restoreSessionUseCase:
-        restoreSessionUseCase ?? () async => noSavedSession(),
-    logoutUseCase: logoutUseCase ?? () async => loggedOut(),
-  );
-}
-
 void main() {
   group('AuthPresenter', () {
     test('starts idle', () {
@@ -230,4 +215,19 @@ void main() {
       expect(presenter.isAuthenticated, isFalse);
     });
   });
+}
+
+AuthPresenter buildPresenter({
+  LoginUseCase? loginUseCase,
+  RestoreSessionUseCase? restoreSessionUseCase,
+  LogoutUseCase? logoutUseCase,
+}) {
+  return AuthPresenter(
+    loginUseCase:
+        loginUseCase ??
+        ({required email, required password}) async => loggedIn(),
+    restoreSessionUseCase:
+        restoreSessionUseCase ?? () async => noSavedSession(),
+    logoutUseCase: logoutUseCase ?? () async => loggedOut(),
+  );
 }

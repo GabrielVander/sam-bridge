@@ -7,26 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/clipboard.dart';
 import '../support/localization.dart';
 
-const _details = 'Request failed for operation dashboard: connection refused';
-
-const _report = ErrorReport(reason: ErrorReason.network, details: _details);
-
-Future<void> pumpPanel(
-  WidgetTester tester, {
-  ErrorReport report = _report,
-  VoidCallback? onRetry,
-  Locale locale = portuguese,
-}) async {
-  await tester.pumpWidget(
-    localizedApp(
-      locale: locale,
-      home: Scaffold(
-        body: ErrorPanel(report: report, onRetry: onRetry ?? () {}),
-      ),
-    ),
-  );
-}
-
 void main() {
   group('ErrorPanel', () {
     const messages = {
@@ -118,3 +98,23 @@ void main() {
     });
   });
 }
+
+Future<void> pumpPanel(
+  WidgetTester tester, {
+  ErrorReport report = _report,
+  VoidCallback? onRetry,
+  Locale locale = portuguese,
+}) async {
+  await tester.pumpWidget(
+    localizedApp(
+      locale: locale,
+      home: Scaffold(
+        body: ErrorPanel(report: report, onRetry: onRetry ?? () {}),
+      ),
+    ),
+  );
+}
+
+const _report = ErrorReport(reason: ErrorReason.network, details: _details);
+
+const _details = 'Request failed for operation dashboard: connection refused';

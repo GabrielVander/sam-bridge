@@ -1,13 +1,6 @@
 import 'package:flutter_application/roster/location_picker_presenter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-List<(String, bool)> offered(LocationPickerPresenter presenter) =>
-    switch (presenter.stateValue) {
-      LocationChoices(:final choices) =>
-        choices.map((choice) => (choice.location, choice.chosen)).toList(),
-      NoLocationsToChoose() => [],
-    };
-
 void main() {
   group('LocationPickerPresenter', () {
     test('offers every location, marking the chosen ones', () {
@@ -51,3 +44,10 @@ void main() {
     });
   });
 }
+
+List<(String, bool)> offered(LocationPickerPresenter presenter) =>
+    switch (presenter.stateValue) {
+      LocationChoices(:final choices) =>
+        choices.map((choice) => (choice.location, choice.chosen)).toList(),
+      NoLocationsToChoose() => [],
+    };

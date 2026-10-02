@@ -5,23 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../support/localization.dart';
 
-Future<void> pumpBackBar(WidgetTester tester, {String? studentName}) {
-  final router = GoRouter(
-    initialLocation: '/student',
-    routes: [
-      GoRoute(
-        path: '/students',
-        builder: (_, _) => const Scaffold(body: Text('lista de alunos aberta')),
-      ),
-      GoRoute(
-        path: '/student',
-        builder: (_, _) => Scaffold(body: BackBar(studentName: studentName)),
-      ),
-    ],
-  );
-  return tester.pumpWidget(localizedRouterApp(router));
-}
-
 void main() {
   group('BackBar', () {
     testWidgets('shows the student name after the list link', (tester) async {
@@ -53,4 +36,21 @@ void main() {
       expect(find.text('lista de alunos aberta'), findsOneWidget);
     });
   });
+}
+
+Future<void> pumpBackBar(WidgetTester tester, {String? studentName}) {
+  final router = GoRouter(
+    initialLocation: '/student',
+    routes: [
+      GoRoute(
+        path: '/students',
+        builder: (_, _) => const Scaffold(body: Text('lista de alunos aberta')),
+      ),
+      GoRoute(
+        path: '/student',
+        builder: (_, _) => Scaffold(body: BackBar(studentName: studentName)),
+      ),
+    ],
+  );
+  return tester.pumpWidget(localizedRouterApp(router));
 }

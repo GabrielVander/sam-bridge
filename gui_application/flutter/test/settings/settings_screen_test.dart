@@ -4,17 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/app.dart';
 import '../support/authentication.dart';
 
-Future<void> openSettings(WidgetTester tester) async {
-  await tester.tap(find.byTooltip('Configurações'));
-  await tester.pumpAndSettle();
-}
-
-SemanticsNode option(WidgetTester tester, String language) =>
-    tester.getSemantics(find.text(language));
-
-final Matcher chosen = isSemantics(isChecked: true);
-final Matcher notChosen = isSemantics(isChecked: false);
-
 void main() {
   testWidgets('can be opened before signing in', (tester) async {
     await pumpApp(tester, await composeFakeApp());
@@ -113,3 +102,14 @@ void main() {
     expect(find.text('v2.3.4+56'), findsOneWidget);
   });
 }
+
+Future<void> openSettings(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Configurações'));
+  await tester.pumpAndSettle();
+}
+
+SemanticsNode option(WidgetTester tester, String language) =>
+    tester.getSemantics(find.text(language));
+
+final Matcher chosen = isSemantics(isChecked: true);
+final Matcher notChosen = isSemantics(isChecked: false);

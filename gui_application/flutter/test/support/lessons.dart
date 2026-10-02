@@ -48,10 +48,6 @@ StudentLessonsDto studentLessons({
   List<LessonDto> method = const [],
 }) => StudentLessonsDto(msa: msa, method: method);
 
-RetrieveStudentLessonsOutcomeDto lessonsRetrieved([
-  StudentLessonsDto lessons = const StudentLessonsDto(msa: [], method: []),
-]) => RetrieveStudentLessonsOutcomeDto.success(lessons: lessons);
-
 Pending<RetrieveStudentLessonsOutcomeDto> pendingLessons() => Pending();
 
 RetrieveStudentLessonsOutcomeDto lessonsFailed(ErrorReportDto report) =>
@@ -72,18 +68,18 @@ abstract final class Levels {
 CheckpointDto achievedCheckpoint(MusicianLevelDto level) =>
     _checkpoint(level, CheckpointStatusDto.achieved);
 
-CheckpointDto readyForExamCheckpoint(MusicianLevelDto level) =>
-    _checkpoint(level, CheckpointStatusDto.readyForExam);
-
-CheckpointDto pendingCheckpoint(MusicianLevelDto level) =>
-    _checkpoint(level, CheckpointStatusDto.pending);
-
 CheckpointDto _checkpoint(MusicianLevelDto level, CheckpointStatusDto status) =>
     CheckpointDto(
       level: level,
       status: status,
       requirement: const RequirementStatusDto(msaMet: true, methodMet: true),
     );
+
+CheckpointDto readyForExamCheckpoint(MusicianLevelDto level) =>
+    _checkpoint(level, CheckpointStatusDto.readyForExam);
+
+CheckpointDto pendingCheckpoint(MusicianLevelDto level) =>
+    _checkpoint(level, CheckpointStatusDto.pending);
 
 ProgressAssessmentDto progressAssessment({
   List<CheckpointDto> checkpoints = const [],
@@ -104,9 +100,6 @@ ProgressAssessmentDto progressAssessment({
 AssessStudentProgressOutcomeDto progressAssessed(
   ProgressAssessmentDto assessment,
 ) => AssessStudentProgressOutcomeDto.success(assessment: assessment);
-
-AssessStudentProgressOutcomeDto noInstrumentAssigned() =>
-    const AssessStudentProgressOutcomeDto.noInstrumentAssigned();
 
 AssessStudentProgressOutcomeDto levelNotRecognized(String raw) =>
     AssessStudentProgressOutcomeDto.unknownLevel(rawLevel: raw);
@@ -144,3 +137,10 @@ Future<void> pumpStudent(
   );
   await tester.pumpAndSettle();
 }
+
+RetrieveStudentLessonsOutcomeDto lessonsRetrieved([
+  StudentLessonsDto lessons = const StudentLessonsDto(msa: [], method: []),
+]) => RetrieveStudentLessonsOutcomeDto.success(lessons: lessons);
+
+AssessStudentProgressOutcomeDto noInstrumentAssigned() =>
+    const AssessStudentProgressOutcomeDto.noInstrumentAssigned();

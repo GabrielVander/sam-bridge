@@ -4,10 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/builders.dart';
 
-double? shownFraction(WidgetTester tester) => tester
-    .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
-    .value;
-
 void main() {
   group('ProgressBar', () {
     testWidgets(
@@ -29,3 +25,7 @@ void main() {
     });
   });
 }
+
+double? shownFraction(WidgetTester tester) => tester
+    .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
+    .value;

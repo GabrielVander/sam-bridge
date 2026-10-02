@@ -29,18 +29,6 @@ LessonItem lessonItem({
   method: method,
 );
 
-CheckpointView checkpoint({
-  ReportedLevel level = const KnownLevel(Level.practice),
-  CheckpointStatus status = CheckpointStatus.pending,
-  bool msaMet = false,
-  bool methodMet = false,
-}) => CheckpointView(
-  level: level,
-  status: status,
-  msaMet: msaMet,
-  methodMet: methodMet,
-);
-
 ProgressView progressView({
   List<CheckpointView>? checkpoints,
   double msaRelativePercent = 40,
@@ -55,6 +43,18 @@ ProgressView progressView({
   combinedPercent: combinedPercent,
   overallCheckpointPercent: overallCheckpointPercent,
   nextLevel: nextLevel,
+);
+
+CheckpointView checkpoint({
+  ReportedLevel level = const KnownLevel(Level.practice),
+  CheckpointStatus status = CheckpointStatus.pending,
+  bool msaMet = false,
+  bool methodMet = false,
+}) => CheckpointView(
+  level: level,
+  status: status,
+  msaMet: msaMet,
+  methodMet: methodMet,
 );
 
 Future<void> pumpInApp(

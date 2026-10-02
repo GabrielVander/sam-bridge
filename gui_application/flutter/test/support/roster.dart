@@ -24,18 +24,6 @@ StudentSummaryDto studentSummary({
   instrument: instrument,
 );
 
-StudentsPresenter presenterAnswering(
-  List<RetrieveAllAvailableStudentsOutcomeDto> outcomes,
-) {
-  final List<RetrieveAllAvailableStudentsOutcomeDto> remaining = [...outcomes];
-
-  return StudentsPresenter(retrieveStudents: () async => remaining.removeAt(0));
-}
-
-RetrieveAllAvailableStudentsOutcomeDto rosterLoaded(
-  List<StudentSummaryDto> students,
-) => RetrieveAllAvailableStudentsOutcomeDto.success(students: students);
-
 RetrieveAllAvailableStudentsOutcomeDto rosterFailed(ErrorReportDto report) =>
     RetrieveAllAvailableStudentsOutcomeDto.failure(report: report);
 
@@ -60,6 +48,32 @@ abstract final class Positions {
   static StudentPositionDto invalid(String raw) =>
       StudentPositionDto.invalid(raw: raw);
 }
+
+Future<StudentsPresenter> pumpRoster(
+  WidgetTester tester,
+  List<StudentSummaryDto> students, {
+  Locale locale = portuguese,
+}) async {
+  final StudentsPresenter presenter = presenterAnswering([
+    rosterLoaded(students),
+  ]);
+
+  await pumpStudents(tester, presenter, locale: locale);
+
+  return presenter;
+}
+
+StudentsPresenter presenterAnswering(
+  List<RetrieveAllAvailableStudentsOutcomeDto> outcomes,
+) {
+  final List<RetrieveAllAvailableStudentsOutcomeDto> remaining = [...outcomes];
+
+  return StudentsPresenter(retrieveStudents: () async => remaining.removeAt(0));
+}
+
+RetrieveAllAvailableStudentsOutcomeDto rosterLoaded(
+  List<StudentSummaryDto> students,
+) => RetrieveAllAvailableStudentsOutcomeDto.success(students: students);
 
 Future<void> pumpStudents(
   WidgetTester tester,
@@ -94,20 +108,6 @@ Future<void> pumpStudents(
     ),
   );
   await tester.pumpAndSettle();
-}
-
-Future<StudentsPresenter> pumpRoster(
-  WidgetTester tester,
-  List<StudentSummaryDto> students, {
-  Locale locale = portuguese,
-}) async {
-  final StudentsPresenter presenter = presenterAnswering([
-    rosterLoaded(students),
-  ]);
-
-  await pumpStudents(tester, presenter, locale: locale);
-
-  return presenter;
 }
 
 abstract final class Instruments {

@@ -8,14 +8,6 @@ import '../support/app.dart';
 import '../support/localization.dart';
 import '../support/window.dart';
 
-Future<void> pumpAppIn(WidgetTester tester, FakeWindow? window) async {
-  setOsLocale(tester, brazilianPortuguese);
-  await tester.pumpWidget(
-    await composeFakeApp(windowControls: window?.controls),
-  );
-  await tester.pumpAndSettle();
-}
-
 void main() {
   group('a window without the platform frame', () {
     testWidgets('is minimised, maximised and closed from the title bar', (
@@ -93,4 +85,12 @@ void main() {
     expect(find.byTooltip('Fechar'), findsNothing);
     expect(find.byTooltip('Minimizar'), findsNothing);
   });
+}
+
+Future<void> pumpAppIn(WidgetTester tester, FakeWindow? window) async {
+  setOsLocale(tester, brazilianPortuguese);
+  await tester.pumpWidget(
+    await composeFakeApp(windowControls: window?.controls),
+  );
+  await tester.pumpAndSettle();
 }

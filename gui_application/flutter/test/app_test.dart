@@ -8,26 +8,6 @@ import 'support/app.dart';
 import 'support/authentication.dart';
 import 'support/errors.dart';
 
-Finder get _emailField => find.widgetWithText(TextField, 'Email');
-Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
-
-Future<void> signIn(WidgetTester tester) async {
-  await tester.enterText(_emailField, 'user@example.com');
-  await tester.enterText(_passwordField, 'hunter2');
-  await tester.tap(find.text('Entrar'));
-  await tester.pumpAndSettle();
-}
-
-Future<void> signOut(WidgetTester tester) async {
-  await tester.tap(find.byTooltip('Configurações'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Sair'));
-  await tester.pumpAndSettle();
-}
-
-GoRouter routerOf(WidgetTester tester) =>
-    GoRouter.of(tester.element(find.byType(MainScreen)));
-
 void main() {
   group('starting the app', () {
     testWidgets('shows the login form when there is no saved session', (
@@ -238,4 +218,24 @@ void main() {
       expect(formatVersion(version: '1.2.3', buildNumber: '45'), 'v1.2.3+45');
     });
   });
+}
+
+Future<void> signIn(WidgetTester tester) async {
+  await tester.enterText(_emailField, 'user@example.com');
+  await tester.enterText(_passwordField, 'hunter2');
+  await tester.tap(find.text('Entrar'));
+  await tester.pumpAndSettle();
+}
+
+Finder get _emailField => find.widgetWithText(TextField, 'Email');
+Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
+
+GoRouter routerOf(WidgetTester tester) =>
+    GoRouter.of(tester.element(find.byType(MainScreen)));
+
+Future<void> signOut(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Configurações'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Sair'));
+  await tester.pumpAndSettle();
 }

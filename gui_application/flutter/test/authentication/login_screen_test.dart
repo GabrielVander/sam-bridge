@@ -12,75 +12,6 @@ import '../support/clipboard.dart';
 import '../support/errors.dart';
 import '../support/localization.dart';
 
-const _details = "Request failed for operation 'authentication'";
-
-Finder get _emailField => find.widgetWithText(TextField, 'Email');
-Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
-
-Future<List<(String, String)>> pumpLoginForm(
-  WidgetTester tester, {
-  LoginUseCase? login,
-}) async {
-  final attempts = <(String, String)>[];
-  final LoginUseCase answer = login ?? loginAnswering(loginRejected());
-  final presenter = AuthPresenter(
-    loginUseCase: ({required email, required password}) {
-      attempts.add((email, password));
-      return answer(email: email, password: password);
-    },
-    restoreSessionUseCase: () async => noSavedSession(),
-    logoutUseCase: () async => loggedOut(),
-  );
-  final router = GoRouter(
-    initialLocation: '/login',
-    routes: [
-      GoRoute(
-        path: '/login',
-        builder: (_, _) => const Scaffold(body: LoginScreen()),
-      ),
-      GoRoute(
-        path: '/students',
-        builder: (_, _) => const Scaffold(body: Text('lista de alunos aberta')),
-      ),
-    ],
-  );
-
-  await tester.pumpWidget(
-    BlocSignalProvider<AuthPresenter>.value(
-      value: presenter,
-      child: localizedRouterApp(router),
-    ),
-  );
-  return attempts;
-}
-
-Future<void> pumpLogin(
-  WidgetTester tester, {
-  required LoginUseCase login,
-}) async {
-  final presenter = AuthPresenter(
-    loginUseCase: login,
-    restoreSessionUseCase: () async => noSavedSession(),
-    logoutUseCase: () async => loggedOut(),
-  );
-
-  await tester.pumpWidget(
-    localizedApp(
-      home: Scaffold(
-        body: BlocSignalProvider<AuthPresenter>.value(
-          value: presenter,
-          child: const LoginScreen(),
-        ),
-      ),
-    ),
-  );
-
-  await tester.enterText(_emailField, 'user@example.com');
-  await tester.enterText(_passwordField, 'hunter2-secret');
-  await tester.tap(find.text('Entrar'));
-  await tester.pumpAndSettle();
-}
-
 void main() {
   group('LoginScreen failure', () {
     testWidgets('expanding reveals the details without exposing the password', (
@@ -194,4 +125,73 @@ void main() {
       expect(hidden(), isTrue);
     });
   });
+}
+
+Future<void> pumpLogin(
+  WidgetTester tester, {
+  required LoginUseCase login,
+}) async {
+  final presenter = AuthPresenter(
+    loginUseCase: login,
+    restoreSessionUseCase: () async => noSavedSession(),
+    logoutUseCase: () async => loggedOut(),
+  );
+
+  await tester.pumpWidget(
+    localizedApp(
+      home: Scaffold(
+        body: BlocSignalProvider<AuthPresenter>.value(
+          value: presenter,
+          child: const LoginScreen(),
+        ),
+      ),
+    ),
+  );
+
+  await tester.enterText(_emailField, 'user@example.com');
+  await tester.enterText(_passwordField, 'hunter2-secret');
+  await tester.tap(find.text('Entrar'));
+  await tester.pumpAndSettle();
+}
+
+Finder get _emailField => find.widgetWithText(TextField, 'Email');
+Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
+
+const _details = "Request failed for operation 'authentication'";
+
+Future<List<(String, String)>> pumpLoginForm(
+  WidgetTester tester, {
+  LoginUseCase? login,
+}) async {
+  final attempts = <(String, String)>[];
+  final LoginUseCase answer = login ?? loginAnswering(loginRejected());
+  final presenter = AuthPresenter(
+    loginUseCase: ({required email, required password}) {
+      attempts.add((email, password));
+      return answer(email: email, password: password);
+    },
+    restoreSessionUseCase: () async => noSavedSession(),
+    logoutUseCase: () async => loggedOut(),
+  );
+  final router = GoRouter(
+    initialLocation: '/login',
+    routes: [
+      GoRoute(
+        path: '/login',
+        builder: (_, _) => const Scaffold(body: LoginScreen()),
+      ),
+      GoRoute(
+        path: '/students',
+        builder: (_, _) => const Scaffold(body: Text('lista de alunos aberta')),
+      ),
+    ],
+  );
+
+  await tester.pumpWidget(
+    BlocSignalProvider<AuthPresenter>.value(
+      value: presenter,
+      child: localizedRouterApp(router),
+    ),
+  );
+  return attempts;
 }

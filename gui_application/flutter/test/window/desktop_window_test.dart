@@ -5,39 +5,6 @@ import 'package:flutter_application/window/desktop_window_web.dart' as web;
 import 'package:flutter_application/window/window_controls.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-final class FakePlatformWindow {
-  final List<MethodCall> calls = [];
-  bool maximized = false;
-
-  void install() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(const MethodChannel('window_manager'), (
-          call,
-        ) async {
-          calls.add(call);
-          return call.method == 'isMaximized' ? maximized : null;
-        });
-    addTearDown(
-      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-            const MethodChannel('window_manager'),
-            null,
-          ),
-    );
-  }
-
-  List<String> get methods => calls.map((call) => call.method).toList();
-}
-
-Future<WindowControls?> frameOn(TargetPlatform platform) async {
-  debugDefaultTargetPlatformOverride = platform;
-  try {
-    return await desktop.frameDesktopWindow();
-  } finally {
-    debugDefaultTargetPlatformOverride = null;
-  }
-}
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -101,4 +68,37 @@ void main() {
       'unmaximize',
     ]);
   });
+}
+
+final class FakePlatformWindow {
+  final List<MethodCall> calls = [];
+  bool maximized = false;
+
+  void install() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(const MethodChannel('window_manager'), (
+          call,
+        ) async {
+          calls.add(call);
+          return call.method == 'isMaximized' ? maximized : null;
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('window_manager'),
+            null,
+          ),
+    );
+  }
+
+  List<String> get methods => calls.map((call) => call.method).toList();
+}
+
+Future<WindowControls?> frameOn(TargetPlatform platform) async {
+  debugDefaultTargetPlatformOverride = platform;
+  try {
+    return await desktop.frameDesktopWindow();
+  } finally {
+    debugDefaultTargetPlatformOverride = null;
+  }
 }

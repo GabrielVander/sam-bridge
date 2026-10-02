@@ -3,43 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/roster.dart';
 
-final _ana = studentSummary(id: '1', name: 'Ana Lima', location: 'Alfa');
-final _bruno = studentSummary(id: '2', name: 'Bruno Costa', location: 'Beta');
-final _carla = studentSummary(id: '3', name: 'Carla Dias', location: 'Alfa');
-final _everyone = [_ana, _bruno, _carla];
-
-Finder get _searchField => find.widgetWithText(TextField, 'Buscar por nome…');
-Finder get _dialog => find.widgetWithText(AlertDialog, 'Aplicar');
-Finder inDialog(Finder finder) =>
-    find.descendant(of: _dialog, matching: finder);
-
-/// Types [text] and lets the search settle: the screen filters only after a
-/// pause in typing, and a pending timer does not by itself schedule a frame.
-Future<void> search(WidgetTester tester, String text) async {
-  await tester.enterText(_searchField, text);
-  await tester.pump(const Duration(seconds: 1));
-  await tester.pumpAndSettle();
-}
-
-Future<void> openLocationPicker(WidgetTester tester) async {
-  await tester.tap(find.byIcon(Icons.filter_list));
-  await tester.pumpAndSettle();
-}
-
-Future<void> pickLocations(
-  WidgetTester tester,
-  List<String> locations, {
-  String apply = 'Aplicar',
-}) async {
-  await openLocationPicker(tester);
-  for (final location in locations) {
-    await tester.tap(find.widgetWithText(CheckboxListTile, location));
-    await tester.pumpAndSettle();
-  }
-  await tester.tap(find.text(apply));
-  await tester.pumpAndSettle();
-}
-
 void main() {
   group('searching by name', () {
     testWidgets('narrows the list to the matching students', (tester) async {
@@ -314,4 +277,44 @@ void main() {
       expect(find.text('Nenhum aluno disponível.'), findsOneWidget);
     });
   });
+}
+
+final _everyone = [_ana, _bruno, _carla];
+
+final _ana = studentSummary(id: '1', name: 'Ana Lima', location: 'Alfa');
+final _bruno = studentSummary(id: '2', name: 'Bruno Costa', location: 'Beta');
+final _carla = studentSummary(id: '3', name: 'Carla Dias', location: 'Alfa');
+
+/// Types [text] and lets the search settle: the screen filters only after a
+/// pause in typing, and a pending timer does not by itself schedule a frame.
+Future<void> search(WidgetTester tester, String text) async {
+  await tester.enterText(_searchField, text);
+  await tester.pump(const Duration(seconds: 1));
+  await tester.pumpAndSettle();
+}
+
+Finder get _searchField => find.widgetWithText(TextField, 'Buscar por nome…');
+
+Future<void> openLocationPicker(WidgetTester tester) async {
+  await tester.tap(find.byIcon(Icons.filter_list));
+  await tester.pumpAndSettle();
+}
+
+Finder inDialog(Finder finder) =>
+    find.descendant(of: _dialog, matching: finder);
+
+Finder get _dialog => find.widgetWithText(AlertDialog, 'Aplicar');
+
+Future<void> pickLocations(
+  WidgetTester tester,
+  List<String> locations, {
+  String apply = 'Aplicar',
+}) async {
+  await openLocationPicker(tester);
+  for (final location in locations) {
+    await tester.tap(find.widgetWithText(CheckboxListTile, location));
+    await tester.pumpAndSettle();
+  }
+  await tester.tap(find.text(apply));
+  await tester.pumpAndSettle();
 }

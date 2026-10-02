@@ -4,19 +4,6 @@ import 'package:flutter_application/roster/student_position.dart';
 import 'package:flutter_application/shared/level.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-StudentListItem _student(String name, {String location = 'Centro'}) =>
-    StudentListItem(
-      id: name,
-      name: name,
-      initial: '',
-      location: location,
-      position: const LeveledPosition([Level.practice]),
-      canOpen: true,
-    );
-
-List<String> _names(List<StudentListItem> students) =>
-    students.map((s) => s.name).toList();
-
 void main() {
   final joao = _student('João Silva', location: 'Vila Nova');
   final maria = _student('Maria Souza', location: 'Centro');
@@ -91,3 +78,16 @@ void main() {
     });
   });
 }
+
+StudentListItem _student(String name, {String location = 'Centro'}) =>
+    StudentListItem(
+      id: name,
+      name: name,
+      initial: '',
+      location: location,
+      position: const LeveledPosition([Level.practice]),
+      canOpen: true,
+    );
+
+List<String> _names(List<StudentListItem> students) =>
+    students.map((s) => s.name).toList();
