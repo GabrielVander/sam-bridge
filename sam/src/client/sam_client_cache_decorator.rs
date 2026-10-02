@@ -4,41 +4,6 @@ use std::time::{Duration, Instant};
 
 use super::{SamClient, SamClientError, SamCredentials, SamStudent, StudentLessonsPage};
 
-pub trait Clock: Send + Sync {
-    fn now(&self) -> Instant;
-}
-
-pub struct SystemClock;
-
-impl Clock for SystemClock {
-    fn now(&self) -> Instant {
-        Instant::now()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CacheTtl {
-    pub students: Duration,
-    pub lessons: Duration,
-}
-
-struct Entry<T> {
-    value: T,
-    stored_at: Instant,
-}
-
-impl<T: Clone> Entry<T> {
-    fn fresh_value(&self, now: Instant, ttl: Duration) -> Option<T> {
-        (now.saturating_duration_since(self.stored_at) < ttl).then(|| self.value.clone())
-    }
-}
-
-#[derive(Default)]
-struct Cache {
-    students: Option<Entry<Vec<SamStudent>>>,
-    lessons: HashMap<String, Entry<StudentLessonsPage>>,
-}
-
 /// Decorates a [`SamClient`] so that repeated reads within a TTL are served from memory.
 ///
 /// Sharing one instance between every gateway also lets them reuse each other's fetches. Only
@@ -117,5 +82,40 @@ impl SamClient for SamClientCacheDecorator {
         );
 
         Ok(page)
+    }
+}
+
+pub trait Clock: Send + Sync {
+    fn now(&self) -> Instant;
+}
+
+pub struct SystemClock;
+
+impl Clock for SystemClock {
+    fn now(&self) -> Instant {
+        Instant::now()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CacheTtl {
+    pub students: Duration,
+    pub lessons: Duration,
+}
+
+#[derive(Default)]
+struct Cache {
+    students: Option<Entry<Vec<SamStudent>>>,
+    lessons: HashMap<String, Entry<StudentLessonsPage>>,
+}
+
+struct Entry<T> {
+    value: T,
+    stored_at: Instant,
+}
+
+impl<T: Clone> Entry<T> {
+    fn fresh_value(&self, now: Instant, ttl: Duration) -> Option<T> {
+        (now.saturating_duration_since(self.stored_at) < ttl).then(|| self.value.clone())
     }
 }

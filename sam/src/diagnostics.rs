@@ -21,15 +21,6 @@ pub fn error_chain(error: &dyn Error) -> String {
     truncate(rendered)
 }
 
-pub(crate) const fn failure_kind(error: &SamClientError) -> FailureKind {
-    match error {
-        SamClientError::RequestError { .. } => FailureKind::Transient,
-        SamClientError::UnexpectedResponse { .. } => FailureKind::Unexpected,
-        SamClientError::SessionExpired => FailureKind::SessionExpired,
-        SamClientError::InvalidCredentials => FailureKind::Unclassified,
-    }
-}
-
 fn truncate(text: String) -> String {
     if text.chars().count() <= MAX_CHARS {
         return text;
@@ -38,4 +29,13 @@ fn truncate(text: String) -> String {
     let mut truncated: String = text.chars().take(KEPT_CHARS_WHEN_TRUNCATED).collect();
     truncated.push('…');
     truncated
+}
+
+pub(crate) const fn failure_kind(error: &SamClientError) -> FailureKind {
+    match error {
+        SamClientError::RequestError { .. } => FailureKind::Transient,
+        SamClientError::UnexpectedResponse { .. } => FailureKind::Unexpected,
+        SamClientError::SessionExpired => FailureKind::SessionExpired,
+        SamClientError::InvalidCredentials => FailureKind::Unclassified,
+    }
 }

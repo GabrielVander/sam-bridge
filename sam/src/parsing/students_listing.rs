@@ -1,15 +1,5 @@
 use anyhow::{Context, bail};
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct SamStudent {
-    pub id: String,
-    pub name: String,
-    pub location: String,
-    pub role: String,
-    pub instrument: String,
-    pub level: String,
-}
-
 pub fn parse_students_listing(
     response_status: reqwest::StatusCode,
     body: &str,
@@ -22,6 +12,16 @@ pub fn parse_students_listing(
         serde_json::from_str(body).context("Unable to decode student listing JSON response")?;
 
     Ok(response.data.iter().map(SamStudent::from).collect())
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct SamStudent {
+    pub id: String,
+    pub name: String,
+    pub location: String,
+    pub role: String,
+    pub instrument: String,
+    pub level: String,
 }
 
 #[derive(serde::Deserialize, Debug)]

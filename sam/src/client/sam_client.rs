@@ -15,6 +15,26 @@ pub trait SamClient: Send + Sync {
     fn student_lessons(&self, student_id: &str) -> Result<StudentLessonsPage, SamClientError>;
 }
 
+pub struct SamCredentials {
+    pub login: String,
+    pub password: String,
+}
+
+#[derive(Error, Debug)]
+pub enum SamClientError {
+    #[error("Request failed")]
+    RequestError {
+        #[from]
+        http_error: SamOperationError,
+    },
+    #[error("Unexpected response: {context}")]
+    UnexpectedResponse { context: String },
+    #[error("Invalid credentials")]
+    InvalidCredentials,
+    #[error("Session expired")]
+    SessionExpired,
+}
+
 #[derive(Debug, Clone)]
 pub struct SamClientImpl {
     sam_ops: SamOperations,
@@ -92,24 +112,4 @@ impl SamClientImpl {
 fn status_of(response: &SamResponse) -> reqwest::StatusCode {
     reqwest::StatusCode::from_u16(response.status)
         .unwrap_or(reqwest::StatusCode::INTERNAL_SERVER_ERROR)
-}
-
-#[derive(Error, Debug)]
-pub enum SamClientError {
-    #[error("Request failed")]
-    RequestError {
-        #[from]
-        http_error: SamOperationError,
-    },
-    #[error("Unexpected response: {context}")]
-    UnexpectedResponse { context: String },
-    #[error("Invalid credentials")]
-    InvalidCredentials,
-    #[error("Session expired")]
-    SessionExpired,
-}
-
-pub struct SamCredentials {
-    pub login: String,
-    pub password: String,
 }

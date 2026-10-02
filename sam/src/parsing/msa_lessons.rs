@@ -4,18 +4,6 @@ use crate::parsing::dom::{
     descendants_with_tag, find_descendant, find_descendant_with_id, optional_cell, row_id,
 };
 
-#[derive(Debug, PartialEq, Eq, Clone, Default)]
-pub struct MsaLesson {
-    pub id: Option<String>,
-    pub date: Option<String>,
-    pub phases: Option<String>,
-    pub pages: Option<String>,
-    pub lessons: Option<String>,
-    pub clefs: Option<String>,
-    pub description: Option<String>,
-    pub authorizer: Option<String>,
-}
-
 pub fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
     if body.trim().is_empty() {
         return Vec::new();
@@ -43,6 +31,18 @@ pub fn parse_msa_lessons_body(body: &str) -> Vec<MsaLesson> {
         .into_iter()
         .map(parse_row)
         .collect()
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
+pub struct MsaLesson {
+    pub id: Option<String>,
+    pub date: Option<String>,
+    pub phases: Option<String>,
+    pub pages: Option<String>,
+    pub lessons: Option<String>,
+    pub clefs: Option<String>,
+    pub description: Option<String>,
+    pub authorizer: Option<String>,
 }
 
 fn parse_row(row: scraper::ElementRef) -> MsaLesson {
