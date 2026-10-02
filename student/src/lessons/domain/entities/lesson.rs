@@ -1,6 +1,12 @@
 use crate::lessons::domain::entities::MethodBook;
 
 #[derive(Debug, PartialEq, Eq, Clone, Default)]
+pub struct StudentLessons {
+    pub msa: Vec<Lesson>,
+    pub method: Vec<Lesson>,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub struct Lesson {
     pub id: Option<String>,
     pub date: Option<chrono::NaiveDate>,
@@ -12,12 +18,6 @@ pub struct Lesson {
     pub instructor: Option<String>,
     pub method: Option<String>,
     pub method_books: Vec<MethodBook>,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Default)]
-pub struct StudentLessons {
-    pub msa: Vec<Lesson>,
-    pub method: Vec<Lesson>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]

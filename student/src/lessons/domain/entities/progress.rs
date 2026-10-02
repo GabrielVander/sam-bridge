@@ -5,51 +5,6 @@ use crate::lessons::domain::entities::{
 use crate::shared::domain::entities::{Instrument, MusicianLevel};
 use thiserror::Error;
 
-#[derive(Debug, Clone, PartialEq, Eq, Error)]
-pub enum AssessError {
-    #[error("unrecognized musician level {0:?}")]
-    UnknownLevel(String),
-    #[error("no published test requirements for {0:?}")]
-    UnpublishedRequirements(Instrument),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RequirementStatus {
-    pub msa_met: bool,
-    pub method_met: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Checkpoint {
-    pub level: MusicianLevel,
-    pub status: CheckpointStatus,
-    pub requirement: RequirementStatus,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CheckpointStatus {
-    Achieved,
-    ReadyForExam,
-    Pending,
-}
-
-impl Checkpoint {
-    #[must_use]
-    pub fn is_achieved(&self) -> bool {
-        self.status == CheckpointStatus::Achieved
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct ProgressAssessment {
-    pub checkpoints: Vec<Checkpoint>,
-    pub msa_relative_percent: f64,
-    pub method_relative_percent: f64,
-    pub combined_percent: f64,
-    pub overall_checkpoint_percent: f64,
-    pub next_level: Option<MusicianLevel>,
-}
-
 pub fn assess(
     assigned_level: &MusicianLevel,
     instrument: Instrument,
@@ -80,6 +35,51 @@ pub fn assess(
         overall_checkpoint_percent,
         next_level: next_exam.level,
     })
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ProgressAssessment {
+    pub checkpoints: Vec<Checkpoint>,
+    pub msa_relative_percent: f64,
+    pub method_relative_percent: f64,
+    pub combined_percent: f64,
+    pub overall_checkpoint_percent: f64,
+    pub next_level: Option<MusicianLevel>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Checkpoint {
+    pub level: MusicianLevel,
+    pub status: CheckpointStatus,
+    pub requirement: RequirementStatus,
+}
+
+impl Checkpoint {
+    #[must_use]
+    pub fn is_achieved(&self) -> bool {
+        self.status == CheckpointStatus::Achieved
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CheckpointStatus {
+    Achieved,
+    ReadyForExam,
+    Pending,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RequirementStatus {
+    pub msa_met: bool,
+    pub method_met: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum AssessError {
+    #[error("unrecognized musician level {0:?}")]
+    UnknownLevel(String),
+    #[error("no published test requirements for {0:?}")]
+    UnpublishedRequirements(Instrument),
 }
 
 struct RecordedProgress<'a> {

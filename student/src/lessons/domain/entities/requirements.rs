@@ -1,41 +1,6 @@
 use crate::lessons::domain::entities::MethodBook;
 use crate::shared::domain::entities::{Instrument, MusicianLevel};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MethodMilestone {
-    Page(u32),
-    Lesson(u32),
-    PageAndLesson { page: u32, lesson: u32 },
-    Phase(u32),
-    Module(u32),
-    ExerciseRange { from: u32, to: u32 },
-    Complete,
-    Unmeasured,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MethodComponent {
-    pub book: MethodBook,
-    pub milestone: MethodMilestone,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MethodAlternative {
-    pub components: Vec<MethodComponent>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TheoryRequirement {
-    pub msa_phase: u32,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TestRequirement {
-    pub level: MusicianLevel,
-    pub method_alternatives: Vec<MethodAlternative>,
-    pub theory: TheoryRequirement,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InstrumentRequirements {
     pub tests: Vec<TestRequirement>,
@@ -498,6 +463,41 @@ impl InstrumentRequirements {
             ],
         }
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestRequirement {
+    pub level: MusicianLevel,
+    pub method_alternatives: Vec<MethodAlternative>,
+    pub theory: TheoryRequirement,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MethodAlternative {
+    pub components: Vec<MethodComponent>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MethodComponent {
+    pub book: MethodBook,
+    pub milestone: MethodMilestone,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MethodMilestone {
+    Page(u32),
+    Lesson(u32),
+    PageAndLesson { page: u32, lesson: u32 },
+    Phase(u32),
+    Module(u32),
+    ExerciseRange { from: u32, to: u32 },
+    Complete,
+    Unmeasured,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TheoryRequirement {
+    pub msa_phase: u32,
 }
 
 const fn test(
