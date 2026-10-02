@@ -24,6 +24,9 @@ use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};
 mod support;
 use support::sam_operations_for;
 
+const STUDENTS_TTL: Duration = Duration::from_secs(300);
+const LESSONS_TTL: Duration = Duration::from_secs(60);
+
 #[test]
 fn the_student_and_musician_profile_gateways_share_a_single_listing_fetch() {
     smol::block_on(async {
@@ -431,6 +434,3 @@ impl Clock for FakeClock {
         self.origin.checked_add(elapsed).unwrap_or(self.origin)
     }
 }
-
-const STUDENTS_TTL: Duration = Duration::from_secs(300);
-const LESSONS_TTL: Duration = Duration::from_secs(60);

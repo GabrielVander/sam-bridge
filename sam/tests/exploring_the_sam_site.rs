@@ -1,5 +1,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
+const SAM_SITE_REQUIRED: &str =
+    "set SAM_USERNAME and SAM_PASSWORD (optionally SAM_BASE_URL) to explore the real SAM site";
+
 #[test]
 #[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn invalid_url() {
@@ -897,9 +900,6 @@ fn configured_sam_site() -> Option<SamSiteConfig> {
         password,
     })
 }
-
-const SAM_SITE_REQUIRED: &str =
-    "set SAM_USERNAME and SAM_PASSWORD (optionally SAM_BASE_URL) to explore the real SAM site";
 
 fn build_sam_authentication_url(site: &SamSiteConfig) -> String {
     format!("{}/autenticar", build_sam_base_url(site))

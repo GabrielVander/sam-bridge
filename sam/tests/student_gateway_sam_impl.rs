@@ -16,6 +16,8 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 mod support;
 use support::{FakeSamClient, UNREACHABLE_SITE, sam_operations_for, sam_student};
 
+const LOCATION: &str = "JARDIM PALMARES DO SUL <span class='m-r-10'></span> | <span class='m-r-10'></span> BR-SP-ARARAQUARA-SÃO CARLOS";
+
 #[test]
 fn given_accessible_dashboard_students_should_be_retrieved_and_mapped() {
     smol::block_on(async {
@@ -504,8 +506,6 @@ fn student_listed(row: SamStudent) -> Option<Student> {
 
     gateway.get_available_records().ok()?.pop()
 }
-
-const LOCATION: &str = "JARDIM PALMARES DO SUL <span class='m-r-10'></span> | <span class='m-r-10'></span> BR-SP-ARARAQUARA-SÃO CARLOS";
 
 const fn musician(level: MusicianLevel, instrument: Option<Instrument>) -> StudentPosition {
     StudentPosition::Musician { level, instrument }

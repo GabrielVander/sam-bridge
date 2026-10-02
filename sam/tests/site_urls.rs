@@ -11,6 +11,13 @@ use student::application::gateways::{StudentGateway, StudentLessonsGateway};
 use student::domain::entities::StudentId;
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
+const EXPECTED_PATHS: [&str; 4] = [
+    "/autenticar",
+    "/painel",
+    "/alunos/listagem",
+    "/licoes/index/500132",
+];
+
 #[test]
 fn endpoints_given_without_a_leading_slash_are_requested_under_the_base_url() {
     smol::block_on(async {
@@ -118,10 +125,3 @@ async fn paths_requested_by_every_operation(
             .collect()
     })
 }
-
-const EXPECTED_PATHS: [&str; 4] = [
-    "/autenticar",
-    "/painel",
-    "/alunos/listagem",
-    "/licoes/index/500132",
-];
