@@ -85,11 +85,6 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
     super.dispose();
   }
 
-  void _submit(BuildContext context) {
-    FocusScope.of(context).unfocus();
-    context.read<AuthPresenter>().submitLogin(_email.text, _password.text);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -198,5 +193,10 @@ final class _LoginFormCardState extends State<_LoginFormCard> {
         ),
       ),
     );
+  }
+
+  void _submit(BuildContext context) {
+    FocusScope.of(context).unfocus();
+    context.read<AuthPresenter>().submitLogin(_email.text, _password.text);
   }
 }

@@ -128,6 +128,11 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     }
   }
 
+  void search(String nameQuery) {
+    _pendingSearch?.cancel();
+    _pendingSearch = Timer(_searchDelay, () => filter(nameQuery: nameQuery));
+  }
+
   void filter({String? nameQuery, Set<String>? selectedLocations}) {
     if (stateValue is! StudentsLoaded && stateValue is! StudentsIdle) return;
     _filter = _filter.copyWith(
@@ -138,11 +143,6 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     if (stateValue is StudentsLoaded) {
       emit(_filteredState());
     }
-  }
-
-  void search(String nameQuery) {
-    _pendingSearch?.cancel();
-    _pendingSearch = Timer(_searchDelay, () => filter(nameQuery: nameQuery));
   }
 
   void clearSearch() {
