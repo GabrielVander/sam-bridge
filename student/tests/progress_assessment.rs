@@ -566,11 +566,28 @@ fn an_alternatives_progress_is_the_average_of_its_measurable_components() {
         assessment.method_relative_percent
     );
 }
+
+fn is_about(actual: f64, expected: f64) -> bool {
+    (actual - expected).abs() < 1e-9
+}
+
 fn candidate_on(
     instrument: Instrument,
     method: &[Lesson],
 ) -> Result<ProgressAssessment, AssessError> {
     assess(&MusicianLevel::Candidate, instrument, &[], method)
+}
+
+fn meets_youth_service_method(assessment: &ProgressAssessment) -> Option<bool> {
+    checkpoint(assessment, &MusicianLevel::YouthService)
+        .map(|youth_service| youth_service.requirement.method_met)
+}
+
+fn phase_lesson_in(book: MethodBook, phase: &str) -> Lesson {
+    Lesson {
+        method_books: vec![book],
+        ..method_phase_lesson(phase)
+    }
 }
 
 fn beginning_strings_and_dotzauer(dotzauer_page: &str, dotzauer_lesson: &str) -> [Lesson; 2] {
@@ -589,20 +606,4 @@ fn beginning_strings_and_volmer(beginning_strings_lesson: &str, volmer_page: &st
         ),
         method_lesson_in(MethodBook::BertaVolmer1, volmer_page, "0"),
     ]
-}
-
-fn phase_lesson_in(book: MethodBook, phase: &str) -> Lesson {
-    Lesson {
-        method_books: vec![book],
-        ..method_phase_lesson(phase)
-    }
-}
-
-fn meets_youth_service_method(assessment: &ProgressAssessment) -> Option<bool> {
-    checkpoint(assessment, &MusicianLevel::YouthService)
-        .map(|youth_service| youth_service.requirement.method_met)
-}
-
-fn is_about(actual: f64, expected: f64) -> bool {
-    (actual - expected).abs() < 1e-9
 }

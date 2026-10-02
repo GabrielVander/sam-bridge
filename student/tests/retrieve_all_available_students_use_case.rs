@@ -10,22 +10,6 @@ use student::{
 
 use pretty_assertions::assert_eq;
 
-struct FakeStudentGateway {
-    result: Result<Vec<Student>, StudentGatewayError>,
-}
-
-impl FakeStudentGateway {
-    const fn new(result: Result<Vec<Student>, StudentGatewayError>) -> Self {
-        Self { result }
-    }
-}
-
-impl StudentGateway for FakeStudentGateway {
-    fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
-        self.result.clone()
-    }
-}
-
 #[test]
 fn returns_every_available_student() {
     let students: [Student; 3] = [
@@ -78,4 +62,20 @@ fn propagates_gateway_errors_with_their_kind_and_details() {
     let result: Result<Vec<Student>, StudentGatewayError> = use_case.execute();
 
     assert_eq!(result, Err(error));
+}
+
+struct FakeStudentGateway {
+    result: Result<Vec<Student>, StudentGatewayError>,
+}
+
+impl FakeStudentGateway {
+    const fn new(result: Result<Vec<Student>, StudentGatewayError>) -> Self {
+        Self { result }
+    }
+}
+
+impl StudentGateway for FakeStudentGateway {
+    fn get_available_records(&self) -> Result<Vec<Student>, StudentGatewayError> {
+        self.result.clone()
+    }
 }

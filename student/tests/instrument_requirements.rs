@@ -453,7 +453,17 @@ fn requirement_for_unpublished_level_is_none() {
     );
 }
 
-type Threshold<'a> = (MusicianLevel, &'a [Lesson], &'a [Lesson]);
+fn theory_met(level: &MusicianLevel, phase: &str) -> Option<bool> {
+    let assessment: ProgressAssessment = assess(
+        &MusicianLevel::Candidate,
+        Instrument::Violin,
+        &[msa_lesson(phase, phase)],
+        &[],
+    )
+    .ok()?;
+
+    checkpoint(&assessment, level).map(|checkpoint| checkpoint.requirement.msa_met)
+}
 
 fn assert_thresholds(instrument: &Instrument, thresholds: &[Threshold]) {
     for (level, reached, one_short) in thresholds {
@@ -470,15 +480,7 @@ fn assert_thresholds(instrument: &Instrument, thresholds: &[Threshold]) {
     }
 }
 
-fn assert_never_met(instrument: &Instrument, level: &MusicianLevel, books: &[MethodBook]) {
-    let far_along: Vec<Lesson> = books.iter().map(|book| at(*book, "999", "999")).collect();
-
-    assert_eq!(
-        method_met(instrument, level, &far_along),
-        Some(false),
-        "{instrument:?} {level:?} cannot be verified from the lessons"
-    );
-}
+type Threshold<'a> = (MusicianLevel, &'a [Lesson], &'a [Lesson]);
 
 fn method_met(instrument: &Instrument, level: &MusicianLevel, lessons: &[Lesson]) -> Option<bool> {
     let assessment: ProgressAssessment =
@@ -487,20 +489,18 @@ fn method_met(instrument: &Instrument, level: &MusicianLevel, lessons: &[Lesson]
     checkpoint(&assessment, level).map(|checkpoint| checkpoint.requirement.method_met)
 }
 
-fn theory_met(level: &MusicianLevel, phase: &str) -> Option<bool> {
-    let assessment: ProgressAssessment = assess(
-        &MusicianLevel::Candidate,
-        Instrument::Violin,
-        &[msa_lesson(phase, phase)],
-        &[],
-    )
-    .ok()?;
-
-    checkpoint(&assessment, level).map(|checkpoint| checkpoint.requirement.msa_met)
-}
-
 fn at(book: MethodBook, page: &str, lesson: &str) -> Lesson {
     method_lesson_in(book, page, lesson)
+}
+
+fn assert_never_met(instrument: &Instrument, level: &MusicianLevel, books: &[MethodBook]) {
+    let far_along: Vec<Lesson> = books.iter().map(|book| at(*book, "999", "999")).collect();
+
+    assert_eq!(
+        method_met(instrument, level, &far_along),
+        Some(false),
+        "{instrument:?} {level:?} cannot be verified from the lessons"
+    );
 }
 
 fn tests_for(instrument: &Instrument) -> Option<Vec<TestRequirement>> {

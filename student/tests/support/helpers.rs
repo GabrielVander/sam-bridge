@@ -51,18 +51,18 @@ pub fn msa_lesson(from: &str, to: &str) -> Lesson {
     }
 }
 
+pub fn method_lesson_in(book: MethodBook, page: &str, lesson: &str) -> Lesson {
+    Lesson {
+        method_books: vec![book],
+        ..method_lesson(page, lesson)
+    }
+}
+
 pub fn method_lesson(page: &str, lesson: &str) -> Lesson {
     Lesson {
         page: Some(Range::single(page.to_owned())),
         lesson: Some(Range::single(lesson.to_owned())),
         ..Lesson::default()
-    }
-}
-
-pub fn method_lesson_in(book: MethodBook, page: &str, lesson: &str) -> Lesson {
-    Lesson {
-        method_books: vec![book],
-        ..method_lesson(page, lesson)
     }
 }
 
