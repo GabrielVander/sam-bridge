@@ -8,10 +8,6 @@ use authentication::{
 use std::path::{Path, PathBuf};
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
-#[error("no platform data directory is available to store credentials")]
-pub struct NoDataDirectory;
-
 pub struct FileCredentialStore {
     dir: PathBuf,
     credential_path: PathBuf,
@@ -53,6 +49,10 @@ impl FileCredentialStore {
         }
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
+#[error("no platform data directory is available to store credentials")]
+pub struct NoDataDirectory;
 
 impl SaveCredentialGateway for FileCredentialStore {
     fn save(&self, credential: &Credential) -> Result<(), SaveCredentialGatewayError> {
