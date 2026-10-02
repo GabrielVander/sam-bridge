@@ -18,6 +18,13 @@ Future<void> signIn(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> signOut(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Configurações'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Sair'));
+  await tester.pumpAndSettle();
+}
+
 GoRouter routerOf(WidgetTester tester) =>
     GoRouter.of(tester.element(find.byType(MainScreen)));
 
@@ -161,24 +168,13 @@ void main() {
   });
 
   group('signing out', () {
-    testWidgets('is not offered on the login form', (tester) async {
-      await pumpApp(tester, await composeFakeApp());
-
-      expect(find.byTooltip('Sair'), findsNothing);
-    });
-
-    testWidgets('returns to the login form', (tester) async {
+    testWidgets('is not offered in the title bar', (tester) async {
       await pumpApp(
         tester,
         await composeFakeApp(restoreSession: sessionRestored()),
       );
-      expect(find.text('Jane Doe'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Sair'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
-      expect(find.text('Jane Doe'), findsNothing);
+      expect(find.byTooltip('Sair'), findsNothing);
     });
 
     testWidgets(
@@ -196,8 +192,7 @@ void main() {
           ),
         );
 
-        await tester.tap(find.byTooltip('Sair'));
-        await tester.pumpAndSettle();
+        await signOut(tester);
         await tester.tap(find.text('Detalhes técnicos'));
         await tester.pumpAndSettle();
 
