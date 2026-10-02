@@ -24,15 +24,6 @@ pub fn descendants_with_tag<'a>(
         .collect()
 }
 
-pub fn text_content(element: scraper::ElementRef<'_>) -> String {
-    element
-        .text()
-        .collect::<Vec<&str>>()
-        .join(" ")
-        .trim()
-        .to_owned()
-}
-
 pub fn row_id(row: scraper::ElementRef<'_>, prefix: &str) -> Option<String> {
     row.value()
         .attr("id")
@@ -48,4 +39,13 @@ pub fn optional_cell<'a>(
         .next()
         .map(text_content)
         .filter(|text| !text.is_empty())
+}
+
+pub fn text_content(element: scraper::ElementRef<'_>) -> String {
+    element
+        .text()
+        .collect::<Vec<&str>>()
+        .join(" ")
+        .trim()
+        .to_owned()
 }
