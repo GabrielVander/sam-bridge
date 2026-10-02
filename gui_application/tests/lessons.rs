@@ -10,20 +10,6 @@ use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
 mod support;
 use support::FakeSam;
 
-fn lessons_of(lessons: StudentLessons) -> RetrieveStudentLessonsOutcomeDto {
-    FakeSam::default()
-        .teaching(Ok(lessons))
-        .build()
-        .retrieve_student_lessons("1".to_owned())
-}
-
-fn msa_lesson_with_clef(clef: Clef) -> Lesson {
-    Lesson {
-        clef: Some(clef),
-        ..Lesson::default()
-    }
-}
-
 #[test]
 fn every_field_of_a_lesson_is_carried() {
     let result = lessons_of(StudentLessons {
@@ -127,4 +113,18 @@ fn a_lessons_failure_is_reported_with_its_kind_and_details() {
             }
         }
     );
+}
+
+fn lessons_of(lessons: StudentLessons) -> RetrieveStudentLessonsOutcomeDto {
+    FakeSam::default()
+        .teaching(Ok(lessons))
+        .build()
+        .retrieve_student_lessons("1".to_owned())
+}
+
+fn msa_lesson_with_clef(clef: Clef) -> Lesson {
+    Lesson {
+        clef: Some(clef),
+        ..Lesson::default()
+    }
 }

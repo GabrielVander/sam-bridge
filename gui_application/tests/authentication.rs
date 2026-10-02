@@ -9,20 +9,6 @@ use pretty_assertions::assert_eq;
 mod support;
 use support::FakeSam;
 
-fn network_failure() -> AuthorizationError {
-    AuthorizationError::UnableToPerformOperation {
-        kind: FailureKind::Transient,
-        details: "Request failed for operation 'authentication'".to_owned(),
-    }
-}
-
-fn network_report() -> ErrorReportDto {
-    ErrorReportDto {
-        kind: ErrorKindDto::Network,
-        details: "Request failed for operation 'authentication'".to_owned(),
-    }
-}
-
 #[test]
 fn an_authorized_login_is_successful() {
     let facade = FakeSam::default()
@@ -164,4 +150,18 @@ fn a_logout_that_cannot_clear_the_credential_is_a_local_storage_failure_with_its
             }
         }
     );
+}
+
+fn network_failure() -> AuthorizationError {
+    AuthorizationError::UnableToPerformOperation {
+        kind: FailureKind::Transient,
+        details: "Request failed for operation 'authentication'".to_owned(),
+    }
+}
+
+fn network_report() -> ErrorReportDto {
+    ErrorReportDto {
+        kind: ErrorKindDto::Network,
+        details: "Request failed for operation 'authentication'".to_owned(),
+    }
 }

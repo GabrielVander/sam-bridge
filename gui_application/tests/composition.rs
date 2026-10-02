@@ -12,39 +12,6 @@ use pretty_assertions::assert_eq;
 use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
-const EMPTY_LISTING: &str = r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#;
-
-fn config_for(base_url: &str) -> Config {
-    Config {
-        base_url: base_url.to_owned(),
-        auth_endpoint: "autenticar".to_owned(),
-        dashboard_endpoint: "painel".to_owned(),
-        students_listing_endpoint: "alunos/listagem".to_owned(),
-        student_lessons_endpoint: "licoes/index".to_owned(),
-    }
-}
-
-fn facade_talking_to(
-    mock_server: &MockServer,
-    timeout: Duration,
-) -> Option<(ApplicationFacade, tempfile::TempDir)> {
-    let credential_dir = tempfile::tempdir().ok()?;
-    let facade = build_application_with(
-        &config_for(&mock_server.uri()),
-        Ok(FileCredentialStore::under(credential_dir.path())),
-        http_client_builder(timeout),
-    )
-    .ok()?;
-
-    Some((facade, credential_dir))
-}
-
-fn json_response(body: &str) -> ResponseTemplate {
-    ResponseTemplate::new(200)
-        .set_body_string(body)
-        .insert_header("Content-Type", "application/json")
-}
-
 #[test]
 fn a_login_redirect_is_read_as_success_instead_of_being_followed() {
     smol::block_on(async {
@@ -207,3 +174,36 @@ fn when_the_http_client_cannot_be_built_the_application_reports_why() {
         report.details
     );
 }
+
+fn facade_talking_to(
+    mock_server: &MockServer,
+    timeout: Duration,
+) -> Option<(ApplicationFacade, tempfile::TempDir)> {
+    let credential_dir = tempfile::tempdir().ok()?;
+    let facade = build_application_with(
+        &config_for(&mock_server.uri()),
+        Ok(FileCredentialStore::under(credential_dir.path())),
+        http_client_builder(timeout),
+    )
+    .ok()?;
+
+    Some((facade, credential_dir))
+}
+
+fn config_for(base_url: &str) -> Config {
+    Config {
+        base_url: base_url.to_owned(),
+        auth_endpoint: "autenticar".to_owned(),
+        dashboard_endpoint: "painel".to_owned(),
+        students_listing_endpoint: "alunos/listagem".to_owned(),
+        student_lessons_endpoint: "licoes/index".to_owned(),
+    }
+}
+
+fn json_response(body: &str) -> ResponseTemplate {
+    ResponseTemplate::new(200)
+        .set_body_string(body)
+        .insert_header("Content-Type", "application/json")
+}
+
+const EMPTY_LISTING: &str = r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#;

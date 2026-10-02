@@ -237,15 +237,6 @@ fn a_lessons_failure_is_reported_with_its_kind_and_details() {
     );
 }
 
-fn assessment_of(
-    musician_profile: Result<MusicianProfile, MusicianProfileGatewayError>,
-) -> AssessStudentProgressOutcomeDto {
-    FakeSam::default()
-        .profiling(musician_profile)
-        .build()
-        .assess_student_progress("1".to_owned())
-}
-
 const fn musician(level: MusicianLevel, instrument: Option<Instrument>) -> MusicianProfile {
     MusicianProfile { level, instrument }
 }
@@ -263,4 +254,13 @@ const fn checkpoint(
             method_met: requirement_met,
         },
     }
+}
+
+fn assessment_of(
+    musician_profile: Result<MusicianProfile, MusicianProfileGatewayError>,
+) -> AssessStudentProgressOutcomeDto {
+    FakeSam::default()
+        .profiling(musician_profile)
+        .build()
+        .assess_student_progress("1".to_owned())
 }
