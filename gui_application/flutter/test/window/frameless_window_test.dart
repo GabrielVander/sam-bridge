@@ -31,6 +31,16 @@ void main() {
       expect(window.requests, ['minimize', 'toggle maximize', 'close']);
     });
 
+    testWidgets('shows the app title in the middle of the title bar', (
+      tester,
+    ) async {
+      await pumpAppIn(tester, FakeWindow());
+
+      final double windowWidth =
+          tester.view.physicalSize.width / tester.view.devicePixelRatio;
+      expect(tester.getCenter(find.text('SAM Bridge')).dx, windowWidth / 2);
+    });
+
     testWidgets('moves when the title bar is dragged', (tester) async {
       final window = FakeWindow();
       await pumpAppIn(tester, window);

@@ -23,9 +23,9 @@ final class WindowTitleBar extends StatelessWidget
     final WindowControls? controls = this.controls;
 
     return AppBar(
-      title: controls == null ? Text(title) : _dragArea(controls),
+      title: IgnorePointer(child: Text(title)),
       centerTitle: true,
-      titleSpacing: 0,
+      flexibleSpace: controls == null ? null : _dragArea(controls),
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       actions: [
         ...actions,
@@ -38,11 +38,6 @@ final class WindowTitleBar extends StatelessWidget
     behavior: HitTestBehavior.opaque,
     onPanStart: (_) => controls.startDragging(),
     onDoubleTap: controls.toggleMaximize,
-    child: SizedBox(
-      width: double.infinity,
-      height: kToolbarHeight,
-      child: Center(child: Text(title)),
-    ),
   );
 
   List<Widget> _buttons(BuildContext context, WindowControls controls) => [
