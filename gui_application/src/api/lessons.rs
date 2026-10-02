@@ -5,23 +5,15 @@ use student::domain::entities::{Clef, Lesson, Range, StudentLessons};
 use crate::api::error_report::ErrorReportDto;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RangeDto {
-    pub from: String,
-    pub to: String,
+pub enum RetrieveStudentLessonsOutcomeDto {
+    Success { lessons: StudentLessonsDto },
+    Failure { report: ErrorReportDto },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ClefDto {
-    G,
-    C,
-    F,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct DateDto {
-    pub year: i32,
-    pub month: u32,
-    pub day: u32,
+pub struct StudentLessonsDto {
+    pub msa: Vec<LessonDto>,
+    pub method: Vec<LessonDto>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,16 +29,24 @@ pub struct LessonDto {
     pub method: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct StudentLessonsDto {
-    pub msa: Vec<LessonDto>,
-    pub method: Vec<LessonDto>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DateDto {
+    pub year: i32,
+    pub month: u32,
+    pub day: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RetrieveStudentLessonsOutcomeDto {
-    Success { lessons: StudentLessonsDto },
-    Failure { report: ErrorReportDto },
+pub struct RangeDto {
+    pub from: String,
+    pub to: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ClefDto {
+    G,
+    C,
+    F,
 }
 
 impl From<Result<StudentLessons, StudentLessonsGatewayError>> for RetrieveStudentLessonsOutcomeDto {

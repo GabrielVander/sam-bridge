@@ -1,8 +1,11 @@
 import 'package:flutter_application/shared/level.dart';
 
-enum LessonKind { msa, method }
+class StudentLessonsView {
+  final List<LessonItem> msa;
+  final List<LessonItem> method;
 
-enum Clef { g, c, f }
+  const StudentLessonsView({required this.msa, required this.method});
+}
 
 class LessonItem {
   final LessonKind kind;
@@ -33,28 +36,9 @@ class LessonItem {
       clef != null || description.isNotEmpty || instructor.isNotEmpty;
 }
 
-class StudentLessonsView {
-  final List<LessonItem> msa;
-  final List<LessonItem> method;
+enum LessonKind { msa, method }
 
-  const StudentLessonsView({required this.msa, required this.method});
-}
-
-enum CheckpointStatus { achieved, readyForExam, pending }
-
-class CheckpointView {
-  final ReportedLevel level;
-  final CheckpointStatus status;
-  final bool msaMet;
-  final bool methodMet;
-
-  const CheckpointView({
-    required this.level,
-    required this.status,
-    required this.msaMet,
-    required this.methodMet,
-  });
-}
+enum Clef { g, c, f }
 
 class ProgressView {
   final List<CheckpointView> checkpoints;
@@ -73,3 +57,19 @@ class ProgressView {
     this.nextLevel,
   });
 }
+
+class CheckpointView {
+  final ReportedLevel level;
+  final CheckpointStatus status;
+  final bool msaMet;
+  final bool methodMet;
+
+  const CheckpointView({
+    required this.level,
+    required this.status,
+    required this.msaMet,
+    required this.methodMet,
+  });
+}
+
+enum CheckpointStatus { achieved, readyForExam, pending }

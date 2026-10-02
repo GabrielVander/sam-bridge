@@ -11,28 +11,6 @@ import 'package:flutter_application/settings/settings_screen.dart';
 import 'package:flutter_application/window/window_controls.dart';
 import 'package:go_router/go_router.dart';
 
-abstract final class Routes {
-  static const String login = '/login';
-  static const String students = '/students';
-  static const String settings = '/settings';
-
-  static String student(String id) => '$students/$id';
-}
-
-class PresenterRefreshListenable extends ChangeNotifier {
-  StreamSubscription<dynamic>? _subscription;
-
-  PresenterRefreshListenable(Stream<dynamic> stream) {
-    _subscription = stream.listen((_) => notifyListeners());
-  }
-
-  @override
-  void dispose() {
-    unawaited(_subscription?.cancel());
-    super.dispose();
-  }
-}
-
 GoRouter buildRouter({
   required String appVersion,
   required WindowControls? windowControls,
@@ -90,4 +68,26 @@ GoRouter buildRouter({
       ),
     ],
   );
+}
+
+abstract final class Routes {
+  static const String login = '/login';
+  static const String students = '/students';
+  static const String settings = '/settings';
+
+  static String student(String id) => '$students/$id';
+}
+
+class PresenterRefreshListenable extends ChangeNotifier {
+  StreamSubscription<dynamic>? _subscription;
+
+  PresenterRefreshListenable(Stream<dynamic> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  @override
+  void dispose() {
+    unawaited(_subscription?.cancel());
+    super.dispose();
+  }
 }

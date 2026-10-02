@@ -12,76 +12,6 @@ import 'package:flutter_application/rust/api/roster.dart';
 
 const Duration _searchDelay = Duration(milliseconds: 250);
 
-sealed class StudentsState {
-  const StudentsState();
-}
-
-final class StudentsIdle extends StudentsState {
-  const StudentsIdle();
-}
-
-final class StudentsLoading extends StudentsState {
-  const StudentsLoading();
-}
-
-final class StudentsLoaded extends StudentsState {
-  final RosterListing listing;
-  final String nameQuery;
-  final Set<String> selectedLocations;
-  final List<String> availableLocations;
-  final bool isFiltering;
-  final bool canClearSearch;
-  final LocationFilterSummary locationFilter;
-  final bool showsSelectedLocations;
-  const StudentsLoaded({
-    required this.listing,
-    required this.nameQuery,
-    required this.selectedLocations,
-    required this.availableLocations,
-    required this.isFiltering,
-    required this.canClearSearch,
-    required this.locationFilter,
-    required this.showsSelectedLocations,
-  });
-}
-
-sealed class LocationFilterSummary {
-  const LocationFilterSummary();
-}
-
-final class AnyLocation extends LocationFilterSummary {
-  const AnyLocation();
-}
-
-final class ChosenLocations extends LocationFilterSummary {
-  final int count;
-  const ChosenLocations(this.count);
-}
-
-sealed class RosterListing {
-  const RosterListing();
-}
-
-final class NoStudents extends RosterListing {
-  const NoStudents();
-}
-
-final class NoMatches extends RosterListing {
-  final String? searchedName;
-  final List<String>? chosenLocations;
-  const NoMatches({this.searchedName, this.chosenLocations});
-}
-
-final class Matches extends RosterListing {
-  final List<StudentListItem> students;
-  const Matches(this.students);
-}
-
-final class StudentsFailure extends StudentsState {
-  final ErrorReport report;
-  const StudentsFailure(this.report);
-}
-
 class StudentsPresenter extends CubitSignal<StudentsState> {
   final RetrieveStudentsUseCase _retrieveStudents;
   final RememberLocations _rememberLocations;
@@ -188,4 +118,74 @@ class StudentsPresenter extends CubitSignal<StudentsState> {
     }
     return Matches(matching);
   }
+}
+
+sealed class StudentsState {
+  const StudentsState();
+}
+
+final class StudentsIdle extends StudentsState {
+  const StudentsIdle();
+}
+
+final class StudentsLoading extends StudentsState {
+  const StudentsLoading();
+}
+
+final class StudentsLoaded extends StudentsState {
+  final RosterListing listing;
+  final String nameQuery;
+  final Set<String> selectedLocations;
+  final List<String> availableLocations;
+  final bool isFiltering;
+  final bool canClearSearch;
+  final LocationFilterSummary locationFilter;
+  final bool showsSelectedLocations;
+  const StudentsLoaded({
+    required this.listing,
+    required this.nameQuery,
+    required this.selectedLocations,
+    required this.availableLocations,
+    required this.isFiltering,
+    required this.canClearSearch,
+    required this.locationFilter,
+    required this.showsSelectedLocations,
+  });
+}
+
+final class StudentsFailure extends StudentsState {
+  final ErrorReport report;
+  const StudentsFailure(this.report);
+}
+
+sealed class RosterListing {
+  const RosterListing();
+}
+
+final class NoStudents extends RosterListing {
+  const NoStudents();
+}
+
+final class NoMatches extends RosterListing {
+  final String? searchedName;
+  final List<String>? chosenLocations;
+  const NoMatches({this.searchedName, this.chosenLocations});
+}
+
+final class Matches extends RosterListing {
+  final List<StudentListItem> students;
+  const Matches(this.students);
+}
+
+sealed class LocationFilterSummary {
+  const LocationFilterSummary();
+}
+
+final class AnyLocation extends LocationFilterSummary {
+  const AnyLocation();
+}
+
+final class ChosenLocations extends LocationFilterSummary {
+  final int count;
+  const ChosenLocations(this.count);
 }

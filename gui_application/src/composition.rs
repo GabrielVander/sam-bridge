@@ -23,17 +23,17 @@ use student::application::use_cases::{
 
 use crate::api::ApplicationFacade;
 
-#[derive(Debug, thiserror::Error)]
-pub enum StartupError {
-    #[error("Unable to set up the credential storage")]
-    CredentialStorage(#[from] NoDataDirectory),
-    #[error("Unable to build the HTTP client")]
-    HttpClient(#[source] reqwest::Error),
-}
-
 pub const REQUEST_TIMEOUT: Duration = Duration::from_secs(120);
 const STUDENTS_CACHE_TTL: Duration = Duration::from_secs(300);
 const LESSONS_CACHE_TTL: Duration = Duration::from_secs(60);
+
+pub fn build_application(config: &Config) -> Result<ApplicationFacade, StartupError> {
+    build_application_with(
+        config,
+        FileCredentialStore::new(),
+        http_client_builder(REQUEST_TIMEOUT),
+    )
+}
 
 pub struct Config {
     pub base_url: String,
@@ -56,19 +56,12 @@ impl Config {
     }
 }
 
-pub fn build_application(config: &Config) -> Result<ApplicationFacade, StartupError> {
-    build_application_with(
-        config,
-        FileCredentialStore::new(),
-        http_client_builder(REQUEST_TIMEOUT),
-    )
-}
-
-pub fn http_client_builder(timeout: Duration) -> reqwest::blocking::ClientBuilder {
-    reqwest::blocking::Client::builder()
-        .timeout(timeout)
-        .redirect(reqwest::redirect::Policy::none())
-        .cookie_store(true)
+#[derive(Debug, thiserror::Error)]
+pub enum StartupError {
+    #[error("Unable to set up the credential storage")]
+    CredentialStorage(#[from] NoDataDirectory),
+    #[error("Unable to build the HTTP client")]
+    HttpClient(#[source] reqwest::Error),
 }
 
 pub fn build_application_with(
@@ -140,4 +133,11 @@ pub fn build_application_with(
             sam_student_lessons_gateway,
         ),
     ))
+}
+
+pub fn http_client_builder(timeout: Duration) -> reqwest::blocking::ClientBuilder {
+    reqwest::blocking::Client::builder()
+        .timeout(timeout)
+        .redirect(reqwest::redirect::Policy::none())
+        .cookie_store(true)
 }

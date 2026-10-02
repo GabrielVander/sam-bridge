@@ -6,12 +6,31 @@ use student::domain::entities::{
 use crate::api::error_report::ErrorReportDto;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RetrieveAllAvailableStudentsOutcomeDto {
+    Success { students: Vec<StudentSummaryDto> },
+    Failure { report: ErrorReportDto },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StudentSummaryDto {
     pub id: String,
     pub name: String,
     pub position: StudentPositionDto,
     pub location: String,
     pub instrument: Option<InstrumentDto>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum StudentPositionDto {
+    Candidate,
+    Practice,
+    YouthService,
+    OfficialService,
+    Officialized,
+    YouthServiceHalfHour,
+    YouthServicePractice,
+    GemSecretary,
+    Invalid { raw: String },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -39,25 +58,6 @@ pub enum InstrumentDto {
     EnglishHorn,
     ContraltoViolin,
     Unknown { raw: String },
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RetrieveAllAvailableStudentsOutcomeDto {
-    Success { students: Vec<StudentSummaryDto> },
-    Failure { report: ErrorReportDto },
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum StudentPositionDto {
-    Candidate,
-    Practice,
-    YouthService,
-    OfficialService,
-    Officialized,
-    YouthServiceHalfHour,
-    YouthServicePractice,
-    GemSecretary,
-    Invalid { raw: String },
 }
 
 impl From<Result<Vec<Student>, StudentGatewayError>> for RetrieveAllAvailableStudentsOutcomeDto {
@@ -90,36 +90,6 @@ impl From<Student> for StudentSummaryDto {
             position: student.position.into(),
             location: student.location,
             instrument,
-        }
-    }
-}
-
-impl From<Instrument> for InstrumentDto {
-    fn from(instrument: Instrument) -> Self {
-        match instrument {
-            Instrument::Violin => Self::Violin,
-            Instrument::Viola => Self::Viola,
-            Instrument::Cello => Self::Cello,
-            Instrument::Flute => Self::Flute,
-            Instrument::Oboe => Self::Oboe,
-            Instrument::Bassoon => Self::Bassoon,
-            Instrument::Clarinet => Self::Clarinet,
-            Instrument::AltoClarinet => Self::AltoClarinet,
-            Instrument::BassClarinet => Self::BassClarinet,
-            Instrument::AltoSaxophone => Self::AltoSaxophone,
-            Instrument::CurvedSopranoSaxophone => Self::CurvedSopranoSaxophone,
-            Instrument::StraightSopranoSaxophone => Self::StraightSopranoSaxophone,
-            Instrument::TenorSaxophone => Self::TenorSaxophone,
-            Instrument::Trumpet => Self::Trumpet,
-            Instrument::Cornet => Self::Cornet,
-            Instrument::Flugelhorn => Self::Flugelhorn,
-            Instrument::FrenchHorn => Self::FrenchHorn,
-            Instrument::Trombone => Self::Trombone,
-            Instrument::Euphonium => Self::Euphonium,
-            Instrument::Tuba => Self::Tuba,
-            Instrument::EnglishHorn => Self::EnglishHorn,
-            Instrument::ContraltoViolin => Self::ContraltoViolin,
-            Instrument::Unknown(raw) => Self::Unknown { raw },
         }
     }
 }
@@ -158,6 +128,36 @@ impl From<OrganistLevel> for StudentPositionDto {
             OrganistLevel::OfficialService => Self::OfficialService,
             OrganistLevel::YouthServiceHalfHour => Self::YouthServiceHalfHour,
             OrganistLevel::Unknown(raw) => Self::Invalid { raw },
+        }
+    }
+}
+
+impl From<Instrument> for InstrumentDto {
+    fn from(instrument: Instrument) -> Self {
+        match instrument {
+            Instrument::Violin => Self::Violin,
+            Instrument::Viola => Self::Viola,
+            Instrument::Cello => Self::Cello,
+            Instrument::Flute => Self::Flute,
+            Instrument::Oboe => Self::Oboe,
+            Instrument::Bassoon => Self::Bassoon,
+            Instrument::Clarinet => Self::Clarinet,
+            Instrument::AltoClarinet => Self::AltoClarinet,
+            Instrument::BassClarinet => Self::BassClarinet,
+            Instrument::AltoSaxophone => Self::AltoSaxophone,
+            Instrument::CurvedSopranoSaxophone => Self::CurvedSopranoSaxophone,
+            Instrument::StraightSopranoSaxophone => Self::StraightSopranoSaxophone,
+            Instrument::TenorSaxophone => Self::TenorSaxophone,
+            Instrument::Trumpet => Self::Trumpet,
+            Instrument::Cornet => Self::Cornet,
+            Instrument::Flugelhorn => Self::Flugelhorn,
+            Instrument::FrenchHorn => Self::FrenchHorn,
+            Instrument::Trombone => Self::Trombone,
+            Instrument::Euphonium => Self::Euphonium,
+            Instrument::Tuba => Self::Tuba,
+            Instrument::EnglishHorn => Self::EnglishHorn,
+            Instrument::ContraltoViolin => Self::ContraltoViolin,
+            Instrument::Unknown(raw) => Self::Unknown { raw },
         }
     }
 }

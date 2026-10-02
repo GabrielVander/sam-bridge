@@ -9,56 +9,6 @@ import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/rust/api/lessons.dart';
 import 'package:flutter_application/rust/api/progress.dart';
 
-sealed class LessonsState {
-  const LessonsState();
-}
-
-final class LessonsIdle extends LessonsState {
-  const LessonsIdle();
-}
-
-final class LessonsLoading extends LessonsState {
-  const LessonsLoading();
-}
-
-final class LessonsLoaded extends LessonsState {
-  final StudentLessonsView view;
-  final ProgressStatus progress;
-  const LessonsLoaded(this.view, this.progress);
-}
-
-final class LessonsFailure extends LessonsState {
-  final ErrorReport report;
-  const LessonsFailure(this.report);
-}
-
-sealed class ProgressStatus {
-  const ProgressStatus();
-}
-
-final class ProgressAvailable extends ProgressStatus {
-  final ProgressView view;
-  const ProgressAvailable(this.view);
-}
-
-final class ProgressNoInstrumentAssigned extends ProgressStatus {
-  const ProgressNoInstrumentAssigned();
-}
-
-final class ProgressUnknownLevel extends ProgressStatus {
-  final String raw;
-  const ProgressUnknownLevel(this.raw);
-}
-
-final class ProgressNotAMusician extends ProgressStatus {
-  const ProgressNotAMusician();
-}
-
-final class ProgressUnavailable extends ProgressStatus {
-  final ErrorReport report;
-  const ProgressUnavailable(this.report);
-}
-
 class LessonsPresenter extends CubitSignal<LessonsState> {
   final RetrieveStudentLessonsUseCase _retrieveStudentLessons;
   final AssessStudentProgressUseCase _assessStudentProgress;
@@ -115,4 +65,54 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
         AssessStudentProgressOutcomeDto_Failure(:final report) =>
           ProgressUnavailable(ErrorReportMapper.toViewModel(report)),
       };
+}
+
+sealed class LessonsState {
+  const LessonsState();
+}
+
+final class LessonsIdle extends LessonsState {
+  const LessonsIdle();
+}
+
+final class LessonsLoading extends LessonsState {
+  const LessonsLoading();
+}
+
+final class LessonsLoaded extends LessonsState {
+  final StudentLessonsView view;
+  final ProgressStatus progress;
+  const LessonsLoaded(this.view, this.progress);
+}
+
+final class LessonsFailure extends LessonsState {
+  final ErrorReport report;
+  const LessonsFailure(this.report);
+}
+
+sealed class ProgressStatus {
+  const ProgressStatus();
+}
+
+final class ProgressAvailable extends ProgressStatus {
+  final ProgressView view;
+  const ProgressAvailable(this.view);
+}
+
+final class ProgressNoInstrumentAssigned extends ProgressStatus {
+  const ProgressNoInstrumentAssigned();
+}
+
+final class ProgressUnknownLevel extends ProgressStatus {
+  final String raw;
+  const ProgressUnknownLevel(this.raw);
+}
+
+final class ProgressNotAMusician extends ProgressStatus {
+  const ProgressNotAMusician();
+}
+
+final class ProgressUnavailable extends ProgressStatus {
+  final ErrorReport report;
+  const ProgressUnavailable(this.report);
 }

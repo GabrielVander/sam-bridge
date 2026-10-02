@@ -4,10 +4,30 @@ use student::domain::entities as student_entities;
 
 use crate::api::error_report::ErrorReportDto;
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum AssessStudentProgressOutcomeDto {
+    Success { assessment: ProgressAssessmentDto },
+    NoInstrumentAssigned,
+    UnknownLevel { raw_level: String },
+    NotAMusician,
+    Failure { report: ErrorReportDto },
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ProgressAssessmentDto {
+    pub checkpoints: Vec<CheckpointDto>,
+    pub msa_relative_percent: f64,
+    pub method_relative_percent: f64,
+    pub combined_percent: f64,
+    pub overall_checkpoint_percent: f64,
+    pub next_level: Option<MusicianLevelDto>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RequirementStatusDto {
-    pub msa_met: bool,
-    pub method_met: bool,
+pub struct CheckpointDto {
+    pub level: MusicianLevelDto,
+    pub status: CheckpointStatusDto,
+    pub requirement: RequirementStatusDto,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -21,36 +41,16 @@ pub enum MusicianLevelDto {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CheckpointDto {
-    pub level: MusicianLevelDto,
-    pub status: CheckpointStatusDto,
-    pub requirement: RequirementStatusDto,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CheckpointStatusDto {
     Achieved,
     ReadyForExam,
     Pending,
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct ProgressAssessmentDto {
-    pub checkpoints: Vec<CheckpointDto>,
-    pub msa_relative_percent: f64,
-    pub method_relative_percent: f64,
-    pub combined_percent: f64,
-    pub overall_checkpoint_percent: f64,
-    pub next_level: Option<MusicianLevelDto>,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum AssessStudentProgressOutcomeDto {
-    Success { assessment: ProgressAssessmentDto },
-    NoInstrumentAssigned,
-    UnknownLevel { raw_level: String },
-    NotAMusician,
-    Failure { report: ErrorReportDto },
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RequirementStatusDto {
+    pub msa_met: bool,
+    pub method_met: bool,
 }
 
 impl From<Result<student_entities::ProgressAssessment, AssessStudentProgressError>>
@@ -94,6 +94,19 @@ impl From<student_entities::ProgressAssessment> for ProgressAssessmentDto {
     }
 }
 
+impl From<student_entities::Checkpoint> for CheckpointDto {
+    fn from(checkpoint: student_entities::Checkpoint) -> Self {
+        Self {
+            level: checkpoint.level.into(),
+            status: checkpoint.status.into(),
+            requirement: RequirementStatusDto {
+                msa_met: checkpoint.requirement.msa_met,
+                method_met: checkpoint.requirement.method_met,
+            },
+        }
+    }
+}
+
 impl From<student_entities::MusicianLevel> for MusicianLevelDto {
     fn from(level: student_entities::MusicianLevel) -> Self {
         match level {
@@ -104,19 +117,6 @@ impl From<student_entities::MusicianLevel> for MusicianLevelDto {
             student_entities::MusicianLevel::OfficialService => Self::OfficialService,
             student_entities::MusicianLevel::Officialized => Self::Officialized,
             student_entities::MusicianLevel::Unknown(raw) => Self::Unknown { raw },
-        }
-    }
-}
-
-impl From<student_entities::Checkpoint> for CheckpointDto {
-    fn from(checkpoint: student_entities::Checkpoint) -> Self {
-        Self {
-            level: checkpoint.level.into(),
-            status: checkpoint.status.into(),
-            requirement: RequirementStatusDto {
-                msa_met: checkpoint.requirement.msa_met,
-                method_met: checkpoint.requirement.method_met,
-            },
         }
     }
 }

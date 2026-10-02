@@ -1,12 +1,3 @@
-enum Level {
-  candidate,
-  practice,
-  youthService,
-  officialService,
-  officialized,
-  halfHour,
-}
-
 sealed class ReportedLevel {
   const ReportedLevel();
 }
@@ -21,4 +12,13 @@ final class UnrecognizedLevel extends ReportedLevel {
   final String raw;
 
   const UnrecognizedLevel(this.raw);
+}
+
+enum Level {
+  candidate,
+  practice,
+  youthService,
+  officialService,
+  officialized,
+  halfHour,
 }

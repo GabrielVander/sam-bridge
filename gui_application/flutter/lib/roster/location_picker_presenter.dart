@@ -1,24 +1,5 @@
 import 'package:bloc_signals/bloc_signals.dart';
 
-sealed class LocationPickerState {
-  const LocationPickerState();
-}
-
-final class NoLocationsToChoose extends LocationPickerState {
-  const NoLocationsToChoose();
-}
-
-final class LocationChoices extends LocationPickerState {
-  final List<LocationChoice> choices;
-  const LocationChoices(this.choices);
-}
-
-final class LocationChoice {
-  final String location;
-  final bool chosen;
-  const LocationChoice({required this.location, required this.chosen});
-}
-
 class LocationPickerPresenter extends CubitSignal<LocationPickerState> {
   final List<String> _available;
   final Set<String> _chosen;
@@ -54,4 +35,23 @@ class LocationPickerPresenter extends CubitSignal<LocationPickerState> {
               chosen: chosen.contains(location),
             ),
         ]);
+}
+
+sealed class LocationPickerState {
+  const LocationPickerState();
+}
+
+final class NoLocationsToChoose extends LocationPickerState {
+  const NoLocationsToChoose();
+}
+
+final class LocationChoices extends LocationPickerState {
+  final List<LocationChoice> choices;
+  const LocationChoices(this.choices);
+}
+
+final class LocationChoice {
+  final String location;
+  final bool chosen;
+  const LocationChoice({required this.location, required this.chosen});
 }

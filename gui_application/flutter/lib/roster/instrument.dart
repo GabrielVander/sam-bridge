@@ -1,3 +1,19 @@
+sealed class ReportedInstrument {
+  const ReportedInstrument();
+}
+
+final class KnownInstrument extends ReportedInstrument {
+  final Instrument instrument;
+
+  const KnownInstrument(this.instrument);
+}
+
+final class UnrecognizedInstrument extends ReportedInstrument {
+  final String raw;
+
+  const UnrecognizedInstrument(this.raw);
+}
+
 enum Instrument {
   violin,
   viola,
@@ -21,20 +37,4 @@ enum Instrument {
   tuba,
   englishHorn,
   contraltoViolin,
-}
-
-sealed class ReportedInstrument {
-  const ReportedInstrument();
-}
-
-final class KnownInstrument extends ReportedInstrument {
-  final Instrument instrument;
-
-  const KnownInstrument(this.instrument);
-}
-
-final class UnrecognizedInstrument extends ReportedInstrument {
-  final String raw;
-
-  const UnrecognizedInstrument(this.raw);
 }

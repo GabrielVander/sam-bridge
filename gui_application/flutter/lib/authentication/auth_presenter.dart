@@ -8,52 +8,6 @@ import 'package:flutter_application/errors/error_report.dart';
 import 'package:flutter_application/rust/api/authentication.dart';
 import 'package:flutter_application/rust/api/error_report.dart';
 
-sealed class AuthState extends Equatable {
-  const AuthState();
-
-  bool get isSignedIn => false;
-
-  @override
-  List<Object?> get props => [];
-}
-
-final class AuthIdle extends AuthState {
-  const AuthIdle();
-}
-
-final class AuthLoading extends AuthState {
-  const AuthLoading();
-}
-
-final class AuthSuccess extends AuthState {
-  final ErrorReport? notRemembered;
-
-  const AuthSuccess({this.notRemembered});
-
-  @override
-  bool get isSignedIn => true;
-
-  @override
-  List<Object?> get props => [notRemembered];
-}
-
-final class AuthMissingFields extends AuthState {
-  const AuthMissingFields();
-}
-
-final class AuthUnauthorized extends AuthState {
-  const AuthUnauthorized();
-}
-
-final class AuthFailure extends AuthState {
-  final ErrorReport report;
-
-  const AuthFailure(this.report);
-
-  @override
-  List<Object?> get props => [report];
-}
-
 class AuthPresenter extends CubitSignal<AuthState> {
   final LoginUseCase _loginUseCase;
   final RestoreSessionUseCase _restoreSessionUseCase;
@@ -132,4 +86,50 @@ class AuthPresenter extends CubitSignal<AuthState> {
   }
 
   bool get isAuthenticated => stateValue.isSignedIn;
+}
+
+sealed class AuthState extends Equatable {
+  const AuthState();
+
+  bool get isSignedIn => false;
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class AuthIdle extends AuthState {
+  const AuthIdle();
+}
+
+final class AuthLoading extends AuthState {
+  const AuthLoading();
+}
+
+final class AuthSuccess extends AuthState {
+  final ErrorReport? notRemembered;
+
+  const AuthSuccess({this.notRemembered});
+
+  @override
+  bool get isSignedIn => true;
+
+  @override
+  List<Object?> get props => [notRemembered];
+}
+
+final class AuthMissingFields extends AuthState {
+  const AuthMissingFields();
+}
+
+final class AuthUnauthorized extends AuthState {
+  const AuthUnauthorized();
+}
+
+final class AuthFailure extends AuthState {
+  final ErrorReport report;
+
+  const AuthFailure(this.report);
+
+  @override
+  List<Object?> get props => [report];
 }
