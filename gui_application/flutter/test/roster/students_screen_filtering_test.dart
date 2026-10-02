@@ -3,6 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/roster.dart';
 
+final _ana = studentSummary(id: '1', name: 'Ana Lima', location: 'Alfa');
+final _bruno = studentSummary(id: '2', name: 'Bruno Costa', location: 'Beta');
+final _carla = studentSummary(id: '3', name: 'Carla Dias', location: 'Alfa');
+
+final _everyone = [_ana, _bruno, _carla];
+
 void main() {
   group('searching by name', () {
     testWidgets('narrows the list to the matching students', (tester) async {
@@ -278,12 +284,6 @@ void main() {
     });
   });
 }
-
-final _everyone = [_ana, _bruno, _carla];
-
-final _ana = studentSummary(id: '1', name: 'Ana Lima', location: 'Alfa');
-final _bruno = studentSummary(id: '2', name: 'Bruno Costa', location: 'Beta');
-final _carla = studentSummary(id: '3', name: 'Carla Dias', location: 'Alfa');
 
 /// Types [text] and lets the search settle: the screen filters only after a
 /// pause in typing, and a pending timer does not by itself schedule a frame.

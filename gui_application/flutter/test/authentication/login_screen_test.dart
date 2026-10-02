@@ -12,6 +12,8 @@ import '../support/clipboard.dart';
 import '../support/errors.dart';
 import '../support/localization.dart';
 
+const _details = "Request failed for operation 'authentication'";
+
 void main() {
   group('LoginScreen failure', () {
     testWidgets('expanding reveals the details without exposing the password', (
@@ -156,8 +158,6 @@ Future<void> pumpLogin(
 
 Finder get _emailField => find.widgetWithText(TextField, 'Email');
 Finder get _passwordField => find.widgetWithText(TextField, 'Senha');
-
-const _details = "Request failed for operation 'authentication'";
 
 Future<List<(String, String)>> pumpLoginForm(
   WidgetTester tester, {

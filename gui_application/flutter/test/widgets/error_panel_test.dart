@@ -7,6 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/clipboard.dart';
 import '../support/localization.dart';
 
+const _details = 'Request failed for operation dashboard: connection refused';
+
+const _report = ErrorReport(reason: ErrorReason.network, details: _details);
+
 void main() {
   group('ErrorPanel', () {
     const messages = {
@@ -114,7 +118,3 @@ Future<void> pumpPanel(
     ),
   );
 }
-
-const _report = ErrorReport(reason: ErrorReason.network, details: _details);
-
-const _details = 'Request failed for operation dashboard: connection refused';

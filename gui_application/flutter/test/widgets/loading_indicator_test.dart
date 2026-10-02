@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/localization.dart';
 
+const _slowNotice = 'O SAM está demorando para responder';
+
 void main() {
   group('LoadingIndicator', () {
     testWidgets('shows a spinner and no message at first', (tester) async {
@@ -47,5 +49,3 @@ void main() {
 Future<void> pumpIndicator(WidgetTester tester) => tester.pumpWidget(
   localizedApp(home: const Scaffold(body: LoadingIndicator())),
 );
-
-const _slowNotice = 'O SAM está demorando para responder';

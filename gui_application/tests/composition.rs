@@ -12,6 +12,8 @@ use pretty_assertions::assert_eq;
 use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
+const EMPTY_LISTING: &str = r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#;
+
 #[test]
 fn a_login_redirect_is_read_as_success_instead_of_being_followed() {
     smol::block_on(async {
@@ -205,5 +207,3 @@ fn json_response(body: &str) -> ResponseTemplate {
         .set_body_string(body)
         .insert_header("Content-Type", "application/json")
 }
-
-const EMPTY_LISTING: &str = r#"{"draw":"1","recordsTotal":0,"recordsFiltered":0,"data":[]}"#;
