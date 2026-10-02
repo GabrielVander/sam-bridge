@@ -7,6 +7,10 @@ use sam::http::SamOperations;
 
 pub const UNREACHABLE_SITE: &str = "http://127.0.0.1:1";
 
+pub fn sam_client_for(base_url: &str) -> Result<SamClientImpl, reqwest::Error> {
+    sam_operations_for(base_url).map(SamClientImpl::new)
+}
+
 pub fn sam_operations_for(base_url: &str) -> Result<SamOperations, reqwest::Error> {
     let http_client: reqwest::blocking::Client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -21,10 +25,6 @@ pub fn sam_operations_for(base_url: &str) -> Result<SamOperations, reqwest::Erro
         "alunos/listagem",
         "licoes/index",
     ))
-}
-
-pub fn sam_client_for(base_url: &str) -> Result<SamClientImpl, reqwest::Error> {
-    sam_operations_for(base_url).map(SamClientImpl::new)
 }
 
 #[derive(Default)]

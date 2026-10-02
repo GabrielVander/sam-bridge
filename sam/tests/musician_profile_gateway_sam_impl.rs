@@ -212,6 +212,26 @@ fn instrument_voices_and_relatives_are_read_as_the_instrument_sam_lists() {
     }
 }
 
+async fn mount_listing(mock_server: &MockServer, row_json: &str) {
+    Mock::given(method("GET"))
+        .and(path("/painel"))
+        .respond_with(ResponseTemplate::new(200))
+        .mount(mock_server)
+        .await;
+
+    Mock::given(method("GET"))
+        .and(path("/alunos/listagem"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_string(format!(
+                    r#"{{"draw":"1","recordsTotal":1,"recordsFiltered":1,"data":[{row_json}]}}"#
+                ))
+                .insert_header("Content-Type", "application/json"),
+        )
+        .mount(mock_server)
+        .await;
+}
+
 fn build_gateway(
     mock_server: &MockServer,
 ) -> Result<MusicianProfileGatewaySamImpl, reqwest::Error> {
@@ -234,26 +254,6 @@ fn failure_of(
         }
         Ok(_) | Err(_) => None,
     }
-}
-
-async fn mount_listing(mock_server: &MockServer, row_json: &str) {
-    Mock::given(method("GET"))
-        .and(path("/painel"))
-        .respond_with(ResponseTemplate::new(200))
-        .mount(mock_server)
-        .await;
-
-    Mock::given(method("GET"))
-        .and(path("/alunos/listagem"))
-        .respond_with(
-            ResponseTemplate::new(200)
-                .set_body_string(format!(
-                    r#"{{"draw":"1","recordsTotal":1,"recordsFiltered":1,"data":[{row_json}]}}"#
-                ))
-                .insert_header("Content-Type", "application/json"),
-        )
-        .mount(mock_server)
-        .await;
 }
 
 fn profile_of(

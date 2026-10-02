@@ -578,137 +578,6 @@ fn an_empty_method_table_has_no_lessons() {
     assert_eq!(method_lessons_listed(""), Some(Vec::new()));
 }
 
-fn msa_lessons_listed(rows_html: &str) -> Option<Vec<Lesson>> {
-    lessons_served(&lessons_page(&msa_table(rows_html), "")).map(|lessons| lessons.msa)
-}
-
-fn assert_recognized(cases: &[(&str, &[MethodBook])]) {
-    for (sam_name, books) in cases {
-        assert_eq!(
-            method_books_of(sam_name),
-            Some(books.to_vec()),
-            "method {sam_name:?}"
-        );
-    }
-}
-
-fn method_lesson_with_notes(notes: &str) -> Option<Lesson> {
-    let row: String = format!(
-        "<tr><td>1</td><td>1</td><td>METODO</td><td></td><td></td><td></td><td>{notes}</td><td></td></tr>"
-    );
-
-    method_lessons_listed(&row)?.into_iter().next()
-}
-
-fn method_books_of(sam_name: &str) -> Option<Vec<MethodBook>> {
-    let row: String = format!(
-        "<tr><td>1</td><td>1</td><td>{sam_name}</td><td></td><td></td><td></td><td></td><td></td></tr>"
-    );
-
-    method_lessons_listed(&row)?
-        .into_iter()
-        .next()
-        .map(|lesson| lesson.method_books)
-}
-
-fn method_lessons_listed(rows_html: &str) -> Option<Vec<Lesson>> {
-    lessons_served(&lessons_page("", &method_table(rows_html))).map(|lessons| lessons.method)
-}
-
-fn lessons_served(body: &str) -> Option<StudentLessons> {
-    smol::block_on(async {
-        let mock_server: MockServer = MockServer::start().await;
-
-        Mock::given(method("GET"))
-            .and(path("/licoes/index/500132"))
-            .respond_with(
-                ResponseTemplate::new(200)
-                    .set_body_string(body)
-                    .insert_header("Content-Type", "text/html"),
-            )
-            .mount(&mock_server)
-            .await;
-
-        build_gateway(&mock_server)
-            .ok()?
-            .get_all_for_student_with_id(&StudentId::new("500132".to_owned()))
-            .ok()
-    })
-}
-
-fn lessons_page(msa_table_html: &str, method_table_html: &str) -> String {
-    format!("<html><body>{msa_table_html}{method_table_html}</body></html>")
-}
-
-fn msa_table(rows_html: &str) -> String {
-    format!(
-        r#"<div id="msa"><table id="datatable1" class="table table-striped dataTable no-footer" role="grid">
-    <thead><tr><th>Data da Lição</th><th>Fases</th><th>Paginas</th><th>Lições</th><th>Claves</th><th>Observações</th><th>Autorizante</th><th>Ações</th></tr></thead>
-    <tbody>{rows_html}</tbody>
-</table></div>"#
-    )
-}
-
-fn method_table(rows_html: &str) -> String {
-    format!(
-        r#"<table id="datatable3" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid">
-    <thead><tr><th>Páginas</th><th>Lição</th><th>Método</th><th>Data da Lição</th><th>Autorizante</th><th>Data de Cadastro</th><th>Observações</th><th>Ações</th></tr></thead>
-    <tbody>{rows_html}</tbody>
-</table>"#
-    )
-}
-
-fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
-    build_gateway_for(&mock_server.uri())
-}
-
-fn build_gateway_for(base_url: &str) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
-    let sam_operations: SamOperations = sam_operations_for(base_url)?;
-
-    let client: Arc<dyn SamClient> = Arc::new(SamClientImpl::new(sam_operations));
-
-    Ok(StudentLessonsGatewaySamImpl::new(client))
-}
-
-fn failure_of(
-    result: Result<StudentLessons, StudentLessonsGatewayError>,
-) -> Option<(FailureKind, String)> {
-    match result {
-        Err(StudentLessonsGatewayError::UnableToPerformOperation { kind, details }) => {
-            Some((kind, details))
-        }
-        Ok(_) => None,
-    }
-}
-
-fn student_lessons_page() -> String {
-    r#"<html><body>
-<div id="msa"><table id="datatable1"><tbody>
-<tr id="msa_559783" role="row" class="even">
-    <td>09/09/2025</td>
-    <td>4.5 - 4.5</td>
-    <td>38 - 38</td>
-    <td>7 - 8</td>
-    <td>Sol</td>
-    <td>Passou lições 7 e 8, estudar próximas lições.</td>
-    <td>BELTRANO DA SILVA</td>
-</tr>
-</tbody></table></div>
-<table id="datatable3"><tbody>
-<tr id="mtd_214020" role="row" class="even">
-    <td>00</td>
-    <td>00</td>
-    <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
-    <td>04/12/2023</td>
-    <td>FULANO DE TAL</td>
-    <td>04/12/2023 21:17:17</td>
-    <td>Postura do violino </td>
-</tr>
-</tbody></table>
-</body></html>"#
-        .to_string()
-}
-
 #[test]
 fn a_date_is_read_day_first() {
     let lesson: Lesson = msa_lesson_with_date("09/09/2025").unwrap();
@@ -787,6 +656,144 @@ fn an_unknown_clef_is_left_out() {
     assert_eq!(msa_lesson_with_clef("Xyz").unwrap().clef, None);
 }
 
+fn student_lessons_page() -> String {
+    r#"<html><body>
+<div id="msa"><table id="datatable1"><tbody>
+<tr id="msa_559783" role="row" class="even">
+    <td>09/09/2025</td>
+    <td>4.5 - 4.5</td>
+    <td>38 - 38</td>
+    <td>7 - 8</td>
+    <td>Sol</td>
+    <td>Passou lições 7 e 8, estudar próximas lições.</td>
+    <td>BELTRANO DA SILVA</td>
+</tr>
+</tbody></table></div>
+<table id="datatable3"><tbody>
+<tr id="mtd_214020" role="row" class="even">
+    <td>00</td>
+    <td>00</td>
+    <td>MÉTODO CCB - SCHIMOLL - VIOLINO</td>
+    <td>04/12/2023</td>
+    <td>FULANO DE TAL</td>
+    <td>04/12/2023 21:17:17</td>
+    <td>Postura do violino </td>
+</tr>
+</tbody></table>
+</body></html>"#
+        .to_string()
+}
+
+fn build_gateway(mock_server: &MockServer) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
+    build_gateway_for(&mock_server.uri())
+}
+
+fn build_gateway_for(base_url: &str) -> Result<StudentLessonsGatewaySamImpl, reqwest::Error> {
+    let sam_operations: SamOperations = sam_operations_for(base_url)?;
+
+    let client: Arc<dyn SamClient> = Arc::new(SamClientImpl::new(sam_operations));
+
+    Ok(StudentLessonsGatewaySamImpl::new(client))
+}
+
+fn failure_of(
+    result: Result<StudentLessons, StudentLessonsGatewayError>,
+) -> Option<(FailureKind, String)> {
+    match result {
+        Err(StudentLessonsGatewayError::UnableToPerformOperation { kind, details }) => {
+            Some((kind, details))
+        }
+        Ok(_) => None,
+    }
+}
+
+fn lessons_served(body: &str) -> Option<StudentLessons> {
+    smol::block_on(async {
+        let mock_server: MockServer = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/licoes/index/500132"))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .set_body_string(body)
+                    .insert_header("Content-Type", "text/html"),
+            )
+            .mount(&mock_server)
+            .await;
+
+        build_gateway(&mock_server)
+            .ok()?
+            .get_all_for_student_with_id(&StudentId::new("500132".to_owned()))
+            .ok()
+    })
+}
+
+fn lessons_page(msa_table_html: &str, method_table_html: &str) -> String {
+    format!("<html><body>{msa_table_html}{method_table_html}</body></html>")
+}
+
+fn msa_table(rows_html: &str) -> String {
+    format!(
+        r#"<div id="msa"><table id="datatable1" class="table table-striped dataTable no-footer" role="grid">
+    <thead><tr><th>Data da Lição</th><th>Fases</th><th>Paginas</th><th>Lições</th><th>Claves</th><th>Observações</th><th>Autorizante</th><th>Ações</th></tr></thead>
+    <tbody>{rows_html}</tbody>
+</table></div>"#
+    )
+}
+
+fn msa_lessons_listed(rows_html: &str) -> Option<Vec<Lesson>> {
+    lessons_served(&lessons_page(&msa_table(rows_html), "")).map(|lessons| lessons.msa)
+}
+
+fn method_lessons_listed(rows_html: &str) -> Option<Vec<Lesson>> {
+    lessons_served(&lessons_page("", &method_table(rows_html))).map(|lessons| lessons.method)
+}
+
+fn method_table(rows_html: &str) -> String {
+    format!(
+        r#"<table id="datatable3" class="table table-striped table-bordered table-hover dataTable no-footer" role="grid">
+    <thead><tr><th>Páginas</th><th>Lição</th><th>Método</th><th>Data da Lição</th><th>Autorizante</th><th>Data de Cadastro</th><th>Observações</th><th>Ações</th></tr></thead>
+    <tbody>{rows_html}</tbody>
+</table>"#
+    )
+}
+
+fn assert_recognized(cases: &[(&str, &[MethodBook])]) {
+    for (sam_name, books) in cases {
+        assert_eq!(
+            method_books_of(sam_name),
+            Some(books.to_vec()),
+            "method {sam_name:?}"
+        );
+    }
+}
+
+fn method_books_of(sam_name: &str) -> Option<Vec<MethodBook>> {
+    let row: String = format!(
+        "<tr><td>1</td><td>1</td><td>{sam_name}</td><td></td><td></td><td></td><td></td><td></td></tr>"
+    );
+
+    method_lessons_listed(&row)?
+        .into_iter()
+        .next()
+        .map(|lesson| lesson.method_books)
+}
+
+fn method_lesson_with_notes(notes: &str) -> Option<Lesson> {
+    let row: String = format!(
+        "<tr><td>1</td><td>1</td><td>METODO</td><td></td><td></td><td></td><td>{notes}</td><td></td></tr>"
+    );
+
+    method_lessons_listed(&row)?.into_iter().next()
+}
+
+fn msa_lesson_with_date(date: &str) -> Option<Lesson> {
+    msa_lesson_read_from(MsaLesson {
+        date: Some(date.to_owned()),
+        ..MsaLesson::default()
+    })
+}
+
 fn msa_lesson_read_from(row: MsaLesson) -> Option<Lesson> {
     let gateway: StudentLessonsGatewaySamImpl = StudentLessonsGatewaySamImpl::new(Arc::new(
         FakeSamClient::showing_lessons(StudentLessonsPage {
@@ -800,13 +807,6 @@ fn msa_lesson_read_from(row: MsaLesson) -> Option<Lesson> {
         .ok()?
         .msa
         .pop()
-}
-
-fn msa_lesson_with_date(date: &str) -> Option<Lesson> {
-    msa_lesson_read_from(MsaLesson {
-        date: Some(date.to_owned()),
-        ..MsaLesson::default()
-    })
 }
 
 fn msa_lesson_with_phases(phases: &str) -> Option<Lesson> {

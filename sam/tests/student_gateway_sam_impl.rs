@@ -222,31 +222,6 @@ fn missing_trailing_columns_are_read_as_empty() {
     );
 }
 
-fn listing_served(body: &str) -> Option<Result<Vec<Student>, StudentGatewayError>> {
-    smol::block_on(async {
-        let mock_server: MockServer = MockServer::start().await;
-
-        Mock::given(method("GET"))
-            .and(path("/painel"))
-            .respond_with(ResponseTemplate::new(200))
-            .mount(&mock_server)
-            .await;
-        Mock::given(method("GET"))
-            .and(path("/alunos/listagem"))
-            .respond_with(
-                ResponseTemplate::new(200)
-                    .set_body_string(body)
-                    .insert_header("Content-Type", "application/json"),
-            )
-            .mount(&mock_server)
-            .await;
-
-        build_gateway(&mock_server)
-            .ok()
-            .map(|gateway| gateway.get_available_records())
-    })
-}
-
 #[test]
 fn given_an_unreachable_site_the_failure_is_a_network_error_naming_the_operation() {
     let gateway: StudentGatewaySamImpl =
@@ -458,26 +433,6 @@ fn a_location_without_markup_is_unchanged() {
     assert_eq!(student_located_at("").unwrap().location, "");
 }
 
-const LOCATION: &str = "JARDIM PALMARES DO SUL <span class='m-r-10'></span> | <span class='m-r-10'></span> BR-SP-ARARAQUARA-SÃO CARLOS";
-
-fn student_listed_as(role: &str, level: &str, instrument: &str) -> Option<Student> {
-    student_listed(sam_student(role, level, instrument, LOCATION))
-}
-
-fn student_located_at(location: &str) -> Option<Student> {
-    student_listed(sam_student("MÚSICO", "RJM", "VIOLINO", location))
-}
-
-fn student_listed(row: SamStudent) -> Option<Student> {
-    let gateway = StudentGatewaySamImpl::new(Arc::new(FakeSamClient::listing(vec![row])));
-
-    gateway.get_available_records().ok()?.pop()
-}
-
-const fn musician(level: MusicianLevel, instrument: Option<Instrument>) -> StudentPosition {
-    StudentPosition::Musician { level, instrument }
-}
-
 fn build_gateway(mock_server: &MockServer) -> Result<StudentGatewaySamImpl, reqwest::Error> {
     build_gateway_for(&mock_server.uri())
 }
@@ -499,6 +454,31 @@ fn failure_of(result: Result<Vec<Student>, StudentGatewayError>) -> Option<(Fail
     }
 }
 
+fn listing_served(body: &str) -> Option<Result<Vec<Student>, StudentGatewayError>> {
+    smol::block_on(async {
+        let mock_server: MockServer = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/painel"))
+            .respond_with(ResponseTemplate::new(200))
+            .mount(&mock_server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/alunos/listagem"))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .set_body_string(body)
+                    .insert_header("Content-Type", "application/json"),
+            )
+            .mount(&mock_server)
+            .await;
+
+        build_gateway(&mock_server)
+            .ok()
+            .map(|gateway| gateway.get_available_records())
+    })
+}
+
 struct FailingSamClient;
 
 impl SamClient for FailingSamClient {
@@ -513,4 +493,24 @@ impl SamClient for FailingSamClient {
     fn student_lessons(&self, _student_id: &str) -> Result<StudentLessonsPage, SamClientError> {
         Err(SamClientError::InvalidCredentials)
     }
+}
+
+fn student_listed_as(role: &str, level: &str, instrument: &str) -> Option<Student> {
+    student_listed(sam_student(role, level, instrument, LOCATION))
+}
+
+fn student_listed(row: SamStudent) -> Option<Student> {
+    let gateway = StudentGatewaySamImpl::new(Arc::new(FakeSamClient::listing(vec![row])));
+
+    gateway.get_available_records().ok()?.pop()
+}
+
+const LOCATION: &str = "JARDIM PALMARES DO SUL <span class='m-r-10'></span> | <span class='m-r-10'></span> BR-SP-ARARAQUARA-SÃO CARLOS";
+
+const fn musician(level: MusicianLevel, instrument: Option<Instrument>) -> StudentPosition {
+    StudentPosition::Musician { level, instrument }
+}
+
+fn student_located_at(location: &str) -> Option<Student> {
+    student_listed(sam_student("MÚSICO", "RJM", "VIOLINO", location))
 }

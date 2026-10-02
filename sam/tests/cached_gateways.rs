@@ -216,9 +216,6 @@ fn a_rejected_login_also_discards_the_cache() {
     });
 }
 
-const STUDENTS_TTL: Duration = Duration::from_secs(300);
-const LESSONS_TTL: Duration = Duration::from_secs(60);
-
 struct Sam {
     server: MockServer,
     site: FakeSite,
@@ -296,21 +293,9 @@ impl Sam {
     }
 }
 
-fn ids(values: &[&str]) -> Vec<String> {
-    values.iter().map(|&value| value.to_owned()).collect()
-}
-
 #[derive(Clone, Default)]
 struct FakeSite {
     state: Arc<Mutex<SiteState>>,
-}
-
-#[derive(Default)]
-struct SiteState {
-    listed: Vec<String>,
-    latest_lesson: HashMap<String, String>,
-    down: bool,
-    rejects_logins: bool,
 }
 
 impl FakeSite {
@@ -345,6 +330,22 @@ impl Respond for FakeSite {
     fn respond(&self, request: &Request) -> ResponseTemplate {
         site_response(&self.state(), request.url.path())
     }
+}
+
+#[derive(Default)]
+struct SiteState {
+    listed: Vec<String>,
+    latest_lesson: HashMap<String, String>,
+    down: bool,
+    rejects_logins: bool,
+}
+
+fn ids(values: &[&str]) -> Vec<String> {
+    values.iter().map(|&value| value.to_owned()).collect()
+}
+
+fn locked<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
+    mutex.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
 fn site_response(state: &SiteState, request_path: &str) -> ResponseTemplate {
@@ -431,6 +432,5 @@ impl Clock for FakeClock {
     }
 }
 
-fn locked<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-    mutex.lock().unwrap_or_else(PoisonError::into_inner)
-}
+const STUDENTS_TTL: Duration = Duration::from_secs(300);
+const LESSONS_TTL: Duration = Duration::from_secs(60);

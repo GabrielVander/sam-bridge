@@ -1,27 +1,5 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-struct SamSiteConfig {
-    base_url: String,
-    username: String,
-    password: String,
-}
-
-fn configured_sam_site() -> Option<SamSiteConfig> {
-    let username: String = std::env::var("SAM_USERNAME").ok()?;
-    let password: String = std::env::var("SAM_PASSWORD").ok()?;
-    let base_url: String = std::env::var("SAM_BASE_URL")
-        .unwrap_or_else(|_| "https://musical.congregacao.org.br".to_owned());
-
-    Some(SamSiteConfig {
-        base_url,
-        username,
-        password,
-    })
-}
-
-const SAM_SITE_REQUIRED: &str =
-    "set SAM_USERNAME and SAM_PASSWORD (optionally SAM_BASE_URL) to explore the real SAM site";
-
 #[test]
 #[ignore = "explores the real SAM site; run with --ignored and SAM credentials"]
 fn invalid_url() {
@@ -897,33 +875,69 @@ fn discovers_where_almeida_dias_lessons_record_the_phase() {
     println!("notes naming a phase (sample): {notes_naming_a_phase:#?}");
 }
 
-fn almeida_dias_players(rows: &[serde_json::Value]) -> Vec<String> {
-    rows.iter()
-        .filter(|row| column(row, 3) == "MÚSICO")
-        .filter(|row| {
-            let instrument: String = column(row, 4);
-            instrument.starts_with("FLAUTA")
-                || instrument.starts_with("SAXOFONE")
-                || [
-                    "TROMPETE",
-                    "CORNET",
-                    "FLUGELHORN",
-                    "TROMBONE",
-                    "EUPHONIUM",
-                    "TUBA",
-                ]
-                .contains(&instrument.as_str())
-        })
-        .map(|row| column(row, 0))
-        .collect()
+const fn build_invalid_sam_base_url() -> &'static str {
+    "https://musical.musical.invalid_url.org.br/"
 }
 
-fn opens_with_a_phase(notes: &str) -> bool {
-    let opening: String = notes.trim_start().chars().take(4).collect();
-    let rest: String = notes.trim_start().chars().skip(4).collect();
+struct SamSiteConfig {
+    base_url: String,
+    username: String,
+    password: String,
+}
 
-    opening.eq_ignore_ascii_case("fase")
-        && rest.trim_start().starts_with(|c: char| c.is_ascii_digit())
+fn configured_sam_site() -> Option<SamSiteConfig> {
+    let username: String = std::env::var("SAM_USERNAME").ok()?;
+    let password: String = std::env::var("SAM_PASSWORD").ok()?;
+    let base_url: String = std::env::var("SAM_BASE_URL")
+        .unwrap_or_else(|_| "https://musical.congregacao.org.br".to_owned());
+
+    Some(SamSiteConfig {
+        base_url,
+        username,
+        password,
+    })
+}
+
+const SAM_SITE_REQUIRED: &str =
+    "set SAM_USERNAME and SAM_PASSWORD (optionally SAM_BASE_URL) to explore the real SAM site";
+
+fn build_sam_authentication_url(site: &SamSiteConfig) -> String {
+    format!("{}/autenticar", build_sam_base_url(site))
+}
+
+const fn build_sam_base_url(site: &SamSiteConfig) -> &str {
+    site.base_url.as_str()
+}
+
+fn build_sam_dashboard_url(site: &SamSiteConfig) -> String {
+    format!("{}/painel", build_sam_base_url(site))
+}
+
+fn build_sam_students_listing_url(site: &SamSiteConfig) -> String {
+    format!("{}/alunos/listagem", build_sam_base_url(site))
+}
+
+fn build_invalid_student_id() -> String {
+    "someStudent".to_string()
+}
+
+fn build_sam_student_lessons_url(site: &SamSiteConfig, student_id: &String) -> String {
+    format!(
+        "{}/licoes/index/{}",
+        build_sam_base_url(site).trim_end_matches('/'),
+        student_id
+    )
+}
+
+fn build_valid_student_id() -> String {
+    "500132".to_string()
+}
+
+fn column(row: &serde_json::Value, index: usize) -> String {
+    row.get(index)
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or_default()
+        .to_owned()
 }
 
 fn one_musician_id_per_level(rows: &[serde_json::Value]) -> BTreeMap<String, String> {
@@ -954,45 +968,31 @@ fn context_around(haystack: &str, needle: &str, radius: usize) -> Option<String>
         .map(|s| s.iter().collect())
 }
 
-fn column(row: &serde_json::Value, index: usize) -> String {
-    row.get(index)
-        .and_then(serde_json::Value::as_str)
-        .unwrap_or_default()
-        .to_owned()
+fn almeida_dias_players(rows: &[serde_json::Value]) -> Vec<String> {
+    rows.iter()
+        .filter(|row| column(row, 3) == "MÚSICO")
+        .filter(|row| {
+            let instrument: String = column(row, 4);
+            instrument.starts_with("FLAUTA")
+                || instrument.starts_with("SAXOFONE")
+                || [
+                    "TROMPETE",
+                    "CORNET",
+                    "FLUGELHORN",
+                    "TROMBONE",
+                    "EUPHONIUM",
+                    "TUBA",
+                ]
+                .contains(&instrument.as_str())
+        })
+        .map(|row| column(row, 0))
+        .collect()
 }
 
-fn build_sam_authentication_url(site: &SamSiteConfig) -> String {
-    format!("{}/autenticar", build_sam_base_url(site))
-}
+fn opens_with_a_phase(notes: &str) -> bool {
+    let opening: String = notes.trim_start().chars().take(4).collect();
+    let rest: String = notes.trim_start().chars().skip(4).collect();
 
-fn build_sam_dashboard_url(site: &SamSiteConfig) -> String {
-    format!("{}/painel", build_sam_base_url(site))
-}
-
-fn build_sam_students_listing_url(site: &SamSiteConfig) -> String {
-    format!("{}/alunos/listagem", build_sam_base_url(site))
-}
-
-fn build_sam_student_lessons_url(site: &SamSiteConfig, student_id: &String) -> String {
-    format!(
-        "{}/licoes/index/{}",
-        build_sam_base_url(site).trim_end_matches('/'),
-        student_id
-    )
-}
-
-const fn build_invalid_sam_base_url() -> &'static str {
-    "https://musical.musical.invalid_url.org.br/"
-}
-
-const fn build_sam_base_url(site: &SamSiteConfig) -> &str {
-    site.base_url.as_str()
-}
-
-fn build_invalid_student_id() -> String {
-    "someStudent".to_string()
-}
-
-fn build_valid_student_id() -> String {
-    "500132".to_string()
+    opening.eq_ignore_ascii_case("fase")
+        && rest.trim_start().starts_with(|c: char| c.is_ascii_digit())
 }

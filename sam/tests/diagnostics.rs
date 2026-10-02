@@ -1,21 +1,6 @@
 use sam::diagnostics::error_chain;
 use thiserror::Error;
 
-#[derive(Error, Debug)]
-#[error("inner failure")]
-struct Inner;
-
-#[derive(Error, Debug)]
-#[error("outer failure")]
-struct Outer {
-    #[source]
-    source: Inner,
-}
-
-#[derive(Error, Debug)]
-#[error("{0}")]
-struct Message(String);
-
 #[test]
 fn error_without_source_renders_only_its_own_message() {
     let rendered: String = error_chain(&Inner);
@@ -45,3 +30,18 @@ fn truncation_never_splits_a_multibyte_character() {
     assert!(rendered.chars().count() <= 500);
     assert!(rendered.starts_with('ç'));
 }
+
+#[derive(Error, Debug)]
+#[error("inner failure")]
+struct Inner;
+
+#[derive(Error, Debug)]
+#[error("outer failure")]
+struct Outer {
+    #[source]
+    source: Inner,
+}
+
+#[derive(Error, Debug)]
+#[error("{0}")]
+struct Message(String);

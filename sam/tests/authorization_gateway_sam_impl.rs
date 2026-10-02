@@ -14,32 +14,6 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 mod support;
 use support::{UNREACHABLE_SITE, sam_operations_for};
 
-fn build_gateway(mock_server: &MockServer) -> Result<AuthorizationGatewaySamImpl, reqwest::Error> {
-    let sam_operations: SamOperations = sam_operations_for(&mock_server.uri())?;
-
-    let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
-
-    Ok(AuthorizationGatewaySamImpl::new(sam_client))
-}
-
-fn failure_of(
-    result: Result<AuthorizationResult, AuthorizationError>,
-) -> Option<(FailureKind, String)> {
-    match result {
-        Err(AuthorizationError::UnableToPerformOperation { kind, details }) => {
-            Some((kind, details))
-        }
-        Ok(_) => None,
-    }
-}
-
-fn credential() -> Credential {
-    Credential::new(
-        Email::new("someone@example.com".to_owned()),
-        Password::new("hunter2".to_owned()),
-    )
-}
-
 #[test]
 fn given_a_303_response_authorization_succeeds() {
     smol::block_on(async {
@@ -162,4 +136,30 @@ fn given_a_connection_failure_authorization_fails() {
             "the email must never appear in diagnostics, got: {details}"
         );
     });
+}
+
+fn build_gateway(mock_server: &MockServer) -> Result<AuthorizationGatewaySamImpl, reqwest::Error> {
+    let sam_operations: SamOperations = sam_operations_for(&mock_server.uri())?;
+
+    let sam_client: Arc<SamClientImpl> = Arc::new(SamClientImpl::new(sam_operations));
+
+    Ok(AuthorizationGatewaySamImpl::new(sam_client))
+}
+
+fn credential() -> Credential {
+    Credential::new(
+        Email::new("someone@example.com".to_owned()),
+        Password::new("hunter2".to_owned()),
+    )
+}
+
+fn failure_of(
+    result: Result<AuthorizationResult, AuthorizationError>,
+) -> Option<(FailureKind, String)> {
+    match result {
+        Err(AuthorizationError::UnableToPerformOperation { kind, details }) => {
+            Some((kind, details))
+        }
+        Ok(_) => None,
+    }
 }
