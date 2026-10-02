@@ -1,5 +1,6 @@
 import 'package:bloc_signals_flutter/bloc_signals_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application/authentication/auth_presenter.dart';
 import 'package:flutter_application/l10n/app_localizations.dart';
 import 'package:flutter_application/l10n/l10n.dart';
 import 'package:flutter_application/settings/settings_presenter.dart';
@@ -18,6 +19,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           _header(context),
           _languages(context, state),
+          _account(context),
           _about(context),
         ],
       ),
@@ -64,6 +66,19 @@ class SettingsScreen extends StatelessWidget {
       locale,
     ).languageName,
   };
+
+  Widget _account(BuildContext context) =>
+      BlocSignalBuilder<AuthPresenter, AuthState>(
+        builder: (context, auth) => auth.isSignedIn
+            ? Card(
+                child: ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: Text(context.l10n.logOut),
+                  onTap: () => context.read<AuthPresenter>().signOut(),
+                ),
+              )
+            : const SizedBox.shrink(),
+      );
 
   Widget _about(BuildContext context) => Card(
     child: ListTile(

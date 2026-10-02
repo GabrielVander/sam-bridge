@@ -79,6 +79,30 @@ void main() {
     semantics.dispose();
   });
 
+  testWidgets('is where the user signs out, returning to the login form', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      await composeFakeApp(restoreSession: sessionRestored()),
+    );
+    await openSettings(tester);
+
+    await tester.tap(find.text('Sair'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Entre com seu usuário SAM'), findsOneWidget);
+    expect(find.text('Idioma'), findsNothing);
+  });
+
+  testWidgets('does not offer signing out before signing in', (tester) async {
+    await pumpApp(tester, await composeFakeApp());
+
+    await openSettings(tester);
+
+    expect(find.text('Sair'), findsNothing);
+  });
+
   testWidgets('is where the app version is shown', (tester) async {
     await pumpApp(tester, await composeFakeApp(versionDisplay: 'v2.3.4+56'));
     expect(find.text('v2.3.4+56'), findsNothing);
