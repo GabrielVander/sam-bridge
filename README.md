@@ -47,6 +47,161 @@ outermost layer. `sam` and `credential_store` implement gateway/store ports
 declared by `authentication` and `student` (dependency inversion), which is
 why the arrows point from adapter to domain and never the reverse.
 
+### Authentication flows
+
+Each port appears in the lane of the crate that implements it; the trait itself
+is declared by `authentication`. Errors travel as `{ kind, details }` up to
+`ApplicationFacade`, which turns them into an `ErrorReportDto`.
+
+Logging in authorizes the credential against SAM and only then remembers it.
+Failing to remember it still logs the user in.
+
+```plantuml
+@startuml
+title SAM Bridge Login Sequence
+
+actor User
+box "gui_application::flutter"
+  participant LoginScreen <<Widget>>
+  participant AuthPresenter <<Presenter>>
+end box
+box "gui_application"
+  participant ApplicationFacade <<Adapter>>
+end box
+box "authentication"
+  participant LoginAndRememberCredentialsUseCase as login <<Use Case>>
+end box
+box "sam"
+  participant AuthorizeCredentialGateway as authorizer <<Port>>
+  participant SamClient
+end box
+box "credential_store"
+  participant SaveCredentialGateway as storage <<Port>>
+end box
+participant "SAM portal" as portal
+
+User -> LoginScreen : submit email and password
+LoginScreen -> AuthPresenter : submitLogin(email, password)
+
+alt email or password empty
+  AuthPresenter --> LoginScreen : emit AuthMissingFields
+else
+  AuthPresenter --> LoginScreen : emit AuthLoading
+  AuthPresenter -> ApplicationFacade : login(email, password)\nawaited across FRB
+  ApplicationFacade -> login : execute(email, password)
+  login -> authorizer : authorize(credential)
+  authorizer -> SamClient : login(credentials)
+  note right of SamClient
+    Discards cached reads:
+    the session may now
+    belong to another user
+  end note
+  SamClient -> portal : POST /autenticar\n(cookie store keeps the session)
+  portal --> SamClient : response
+
+  alt 303 See Other
+    SamClient --> authorizer : Ok
+    authorizer --> login : Authorized
+    login -> storage : save(credential)
+    note right of storage : Encrypted file (cocoon)
+
+    alt saved
+      storage --> login : Ok
+      login --> ApplicationFacade : LoggedIn
+      ApplicationFacade --> AuthPresenter : Successful
+      AuthPresenter --> LoginScreen : emit AuthSuccess
+    else storage failed
+      storage --> login : SaveCredentialGatewayError
+      login --> ApplicationFacade : LoggedInWithoutRemembering
+      ApplicationFacade --> AuthPresenter : SuccessfulWithoutRemembering { report }
+      AuthPresenter --> LoginScreen : emit AuthSuccess(notRemembered)
+    end
+
+  else 200 with the invalid credentials marker
+    SamClient --> authorizer : InvalidCredentials
+    authorizer --> login : Unauthorized
+    login --> ApplicationFacade : InvalidEmailOrPassword
+    ApplicationFacade --> AuthPresenter : InvalidEmailOrPassword
+    AuthPresenter --> LoginScreen : emit AuthUnauthorized
+
+  else network failure or unexpected response
+    SamClient --> authorizer : SamClientError
+    authorizer --> login : AuthorizationError { kind, details }
+    login --> ApplicationFacade : UnableToPerformAuthorization
+    ApplicationFacade --> AuthPresenter : Failure { report }
+    AuthPresenter --> LoginScreen : emit AuthFailure(report)
+  end
+end
+@enduml
+```
+
+At startup, `main.dart` restores the session before running the app. Credentials
+that SAM rejects are cleared, and no failure here keeps the user from reaching
+the login form.
+
+```plantuml
+@startuml
+title SAM Bridge Session Restore Sequence
+
+box "gui_application::flutter"
+  participant main <<Main>>
+  participant AuthPresenter <<Presenter>>
+end box
+box "gui_application"
+  participant ApplicationFacade <<Adapter>>
+end box
+box "authentication"
+  participant RestoreSessionUseCase as restore <<Use Case>>
+end box
+box "credential_store"
+  participant LoadCredentialGateway as loader <<Port>>
+  participant ClearCredentialGateway as clearer <<Port>>
+end box
+box "sam"
+  participant AuthorizeCredentialGateway as authorizer <<Port>>
+end box
+
+main -> AuthPresenter : restoreSession()
+AuthPresenter -> ApplicationFacade : restoreSession()\nawaited across FRB
+ApplicationFacade -> restore : execute()
+restore -> loader : load()
+
+alt nothing stored, or undecryptable
+  loader --> restore : None
+  restore --> ApplicationFacade : NoStoredCredentials
+  ApplicationFacade --> AuthPresenter : NotAvailable
+  AuthPresenter -> AuthPresenter : emit AuthIdle
+else credential loaded
+  loader --> restore : credential
+  restore -> authorizer : authorize(credential)
+  note right of authorizer : Same SAM login as\nthe Login Sequence
+
+  alt Authorized
+    authorizer --> restore : Authorized
+    restore --> ApplicationFacade : Restored
+    ApplicationFacade --> AuthPresenter : Restored
+    AuthPresenter -> AuthPresenter : emit AuthSuccess
+  else Unauthorized
+    authorizer --> restore : Unauthorized
+    restore -> clearer : clear()
+    clearer --> restore : Ok, or ClearCredentialGatewayError
+    restore --> ApplicationFacade : CredentialsRejected, or\nUnableToClearRejectedCredentials
+    ApplicationFacade --> AuthPresenter : NotAvailable
+    AuthPresenter -> AuthPresenter : emit AuthIdle
+  else unable to authorize
+    authorizer --> restore : AuthorizationError { kind, details }
+    restore --> ApplicationFacade : UnableToPerformOperation
+    ApplicationFacade --> AuthPresenter : Failure { report }
+    AuthPresenter -> AuthPresenter : emit AuthIdle
+    note right of AuthPresenter : A failed restore never\nblocks startup
+  end
+end
+
+AuthPresenter --> main
+main -> main : runApp
+@enduml
+```
+
 ## Development
 
 Common commands (from the repository root unless noted):
