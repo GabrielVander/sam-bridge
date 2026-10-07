@@ -6,6 +6,7 @@ use student::application::gateways::{
     MusicianProfileGatewayError, StudentGatewayError, StudentLessonsGatewayError,
 };
 use student::application::use_cases::AssessStudentProgressError;
+use student::domain::entities::AssessError;
 
 use crate::composition::StartupError;
 
@@ -99,9 +100,13 @@ impl From<AssessStudentProgressError> for ErrorReportDto {
                 kind: ErrorKindDto::UnexpectedResponse,
                 details: error.to_string(),
             },
-            other => Self {
+            AssessStudentProgressError::Profile(MusicianProfileGatewayError::NotAMusician)
+            | AssessStudentProgressError::NoInstrumentAssigned
+            | AssessStudentProgressError::Assessment(
+                AssessError::UnknownLevel(_) | AssessError::UnpublishedRequirements(_),
+            ) => Self {
                 kind: ErrorKindDto::Unknown,
-                details: other.to_string(),
+                details: error.to_string(),
             },
         }
     }
