@@ -1,6 +1,6 @@
 use crate::lessons::domain::entities::{
     InstrumentRequirements, Lesson, MethodAlternative, MethodBook, MethodComponent,
-    MethodMilestone, Range, TestRequirement,
+    MethodMilestone, ProgressionLevel, Range, TestRequirement,
 };
 use crate::shared::domain::entities::{Instrument, MusicianLevel};
 use thiserror::Error;
@@ -11,16 +11,13 @@ pub fn assess(
     msa_lessons: &[Lesson],
     method_lessons: &[Lesson],
 ) -> Result<ProgressAssessment, AssessError> {
-    if let MusicianLevel::Unknown(raw) = assigned_level {
-        return Err(AssessError::UnknownLevel(raw.clone()));
-    }
-
+    let assigned_level: ProgressionLevel = progression_level_of(assigned_level)?;
     let catalog: InstrumentRequirements = InstrumentRequirements::for_instrument(&instrument)
         .ok_or(AssessError::UnpublishedRequirements(instrument))?;
     let recorded: RecordedProgress = RecordedProgress::from_lessons(msa_lessons, method_lessons);
 
-    let checkpoints: Vec<Checkpoint> = MusicianLevel::ASCENDING
-        .iter()
+    let checkpoints: Vec<Checkpoint> = ProgressionLevel::ASCENDING
+        .into_iter()
         .map(|level| build_checkpoint(assigned_level, level, &catalog, &recorded))
         .collect();
     let next_exam: ExamProgress = progress_towards_next_exam(&checkpoints, &catalog, &recorded);
@@ -37,6 +34,19 @@ pub fn assess(
     })
 }
 
+fn progression_level_of(level: &MusicianLevel) -> Result<ProgressionLevel, AssessError> {
+    match level {
+        MusicianLevel::Candidate => Ok(ProgressionLevel::Candidate),
+        MusicianLevel::Practice => Ok(ProgressionLevel::Practice),
+        MusicianLevel::YouthService | MusicianLevel::YouthServicePractice => {
+            Ok(ProgressionLevel::YouthService)
+        }
+        MusicianLevel::OfficialService => Ok(ProgressionLevel::OfficialService),
+        MusicianLevel::Officialized => Ok(ProgressionLevel::Officialized),
+        MusicianLevel::Unknown(raw) => Err(AssessError::UnknownLevel(raw.clone())),
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct ProgressAssessment {
     pub checkpoints: Vec<Checkpoint>,
@@ -44,12 +54,12 @@ pub struct ProgressAssessment {
     pub method_relative_percent: f64,
     pub combined_percent: f64,
     pub overall_checkpoint_percent: f64,
-    pub next_level: Option<MusicianLevel>,
+    pub next_level: Option<ProgressionLevel>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Checkpoint {
-    pub level: MusicianLevel,
+    pub level: ProgressionLevel,
     pub status: CheckpointStatus,
     pub requirement: RequirementStatus,
 }
@@ -123,16 +133,16 @@ fn highest<'a>(ranges: impl Iterator<Item = &'a Option<Range>>) -> f64 {
 }
 
 fn build_checkpoint(
-    assigned_level: &MusicianLevel,
-    level: &MusicianLevel,
+    assigned_level: ProgressionLevel,
+    level: ProgressionLevel,
     catalog: &InstrumentRequirements,
     recorded: &RecordedProgress,
 ) -> Checkpoint {
-    let achieved: bool = assigned_level.rank() >= level.rank();
+    let achieved: bool = assigned_level >= level;
 
     let Some(requirement) = catalog.requirement_for(level) else {
         return Checkpoint {
-            level: level.clone(),
+            level,
             status: checkpoint_status(achieved, false),
             requirement: RequirementStatus {
                 msa_met: true,
@@ -145,7 +155,7 @@ fn build_checkpoint(
     let method_met: bool = measure_method(requirement, recorded).met;
 
     Checkpoint {
-        level: level.clone(),
+        level,
         status: checkpoint_status(achieved, msa_met && method_met),
         requirement: RequirementStatus {
             msa_met,
@@ -264,7 +274,7 @@ impl Measurement {
 }
 
 struct ExamProgress {
-    level: Option<MusicianLevel>,
+    level: Option<ProgressionLevel>,
     msa_percent: f64,
     method_percent: f64,
     combined_percent: f64,
@@ -291,7 +301,7 @@ fn progress_towards_next_exam(
         .filter(|checkpoint| !checkpoint.is_achieved())
         .find_map(|checkpoint| {
             catalog
-                .requirement_for(&checkpoint.level)
+                .requirement_for(checkpoint.level)
                 .map(|requirement| exam_progress(requirement, recorded))
         })
         .unwrap_or_else(ExamProgress::journey_complete)
@@ -302,7 +312,7 @@ fn exam_progress(requirement: &TestRequirement, recorded: &RecordedProgress) -> 
     let method_percent: f64 = measure_method(requirement, recorded).percent;
 
     ExamProgress {
-        level: Some(requirement.level.clone()),
+        level: Some(requirement.level),
         msa_percent,
         method_percent,
         combined_percent: msa_percent.midpoint(method_percent),

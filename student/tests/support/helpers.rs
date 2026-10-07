@@ -5,7 +5,7 @@ use student::application::gateways::{
     StudentLessonsGatewayError,
 };
 use student::domain::entities::{
-    Checkpoint, Lesson, MethodBook, MusicianLevel, MusicianProfile, ProgressAssessment, Range,
+    Checkpoint, Lesson, MethodBook, MusicianProfile, ProgressAssessment, ProgressionLevel, Range,
     StudentId, StudentLessons,
 };
 
@@ -73,12 +73,9 @@ pub fn method_phase_lesson(phase: &str) -> Lesson {
     }
 }
 
-pub fn checkpoint<'a>(
-    assessment: &'a ProgressAssessment,
-    level: &MusicianLevel,
-) -> Option<&'a Checkpoint> {
+pub fn checkpoint(assessment: &ProgressAssessment, level: ProgressionLevel) -> Option<&Checkpoint> {
     assessment
         .checkpoints
         .iter()
-        .find(|checkpoint| &checkpoint.level == level)
+        .find(|checkpoint| checkpoint.level == level)
 }

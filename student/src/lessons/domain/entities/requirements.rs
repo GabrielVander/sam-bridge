@@ -1,5 +1,5 @@
-use crate::lessons::domain::entities::MethodBook;
-use crate::shared::domain::entities::{Instrument, MusicianLevel};
+use crate::lessons::domain::entities::{MethodBook, ProgressionLevel};
+use crate::shared::domain::entities::Instrument;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InstrumentRequirements {
@@ -8,8 +8,8 @@ pub struct InstrumentRequirements {
 
 impl InstrumentRequirements {
     #[must_use]
-    pub fn requirement_for(&self, level: &MusicianLevel) -> Option<&TestRequirement> {
-        self.tests.iter().find(|test| &test.level == level)
+    pub fn requirement_for(&self, level: ProgressionLevel) -> Option<&TestRequirement> {
+        self.tests.iter().find(|test| test.level == level)
     }
 
     #[must_use]
@@ -44,7 +44,7 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::Laoureux1, page(35))]),
                         alt(vec![
@@ -55,7 +55,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![
                             comp(MethodBook::Laoureux1, complete()),
@@ -69,7 +69,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![
                             comp(MethodBook::Laoureux1, complete()),
@@ -90,7 +90,7 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![
                             comp(MethodBook::BeginningStringsViola, lesson(6)),
@@ -100,7 +100,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![
                             comp(MethodBook::BertaVolmer1, page(62)),
@@ -110,7 +110,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![
                             comp(MethodBook::BertaVolmer1, complete()),
@@ -127,7 +127,7 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![
                             comp(MethodBook::BeginningStringsCello, lesson(6)),
@@ -137,7 +137,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![
                             comp(MethodBook::Dotzauer1, complete()),
@@ -147,7 +147,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![
                             comp(MethodBook::Dotzauer1, complete()),
@@ -164,7 +164,7 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::Pares, lesson(41))]),
                         alt(vec![comp(MethodBook::Galli, page(41))]),
@@ -172,7 +172,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::Pares, lesson(62))]),
                         alt(vec![comp(MethodBook::Galli, complete())]),
@@ -180,7 +180,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::Pares, complete())]),
                         alt(vec![comp(MethodBook::Galli, complete())]),
@@ -195,21 +195,21 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::RubankOboe1, complete())]),
                         alt(vec![comp(MethodBook::GiampieriOboe, page(21))]),
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::RubankOboe2, page(16))]),
                         alt(vec![comp(MethodBook::GiampieriOboe, page(30))]),
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::RubankOboe2, page(30))]),
                         alt(vec![comp(MethodBook::GiampieriOboe, page(50))]),
@@ -223,21 +223,21 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriBassoon, page(18))]),
                         alt(vec![comp(MethodBook::Weissenborn, module(12))]),
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriBassoon, page(26))]),
                         alt(vec![comp(MethodBook::Weissenborn, module(18))]),
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriBassoon, page(43))]),
                         alt(vec![comp(MethodBook::Weissenborn, module(22))]),
@@ -251,7 +251,7 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriClarinet, page(28))]),
                         alt(vec![comp(MethodBook::DomingosPecci, page(29))]),
@@ -259,7 +259,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriClarinet, page(41))]),
                         alt(vec![comp(MethodBook::DomingosPecci, page(36))]),
@@ -271,7 +271,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriClarinet, page(63))]),
                         alt(vec![comp(MethodBook::DomingosPecci, complete())]),
@@ -290,14 +290,14 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriClarinet, page(28))]),
                         alt(vec![comp(MethodBook::GalperAltoBass1, unmeasured())]),
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriClarinet, page(36))]),
                         alt(vec![
@@ -307,7 +307,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriClarinet, complete())]),
                         alt(vec![
@@ -324,7 +324,7 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriSaxophone, page(21))]),
                         alt(vec![comp(MethodBook::AmadeuRussoSaxophone, page(25))]),
@@ -332,7 +332,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriSaxophone, page(30))]),
                         alt(vec![comp(MethodBook::AmadeuRussoSaxophone, page(40))]),
@@ -340,7 +340,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::GiampieriSaxophone, page(50))]),
                         alt(vec![comp(MethodBook::AmadeuRussoSaxophone, page(55))]),
@@ -355,11 +355,11 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![alt(vec![comp(MethodBook::RubankTrumpet, complete())])],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::Getchel2, exercise_range(65, 94))]),
                         alt(vec![comp(MethodBook::AmadeuRussoBrass, page(30))]),
@@ -367,7 +367,7 @@ impl InstrumentRequirements {
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::Getchel2, complete())]),
                         alt(vec![comp(MethodBook::AmadeuRussoBrass, page(41))]),
@@ -382,14 +382,14 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![alt(vec![
                         comp(MethodBook::RubankElementaryHorn, complete()),
                         comp(MethodBook::AlmeidaDiasHorn, lesson(73)),
                     ])],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![alt(vec![
                         comp(MethodBook::RubankElementaryHorn, complete()),
                         comp(MethodBook::RubankIntermediateHorn, complete()),
@@ -397,7 +397,7 @@ impl InstrumentRequirements {
                     ])],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![alt(vec![
                         comp(MethodBook::RubankElementaryHorn, complete()),
                         comp(MethodBook::RubankIntermediateHorn, complete()),
@@ -412,21 +412,21 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::RubankTrombone, page(24))]),
                         alt(vec![comp(MethodBook::AlmeidaDiasTrombone, phase(13))]),
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::RubankTrombone, page(37))]),
                         alt(vec![comp(MethodBook::AlmeidaDiasTrombone, phase(25))]),
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::RubankTrombone, page(48))]),
                         alt(vec![comp(MethodBook::AlmeidaDiasTrombone, complete())]),
@@ -440,21 +440,21 @@ impl InstrumentRequirements {
         Self {
             tests: vec![
                 test(
-                    MusicianLevel::YouthService,
+                    ProgressionLevel::YouthService,
                     vec![
                         alt(vec![comp(MethodBook::RubankTuba, page(24))]),
                         alt(vec![comp(MethodBook::AlmeidaDiasTuba, phase(13))]),
                     ],
                 ),
                 test(
-                    MusicianLevel::OfficialService,
+                    ProgressionLevel::OfficialService,
                     vec![
                         alt(vec![comp(MethodBook::RubankTuba, page(37))]),
                         alt(vec![comp(MethodBook::AlmeidaDiasTuba, phase(25))]),
                     ],
                 ),
                 test(
-                    MusicianLevel::Officialized,
+                    ProgressionLevel::Officialized,
                     vec![
                         alt(vec![comp(MethodBook::RubankTuba, page(48))]),
                         alt(vec![comp(MethodBook::AlmeidaDiasTuba, complete())]),
@@ -467,7 +467,7 @@ impl InstrumentRequirements {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TestRequirement {
-    pub level: MusicianLevel,
+    pub level: ProgressionLevel,
     pub method_alternatives: Vec<MethodAlternative>,
     pub theory: TheoryRequirement,
 }
@@ -501,19 +501,19 @@ pub struct TheoryRequirement {
 }
 
 const fn test(
-    level: MusicianLevel,
+    level: ProgressionLevel,
     method_alternatives: Vec<MethodAlternative>,
 ) -> TestRequirement {
     TestRequirement {
-        theory: theory_for(&level),
+        theory: theory_for(level),
         method_alternatives,
         level,
     }
 }
 
-const fn theory_for(level: &MusicianLevel) -> TheoryRequirement {
+const fn theory_for(level: ProgressionLevel) -> TheoryRequirement {
     match level {
-        MusicianLevel::Officialized | MusicianLevel::OfficialService => {
+        ProgressionLevel::Officialized | ProgressionLevel::OfficialService => {
             TheoryRequirement { msa_phase: 16 }
         }
         _ => TheoryRequirement { msa_phase: 12 },

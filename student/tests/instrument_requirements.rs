@@ -1,7 +1,7 @@
 use pretty_assertions::assert_eq;
 use student::domain::entities::{
     Instrument, InstrumentRequirements, Lesson, MethodBook, MusicianLevel, ProgressAssessment,
-    TestRequirement, assess,
+    ProgressionLevel, TestRequirement, assess,
 };
 
 #[path = "support/helpers.rs"]
@@ -9,16 +9,16 @@ mod support;
 use support::{checkpoint, method_lesson_in, msa_lesson};
 
 use MethodBook::*;
-use MusicianLevel::{OfficialService, Officialized, YouthService};
+use ProgressionLevel::{OfficialService, Officialized, YouthService};
 
 #[test]
 fn the_youth_meeting_needs_msa_phase_12_and_official_service_phase_16() {
-    assert_eq!(theory_met(&YouthService, "12"), Some(true));
-    assert_eq!(theory_met(&YouthService, "11"), Some(false));
-    assert_eq!(theory_met(&OfficialService, "16"), Some(true));
-    assert_eq!(theory_met(&OfficialService, "15"), Some(false));
-    assert_eq!(theory_met(&Officialized, "16"), Some(true));
-    assert_eq!(theory_met(&Officialized, "15"), Some(false));
+    assert_eq!(theory_met(YouthService, "12"), Some(true));
+    assert_eq!(theory_met(YouthService, "11"), Some(false));
+    assert_eq!(theory_met(OfficialService, "16"), Some(true));
+    assert_eq!(theory_met(OfficialService, "15"), Some(false));
+    assert_eq!(theory_met(Officialized, "16"), Some(true));
+    assert_eq!(theory_met(Officialized, "15"), Some(false));
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn violin_thresholds() {
     );
     assert_never_met(
         &Instrument::Violin,
-        &Officialized,
+        Officialized,
         &[Laoureux1, Laoureux3, Ccb, HansSitt1, BrittenViolin1],
     );
 }
@@ -95,7 +95,7 @@ fn viola_thresholds() {
     );
     assert_never_met(
         &Instrument::Viola,
-        &Officialized,
+        Officialized,
         &[BertaVolmer1, ATuneADay3, BrittenViola1],
     );
 }
@@ -130,7 +130,7 @@ fn cello_thresholds() {
     );
     assert_never_met(
         &Instrument::Cello,
-        &Officialized,
+        Officialized,
         &[Dotzauer1, Dotzauer2, BrittenCello1],
     );
 }
@@ -159,7 +159,7 @@ fn flute_thresholds() {
     );
     assert_never_met(
         &Instrument::Flute,
-        &Officialized,
+        Officialized,
         &[Pares, Galli, AlmeidaDiasFlute],
     );
 }
@@ -280,7 +280,7 @@ fn bass_clarinet_thresholds() {
     );
     assert_never_met(
         &Instrument::BassClarinet,
-        &Officialized,
+        Officialized,
         &[GiampieriClarinet, GalperAltoBass1, GalperAltoBass2],
     );
 }
@@ -321,7 +321,7 @@ fn saxophone_thresholds() {
 
 #[test]
 fn trumpet_thresholds() {
-    assert_never_met(&Instrument::Trumpet, &YouthService, &[RubankTrumpet]);
+    assert_never_met(&Instrument::Trumpet, YouthService, &[RubankTrumpet]);
     assert_thresholds(
         &Instrument::Trumpet,
         &[
@@ -343,7 +343,7 @@ fn trumpet_thresholds() {
 fn french_horn_needs_a_completed_book_that_cannot_be_verified() {
     assert_never_met(
         &Instrument::FrenchHorn,
-        &YouthService,
+        YouthService,
         &[RubankElementaryHorn, AlmeidaDiasHorn],
     );
 }
@@ -447,13 +447,13 @@ fn requirement_for_unpublished_level_is_none() {
 
     assert_eq!(
         requirements.and_then(|requirements| requirements
-            .requirement_for(&MusicianLevel::Candidate)
+            .requirement_for(ProgressionLevel::Candidate)
             .cloned()),
         None
     );
 }
 
-fn theory_met(level: &MusicianLevel, phase: &str) -> Option<bool> {
+fn theory_met(level: ProgressionLevel, phase: &str) -> Option<bool> {
     let assessment: ProgressAssessment = assess(
         &MusicianLevel::Candidate,
         Instrument::Violin,
@@ -468,21 +468,25 @@ fn theory_met(level: &MusicianLevel, phase: &str) -> Option<bool> {
 fn assert_thresholds(instrument: &Instrument, thresholds: &[Threshold]) {
     for (level, reached, one_short) in thresholds {
         assert_eq!(
-            method_met(instrument, level, reached),
+            method_met(instrument, *level, reached),
             Some(true),
             "{instrument:?} {level:?} should be met by {reached:?}"
         );
         assert_eq!(
-            method_met(instrument, level, one_short),
+            method_met(instrument, *level, one_short),
             Some(false),
             "{instrument:?} {level:?} should not be met by {one_short:?}"
         );
     }
 }
 
-type Threshold<'a> = (MusicianLevel, &'a [Lesson], &'a [Lesson]);
+type Threshold<'a> = (ProgressionLevel, &'a [Lesson], &'a [Lesson]);
 
-fn method_met(instrument: &Instrument, level: &MusicianLevel, lessons: &[Lesson]) -> Option<bool> {
+fn method_met(
+    instrument: &Instrument,
+    level: ProgressionLevel,
+    lessons: &[Lesson],
+) -> Option<bool> {
     let assessment: ProgressAssessment =
         assess(&MusicianLevel::Candidate, instrument.clone(), &[], lessons).ok()?;
 
@@ -493,7 +497,7 @@ fn at(book: MethodBook, page: &str, lesson: &str) -> Lesson {
     method_lesson_in(book, page, lesson)
 }
 
-fn assert_never_met(instrument: &Instrument, level: &MusicianLevel, books: &[MethodBook]) {
+fn assert_never_met(instrument: &Instrument, level: ProgressionLevel, books: &[MethodBook]) {
     let far_along: Vec<Lesson> = books.iter().map(|book| at(*book, "999", "999")).collect();
 
     assert_eq!(

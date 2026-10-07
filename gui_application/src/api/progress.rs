@@ -107,16 +107,14 @@ impl From<student_entities::Checkpoint> for CheckpointDto {
     }
 }
 
-impl From<student_entities::MusicianLevel> for MusicianLevelDto {
-    fn from(level: student_entities::MusicianLevel) -> Self {
+impl From<student_entities::ProgressionLevel> for MusicianLevelDto {
+    fn from(level: student_entities::ProgressionLevel) -> Self {
         match level {
-            student_entities::MusicianLevel::Candidate => Self::Candidate,
-            student_entities::MusicianLevel::Practice => Self::Practice,
-            student_entities::MusicianLevel::YouthService
-            | student_entities::MusicianLevel::YouthServicePractice => Self::YouthService,
-            student_entities::MusicianLevel::OfficialService => Self::OfficialService,
-            student_entities::MusicianLevel::Officialized => Self::Officialized,
-            student_entities::MusicianLevel::Unknown(raw) => Self::Unknown { raw },
+            student_entities::ProgressionLevel::Candidate => Self::Candidate,
+            student_entities::ProgressionLevel::Practice => Self::Practice,
+            student_entities::ProgressionLevel::YouthService => Self::YouthService,
+            student_entities::ProgressionLevel::OfficialService => Self::OfficialService,
+            student_entities::ProgressionLevel::Officialized => Self::Officialized,
         }
     }
 }

@@ -1,7 +1,7 @@
 use pretty_assertions::assert_eq;
 use student::domain::entities::{
     AssessError, Checkpoint, CheckpointStatus, Instrument, Lesson, MethodBook, MusicianLevel,
-    ProgressAssessment, assess,
+    ProgressAssessment, ProgressionLevel, assess,
 };
 
 #[path = "support/helpers.rs"]
@@ -14,7 +14,7 @@ fn a_candidate_without_lessons_has_only_the_first_checkpoint() {
         assess(&MusicianLevel::Candidate, Instrument::Violin, &[], &[]).unwrap();
 
     assert_eq!(
-        checkpoint(&assessment, &MusicianLevel::Candidate)
+        checkpoint(&assessment, ProgressionLevel::Candidate)
             .unwrap()
             .status,
         CheckpointStatus::Achieved
@@ -48,20 +48,20 @@ fn the_assigned_level_and_every_level_below_it_are_achieved() {
     )
     .unwrap();
 
-    let statuses: Vec<(MusicianLevel, CheckpointStatus)> = assessment
+    let statuses: Vec<(ProgressionLevel, CheckpointStatus)> = assessment
         .checkpoints
         .iter()
-        .map(|c| (c.level.clone(), c.status))
+        .map(|c| (c.level, c.status))
         .collect();
 
     assert_eq!(
         statuses,
         vec![
-            (MusicianLevel::Candidate, CheckpointStatus::Achieved),
-            (MusicianLevel::Practice, CheckpointStatus::Achieved),
-            (MusicianLevel::YouthService, CheckpointStatus::Achieved),
-            (MusicianLevel::OfficialService, CheckpointStatus::Pending),
-            (MusicianLevel::Officialized, CheckpointStatus::Pending),
+            (ProgressionLevel::Candidate, CheckpointStatus::Achieved),
+            (ProgressionLevel::Practice, CheckpointStatus::Achieved),
+            (ProgressionLevel::YouthService, CheckpointStatus::Achieved),
+            (ProgressionLevel::OfficialService, CheckpointStatus::Pending),
+            (ProgressionLevel::Officialized, CheckpointStatus::Pending),
         ]
     );
 }
@@ -76,20 +76,20 @@ fn a_musician_rehearsing_at_the_youth_meeting_has_reached_the_youth_meeting() {
     )
     .unwrap();
 
-    let statuses: Vec<(MusicianLevel, CheckpointStatus)> = assessment
+    let statuses: Vec<(ProgressionLevel, CheckpointStatus)> = assessment
         .checkpoints
         .iter()
-        .map(|c| (c.level.clone(), c.status))
+        .map(|c| (c.level, c.status))
         .collect();
 
     assert_eq!(
         statuses,
         vec![
-            (MusicianLevel::Candidate, CheckpointStatus::Achieved),
-            (MusicianLevel::Practice, CheckpointStatus::Achieved),
-            (MusicianLevel::YouthService, CheckpointStatus::Achieved),
-            (MusicianLevel::OfficialService, CheckpointStatus::Pending),
-            (MusicianLevel::Officialized, CheckpointStatus::Pending),
+            (ProgressionLevel::Candidate, CheckpointStatus::Achieved),
+            (ProgressionLevel::Practice, CheckpointStatus::Achieved),
+            (ProgressionLevel::YouthService, CheckpointStatus::Achieved),
+            (ProgressionLevel::OfficialService, CheckpointStatus::Pending),
+            (ProgressionLevel::Officialized, CheckpointStatus::Pending),
         ]
     );
 }
@@ -107,10 +107,11 @@ fn meeting_a_higher_levels_requirements_makes_it_ready_for_the_exam() {
     )
     .unwrap();
 
-    let practice: &Checkpoint = checkpoint(&assessment, &MusicianLevel::Practice).unwrap();
+    let practice: &Checkpoint = checkpoint(&assessment, ProgressionLevel::Practice).unwrap();
     assert_eq!(practice.status, CheckpointStatus::Pending);
 
-    let youth_service: &Checkpoint = checkpoint(&assessment, &MusicianLevel::YouthService).unwrap();
+    let youth_service: &Checkpoint =
+        checkpoint(&assessment, ProgressionLevel::YouthService).unwrap();
     assert_eq!(youth_service.status, CheckpointStatus::ReadyForExam);
 }
 
@@ -125,7 +126,7 @@ fn an_achieved_level_is_not_ready_for_the_exam_again() {
     .unwrap();
 
     assert_eq!(
-        checkpoint(&assessment, &MusicianLevel::YouthService)
+        checkpoint(&assessment, ProgressionLevel::YouthService)
             .unwrap()
             .status,
         CheckpointStatus::Achieved
@@ -157,7 +158,7 @@ fn official_service_needs_msa_phase_16() {
     .unwrap();
 
     assert_eq!(
-        checkpoint(&assessment, &MusicianLevel::OfficialService)
+        checkpoint(&assessment, ProgressionLevel::OfficialService)
             .unwrap()
             .status,
         CheckpointStatus::ReadyForExam
@@ -180,7 +181,8 @@ fn officialization_cannot_be_verified_from_the_lessons_alone() {
     )
     .unwrap();
 
-    let officialized: &Checkpoint = checkpoint(&assessment, &MusicianLevel::Officialized).unwrap();
+    let officialized: &Checkpoint =
+        checkpoint(&assessment, ProgressionLevel::Officialized).unwrap();
 
     assert_eq!(officialized.status, CheckpointStatus::Pending);
     assert!(!officialized.requirement.method_met);
@@ -261,7 +263,7 @@ fn the_furthest_lesson_counts_not_the_latest() {
     .unwrap();
 
     assert!((assessment.msa_relative_percent - 100.0).abs() < 0.1);
-    assert_eq!(assessment.next_level, Some(MusicianLevel::YouthService));
+    assert_eq!(assessment.next_level, Some(ProgressionLevel::YouthService));
 }
 
 #[test]
@@ -511,7 +513,7 @@ fn milestones_that_the_lessons_cannot_measure_are_never_met_and_add_no_progress(
     .unwrap();
 
     assert!(
-        !checkpoint(&exercise_range, &MusicianLevel::OfficialService)
+        !checkpoint(&exercise_range, ProgressionLevel::OfficialService)
             .unwrap()
             .requirement
             .method_met
@@ -579,7 +581,7 @@ fn candidate_on(
 }
 
 fn meets_youth_service_method(assessment: &ProgressAssessment) -> Option<bool> {
-    checkpoint(assessment, &MusicianLevel::YouthService)
+    checkpoint(assessment, ProgressionLevel::YouthService)
         .map(|youth_service| youth_service.requirement.method_met)
 }
 

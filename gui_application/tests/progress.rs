@@ -122,10 +122,18 @@ fn a_level_whose_requirements_are_met_is_ready_for_the_exam() {
 
 #[test]
 fn rehearsing_at_the_youth_meeting_is_the_youth_meeting_on_the_progress_journey() {
-    assert_eq!(
-        MusicianLevelDto::from(MusicianLevel::YouthServicePractice),
-        MusicianLevelDto::YouthService
-    );
+    let AssessStudentProgressOutcomeDto::Success { assessment } = assessment_of(Ok(musician(
+        MusicianLevel::YouthServicePractice,
+        Some(Instrument::Violin),
+    ))) else {
+        panic!("the progress should be assessed");
+    };
+    let youth_service: Option<CheckpointStatusDto> = assessment
+        .checkpoints
+        .into_iter()
+        .find(|checkpoint| checkpoint.level == MusicianLevelDto::YouthService)
+        .map(|checkpoint| checkpoint.status);
+    assert_eq!(youth_service, Some(CheckpointStatusDto::Achieved));
 }
 
 #[test]
