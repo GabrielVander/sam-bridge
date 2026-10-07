@@ -1,7 +1,7 @@
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use gui_application::api::progress::{
-    AssessStudentProgressOutcomeDto, CheckpointDto, CheckpointStatusDto, MusicianLevelDto,
-    ProgressAssessmentDto, RequirementStatusDto,
+    AssessStudentProgressOutcomeDto, CheckpointDto, CheckpointStatusDto, ProgressAssessmentDto,
+    ProgressionLevelDto, RequirementStatusDto,
 };
 use pretty_assertions::assert_eq;
 use student::application::gateways::{
@@ -39,27 +39,27 @@ fn an_assessment_carries_every_checkpoint_and_percentage() {
             assessment: ProgressAssessmentDto {
                 checkpoints: vec![
                     checkpoint(
-                        MusicianLevelDto::Candidate,
+                        ProgressionLevelDto::Candidate,
                         CheckpointStatusDto::Achieved,
                         true
                     ),
                     checkpoint(
-                        MusicianLevelDto::Practice,
+                        ProgressionLevelDto::Practice,
                         CheckpointStatusDto::Pending,
                         true
                     ),
                     checkpoint(
-                        MusicianLevelDto::YouthService,
+                        ProgressionLevelDto::YouthService,
                         CheckpointStatusDto::Pending,
                         false
                     ),
                     checkpoint(
-                        MusicianLevelDto::OfficialService,
+                        ProgressionLevelDto::OfficialService,
                         CheckpointStatusDto::Pending,
                         false
                     ),
                     checkpoint(
-                        MusicianLevelDto::Officialized,
+                        ProgressionLevelDto::Officialized,
                         CheckpointStatusDto::Pending,
                         false
                     ),
@@ -68,7 +68,7 @@ fn an_assessment_carries_every_checkpoint_and_percentage() {
                 method_relative_percent: 0.0,
                 combined_percent: 25.0,
                 overall_checkpoint_percent: 25.0,
-                next_level: Some(MusicianLevelDto::YouthService),
+                next_level: Some(ProgressionLevelDto::YouthService),
             }
         }
     );
@@ -115,7 +115,7 @@ fn a_level_whose_requirements_are_met_is_ready_for_the_exam() {
     let youth_service: Option<CheckpointStatusDto> = assessment
         .checkpoints
         .into_iter()
-        .find(|checkpoint| checkpoint.level == MusicianLevelDto::YouthService)
+        .find(|checkpoint| checkpoint.level == ProgressionLevelDto::YouthService)
         .map(|checkpoint| checkpoint.status);
     assert_eq!(youth_service, Some(CheckpointStatusDto::ReadyForExam));
 }
@@ -131,7 +131,7 @@ fn rehearsing_at_the_youth_meeting_is_the_youth_meeting_on_the_progress_journey(
     let youth_service: Option<CheckpointStatusDto> = assessment
         .checkpoints
         .into_iter()
-        .find(|checkpoint| checkpoint.level == MusicianLevelDto::YouthService)
+        .find(|checkpoint| checkpoint.level == ProgressionLevelDto::YouthService)
         .map(|checkpoint| checkpoint.status);
     assert_eq!(youth_service, Some(CheckpointStatusDto::Achieved));
 }
@@ -250,7 +250,7 @@ const fn musician(level: MusicianLevel, instrument: Option<Instrument>) -> Music
 }
 
 const fn checkpoint(
-    level: MusicianLevelDto,
+    level: ProgressionLevelDto,
     status: CheckpointStatusDto,
     requirement_met: bool,
 ) -> CheckpointDto {

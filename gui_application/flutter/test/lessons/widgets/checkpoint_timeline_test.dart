@@ -17,11 +17,11 @@ void main() {
           progress: progressView(
             checkpoints: [
               checkpoint(
-                level: const KnownLevel(Level.practice),
+                level: Level.practice,
                 status: CheckpointStatus.achieved,
               ),
-              checkpoint(level: const KnownLevel(Level.officialService)),
-              checkpoint(level: const KnownLevel(Level.officialized)),
+              checkpoint(level: Level.officialService),
+              checkpoint(level: Level.officialized),
             ],
           ),
         ),
@@ -48,7 +48,7 @@ void main() {
           tester,
           CheckpointTimeline(
             progress: progressView(
-              checkpoints: [checkpoint(level: KnownLevel(level))],
+              checkpoints: [checkpoint(level: level)],
               nextLevel: null,
             ),
           ),
@@ -57,24 +57,6 @@ void main() {
         expect(find.text(name), findsOneWidget);
       });
     }
-
-    testWidgets('shows what SAM wrote for a level it does not recognize', (
-      tester,
-    ) async {
-      await pumpInApp(
-        tester,
-        CheckpointTimeline(
-          progress: progressView(
-            checkpoints: [
-              checkpoint(level: const UnrecognizedLevel('SomethingNew')),
-            ],
-            nextLevel: null,
-          ),
-        ),
-      );
-
-      expect(find.text('SomethingNew'), findsOneWidget);
-    });
 
     testWidgets('marks achieved, ready and pending checkpoints differently', (
       tester,
@@ -85,14 +67,14 @@ void main() {
           progress: progressView(
             checkpoints: [
               checkpoint(
-                level: const KnownLevel(Level.practice),
+                level: Level.practice,
                 status: CheckpointStatus.achieved,
               ),
               checkpoint(
-                level: const KnownLevel(Level.officialService),
+                level: Level.officialService,
                 status: CheckpointStatus.readyForExam,
               ),
-              checkpoint(level: const KnownLevel(Level.officialized)),
+              checkpoint(level: Level.officialized),
             ],
           ),
         ),
@@ -112,11 +94,11 @@ void main() {
           progress: progressView(
             checkpoints: [
               checkpoint(
-                level: const KnownLevel(Level.practice),
+                level: Level.practice,
                 status: CheckpointStatus.achieved,
               ),
               checkpoint(
-                level: const KnownLevel(Level.officialService),
+                level: Level.officialService,
                 status: CheckpointStatus.readyForExam,
               ),
             ],
@@ -139,14 +121,14 @@ void main() {
           progress: progressView(
             checkpoints: [
               checkpoint(
-                level: const KnownLevel(Level.practice),
+                level: Level.practice,
                 status: CheckpointStatus.achieved,
               ),
               checkpoint(
-                level: const KnownLevel(Level.officialService),
+                level: Level.officialService,
                 status: CheckpointStatus.achieved,
               ),
-              checkpoint(level: const KnownLevel(Level.officialized)),
+              checkpoint(level: Level.officialized),
             ],
           ),
         ),
@@ -176,7 +158,7 @@ void main() {
         tester,
         CheckpointTimeline(
           progress: progressView(
-            nextLevel: const KnownLevel(Level.officialService),
+            nextLevel: Level.officialService,
             msaRelativePercent: 40,
             methodRelativePercent: 75,
           ),
@@ -198,7 +180,7 @@ void main() {
           progress: progressView(
             checkpoints: [
               checkpoint(
-                level: const KnownLevel(Level.youthService),
+                level: Level.youthService,
                 status: CheckpointStatus.readyForExam,
               ),
             ],

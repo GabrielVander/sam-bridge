@@ -139,7 +139,7 @@ void main() {
       final loaded = cubit.stateValue as LessonsLoaded;
       expect(loaded.progress, isA<ProgressAvailable>());
       final progress = loaded.progress as ProgressAvailable;
-      expect(progress.view.nextLevel, const KnownLevel(Level.officialService));
+      expect(progress.view.nextLevel, Level.officialService);
       expect(progress.view.overallCheckpointPercent, 60);
     });
 

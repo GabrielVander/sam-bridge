@@ -20,24 +20,23 @@ pub struct ProgressAssessmentDto {
     pub method_relative_percent: f64,
     pub combined_percent: f64,
     pub overall_checkpoint_percent: f64,
-    pub next_level: Option<MusicianLevelDto>,
+    pub next_level: Option<ProgressionLevelDto>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckpointDto {
-    pub level: MusicianLevelDto,
+    pub level: ProgressionLevelDto,
     pub status: CheckpointStatusDto,
     pub requirement: RequirementStatusDto,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum MusicianLevelDto {
+pub enum ProgressionLevelDto {
     Candidate,
     Practice,
     YouthService,
     OfficialService,
     Officialized,
-    Unknown { raw: String },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -89,7 +88,7 @@ impl From<student_entities::ProgressAssessment> for ProgressAssessmentDto {
             method_relative_percent: assessment.method_relative_percent,
             combined_percent: assessment.combined_percent,
             overall_checkpoint_percent: assessment.overall_checkpoint_percent,
-            next_level: assessment.next_level.map(MusicianLevelDto::from),
+            next_level: assessment.next_level.map(ProgressionLevelDto::from),
         }
     }
 }
@@ -107,7 +106,7 @@ impl From<student_entities::Checkpoint> for CheckpointDto {
     }
 }
 
-impl From<student_entities::ProgressionLevel> for MusicianLevelDto {
+impl From<student_entities::ProgressionLevel> for ProgressionLevelDto {
     fn from(level: student_entities::ProgressionLevel) -> Self {
         match level {
             student_entities::ProgressionLevel::Candidate => Self::Candidate,

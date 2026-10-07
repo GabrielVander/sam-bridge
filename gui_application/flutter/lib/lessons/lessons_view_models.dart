@@ -46,7 +46,7 @@ class ProgressView {
   final double methodRelativePercent;
   final double combinedPercent;
   final double overallCheckpointPercent;
-  final ReportedLevel? nextLevel;
+  final Level? nextLevel;
 
   const ProgressView({
     required this.checkpoints,
@@ -59,7 +59,7 @@ class ProgressView {
 }
 
 class CheckpointView {
-  final ReportedLevel level;
+  final Level level;
   final CheckpointStatus status;
   final bool msaMet;
   final bool methodMet;

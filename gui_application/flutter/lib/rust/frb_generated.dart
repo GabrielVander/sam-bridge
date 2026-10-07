@@ -492,17 +492,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicianLevelDto dco_decode_box_autoadd_musician_level_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_musician_level_dto(raw);
-  }
-
-  @protected
   ProgressAssessmentDto dco_decode_box_autoadd_progress_assessment_dto(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_progress_assessment_dto(raw);
+  }
+
+  @protected
+  ProgressionLevelDto dco_decode_box_autoadd_progression_level_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_progression_level_dto(raw);
   }
 
   @protected
@@ -524,7 +526,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 3)
       throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return CheckpointDto(
-      level: dco_decode_musician_level_dto(arr[0]),
+      level: dco_decode_progression_level_dto(arr[0]),
       status: dco_decode_checkpoint_status_dto(arr[1]),
       requirement: dco_decode_requirement_status_dto(arr[2]),
     );
@@ -723,28 +725,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicianLevelDto dco_decode_musician_level_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = dcoDecodeList(raw);
-    switch (dcoDecodePrimitiveInt(arr[0])) {
-      case 0:
-        return MusicianLevelDto_Candidate();
-      case 1:
-        return MusicianLevelDto_Practice();
-      case 2:
-        return MusicianLevelDto_YouthService();
-      case 3:
-        return MusicianLevelDto_OfficialService();
-      case 4:
-        return MusicianLevelDto_Officialized();
-      case 5:
-        return MusicianLevelDto_Unknown(raw: dco_decode_String(arr[1]));
-      default:
-        throw Exception("unreachable");
-    }
-  }
-
-  @protected
   String? dco_decode_opt_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_String(raw);
@@ -769,9 +749,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicianLevelDto? dco_decode_opt_box_autoadd_musician_level_dto(dynamic raw) {
+  ProgressionLevelDto? dco_decode_opt_box_autoadd_progression_level_dto(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_musician_level_dto(raw);
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_progression_level_dto(raw);
   }
 
   @protected
@@ -792,8 +776,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       methodRelativePercent: dco_decode_f_64(arr[2]),
       combinedPercent: dco_decode_f_64(arr[3]),
       overallCheckpointPercent: dco_decode_f_64(arr[4]),
-      nextLevel: dco_decode_opt_box_autoadd_musician_level_dto(arr[5]),
+      nextLevel: dco_decode_opt_box_autoadd_progression_level_dto(arr[5]),
     );
+  }
+
+  @protected
+  ProgressionLevelDto dco_decode_progression_level_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ProgressionLevelDto.values[dcoDecodePrimitiveInt(raw)];
   }
 
   @protected
@@ -1064,19 +1054,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicianLevelDto sse_decode_box_autoadd_musician_level_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_musician_level_dto(deserializer));
-  }
-
-  @protected
   ProgressAssessmentDto sse_decode_box_autoadd_progress_assessment_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_progress_assessment_dto(deserializer));
+  }
+
+  @protected
+  ProgressionLevelDto sse_decode_box_autoadd_progression_level_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_progression_level_dto(deserializer));
   }
 
   @protected
@@ -1096,7 +1086,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   CheckpointDto sse_decode_checkpoint_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_level = sse_decode_musician_level_dto(deserializer);
+    var var_level = sse_decode_progression_level_dto(deserializer);
     var var_status = sse_decode_checkpoint_status_dto(deserializer);
     var var_requirement = sse_decode_requirement_status_dto(deserializer);
     return CheckpointDto(
@@ -1326,30 +1316,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicianLevelDto sse_decode_musician_level_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var tag_ = sse_decode_i_32(deserializer);
-    switch (tag_) {
-      case 0:
-        return MusicianLevelDto_Candidate();
-      case 1:
-        return MusicianLevelDto_Practice();
-      case 2:
-        return MusicianLevelDto_YouthService();
-      case 3:
-        return MusicianLevelDto_OfficialService();
-      case 4:
-        return MusicianLevelDto_Officialized();
-      case 5:
-        var var_raw = sse_decode_String(deserializer);
-        return MusicianLevelDto_Unknown(raw: var_raw);
-      default:
-        throw UnimplementedError('');
-    }
-  }
-
-  @protected
   String? sse_decode_opt_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1396,13 +1362,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicianLevelDto? sse_decode_opt_box_autoadd_musician_level_dto(
+  ProgressionLevelDto? sse_decode_opt_box_autoadd_progression_level_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_musician_level_dto(deserializer));
+      return (sse_decode_box_autoadd_progression_level_dto(deserializer));
     } else {
       return null;
     }
@@ -1429,7 +1395,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_methodRelativePercent = sse_decode_f_64(deserializer);
     var var_combinedPercent = sse_decode_f_64(deserializer);
     var var_overallCheckpointPercent = sse_decode_f_64(deserializer);
-    var var_nextLevel = sse_decode_opt_box_autoadd_musician_level_dto(
+    var var_nextLevel = sse_decode_opt_box_autoadd_progression_level_dto(
       deserializer,
     );
     return ProgressAssessmentDto(
@@ -1440,6 +1406,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       overallCheckpointPercent: var_overallCheckpointPercent,
       nextLevel: var_nextLevel,
     );
+  }
+
+  @protected
+  ProgressionLevelDto sse_decode_progression_level_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ProgressionLevelDto.values[inner];
   }
 
   @protected
@@ -1721,21 +1696,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_musician_level_dto(
-    MusicianLevelDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_musician_level_dto(self, serializer);
-  }
-
-  @protected
   void sse_encode_box_autoadd_progress_assessment_dto(
     ProgressAssessmentDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_progress_assessment_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_progression_level_dto(
+    ProgressionLevelDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_progression_level_dto(self, serializer);
   }
 
   @protected
@@ -1759,7 +1734,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_checkpoint_dto(CheckpointDto self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_musician_level_dto(self.level, serializer);
+    sse_encode_progression_level_dto(self.level, serializer);
     sse_encode_checkpoint_status_dto(self.status, serializer);
     sse_encode_requirement_status_dto(self.requirement, serializer);
   }
@@ -1965,29 +1940,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_musician_level_dto(
-    MusicianLevelDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    switch (self) {
-      case MusicianLevelDto_Candidate():
-        sse_encode_i_32(0, serializer);
-      case MusicianLevelDto_Practice():
-        sse_encode_i_32(1, serializer);
-      case MusicianLevelDto_YouthService():
-        sse_encode_i_32(2, serializer);
-      case MusicianLevelDto_OfficialService():
-        sse_encode_i_32(3, serializer);
-      case MusicianLevelDto_Officialized():
-        sse_encode_i_32(4, serializer);
-      case MusicianLevelDto_Unknown(raw: final raw):
-        sse_encode_i_32(5, serializer);
-        sse_encode_String(raw, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2037,15 +1989,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_opt_box_autoadd_musician_level_dto(
-    MusicianLevelDto? self,
+  void sse_encode_opt_box_autoadd_progression_level_dto(
+    ProgressionLevelDto? self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
     if (self != null) {
-      sse_encode_box_autoadd_musician_level_dto(self, serializer);
+      sse_encode_box_autoadd_progression_level_dto(self, serializer);
     }
   }
 
@@ -2073,7 +2025,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_f_64(self.methodRelativePercent, serializer);
     sse_encode_f_64(self.combinedPercent, serializer);
     sse_encode_f_64(self.overallCheckpointPercent, serializer);
-    sse_encode_opt_box_autoadd_musician_level_dto(self.nextLevel, serializer);
+    sse_encode_opt_box_autoadd_progression_level_dto(
+      self.nextLevel,
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_progression_level_dto(
+    ProgressionLevelDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected

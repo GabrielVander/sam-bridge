@@ -35,7 +35,7 @@ ProgressView progressView({
   double methodRelativePercent = 75,
   double combinedPercent = 50,
   double overallCheckpointPercent = 25,
-  ReportedLevel? nextLevel = const KnownLevel(Level.officialService),
+  Level? nextLevel = Level.officialService,
 }) => ProgressView(
   checkpoints: checkpoints ?? [checkpoint()],
   msaRelativePercent: msaRelativePercent,
@@ -46,7 +46,7 @@ ProgressView progressView({
 );
 
 CheckpointView checkpoint({
-  ReportedLevel level = const KnownLevel(Level.practice),
+  Level level = Level.practice,
   CheckpointStatus status = CheckpointStatus.pending,
   bool msaMet = false,
   bool methodMet = false,

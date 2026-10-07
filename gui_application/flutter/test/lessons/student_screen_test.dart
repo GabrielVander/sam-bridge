@@ -79,7 +79,7 @@ void main() {
             checkpoints: [
               achievedCheckpoint(Levels.youthService),
               readyForExamCheckpoint(Levels.officialService),
-              pendingCheckpoint(Levels.unknown('EXÓTICO')),
+              pendingCheckpoint(Levels.officialized),
             ],
             nextLevel: Levels.officialService,
           ),
@@ -91,7 +91,7 @@ void main() {
         find.byTooltip('Culto Oficial - pronto para a prova'),
         findsOneWidget,
       );
-      expect(find.text('EXÓTICO'), findsOneWidget);
+      expect(find.text('Oficialização'), findsOneWidget);
     });
 
     testWidgets('marks an achieved level as achieved', (tester) async {

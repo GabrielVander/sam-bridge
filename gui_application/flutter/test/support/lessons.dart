@@ -54,31 +54,32 @@ RetrieveStudentLessonsOutcomeDto lessonsFailed(ErrorReportDto report) =>
     RetrieveStudentLessonsOutcomeDto.failure(report: report);
 
 abstract final class Levels {
-  static const MusicianLevelDto candidate = MusicianLevelDto.candidate();
-  static const MusicianLevelDto practice = MusicianLevelDto.practice();
-  static const MusicianLevelDto youthService = MusicianLevelDto.youthService();
-  static const MusicianLevelDto officialService =
-      MusicianLevelDto.officialService();
-  static const MusicianLevelDto officialized = MusicianLevelDto.officialized();
-
-  static MusicianLevelDto unknown(String raw) =>
-      MusicianLevelDto.unknown(raw: raw);
+  static const ProgressionLevelDto candidate = ProgressionLevelDto.candidate;
+  static const ProgressionLevelDto practice = ProgressionLevelDto.practice;
+  static const ProgressionLevelDto youthService =
+      ProgressionLevelDto.youthService;
+  static const ProgressionLevelDto officialService =
+      ProgressionLevelDto.officialService;
+  static const ProgressionLevelDto officialized =
+      ProgressionLevelDto.officialized;
 }
 
-CheckpointDto achievedCheckpoint(MusicianLevelDto level) =>
+CheckpointDto achievedCheckpoint(ProgressionLevelDto level) =>
     _checkpoint(level, CheckpointStatusDto.achieved);
 
-CheckpointDto _checkpoint(MusicianLevelDto level, CheckpointStatusDto status) =>
-    CheckpointDto(
-      level: level,
-      status: status,
-      requirement: const RequirementStatusDto(msaMet: true, methodMet: true),
-    );
+CheckpointDto _checkpoint(
+  ProgressionLevelDto level,
+  CheckpointStatusDto status,
+) => CheckpointDto(
+  level: level,
+  status: status,
+  requirement: const RequirementStatusDto(msaMet: true, methodMet: true),
+);
 
-CheckpointDto readyForExamCheckpoint(MusicianLevelDto level) =>
+CheckpointDto readyForExamCheckpoint(ProgressionLevelDto level) =>
     _checkpoint(level, CheckpointStatusDto.readyForExam);
 
-CheckpointDto pendingCheckpoint(MusicianLevelDto level) =>
+CheckpointDto pendingCheckpoint(ProgressionLevelDto level) =>
     _checkpoint(level, CheckpointStatusDto.pending);
 
 ProgressAssessmentDto progressAssessment({
@@ -87,7 +88,7 @@ ProgressAssessmentDto progressAssessment({
   double methodRelativePercent = 0,
   double combinedPercent = 0,
   double overallCheckpointPercent = 0,
-  MusicianLevelDto? nextLevel,
+  ProgressionLevelDto? nextLevel,
 }) => ProgressAssessmentDto(
   checkpoints: checkpoints,
   msaRelativePercent: msaRelativePercent,

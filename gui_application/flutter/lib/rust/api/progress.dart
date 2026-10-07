@@ -10,7 +10,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'progress.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 @freezed
 sealed class AssessStudentProgressOutcomeDto
@@ -33,7 +33,7 @@ sealed class AssessStudentProgressOutcomeDto
 }
 
 class CheckpointDto {
-  final MusicianLevelDto level;
+  final ProgressionLevelDto level;
   final CheckpointStatusDto status;
   final RequirementStatusDto requirement;
 
@@ -58,27 +58,13 @@ class CheckpointDto {
 
 enum CheckpointStatusDto { achieved, readyForExam, pending }
 
-@freezed
-sealed class MusicianLevelDto with _$MusicianLevelDto {
-  const MusicianLevelDto._();
-
-  const factory MusicianLevelDto.candidate() = MusicianLevelDto_Candidate;
-  const factory MusicianLevelDto.practice() = MusicianLevelDto_Practice;
-  const factory MusicianLevelDto.youthService() = MusicianLevelDto_YouthService;
-  const factory MusicianLevelDto.officialService() =
-      MusicianLevelDto_OfficialService;
-  const factory MusicianLevelDto.officialized() = MusicianLevelDto_Officialized;
-  const factory MusicianLevelDto.unknown({required String raw}) =
-      MusicianLevelDto_Unknown;
-}
-
 class ProgressAssessmentDto {
   final List<CheckpointDto> checkpoints;
   final double msaRelativePercent;
   final double methodRelativePercent;
   final double combinedPercent;
   final double overallCheckpointPercent;
-  final MusicianLevelDto? nextLevel;
+  final ProgressionLevelDto? nextLevel;
 
   const ProgressAssessmentDto({
     required this.checkpoints,
@@ -109,6 +95,14 @@ class ProgressAssessmentDto {
           combinedPercent == other.combinedPercent &&
           overallCheckpointPercent == other.overallCheckpointPercent &&
           nextLevel == other.nextLevel;
+}
+
+enum ProgressionLevelDto {
+  candidate,
+  practice,
+  youthService,
+  officialService,
+  officialized,
 }
 
 class RequirementStatusDto {

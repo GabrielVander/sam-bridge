@@ -71,12 +71,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   InstrumentDto dco_decode_box_autoadd_instrument_dto(dynamic raw);
 
   @protected
-  MusicianLevelDto dco_decode_box_autoadd_musician_level_dto(dynamic raw);
-
-  @protected
   ProgressAssessmentDto dco_decode_box_autoadd_progress_assessment_dto(
     dynamic raw,
   );
+
+  @protected
+  ProgressionLevelDto dco_decode_box_autoadd_progression_level_dto(dynamic raw);
 
   @protected
   RangeDto dco_decode_box_autoadd_range_dto(dynamic raw);
@@ -133,9 +133,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LogoutOutcomeDto dco_decode_logout_outcome_dto(dynamic raw);
 
   @protected
-  MusicianLevelDto dco_decode_musician_level_dto(dynamic raw);
-
-  @protected
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
@@ -148,13 +145,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   InstrumentDto? dco_decode_opt_box_autoadd_instrument_dto(dynamic raw);
 
   @protected
-  MusicianLevelDto? dco_decode_opt_box_autoadd_musician_level_dto(dynamic raw);
+  ProgressionLevelDto? dco_decode_opt_box_autoadd_progression_level_dto(
+    dynamic raw,
+  );
 
   @protected
   RangeDto? dco_decode_opt_box_autoadd_range_dto(dynamic raw);
 
   @protected
   ProgressAssessmentDto dco_decode_progress_assessment_dto(dynamic raw);
+
+  @protected
+  ProgressionLevelDto dco_decode_progression_level_dto(dynamic raw);
 
   @protected
   RangeDto dco_decode_range_dto(dynamic raw);
@@ -239,12 +241,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  MusicianLevelDto sse_decode_box_autoadd_musician_level_dto(
+  ProgressAssessmentDto sse_decode_box_autoadd_progress_assessment_dto(
     SseDeserializer deserializer,
   );
 
   @protected
-  ProgressAssessmentDto sse_decode_box_autoadd_progress_assessment_dto(
+  ProgressionLevelDto sse_decode_box_autoadd_progression_level_dto(
     SseDeserializer deserializer,
   );
 
@@ -311,9 +313,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LogoutOutcomeDto sse_decode_logout_outcome_dto(SseDeserializer deserializer);
 
   @protected
-  MusicianLevelDto sse_decode_musician_level_dto(SseDeserializer deserializer);
-
-  @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
@@ -328,7 +327,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  MusicianLevelDto? sse_decode_opt_box_autoadd_musician_level_dto(
+  ProgressionLevelDto? sse_decode_opt_box_autoadd_progression_level_dto(
     SseDeserializer deserializer,
   );
 
@@ -337,6 +336,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ProgressAssessmentDto sse_decode_progress_assessment_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ProgressionLevelDto sse_decode_progression_level_dto(
     SseDeserializer deserializer,
   );
 
@@ -442,14 +446,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_box_autoadd_musician_level_dto(
-    MusicianLevelDto self,
+  void sse_encode_box_autoadd_progress_assessment_dto(
+    ProgressAssessmentDto self,
     SseSerializer serializer,
   );
 
   @protected
-  void sse_encode_box_autoadd_progress_assessment_dto(
-    ProgressAssessmentDto self,
+  void sse_encode_box_autoadd_progression_level_dto(
+    ProgressionLevelDto self,
     SseSerializer serializer,
   );
 
@@ -538,12 +542,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_musician_level_dto(
-    MusicianLevelDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
@@ -565,8 +563,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_opt_box_autoadd_musician_level_dto(
-    MusicianLevelDto? self,
+  void sse_encode_opt_box_autoadd_progression_level_dto(
+    ProgressionLevelDto? self,
     SseSerializer serializer,
   );
 
@@ -579,6 +577,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_progress_assessment_dto(
     ProgressAssessmentDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_progression_level_dto(
+    ProgressionLevelDto self,
     SseSerializer serializer,
   );
 

@@ -483,7 +483,7 @@ impl SseDecode for bool {
 impl SseDecode for crate::api::progress::CheckpointDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_level = <crate::api::progress::MusicianLevelDto>::sse_decode(deserializer);
+        let mut var_level = <crate::api::progress::ProgressionLevelDto>::sse_decode(deserializer);
         let mut var_status = <crate::api::progress::CheckpointStatusDto>::sse_decode(deserializer);
         let mut var_requirement =
             <crate::api::progress::RequirementStatusDto>::sse_decode(deserializer);
@@ -788,37 +788,6 @@ impl SseDecode for crate::api::authentication::LogoutOutcomeDto {
     }
 }
 
-impl SseDecode for crate::api::progress::MusicianLevelDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut tag_ = <i32>::sse_decode(deserializer);
-        match tag_ {
-            0 => {
-                return crate::api::progress::MusicianLevelDto::Candidate;
-            }
-            1 => {
-                return crate::api::progress::MusicianLevelDto::Practice;
-            }
-            2 => {
-                return crate::api::progress::MusicianLevelDto::YouthService;
-            }
-            3 => {
-                return crate::api::progress::MusicianLevelDto::OfficialService;
-            }
-            4 => {
-                return crate::api::progress::MusicianLevelDto::Officialized;
-            }
-            5 => {
-                let mut var_raw = <String>::sse_decode(deserializer);
-                return crate::api::progress::MusicianLevelDto::Unknown { raw: var_raw };
-            }
-            _ => {
-                unimplemented!("");
-            }
-        }
-    }
-}
-
 impl SseDecode for Option<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -865,11 +834,11 @@ impl SseDecode for Option<crate::api::roster::InstrumentDto> {
     }
 }
 
-impl SseDecode for Option<crate::api::progress::MusicianLevelDto> {
+impl SseDecode for Option<crate::api::progress::ProgressionLevelDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
-            return Some(<crate::api::progress::MusicianLevelDto>::sse_decode(
+            return Some(<crate::api::progress::ProgressionLevelDto>::sse_decode(
                 deserializer,
             ));
         } else {
@@ -899,7 +868,7 @@ impl SseDecode for crate::api::progress::ProgressAssessmentDto {
         let mut var_combinedPercent = <f64>::sse_decode(deserializer);
         let mut var_overallCheckpointPercent = <f64>::sse_decode(deserializer);
         let mut var_nextLevel =
-            <Option<crate::api::progress::MusicianLevelDto>>::sse_decode(deserializer);
+            <Option<crate::api::progress::ProgressionLevelDto>>::sse_decode(deserializer);
         return crate::api::progress::ProgressAssessmentDto {
             checkpoints: var_checkpoints,
             msa_relative_percent: var_msaRelativePercent,
@@ -907,6 +876,21 @@ impl SseDecode for crate::api::progress::ProgressAssessmentDto {
             combined_percent: var_combinedPercent,
             overall_checkpoint_percent: var_overallCheckpointPercent,
             next_level: var_nextLevel,
+        };
+    }
+}
+
+impl SseDecode for crate::api::progress::ProgressionLevelDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::progress::ProgressionLevelDto::Candidate,
+            1 => crate::api::progress::ProgressionLevelDto::Practice,
+            2 => crate::api::progress::ProgressionLevelDto::YouthService,
+            3 => crate::api::progress::ProgressionLevelDto::OfficialService,
+            4 => crate::api::progress::ProgressionLevelDto::Officialized,
+            _ => unreachable!("Invalid variant for ProgressionLevelDto: {}", inner),
         };
     }
 }
@@ -1476,35 +1460,6 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::authentication::LogoutOutcome
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::progress::MusicianLevelDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self {
-            crate::api::progress::MusicianLevelDto::Candidate => [0.into_dart()].into_dart(),
-            crate::api::progress::MusicianLevelDto::Practice => [1.into_dart()].into_dart(),
-            crate::api::progress::MusicianLevelDto::YouthService => [2.into_dart()].into_dart(),
-            crate::api::progress::MusicianLevelDto::OfficialService => [3.into_dart()].into_dart(),
-            crate::api::progress::MusicianLevelDto::Officialized => [4.into_dart()].into_dart(),
-            crate::api::progress::MusicianLevelDto::Unknown { raw } => {
-                [5.into_dart(), raw.into_into_dart().into_dart()].into_dart()
-            }
-            _ => {
-                unimplemented!("");
-            }
-        }
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::progress::MusicianLevelDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::progress::MusicianLevelDto>
-    for crate::api::progress::MusicianLevelDto
-{
-    fn into_into_dart(self) -> crate::api::progress::MusicianLevelDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::progress::ProgressAssessmentDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -1526,6 +1481,30 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::progress::ProgressAssessmentD
     for crate::api::progress::ProgressAssessmentDto
 {
     fn into_into_dart(self) -> crate::api::progress::ProgressAssessmentDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::progress::ProgressionLevelDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Candidate => 0.into_dart(),
+            Self::Practice => 1.into_dart(),
+            Self::YouthService => 2.into_dart(),
+            Self::OfficialService => 3.into_dart(),
+            Self::Officialized => 4.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::progress::ProgressionLevelDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::progress::ProgressionLevelDto>
+    for crate::api::progress::ProgressionLevelDto
+{
+    fn into_into_dart(self) -> crate::api::progress::ProgressionLevelDto {
         self
     }
 }
@@ -1798,7 +1777,7 @@ impl SseEncode for bool {
 impl SseEncode for crate::api::progress::CheckpointDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::api::progress::MusicianLevelDto>::sse_encode(self.level, serializer);
+        <crate::api::progress::ProgressionLevelDto>::sse_encode(self.level, serializer);
         <crate::api::progress::CheckpointStatusDto>::sse_encode(self.status, serializer);
         <crate::api::progress::RequirementStatusDto>::sse_encode(self.requirement, serializer);
     }
@@ -2069,36 +2048,6 @@ impl SseEncode for crate::api::authentication::LogoutOutcomeDto {
     }
 }
 
-impl SseEncode for crate::api::progress::MusicianLevelDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        match self {
-            crate::api::progress::MusicianLevelDto::Candidate => {
-                <i32>::sse_encode(0, serializer);
-            }
-            crate::api::progress::MusicianLevelDto::Practice => {
-                <i32>::sse_encode(1, serializer);
-            }
-            crate::api::progress::MusicianLevelDto::YouthService => {
-                <i32>::sse_encode(2, serializer);
-            }
-            crate::api::progress::MusicianLevelDto::OfficialService => {
-                <i32>::sse_encode(3, serializer);
-            }
-            crate::api::progress::MusicianLevelDto::Officialized => {
-                <i32>::sse_encode(4, serializer);
-            }
-            crate::api::progress::MusicianLevelDto::Unknown { raw } => {
-                <i32>::sse_encode(5, serializer);
-                <String>::sse_encode(raw, serializer);
-            }
-            _ => {
-                unimplemented!("");
-            }
-        }
-    }
-}
-
 impl SseEncode for Option<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2139,12 +2088,12 @@ impl SseEncode for Option<crate::api::roster::InstrumentDto> {
     }
 }
 
-impl SseEncode for Option<crate::api::progress::MusicianLevelDto> {
+impl SseEncode for Option<crate::api::progress::ProgressionLevelDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
-            <crate::api::progress::MusicianLevelDto>::sse_encode(value, serializer);
+            <crate::api::progress::ProgressionLevelDto>::sse_encode(value, serializer);
         }
     }
 }
@@ -2167,7 +2116,29 @@ impl SseEncode for crate::api::progress::ProgressAssessmentDto {
         <f64>::sse_encode(self.method_relative_percent, serializer);
         <f64>::sse_encode(self.combined_percent, serializer);
         <f64>::sse_encode(self.overall_checkpoint_percent, serializer);
-        <Option<crate::api::progress::MusicianLevelDto>>::sse_encode(self.next_level, serializer);
+        <Option<crate::api::progress::ProgressionLevelDto>>::sse_encode(
+            self.next_level,
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::api::progress::ProgressionLevelDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::progress::ProgressionLevelDto::Candidate => 0,
+                crate::api::progress::ProgressionLevelDto::Practice => 1,
+                crate::api::progress::ProgressionLevelDto::YouthService => 2,
+                crate::api::progress::ProgressionLevelDto::OfficialService => 3,
+                crate::api::progress::ProgressionLevelDto::Officialized => 4,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 

@@ -26,14 +26,11 @@ class ProgressMapper {
     methodMet: dto.requirement.methodMet,
   );
 
-  static ReportedLevel _toLevel(MusicianLevelDto level) => switch (level) {
-    MusicianLevelDto_Candidate() => const KnownLevel(Level.candidate),
-    MusicianLevelDto_Practice() => const KnownLevel(Level.practice),
-    MusicianLevelDto_YouthService() => const KnownLevel(Level.youthService),
-    MusicianLevelDto_OfficialService() => const KnownLevel(
-      Level.officialService,
-    ),
-    MusicianLevelDto_Officialized() => const KnownLevel(Level.officialized),
-    MusicianLevelDto_Unknown(:final raw) => UnrecognizedLevel(raw),
+  static Level _toLevel(ProgressionLevelDto level) => switch (level) {
+    ProgressionLevelDto.candidate => Level.candidate,
+    ProgressionLevelDto.practice => Level.practice,
+    ProgressionLevelDto.youthService => Level.youthService,
+    ProgressionLevelDto.officialService => Level.officialService,
+    ProgressionLevelDto.officialized => Level.officialized,
   };
 }

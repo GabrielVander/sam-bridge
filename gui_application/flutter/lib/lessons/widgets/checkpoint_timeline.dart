@@ -29,9 +29,7 @@ final class CheckpointTimeline extends StatelessWidget {
             const SizedBox(height: 20),
             if (nextLevel != null) ...[
               Text(
-                context.l10n.progressTowards(
-                  context.l10n.reportedLevelName(nextLevel),
-                ),
+                context.l10n.progressTowards(context.l10n.levelName(nextLevel)),
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               const SizedBox(height: 10),
@@ -117,7 +115,7 @@ final class _CheckpointDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final label = context.l10n.reportedLevelName(checkpoint.level);
+    final label = context.l10n.levelName(checkpoint.level);
     final (icon, color, tooltip) = switch (checkpoint.status) {
       CheckpointStatus.achieved => (
         Icons.check_circle,
