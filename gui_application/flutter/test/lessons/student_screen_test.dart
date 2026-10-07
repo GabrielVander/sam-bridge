@@ -20,6 +20,15 @@ void main() {
       );
     });
 
+    testWidgets('shows the level SAM wrote when it is not recognised', (
+      tester,
+    ) async {
+      await pumpStudent(tester, progress: levelNotRecognized('EXÓTICO'));
+
+      expect(find.text('nível não reconhecido'), findsOneWidget);
+      expect(find.text('Valor: EXÓTICO'), findsOneWidget);
+    });
+
     testWidgets('explains that progress is only for musicians', (tester) async {
       await pumpStudent(tester, progress: notAMusician());
 
