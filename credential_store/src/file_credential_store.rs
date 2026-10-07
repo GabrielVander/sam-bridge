@@ -174,10 +174,13 @@ const fn restrict_permissions(_path: &Path, _mode: u32) -> std::io::Result<()> {
     Ok(())
 }
 
+// The OS random source and AEAD over a few bytes are not expected to fail.
+#[coverage(off)]
 fn key_generation_failed(error: getrandom::Error) -> anyhow::Error {
     anyhow::anyhow!("Failed to generate encryption key: {error}")
 }
 
+#[coverage(off)]
 #[allow(clippy::needless_pass_by_value)] // `map_err` hands the error over by value
 fn encryption_failed(error: cocoon::Error) -> anyhow::Error {
     anyhow::anyhow!("Failed to encrypt credential file: {error:?}")
