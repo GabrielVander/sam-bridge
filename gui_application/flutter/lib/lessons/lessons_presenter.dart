@@ -12,6 +12,7 @@ import 'package:flutter_application/rust/api/progress.dart';
 class LessonsPresenter extends CubitSignal<LessonsState> {
   final RetrieveStudentLessonsUseCase _retrieveStudentLessons;
   final AssessStudentProgressUseCase _assessStudentProgress;
+  int _latestLoad = 0;
 
   LessonsPresenter({
     required this._retrieveStudentLessons,
@@ -19,6 +20,11 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
   }) : super(initialState: const LessonsIdle());
 
   Future<void> load(String studentId) async {
+    final int thisLoad = ++_latestLoad;
+    void emitIfLatest(LessonsState state) {
+      if (thisLoad == _latestLoad) emit(state);
+    }
+
     emit(const LessonsLoading());
     final progressFuture = _assessProgress(studentId);
     try {
@@ -28,17 +34,17 @@ class LessonsPresenter extends CubitSignal<LessonsState> {
 
       switch (lessonsOutcome) {
         case RetrieveStudentLessonsOutcomeDto_Success(:final lessons):
-          emit(
+          emitIfLatest(
             LessonsLoaded(
               LessonsMapper.toViewModel(lessons),
               await progressFuture,
             ),
           );
         case RetrieveStudentLessonsOutcomeDto_Failure(:final report):
-          emit(LessonsFailure(ErrorReportMapper.toViewModel(report)));
+          emitIfLatest(LessonsFailure(ErrorReportMapper.toViewModel(report)));
       }
     } catch (e) {
-      emit(LessonsFailure(ErrorReportMapper.fromThrown(e)));
+      emitIfLatest(LessonsFailure(ErrorReportMapper.fromThrown(e)));
     }
   }
 

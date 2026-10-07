@@ -201,6 +201,51 @@ void main() {
       final loaded = cubit.stateValue as LessonsLoaded;
       expect(loaded.progress, isA<ProgressNotAMusician>());
     });
+
+    test(
+      "a superseded load's lessons never replace the latest student's",
+      () async {
+        final pending = {'A': pendingLessons(), 'B': pendingLessons()};
+        final cubit = _buildCubit(
+          retrieveStudentLessons: ({required studentId}) =>
+              pending[studentId]!.future,
+        );
+
+        final loadA = cubit.load('A');
+        final loadB = cubit.load('B');
+        pending['B']!.complete(
+          lessonsRetrieved(studentLessons(msa: [lesson(id: 'B')])),
+        );
+        await loadB;
+        pending['A']!.complete(
+          lessonsRetrieved(studentLessons(msa: [lesson(id: 'A')])),
+        );
+        await loadA;
+
+        final loaded = cubit.stateValue as LessonsLoaded;
+        expect(loaded.view.msa.single.id, 'B');
+      },
+    );
+
+    test(
+      "a superseded load's failure never replaces the latest student's lessons",
+      () async {
+        final pending = {'A': pendingLessons(), 'B': pendingLessons()};
+        final cubit = _buildCubit(
+          retrieveStudentLessons: ({required studentId}) =>
+              pending[studentId]!.future,
+        );
+
+        final loadA = cubit.load('A');
+        final loadB = cubit.load('B');
+        pending['B']!.complete(lessonsRetrieved());
+        await loadB;
+        pending['A']!.complete(lessonsFailed(networkFailure('A failed')));
+        await loadA;
+
+        expect(cubit.stateValue, isA<LessonsLoaded>());
+      },
+    );
   });
 }
 
