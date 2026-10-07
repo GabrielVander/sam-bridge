@@ -95,6 +95,29 @@ fn a_musician_rehearsing_at_the_youth_meeting_has_reached_the_youth_meeting() {
 }
 
 #[test]
+fn a_musician_in_practice_has_reached_practice_but_not_the_youth_meeting() {
+    let assessment: ProgressAssessment =
+        assess(&MusicianLevel::Practice, Instrument::Violin, &[], &[]).unwrap();
+
+    let statuses: Vec<(ProgressionLevel, CheckpointStatus)> = assessment
+        .checkpoints
+        .iter()
+        .map(|c| (c.level, c.status))
+        .collect();
+
+    assert_eq!(
+        statuses,
+        vec![
+            (ProgressionLevel::Candidate, CheckpointStatus::Achieved),
+            (ProgressionLevel::Practice, CheckpointStatus::Achieved),
+            (ProgressionLevel::YouthService, CheckpointStatus::Pending),
+            (ProgressionLevel::OfficialService, CheckpointStatus::Pending),
+            (ProgressionLevel::Officialized, CheckpointStatus::Pending),
+        ]
+    );
+}
+
+#[test]
 fn meeting_a_higher_levels_requirements_makes_it_ready_for_the_exam() {
     let assessment: ProgressAssessment = assess(
         &MusicianLevel::Candidate,
