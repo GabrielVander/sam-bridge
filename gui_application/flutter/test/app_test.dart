@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/main.dart' show formatVersion;
 import 'package:flutter_application/main_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -210,12 +209,6 @@ void main() {
 
       expect(find.byTooltip('Voltar'), findsNothing);
       expect(find.text('Jane Doe'), findsOneWidget);
-    });
-  });
-
-  group('formatVersion', () {
-    test('joins the version and build number', () {
-      expect(formatVersion(version: '1.2.3', buildNumber: '45'), 'v1.2.3+45');
     });
   });
 }

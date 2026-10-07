@@ -6,6 +6,7 @@ import 'package:flutter_application/lessons/lessons_presenter.dart';
 import 'package:flutter_application/roster/students_presenter.dart';
 import 'package:flutter_application/settings/settings_presenter.dart';
 import 'package:flutter_application/startup_failure_app.dart';
+import 'package:flutter_application/version.dart';
 import 'package:flutter_application/rust/api.dart';
 import 'package:flutter_application/rust/api/error_report.dart';
 import 'package:flutter_application/rust/frb_generated.dart';
@@ -103,6 +104,3 @@ Future<void> _start({
     ),
   );
 }
-
-String formatVersion({required String version, required String buildNumber}) =>
-    'v$version+$buildNumber';
