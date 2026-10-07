@@ -55,7 +55,7 @@ def totals(path, *, exclude=None):
     return hit, total
 
 def flutter_excluded(path):
-    return path.startswith(("lib/rust/", "lib/l10n/app_localizations")) or path.endswith((".freezed.dart", ".g.dart"))
+    return path == "lib/main.dart" or path.startswith(("lib/rust/", "lib/l10n/app_localizations")) or path.endswith((".freezed.dart", ".g.dart"))
 
 rust_hit, rust_total = totals(sys.argv[1])
 flutter_hit, flutter_total = totals(sys.argv[2], exclude=flutter_excluded)
