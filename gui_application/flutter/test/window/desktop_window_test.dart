@@ -27,7 +27,11 @@ void main() {
     });
   }
 
-  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+  for (final platform in [
+    TargetPlatform.android,
+    TargetPlatform.iOS,
+    TargetPlatform.fuchsia,
+  ]) {
     test('leaves the ${platform.name} window to the platform', () async {
       final window = FakePlatformWindow()..install();
 
