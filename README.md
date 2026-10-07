@@ -69,6 +69,7 @@ scripts/coverage.sh
 
 # Regenerate FRB bindings after changing anything under gui_application/src/api/
 cd gui_application/flutter && flutter_rust_bridge_codegen generate
+```
 
 ## Localization
 
