@@ -8,7 +8,6 @@ authentication = { workspace = true }
 anyhow = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-dirs = { workspace = true }
 cocoon = { workspace = true, features = ["std"] }
 getrandom = { workspace = true }
 thiserror = { workspace = true }

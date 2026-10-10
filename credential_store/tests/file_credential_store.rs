@@ -3,7 +3,7 @@ use authentication::application::gateways::{
     SaveCredentialGateway, SaveCredentialGatewayError,
 };
 use authentication::domain::entities::{Credential, Email, Password};
-use credential_store::{FileCredentialStore, NoDataDirectory};
+use credential_store::FileCredentialStore;
 
 #[test]
 fn a_new_store_holds_no_credential() {
@@ -355,34 +355,6 @@ fn files_have_restricted_permissions() {
     let key_meta: std::fs::Metadata =
         std::fs::metadata(dir.path().join("key.bin")).expect("key meta");
     assert_eq!(key_meta.permissions().mode() & 0o777, 0o600);
-}
-
-#[test]
-fn without_a_platform_data_dir_there_is_nowhere_to_store_credentials() {
-    let result: Result<FileCredentialStore, NoDataDirectory> =
-        FileCredentialStore::in_platform_data_dir(None);
-
-    assert_eq!(result.err(), Some(NoDataDirectory));
-}
-
-#[test]
-fn a_store_in_the_platform_data_dir_keeps_its_credentials_there() {
-    let base: tempfile::TempDir = tempfile::tempdir().expect("tempdir");
-    let store: FileCredentialStore =
-        FileCredentialStore::in_platform_data_dir(Some(base.path().to_path_buf()))
-            .expect("a platform data dir is available");
-
-    store.save(&credential()).expect("save should succeed");
-
-    assert!(base.path().join("sam_bridge").join("session.enc").exists());
-}
-
-#[test]
-fn the_missing_data_dir_error_explains_itself() {
-    assert_eq!(
-        NoDataDirectory.to_string(),
-        "no platform data directory is available to store credentials"
-    );
 }
 
 fn temp_store() -> std::io::Result<(FileCredentialStore, tempfile::TempDir)> {

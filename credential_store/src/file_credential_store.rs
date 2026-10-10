@@ -15,18 +15,6 @@ pub struct FileCredentialStore {
 }
 
 impl FileCredentialStore {
-    pub fn new() -> Result<Self, NoDataDirectory> {
-        Self::in_platform_data_dir(dirs::data_local_dir())
-    }
-
-    pub fn in_platform_data_dir(
-        platform_data_dir: Option<PathBuf>,
-    ) -> Result<Self, NoDataDirectory> {
-        platform_data_dir
-            .map(|base| Self::under(&base))
-            .ok_or(NoDataDirectory)
-    }
-
     #[must_use]
     pub fn under(base: &Path) -> Self {
         let data_dir: PathBuf = base.join("sam_bridge");
@@ -49,10 +37,6 @@ impl FileCredentialStore {
         }
     }
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
-#[error("no platform data directory is available to store credentials")]
-pub struct NoDataDirectory;
 
 impl SaveCredentialGateway for FileCredentialStore {
     fn save(&self, credential: &Credential) -> Result<(), SaveCredentialGatewayError> {
