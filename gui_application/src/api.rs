@@ -20,9 +20,11 @@ use crate::api::progress::AssessStudentProgressOutcomeDto;
 use crate::api::roster::RetrieveAllAvailableStudentsOutcomeDto;
 use crate::composition::{self, Config};
 use flutter_rust_bridge::frb;
+use std::path::PathBuf;
 
-pub fn build_main_application() -> Result<ApplicationFacade, ErrorReportDto> {
-    composition::build_application(&Config::production()).map_err(ErrorReportDto::from)
+pub fn build_main_application(data_directory: String) -> Result<ApplicationFacade, ErrorReportDto> {
+    composition::build_application(&Config::production(), &PathBuf::from(data_directory))
+        .map_err(ErrorReportDto::from)
 }
 
 pub struct ApplicationFacade {

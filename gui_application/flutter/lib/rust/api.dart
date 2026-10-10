@@ -14,8 +14,11 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `new`
 
-Future<ApplicationFacade> buildMainApplication() =>
-    RustLib.instance.api.crateApiBuildMainApplication();
+Future<ApplicationFacade> buildMainApplication({
+  required String dataDirectory,
+}) => RustLib.instance.api.crateApiBuildMainApplication(
+  dataDirectory: dataDirectory,
+);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ApplicationFacade>>
 abstract class ApplicationFacade implements RustOpaqueInterface {

@@ -1,8 +1,7 @@
 use std::time::Duration;
 
-use credential_store::{FileCredentialStore, NoDataDirectory};
 use gui_application::api::ApplicationFacade;
-use gui_application::api::authentication::LoginOutcomeDto;
+use gui_application::api::authentication::{LoginOutcomeDto, RestoreSessionOutcomeDto};
 use gui_application::api::error_report::{ErrorKindDto, ErrorReportDto};
 use gui_application::api::roster::RetrieveAllAvailableStudentsOutcomeDto;
 use gui_application::composition::{
@@ -128,29 +127,45 @@ fn a_sam_slower_than_the_request_timeout_fails_as_a_network_error() {
 }
 
 #[test]
+fn credentials_remembered_at_login_are_restored_from_the_same_data_directory() {
+    smol::block_on(async {
+        let mock_server: MockServer = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/autenticar"))
+            .respond_with(ResponseTemplate::new(303))
+            .mount(&mock_server)
+            .await;
+        let data_dir = tempfile::tempdir().unwrap();
+        let first_run = build_application_with(
+            &config_for(&mock_server.uri()),
+            data_dir.path(),
+            http_client_builder(REQUEST_TIMEOUT),
+        )
+        .unwrap();
+        assert_eq!(
+            first_run.login("user@example.com".to_owned(), "hunter2".to_owned()),
+            LoginOutcomeDto::Successful
+        );
+
+        let second_run = build_application_with(
+            &config_for(&mock_server.uri()),
+            data_dir.path(),
+            http_client_builder(REQUEST_TIMEOUT),
+        )
+        .unwrap();
+
+        assert_eq!(
+            second_run.restore_session(),
+            RestoreSessionOutcomeDto::Restored
+        );
+    });
+}
+
+#[test]
 fn the_request_timeout_outlasts_the_slowest_sam_response_observed() {
     const SLOWEST_OBSERVED_RESPONSE: Duration = Duration::from_millis(87_500);
 
     assert!(REQUEST_TIMEOUT > SLOWEST_OBSERVED_RESPONSE);
-}
-
-#[test]
-fn without_a_data_directory_the_application_cannot_be_built() {
-    let result = build_application_with(
-        &config_for("http://127.0.0.1:1"),
-        Err(NoDataDirectory),
-        http_client_builder(REQUEST_TIMEOUT),
-    );
-
-    assert_eq!(
-        result.err().map(ErrorReportDto::from),
-        Some(ErrorReportDto {
-            kind: ErrorKindDto::LocalStorage,
-            details: "Unable to set up the credential storage: \
-                      no platform data directory is available to store credentials"
-                .to_owned(),
-        })
-    );
 }
 
 #[test]
@@ -162,7 +177,7 @@ fn when_the_http_client_cannot_be_built_the_application_reports_why() {
 
     let result = build_application_with(
         &config_for("http://127.0.0.1:1"),
-        Ok(FileCredentialStore::under(credential_dir.path())),
+        credential_dir.path(),
         impossible_tls_range,
     );
 
@@ -184,7 +199,7 @@ fn facade_talking_to(
     let credential_dir = tempfile::tempdir().ok()?;
     let facade = build_application_with(
         &config_for(&mock_server.uri()),
-        Ok(FileCredentialStore::under(credential_dir.path())),
+        credential_dir.path(),
         http_client_builder(timeout),
     )
     .ok()?;

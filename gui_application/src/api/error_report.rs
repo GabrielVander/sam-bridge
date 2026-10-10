@@ -28,7 +28,6 @@ pub enum ErrorKindDto {
 impl From<StartupError> for ErrorReportDto {
     fn from(error: StartupError) -> Self {
         let kind: ErrorKindDto = match error {
-            StartupError::CredentialStorage(_) => ErrorKindDto::LocalStorage,
             StartupError::HttpClient(_) => ErrorKindDto::Unknown,
         };
 

@@ -14,6 +14,7 @@ import 'package:flutter_application/window/desktop_window.dart'
     if (dart.library.js_interop) 'package:flutter_application/window/desktop_window_web.dart';
 import 'package:flutter_application/window/window_controls.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _chosenLocationsKey = 'roster.chosenLocations';
@@ -32,6 +33,7 @@ Future<void> main() async {
       );
 
   await _start(
+    dataDirectory: (await getApplicationSupportDirectory()).path,
     versionDisplay: formatVersion(
       version: packageInfo.version,
       buildNumber: packageInfo.buildNumber,
@@ -48,6 +50,7 @@ Future<void> main() async {
 }
 
 Future<void> _start({
+  required String dataDirectory,
   required String versionDisplay,
   required WindowControls? windowControls,
   required SharedPreferencesWithCache preferences,
@@ -56,12 +59,13 @@ Future<void> _start({
   final ApplicationFacade application;
 
   try {
-    application = await buildMainApplication();
+    application = await buildMainApplication(dataDirectory: dataDirectory);
   } on ErrorReportDto catch (report) {
     runApp(
       StartupFailureApp(
         report: ErrorReportMapper.toViewModel(report),
         onRetry: () => _start(
+          dataDirectory: dataDirectory,
           versionDisplay: versionDisplay,
           windowControls: windowControls,
           preferences: preferences,

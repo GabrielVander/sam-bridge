@@ -115,7 +115,9 @@ abstract class RustLibApi extends BaseApi {
     required String studentId,
   });
 
-  Future<ApplicationFacade> crateApiBuildMainApplication();
+  Future<ApplicationFacade> crateApiBuildMainApplication({
+    required String dataDirectory,
+  });
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_ApplicationFacade;
@@ -366,11 +368,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<ApplicationFacade> crateApiBuildMainApplication() {
+  Future<ApplicationFacade> crateApiBuildMainApplication({
+    required String dataDirectory,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(dataDirectory, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -384,14 +389,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_error_report_dto,
         ),
         constMeta: kCrateApiBuildMainApplicationConstMeta,
-        argValues: [],
+        argValues: [dataDirectory],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta get kCrateApiBuildMainApplicationConstMeta =>
-      const TaskConstMeta(debugName: "build_main_application", argNames: []);
+      const TaskConstMeta(
+        debugName: "build_main_application",
+        argNames: ["dataDirectory"],
+      );
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_ApplicationFacade => wire

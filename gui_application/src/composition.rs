@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -5,7 +6,7 @@ use authentication::application::gateways::AuthorizeCredentialGateway;
 use authentication::application::use_cases::{
     LoginAndRememberCredentialsUseCase, LogoutUseCase, RestoreSessionUseCase,
 };
-use credential_store::{FileCredentialStore, NoDataDirectory};
+use credential_store::FileCredentialStore;
 use sam::{
     authentication::adapters::gateways::AuthorizationGatewaySamImpl,
     client::{CacheTtl, SamClient, SamClientCacheDecorator, SamClientImpl, SystemClock},
@@ -27,12 +28,11 @@ pub const REQUEST_TIMEOUT: Duration = Duration::from_secs(120);
 const STUDENTS_CACHE_TTL: Duration = Duration::from_secs(300);
 const LESSONS_CACHE_TTL: Duration = Duration::from_secs(60);
 
-pub fn build_application(config: &Config) -> Result<ApplicationFacade, StartupError> {
-    build_application_with(
-        config,
-        FileCredentialStore::new(),
-        http_client_builder(REQUEST_TIMEOUT),
-    )
+pub fn build_application(
+    config: &Config,
+    data_directory: &Path,
+) -> Result<ApplicationFacade, StartupError> {
+    build_application_with(config, data_directory, http_client_builder(REQUEST_TIMEOUT))
 }
 
 pub struct Config {
@@ -58,18 +58,17 @@ impl Config {
 
 #[derive(Debug, thiserror::Error)]
 pub enum StartupError {
-    #[error("Unable to set up the credential storage")]
-    CredentialStorage(#[from] NoDataDirectory),
     #[error("Unable to build the HTTP client")]
     HttpClient(#[source] reqwest::Error),
 }
 
 pub fn build_application_with(
     config: &Config,
-    credential_store: Result<FileCredentialStore, NoDataDirectory>,
+    data_directory: &Path,
     http_client_builder: reqwest::blocking::ClientBuilder,
 ) -> Result<ApplicationFacade, StartupError> {
-    let file_credential_store: Arc<FileCredentialStore> = Arc::new(credential_store?);
+    let file_credential_store: Arc<FileCredentialStore> =
+        Arc::new(FileCredentialStore::under(data_directory));
 
     let reqwest_client: reqwest::blocking::Client = http_client_builder
         .build()
