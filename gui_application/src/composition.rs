@@ -135,8 +135,30 @@ pub fn build_application_with(
 }
 
 pub fn http_client_builder(timeout: Duration) -> reqwest::blocking::ClientBuilder {
-    reqwest::blocking::Client::builder()
+    let builder: reqwest::blocking::ClientBuilder = reqwest::blocking::Client::builder()
         .timeout(timeout)
         .redirect(reqwest::redirect::Policy::none())
-        .cookie_store(true)
+        .cookie_store(true);
+    trusting_platform_roots(builder)
+}
+
+#[cfg(not(target_os = "android"))]
+const fn trusting_platform_roots(
+    builder: reqwest::blocking::ClientBuilder,
+) -> reqwest::blocking::ClientBuilder {
+    builder
+}
+
+// The platform verifier needs a JNI initialisation on Android, and without it the first
+// TLS handshake panics reqwest's event loop thread, so Android trusts Mozilla's bundled
+// roots instead. `from_der` cannot fail with the rustls backend, it only copies the bytes.
+#[cfg(target_os = "android")]
+fn trusting_platform_roots(
+    builder: reqwest::blocking::ClientBuilder,
+) -> reqwest::blocking::ClientBuilder {
+    builder.tls_certs_only(
+        webpki_root_certs::TLS_SERVER_ROOT_CERTS
+            .iter()
+            .filter_map(|root| reqwest::Certificate::from_der(root).ok()),
+    )
 }

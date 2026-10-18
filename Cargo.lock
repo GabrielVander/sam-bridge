@@ -1119,6 +1119,7 @@ dependencies = [
  "student",
  "tempfile",
  "thiserror",
+ "webpki-root-certs",
  "wiremock",
 ]
 

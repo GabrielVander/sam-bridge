@@ -18,6 +18,9 @@ reqwest = { workspace = true }
 chrono = { workspace = true }
 thiserror = { workspace = true }
 
+[target.'cfg(target_os = "android")'.dependencies]
+webpki-root-certs = { workspace = true }
+
 [dev-dependencies]
 pretty_assertions = { workspace = true }
 smol = { workspace = true }
